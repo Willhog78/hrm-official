@@ -1,0 +1,13 @@
+{
+  "name": "trust_failure",
+  "event": {
+    "label": "institution_failure",
+    "x": 50,
+    "y": 50,
+    "radius": 30,
+    "stress_delta": 0.20,
+    "trust_delta": -0.15,
+    "health_delta": 0.0
+  },
+  "ticks": 30
+}
