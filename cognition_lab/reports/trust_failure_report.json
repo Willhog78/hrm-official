@@ -1,6 +1,8 @@
 {
   "experiment": "trust_failure",
-  "ticks": 30,
+  "repeat": 1,
+  "gap_ticks": 0,
+  "final_ticks": 30,
   "event": {
     "label": "institution_failure",
     "x": 50,
@@ -19,7 +21,7 @@
     "health": 0.8538,
     "valence": 0.5344
   },
-  "immediate": {
+  "after_repeated_events": {
     "stress": 0.3843,
     "trust": 0.5479,
     "fear": 0.2772,
@@ -27,14 +29,36 @@
     "valence": 0.5306
   },
   "after": {
-    "stress": 0.3171,
-    "trust": 0.5424,
-    "fear": 0.2112,
+    "stress": 0.3186,
+    "trust": 0.5425,
+    "fear": 0.2124,
     "health": 0.8552,
     "valence": 0.5241
   },
+  "event_steps": [
+    {
+      "event_number": 1,
+      "tick": 0,
+      "averages": {
+        "stress": 0.3843,
+        "trust": 0.5479,
+        "fear": 0.2772,
+        "health": 0.8538,
+        "valence": 0.5306
+      },
+      "delta_from_previous": {
+        "stress": 0.0151,
+        "trust": -0.0113,
+        "fear": 0.0068,
+        "health": 0.0,
+        "valence": -0.0038
+      },
+      "impacted_agents": 69,
+      "average_memory_multiplier": 1.0
+    }
+  ],
   "delta": {
-    "event_impact": {
+    "event_phase": {
       "stress": 0.0151,
       "trust": -0.0113,
       "fear": 0.0068,
@@ -42,24 +66,24 @@
       "valence": -0.0038
     },
     "post_event_recovery": {
-      "stress": -0.0672,
-      "trust": -0.0055,
-      "fear": -0.066,
+      "stress": -0.0657,
+      "trust": -0.0054,
+      "fear": -0.0648,
       "health": 0.0014,
       "valence": -0.0065
     },
     "total": {
-      "stress": -0.0521,
-      "trust": -0.0168,
-      "fear": -0.0592,
+      "stress": -0.0506,
+      "trust": -0.0167,
+      "fear": -0.058,
       "health": 0.0014,
       "valence": -0.0103
     }
   },
   "interpretation": {
-    "event_stress": "rose",
-    "event_trust": "fell",
-    "event_fear": "rose",
+    "event_phase_stress": "rose",
+    "event_phase_trust": "fell",
+    "event_phase_fear": "rose",
     "recovery_stress": "recovered",
     "recovery_fear": "recovered",
     "total_stress": "fell_or_stable",

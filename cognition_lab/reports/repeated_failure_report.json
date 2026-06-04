@@ -1,6 +1,8 @@
 {
   "experiment": "repeated_failure",
-  "ticks": 60,
+  "repeat": 3,
+  "gap_ticks": 10,
+  "final_ticks": 30,
   "event": {
     "label": "repeat_failure",
     "x": 50,
@@ -11,7 +13,7 @@
     "health_delta": -0.01
   },
   "population": 250,
-  "impacted_agents": 96,
+  "impacted_agents": 112,
   "before": {
     "stress": 0.3692,
     "trust": 0.5592,
@@ -19,47 +21,109 @@
     "health": 0.8538,
     "valence": 0.5344
   },
-  "immediate": {
-    "stress": 0.4026,
-    "trust": 0.5369,
-    "fear": 0.2855,
-    "health": 0.8527,
-    "valence": 0.526
+  "after_repeated_events": {
+    "stress": 0.4405,
+    "trust": 0.4729,
+    "fear": 0.277,
+    "health": 0.8505,
+    "valence": 0.4994
   },
   "after": {
-    "stress": 0.2818,
-    "trust": 0.529,
-    "fear": 0.1756,
-    "health": 0.8555,
-    "valence": 0.5161
+    "stress": 0.3653,
+    "trust": 0.4743,
+    "fear": 0.2189,
+    "health": 0.852,
+    "valence": 0.4986
   },
+  "event_steps": [
+    {
+      "event_number": 1,
+      "tick": 0,
+      "averages": {
+        "stress": 0.4026,
+        "trust": 0.5369,
+        "fear": 0.2855,
+        "health": 0.8527,
+        "valence": 0.526
+      },
+      "delta_from_previous": {
+        "stress": 0.0334,
+        "trust": -0.0223,
+        "fear": 0.0151,
+        "health": -0.0011,
+        "valence": -0.0084
+      },
+      "impacted_agents": 96,
+      "average_memory_multiplier": 1.0
+    },
+    {
+      "event_number": 2,
+      "tick": 10,
+      "averages": {
+        "stress": 0.418,
+        "trust": 0.507,
+        "fear": 0.2781,
+        "health": 0.8518,
+        "valence": 0.5134
+      },
+      "delta_from_previous": {
+        "stress": 0.0428,
+        "trust": -0.0285,
+        "fear": 0.0192,
+        "health": -0.0014,
+        "valence": -0.0107
+      },
+      "impacted_agents": 102,
+      "average_memory_multiplier": 1.1179
+    },
+    {
+      "event_number": 3,
+      "tick": 20,
+      "averages": {
+        "stress": 0.4405,
+        "trust": 0.4729,
+        "fear": 0.277,
+        "health": 0.8505,
+        "valence": 0.4994
+      },
+      "delta_from_previous": {
+        "stress": 0.0503,
+        "trust": -0.0336,
+        "fear": 0.0231,
+        "health": -0.0017,
+        "valence": -0.0128
+      },
+      "impacted_agents": 112,
+      "average_memory_multiplier": 1.228
+    }
+  ],
   "delta": {
-    "event_impact": {
-      "stress": 0.0334,
-      "trust": -0.0223,
-      "fear": 0.0151,
-      "health": -0.0011,
-      "valence": -0.0084
+    "event_phase": {
+      "stress": 0.0713,
+      "trust": -0.0863,
+      "fear": 0.0066,
+      "health": -0.0033,
+      "valence": -0.035
     },
     "post_event_recovery": {
-      "stress": -0.1208,
-      "trust": -0.0079,
-      "fear": -0.1099,
-      "health": 0.0028,
-      "valence": -0.0099
+      "stress": -0.0752,
+      "trust": 0.0014,
+      "fear": -0.0581,
+      "health": 0.0015,
+      "valence": -0.0008
     },
     "total": {
-      "stress": -0.0874,
-      "trust": -0.0302,
-      "fear": -0.0948,
-      "health": 0.0017,
-      "valence": -0.0183
+      "stress": -0.0039,
+      "trust": -0.0849,
+      "fear": -0.0515,
+      "health": -0.0018,
+      "valence": -0.0358
     }
   },
   "interpretation": {
-    "event_stress": "rose",
-    "event_trust": "fell",
-    "event_fear": "rose",
+    "event_phase_stress": "rose",
+    "event_phase_trust": "fell",
+    "event_phase_fear": "rose",
     "recovery_stress": "recovered",
     "recovery_fear": "recovered",
     "total_stress": "fell_or_stable",

@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 from statistics import mean
 
-# Ensure HRM_WORKING root is importable even when this script is run directly.
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -30,10 +29,29 @@ def averages(state):
 
 
 def delta(a, b):
-    return {
-        key: round(b[key] - a[key], 4)
-        for key in a
-    }
+    return {key: round(b[key] - a[key], 4) for key in a}
+
+
+def count_impacted_agents(state, label):
+    return sum(
+        1
+        for agent in state["agents"]
+        if any(m.get("event") == label for m in agent.get("memory", []))
+    )
+
+
+def average_memory_multiplier(state, label):
+    values = []
+
+    for agent in state["agents"]:
+        for memory in agent.get("memory", []):
+            if memory.get("event") == label:
+                values.append(float(memory.get("memory_multiplier", 1.0)))
+
+    if not values:
+        return 1.0
+
+    return round(mean(values), 4)
 
 
 def run_experiment(path: Path):
@@ -41,46 +59,77 @@ def run_experiment(path: Path):
 
     kernel = HRMKernel()
 
+    event = experiment["event"]
+    label = event["label"]
+    repeat = max(1, int(experiment.get("repeat", 1)))
+    gap_ticks = max(0, int(experiment.get("gap_ticks", 0)))
+    final_ticks = max(0, int(experiment.get("ticks", 30)))
+
     before = kernel.export_state()
     before_avg = averages(before)
 
-    kernel.inject_event(experiment["event"])
+    event_steps = []
 
-    immediate = kernel.export_state()
-    immediate_avg = averages(immediate)
+    previous_avg = before_avg
 
-    kernel.tick(experiment.get("ticks", 30))
+    for i in range(repeat):
+        kernel.inject_event(event)
+
+        immediate_state = kernel.export_state()
+        immediate_avg = averages(immediate_state)
+
+        event_steps.append(
+            {
+                "event_number": i + 1,
+                "tick": immediate_state["tick"],
+                "averages": immediate_avg,
+                "delta_from_previous": delta(previous_avg, immediate_avg),
+                "impacted_agents": count_impacted_agents(immediate_state, label),
+                "average_memory_multiplier": average_memory_multiplier(immediate_state, label),
+            }
+        )
+
+        previous_avg = immediate_avg
+
+        if i < repeat - 1 and gap_ticks > 0:
+            kernel.tick(gap_ticks)
+            gap_state = kernel.export_state()
+            previous_avg = averages(gap_state)
+
+    after_repeated_events = kernel.export_state()
+    after_repeated_avg = averages(after_repeated_events)
+
+    if final_ticks > 0:
+        kernel.tick(final_ticks)
 
     after = kernel.export_state()
     after_avg = averages(after)
 
-    immediate_delta = delta(before_avg, immediate_avg)
-    recovery_delta = delta(immediate_avg, after_avg)
+    event_phase_delta = delta(before_avg, after_repeated_avg)
+    recovery_delta = delta(after_repeated_avg, after_avg)
     total_delta = delta(before_avg, after_avg)
-
-    impacted_agents = [
-        a for a in after["agents"]
-        if any(m.get("event") == experiment["event"]["label"] for m in a.get("memory", []))
-    ]
 
     report = {
         "experiment": experiment["name"],
-        "ticks": experiment.get("ticks", 30),
-        "event": experiment["event"],
+        "repeat": repeat,
+        "gap_ticks": gap_ticks,
+        "final_ticks": final_ticks,
+        "event": event,
         "population": len(after["agents"]),
-        "impacted_agents": len(impacted_agents),
+        "impacted_agents": count_impacted_agents(after, label),
         "before": before_avg,
-        "immediate": immediate_avg,
+        "after_repeated_events": after_repeated_avg,
         "after": after_avg,
+        "event_steps": event_steps,
         "delta": {
-            "event_impact": immediate_delta,
+            "event_phase": event_phase_delta,
             "post_event_recovery": recovery_delta,
             "total": total_delta,
         },
         "interpretation": {
-            "event_stress": "rose" if immediate_delta["stress"] > 0 else "fell_or_stable",
-            "event_trust": "fell" if immediate_delta["trust"] < 0 else "rose_or_stable",
-            "event_fear": "rose" if immediate_delta["fear"] > 0 else "fell_or_stable",
+            "event_phase_stress": "rose" if event_phase_delta["stress"] > 0 else "fell_or_stable",
+            "event_phase_trust": "fell" if event_phase_delta["trust"] < 0 else "rose_or_stable",
+            "event_phase_fear": "rose" if event_phase_delta["fear"] > 0 else "fell_or_stable",
             "recovery_stress": "recovered" if recovery_delta["stress"] < 0 else "increased_or_stable",
             "recovery_fear": "recovered" if recovery_delta["fear"] < 0 else "increased_or_stable",
             "total_stress": "rose" if total_delta["stress"] > 0 else "fell_or_stable",
@@ -97,13 +146,27 @@ def run_experiment(path: Path):
     print("====================")
     print(f"Experiment: {report['experiment']}")
     print(f"Population: {report['population']}")
+    print(f"Repeat: {repeat}")
+    print(f"Gap ticks: {gap_ticks}")
+    print(f"Final recovery ticks: {final_ticks}")
     print(f"Impacted agents: {report['impacted_agents']}")
     print()
-    print("Before:   ", report["before"])
-    print("Immediate:", report["immediate"])
-    print("After:    ", report["after"])
+    print("Before:               ", report["before"])
+    print("After repeated events:", report["after_repeated_events"])
+    print("After final recovery: ", report["after"])
     print()
-    print("Event impact delta:    ", report["delta"]["event_impact"])
+
+    print("Event steps:")
+    for step in event_steps:
+        print(
+            f"  Event {step['event_number']}: "
+            f"delta={step['delta_from_previous']} "
+            f"memory_multiplier={step['average_memory_multiplier']} "
+            f"impacted={step['impacted_agents']}"
+        )
+
+    print()
+    print("Event phase delta:     ", report["delta"]["event_phase"])
     print("Recovery delta:        ", report["delta"]["post_event_recovery"])
     print("Total delta:           ", report["delta"]["total"])
     print()

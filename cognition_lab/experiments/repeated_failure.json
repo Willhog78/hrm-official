@@ -9,5 +9,7 @@
     "trust_delta": -0.20,
     "health_delta": -0.01
   },
-  "ticks": 60
+  "repeat": 3,
+  "gap_ticks": 10,
+  "ticks": 30
 }
