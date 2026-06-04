@@ -239,5 +239,493 @@
     "stress_scar": "scar_persisted",
     "fear_scar": "scar_persisted",
     "trust_scar": "scar_persisted"
+  },
+  "agent_life_history_report": {
+    "most_traumatized_agents": [
+      {
+        "id": "agent_00176",
+        "stress": 0.4656,
+        "trust": 0.1433,
+        "fear": 0.3141,
+        "valence": 0.2404,
+        "trauma_load": 0.2183,
+        "trust_damage": 0.3083,
+        "resilience": 0.4999,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00094",
+        "stress": 0.5605,
+        "trust": 0.1431,
+        "fear": 0.5886,
+        "valence": 0.4024,
+        "trauma_load": 0.2133,
+        "trust_damage": 0.3136,
+        "resilience": 0.4671,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00049",
+        "stress": 0.5321,
+        "trust": 0.1476,
+        "fear": 0.2378,
+        "valence": 0.2777,
+        "trauma_load": 0.2077,
+        "trust_damage": 0.3118,
+        "resilience": 0.529,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00131",
+        "stress": 0.696,
+        "trust": 0.0933,
+        "fear": 0.5367,
+        "valence": 0.4523,
+        "trauma_load": 0.2047,
+        "trust_damage": 0.2265,
+        "resilience": 0.2865,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00199",
+        "stress": 0.5242,
+        "trust": 0.155,
+        "fear": 0.3888,
+        "valence": 0.281,
+        "trauma_load": 0.2021,
+        "trust_damage": 0.3489,
+        "resilience": 0.3512,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00190",
+        "stress": 0.522,
+        "trust": 0.1017,
+        "fear": 0.4753,
+        "valence": 0.3808,
+        "trauma_load": 0.201,
+        "trust_damage": 0.23,
+        "resilience": 0.4062,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00098",
+        "stress": 0.523,
+        "trust": 0.1784,
+        "fear": 0.5561,
+        "valence": 0.2931,
+        "trauma_load": 0.2001,
+        "trust_damage": 0.3672,
+        "resilience": 0.5549,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00166",
+        "stress": 0.6645,
+        "trust": 0.1694,
+        "fear": 0.5151,
+        "valence": 0.2446,
+        "trauma_load": 0.2,
+        "trust_damage": 0.3796,
+        "resilience": 0.3925,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00076",
+        "stress": 0.4798,
+        "trust": 0.1139,
+        "fear": 0.4499,
+        "valence": 0.3224,
+        "trauma_load": 0.198,
+        "trust_damage": 0.2453,
+        "resilience": 0.5053,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00019",
+        "stress": 0.5676,
+        "trust": 0.1435,
+        "fear": 0.249,
+        "valence": 0.3004,
+        "trauma_load": 0.1952,
+        "trust_damage": 0.3202,
+        "resilience": 0.3821,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      }
+    ],
+    "most_trust_damaged_agents": [
+      {
+        "id": "agent_00138",
+        "stress": 0.6424,
+        "trust": 0.1946,
+        "fear": 0.4555,
+        "valence": 0.5642,
+        "trauma_load": 0.1863,
+        "trust_damage": 0.3872,
+        "resilience": 0.3776,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00166",
+        "stress": 0.6645,
+        "trust": 0.1694,
+        "fear": 0.5151,
+        "valence": 0.2446,
+        "trauma_load": 0.2,
+        "trust_damage": 0.3796,
+        "resilience": 0.3925,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00189",
+        "stress": 0.6166,
+        "trust": 0.1932,
+        "fear": 0.3421,
+        "valence": 0.4722,
+        "trauma_load": 0.1761,
+        "trust_damage": 0.3766,
+        "resilience": 0.6397,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00098",
+        "stress": 0.523,
+        "trust": 0.1784,
+        "fear": 0.5561,
+        "valence": 0.2931,
+        "trauma_load": 0.2001,
+        "trust_damage": 0.3672,
+        "resilience": 0.5549,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00026",
+        "stress": 0.5364,
+        "trust": 0.2002,
+        "fear": 0.3269,
+        "valence": 0.4452,
+        "trauma_load": 0.1736,
+        "trust_damage": 0.35,
+        "resilience": 0.8473,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00199",
+        "stress": 0.5242,
+        "trust": 0.155,
+        "fear": 0.3888,
+        "valence": 0.281,
+        "trauma_load": 0.2021,
+        "trust_damage": 0.3489,
+        "resilience": 0.3512,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00204",
+        "stress": 0.6314,
+        "trust": 0.2247,
+        "fear": 0.5312,
+        "valence": 0.2817,
+        "trauma_load": 0.1675,
+        "trust_damage": 0.3449,
+        "resilience": 0.5299,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00114",
+        "stress": 0.518,
+        "trust": 0.1779,
+        "fear": 0.4175,
+        "valence": 0.3391,
+        "trauma_load": 0.176,
+        "trust_damage": 0.337,
+        "resilience": 0.6826,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00163",
+        "stress": 0.6247,
+        "trust": 0.1455,
+        "fear": 0.4198,
+        "valence": 0.3845,
+        "trauma_load": 0.1774,
+        "trust_damage": 0.3221,
+        "resilience": 0.3785,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      },
+      {
+        "id": "agent_00017",
+        "stress": 0.4645,
+        "trust": 0.174,
+        "fear": 0.504,
+        "valence": 0.2155,
+        "trauma_load": 0.1933,
+        "trust_damage": 0.3216,
+        "resilience": 0.7735,
+        "negative_memory_count": 5,
+        "last_negative_events": [
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure",
+          "lifetime_scarring_failure"
+        ]
+      }
+    ],
+    "least_scarred_agents": [
+      {
+        "id": "agent_00001",
+        "stress": 0.3477,
+        "trust": 0.3619,
+        "fear": 0.1765,
+        "valence": 0.5269,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.577,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00002",
+        "stress": 0.2772,
+        "trust": 0.5857,
+        "fear": 0.3833,
+        "valence": 0.3523,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.3433,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00003",
+        "stress": 0.535,
+        "trust": 0.4846,
+        "fear": 0.1325,
+        "valence": 0.3839,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.6878,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00005",
+        "stress": 0.4466,
+        "trust": 0.3683,
+        "fear": 0.1798,
+        "valence": 0.4513,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.4168,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00006",
+        "stress": 0.4225,
+        "trust": 0.4959,
+        "fear": 0.2296,
+        "valence": 0.4233,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.6155,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00007",
+        "stress": 0.2599,
+        "trust": 0.6417,
+        "fear": 0.1572,
+        "valence": 0.4828,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.6608,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00009",
+        "stress": 0.5067,
+        "trust": 0.4759,
+        "fear": 0.3294,
+        "valence": 0.4885,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.398,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00012",
+        "stress": 0.5486,
+        "trust": 0.5616,
+        "fear": 0.4399,
+        "valence": 0.6513,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.5722,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00013",
+        "stress": 0.2934,
+        "trust": 0.6064,
+        "fear": 0.139,
+        "valence": 0.5022,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.408,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      },
+      {
+        "id": "agent_00015",
+        "stress": 0.4669,
+        "trust": 0.5658,
+        "fear": 0.3725,
+        "valence": 0.5356,
+        "trauma_load": 0.0,
+        "trust_damage": 0.0,
+        "resilience": 0.8075,
+        "negative_memory_count": 0,
+        "last_negative_events": []
+      }
+    ]
   }
 }

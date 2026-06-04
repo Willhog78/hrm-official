@@ -1,0 +1,34 @@
+{
+  "name": "baseline_personality_divergence",
+  "description": "Cognition v0.4 validation: controlled resilience cohorts under a milder threat event to test whether agent history/state produces divergent post-recovery profiles.",
+  "resilience_groups": [
+    {
+      "name": "low_resilience",
+      "resilience": 0.2,
+      "fraction": 0.333
+    },
+    {
+      "name": "medium_resilience",
+      "resilience": 0.55,
+      "fraction": 0.333
+    },
+    {
+      "name": "high_resilience",
+      "resilience": 0.9,
+      "fraction": 0.334
+    }
+  ],
+  "event": {
+    "label": "baseline_divergence_threat",
+    "x": 50,
+    "y": 50,
+    "radius": 35,
+    "stress_delta": 0.18,
+    "trust_delta": -0.1,
+    "health_delta": -0.005
+  },
+  "repeat": 4,
+  "gap_ticks": 12,
+  "ticks": 120,
+  "controlled_resilience_triplets": true
+}

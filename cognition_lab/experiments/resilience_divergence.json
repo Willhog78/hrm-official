@@ -1,0 +1,34 @@
+{
+  "name": "resilience_divergence",
+  "description": "Cognition v0.4 validation: identical repeated negative events applied to controlled low/mid/high resilience cohorts.",
+  "resilience_groups": [
+    {
+      "name": "low_resilience",
+      "resilience": 0.15,
+      "fraction": 0.333
+    },
+    {
+      "name": "medium_resilience",
+      "resilience": 0.5,
+      "fraction": 0.333
+    },
+    {
+      "name": "high_resilience",
+      "resilience": 0.85,
+      "fraction": 0.334
+    }
+  ],
+  "event": {
+    "label": "resilience_divergence_failure",
+    "x": 50,
+    "y": 50,
+    "radius": 35,
+    "stress_delta": 0.28,
+    "trust_delta": -0.18,
+    "health_delta": -0.01
+  },
+  "repeat": 6,
+  "gap_ticks": 8,
+  "ticks": 100,
+  "controlled_resilience_triplets": true
+}
