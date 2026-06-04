@@ -1,0 +1,69 @@
+{
+  "experiment": "trust_repair",
+  "ticks": 30,
+  "event": {
+    "label": "institution_success",
+    "x": 50,
+    "y": 50,
+    "radius": 35,
+    "stress_delta": -0.1,
+    "trust_delta": 0.15,
+    "health_delta": 0.02
+  },
+  "population": 250,
+  "impacted_agents": 96,
+  "before": {
+    "stress": 0.3692,
+    "trust": 0.5592,
+    "fear": 0.2704,
+    "health": 0.8538,
+    "valence": 0.5344
+  },
+  "immediate": {
+    "stress": 0.3581,
+    "trust": 0.5758,
+    "fear": 0.2704,
+    "health": 0.856,
+    "valence": 0.5344
+  },
+  "after": {
+    "stress": 0.3005,
+    "trust": 0.5672,
+    "fear": 0.2072,
+    "health": 0.8573,
+    "valence": 0.527
+  },
+  "delta": {
+    "event_impact": {
+      "stress": -0.0111,
+      "trust": 0.0166,
+      "fear": 0.0,
+      "health": 0.0022,
+      "valence": 0.0
+    },
+    "post_event_recovery": {
+      "stress": -0.0576,
+      "trust": -0.0086,
+      "fear": -0.0632,
+      "health": 0.0013,
+      "valence": -0.0074
+    },
+    "total": {
+      "stress": -0.0687,
+      "trust": 0.008,
+      "fear": -0.0632,
+      "health": 0.0035,
+      "valence": -0.0074
+    }
+  },
+  "interpretation": {
+    "event_stress": "fell_or_stable",
+    "event_trust": "rose_or_stable",
+    "event_fear": "fell_or_stable",
+    "recovery_stress": "recovered",
+    "recovery_fear": "recovered",
+    "total_stress": "fell_or_stable",
+    "total_trust": "rose_or_stable",
+    "total_fear": "fell_or_stable"
+  }
+}

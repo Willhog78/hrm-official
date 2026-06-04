@@ -1,0 +1,13 @@
+{
+  "name": "threat_response",
+  "event": {
+    "label": "major_threat",
+    "x": 50,
+    "y": 50,
+    "radius": 35,
+    "stress_delta": 0.40,
+    "trust_delta": -0.05,
+    "health_delta": -0.02
+  },
+  "ticks": 30
+}
