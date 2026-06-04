@@ -1,11 +1,13 @@
-
 from __future__ import annotations
-from dataclasses import dataclass, asdict, field
-from typing import Dict, List, Any
+
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List
 import time
+
 
 def clamp(x: float, lo: float = 0.0, hi: float = 1.0) -> float:
     return max(lo, min(hi, float(x)))
+
 
 @dataclass
 class AgentState:
@@ -13,15 +15,41 @@ class AgentState:
     x: float
     y: float
     faction: str = "neutral"
+
+    # Immediate emotional / physical cognition state.
     stress: float = 0.35
     trust: float = 0.55
     health: float = 0.85
     fear: float = 0.25
     valence: float = 0.50
+
+    # Individual homeostatic baselines. Recovery moves toward these personal
+    # baselines, not toward one universal population constant. Trauma then
+    # modifies these targets into chronic scarred baselines.
+    baseline_stress: float = 0.35
+    baseline_trust: float = 0.55
+    baseline_fear: float = 0.25
+    baseline_valence: float = 0.50
+
+    # Persistent cognition state.
+    # trauma_load is accumulated negative emotional injury. Unlike memory burden,
+    # it decays slowly and survives beyond the short memory amplification window.
+    trauma_load: float = 0.0
+
+    # trust_damage is persistent trust scarring caused by negative trust events.
+    # It decays more slowly than stress/fear trauma by design.
+    trust_damage: float = 0.0
+
+    # resilience protects against trauma formation and recovery drag.
+    # Higher resilience means less trauma accumulation and faster recovery.
+    resilience: float = 0.50
+
+    # Event memory supports cognition v0.2 memory amplification.
     memory: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
 
 @dataclass
 class WorldState:
@@ -58,4 +86,7 @@ class WorldState:
             "avg_health": sum(a.health for a in self.agents) / n,
             "avg_fear": sum(a.fear for a in self.agents) / n,
             "avg_valence": sum(a.valence for a in self.agents) / n,
+            "avg_trauma_load": sum(a.trauma_load for a in self.agents) / n,
+            "avg_trust_damage": sum(a.trust_damage for a in self.agents) / n,
+            "avg_resilience": sum(a.resilience for a in self.agents) / n,
         }

@@ -1,0 +1,15 @@
+{
+  "name": "trauma_accumulation",
+  "event": {
+    "label": "trauma_accumulation_failure",
+    "x": 50,
+    "y": 50,
+    "radius": 35,
+    "stress_delta": 0.28,
+    "trust_delta": -0.18,
+    "health_delta": -0.01
+  },
+  "repeat": 8,
+  "gap_ticks": 8,
+  "ticks": 80
+}

@@ -1,0 +1,243 @@
+{
+  "experiment": "lifetime_scarring",
+  "repeat": 5,
+  "gap_ticks": 10,
+  "final_ticks": 150,
+  "event": {
+    "label": "lifetime_scarring_failure",
+    "x": 50,
+    "y": 50,
+    "radius": 35,
+    "stress_delta": 0.25,
+    "trust_delta": -0.18,
+    "health_delta": -0.01
+  },
+  "population": 250,
+  "impacted_agents": 112,
+  "before": {
+    "stress": 0.3681,
+    "trust": 0.546,
+    "fear": 0.2807,
+    "health": 0.8544,
+    "valence": 0.5241,
+    "trauma_load": 0.0,
+    "trust_damage": 0.0,
+    "resilience": 0.5683
+  },
+  "after_repeated_events": {
+    "stress": 0.5286,
+    "trust": 0.4146,
+    "fear": 0.3683,
+    "health": 0.8469,
+    "valence": 0.4698,
+    "trauma_load": 0.045,
+    "trust_damage": 0.0721,
+    "resilience": 0.5683
+  },
+  "after": {
+    "stress": 0.4177,
+    "trust": 0.45,
+    "fear": 0.3036,
+    "health": 0.8543,
+    "valence": 0.495,
+    "trauma_load": 0.0421,
+    "trust_damage": 0.0702,
+    "resilience": 0.5683
+  },
+  "event_steps": [
+    {
+      "event_number": 1,
+      "tick": 0,
+      "averages": {
+        "stress": 0.4019,
+        "trust": 0.5216,
+        "fear": 0.296,
+        "health": 0.8531,
+        "valence": 0.5157,
+        "trauma_load": 0.0074,
+        "trust_damage": 0.0127,
+        "resilience": 0.5683
+      },
+      "delta_from_previous": {
+        "stress": 0.0338,
+        "trust": -0.0244,
+        "fear": 0.0153,
+        "health": -0.0013,
+        "valence": -0.0084,
+        "trauma_load": 0.0074,
+        "trust_damage": 0.0127,
+        "resilience": 0.0
+      },
+      "impacted_agents": 97,
+      "average_memory_multiplier": 1.0,
+      "average_trauma_sensitivity": 1.0,
+      "average_trauma_gain": 0.0192,
+      "average_trust_damage_gain": 0.0326
+    },
+    {
+      "event_number": 2,
+      "tick": 10,
+      "averages": {
+        "stress": 0.4399,
+        "trust": 0.4921,
+        "fear": 0.3127,
+        "health": 0.8519,
+        "valence": 0.5057,
+        "trauma_load": 0.0167,
+        "trust_damage": 0.0284,
+        "resilience": 0.5683
+      },
+      "delta_from_previous": {
+        "stress": 0.0422,
+        "trust": -0.0303,
+        "fear": 0.0189,
+        "health": -0.0017,
+        "valence": -0.0105,
+        "trauma_load": 0.0093,
+        "trust_damage": 0.0158,
+        "resilience": 0.0
+      },
+      "impacted_agents": 101,
+      "average_memory_multiplier": 1.1192,
+      "average_trauma_sensitivity": 1.0023,
+      "average_trauma_gain": 0.0217,
+      "average_trust_damage_gain": 0.0369
+    },
+    {
+      "event_number": 3,
+      "tick": 20,
+      "averages": {
+        "stress": 0.4787,
+        "trust": 0.4596,
+        "fear": 0.331,
+        "health": 0.8504,
+        "valence": 0.4943,
+        "trauma_load": 0.0272,
+        "trust_damage": 0.0461,
+        "resilience": 0.5683
+      },
+      "delta_from_previous": {
+        "stress": 0.0469,
+        "trust": -0.0341,
+        "fear": 0.0224,
+        "health": -0.002,
+        "valence": -0.0125,
+        "trauma_load": 0.0105,
+        "trust_damage": 0.0177,
+        "resilience": 0.0
+      },
+      "impacted_agents": 105,
+      "average_memory_multiplier": 1.2381,
+      "average_trauma_sensitivity": 1.005,
+      "average_trauma_gain": 0.0233,
+      "average_trust_damage_gain": 0.0394
+    },
+    {
+      "event_number": 4,
+      "tick": 30,
+      "averages": {
+        "stress": 0.51,
+        "trust": 0.4322,
+        "fear": 0.3506,
+        "health": 0.8486,
+        "valence": 0.4818,
+        "trauma_load": 0.0371,
+        "trust_damage": 0.0616,
+        "resilience": 0.5683
+      },
+      "delta_from_previous": {
+        "stress": 0.0424,
+        "trust": -0.0297,
+        "fear": 0.0254,
+        "health": -0.0022,
+        "valence": -0.0141,
+        "trauma_load": 0.01,
+        "trust_damage": 0.0156,
+        "resilience": 0.0
+      },
+      "impacted_agents": 110,
+      "average_memory_multiplier": 1.3495,
+      "average_trauma_sensitivity": 1.0078,
+      "average_trauma_gain": 0.0238,
+      "average_trust_damage_gain": 0.0394
+    },
+    {
+      "event_number": 5,
+      "tick": 40,
+      "averages": {
+        "stress": 0.5286,
+        "trust": 0.4146,
+        "fear": 0.3683,
+        "health": 0.8469,
+        "valence": 0.4698,
+        "trauma_load": 0.045,
+        "trust_damage": 0.0721,
+        "resilience": 0.5683
+      },
+      "delta_from_previous": {
+        "stress": 0.0312,
+        "trust": -0.0203,
+        "fear": 0.0249,
+        "health": -0.0022,
+        "valence": -0.014,
+        "trauma_load": 0.008,
+        "trust_damage": 0.0107,
+        "resilience": 0.0
+      },
+      "impacted_agents": 112,
+      "average_memory_multiplier": 1.4172,
+      "average_trauma_sensitivity": 1.0109,
+      "average_trauma_gain": 0.0235,
+      "average_trust_damage_gain": 0.0375
+    }
+  ],
+  "delta": {
+    "event_phase": {
+      "stress": 0.1605,
+      "trust": -0.1314,
+      "fear": 0.0876,
+      "health": -0.0075,
+      "valence": -0.0543,
+      "trauma_load": 0.045,
+      "trust_damage": 0.0721,
+      "resilience": 0.0
+    },
+    "post_event_recovery": {
+      "stress": -0.1109,
+      "trust": 0.0354,
+      "fear": -0.0647,
+      "health": 0.0074,
+      "valence": 0.0252,
+      "trauma_load": -0.0029,
+      "trust_damage": -0.0019,
+      "resilience": 0.0
+    },
+    "total": {
+      "stress": 0.0496,
+      "trust": -0.096,
+      "fear": 0.0229,
+      "health": -0.0001,
+      "valence": -0.0291,
+      "trauma_load": 0.0421,
+      "trust_damage": 0.0702,
+      "resilience": 0.0
+    }
+  },
+  "interpretation": {
+    "event_phase_stress": "rose",
+    "event_phase_trust": "fell",
+    "event_phase_fear": "rose",
+    "event_phase_trauma": "rose",
+    "event_phase_trust_damage": "rose",
+    "recovery_stress": "recovered",
+    "recovery_fear": "recovered",
+    "total_stress": "rose",
+    "total_trust": "fell",
+    "total_fear": "rose",
+    "trauma_persistence": "persisted",
+    "trust_damage_persistence": "persisted",
+    "stress_scar": "scar_persisted",
+    "fear_scar": "scar_persisted",
+    "trust_scar": "scar_persisted"
+  }
+}

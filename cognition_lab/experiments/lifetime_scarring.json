@@ -1,0 +1,15 @@
+{
+  "name": "lifetime_scarring",
+  "event": {
+    "label": "lifetime_scarring_failure",
+    "x": 50,
+    "y": 50,
+    "radius": 35,
+    "stress_delta": 0.25,
+    "trust_delta": -0.18,
+    "health_delta": -0.01
+  },
+  "repeat": 5,
+  "gap_ticks": 10,
+  "ticks": 150
+}
