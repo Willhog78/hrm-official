@@ -44,6 +44,13 @@ class AgentState:
     # Higher resilience means less trauma accumulation and faster recovery.
     resilience: float = 0.50
 
+    # Cognition v0.5: learned appraisal expectations.
+    # These are not emotions. They are learned interpretive priors.
+    # threat_expectation makes ambiguous threat cues feel more threatening.
+    # trust_expectation makes ambiguous trust/betrayal cues feel less safe.
+    threat_expectation: float = 0.0
+    trust_expectation: float = 0.0
+
     # Event memory supports cognition v0.2 memory amplification.
     memory: List[Dict[str, Any]] = field(default_factory=list)
 
@@ -89,4 +96,6 @@ class WorldState:
             "avg_trauma_load": sum(a.trauma_load for a in self.agents) / n,
             "avg_trust_damage": sum(a.trust_damage for a in self.agents) / n,
             "avg_resilience": sum(a.resilience for a in self.agents) / n,
+            "avg_threat_expectation": sum(a.threat_expectation for a in self.agents) / n,
+            "avg_trust_expectation": sum(a.trust_expectation for a in self.agents) / n,
         }

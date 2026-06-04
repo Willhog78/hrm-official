@@ -22,7 +22,9 @@
     "valence": 0.5241,
     "trauma_load": 0.0,
     "trust_damage": 0.0,
-    "resilience": 0.5683
+    "resilience": 0.5683,
+    "threat_expectation": 0.0,
+    "trust_expectation": 0.0
   },
   "after_repeated_events": {
     "stress": 0.5676,
@@ -32,7 +34,9 @@
     "valence": 0.4296,
     "trauma_load": 0.0641,
     "trust_damage": 0.0895,
-    "resilience": 0.5683
+    "resilience": 0.5683,
+    "threat_expectation": 0.0939,
+    "trust_expectation": 0.0734
   },
   "after": {
     "stress": 0.485,
@@ -42,7 +46,9 @@
     "valence": 0.453,
     "trauma_load": 0.0618,
     "trust_damage": 0.0883,
-    "resilience": 0.5683
+    "resilience": 0.5683,
+    "threat_expectation": 0.0916,
+    "trust_expectation": 0.0716
   },
   "event_steps": [
     {
@@ -56,7 +62,9 @@
         "valence": 0.5146,
         "trauma_load": 0.0082,
         "trust_damage": 0.0127,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.0118,
+        "trust_expectation": 0.0104
       },
       "delta_from_previous": {
         "stress": 0.0379,
@@ -66,13 +74,19 @@
         "valence": -0.0095,
         "trauma_load": 0.0082,
         "trust_damage": 0.0127,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0118,
+        "trust_expectation": 0.0104
       },
       "impacted_agents": 97,
       "average_memory_multiplier": 1.0,
       "average_trauma_sensitivity": 1.0,
       "average_trauma_gain": 0.021,
-      "average_trust_damage_gain": 0.0326
+      "average_trust_damage_gain": 0.0326,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.0304,
+      "average_trust_expectation_gain": 0.0269
     },
     {
       "event_number": 2,
@@ -85,7 +99,9 @@
         "valence": 0.5034,
         "trauma_load": 0.0183,
         "trust_damage": 0.0284,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.0264,
+        "trust_expectation": 0.0234
       },
       "delta_from_previous": {
         "stress": 0.0469,
@@ -95,13 +111,19 @@
         "valence": -0.0117,
         "trauma_load": 0.0102,
         "trust_damage": 0.0158,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0146,
+        "trust_expectation": 0.013
       },
       "impacted_agents": 102,
       "average_memory_multiplier": 1.1199,
       "average_trauma_sensitivity": 1.0025,
       "average_trauma_gain": 0.0234,
-      "average_trust_damage_gain": 0.0362
+      "average_trust_damage_gain": 0.0362,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.0337,
+      "average_trust_expectation_gain": 0.0299
     },
     {
       "event_number": 3,
@@ -114,7 +136,9 @@
         "valence": 0.4901,
         "trauma_load": 0.0296,
         "trust_damage": 0.0462,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.0427,
+        "trust_expectation": 0.0381
       },
       "delta_from_previous": {
         "stress": 0.0507,
@@ -124,13 +148,19 @@
         "valence": -0.0143,
         "trauma_load": 0.0114,
         "trust_damage": 0.0179,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0163,
+        "trust_expectation": 0.0148
       },
       "impacted_agents": 106,
       "average_memory_multiplier": 1.2374,
       "average_trauma_sensitivity": 1.0054,
       "average_trauma_gain": 0.025,
-      "average_trust_damage_gain": 0.039
+      "average_trust_damage_gain": 0.039,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.036,
+      "average_trust_expectation_gain": 0.0321
     },
     {
       "event_number": 4,
@@ -143,7 +173,9 @@
         "valence": 0.4753,
         "trauma_load": 0.0399,
         "trust_damage": 0.062,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.0574,
+        "trust_expectation": 0.051
       },
       "delta_from_previous": {
         "stress": 0.0404,
@@ -153,13 +185,19 @@
         "valence": -0.0163,
         "trauma_load": 0.0104,
         "trust_damage": 0.0159,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0148,
+        "trust_expectation": 0.013
       },
       "impacted_agents": 109,
       "average_memory_multiplier": 1.3519,
       "average_trauma_sensitivity": 1.0085,
       "average_trauma_gain": 0.0254,
-      "average_trust_damage_gain": 0.0393
+      "average_trust_damage_gain": 0.0393,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.0364,
+      "average_trust_expectation_gain": 0.0324
     },
     {
       "event_number": 5,
@@ -172,7 +210,9 @@
         "valence": 0.4616,
         "trauma_load": 0.0478,
         "trust_damage": 0.0727,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.069,
+        "trust_expectation": 0.0598
       },
       "delta_from_previous": {
         "stress": 0.0294,
@@ -182,13 +222,19 @@
         "valence": -0.0156,
         "trauma_load": 0.0081,
         "trust_damage": 0.0108,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0118,
+        "trust_expectation": 0.0089
       },
       "impacted_agents": 113,
       "average_memory_multiplier": 1.4221,
       "average_trauma_sensitivity": 1.0116,
       "average_trauma_gain": 0.0244,
-      "average_trust_damage_gain": 0.0369
+      "average_trust_damage_gain": 0.0369,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.0351,
+      "average_trust_expectation_gain": 0.0304
     },
     {
       "event_number": 6,
@@ -201,7 +247,9 @@
         "valence": 0.4495,
         "trauma_load": 0.0542,
         "trust_damage": 0.0802,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.0786,
+        "trust_expectation": 0.0658
       },
       "delta_from_previous": {
         "stress": 0.0227,
@@ -211,13 +259,19 @@
         "valence": -0.0142,
         "trauma_load": 0.0065,
         "trust_damage": 0.0076,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0098,
+        "trust_expectation": 0.0062
       },
       "impacted_agents": 114,
       "average_memory_multiplier": 1.4688,
       "average_trauma_sensitivity": 1.0146,
       "average_trauma_gain": 0.0234,
-      "average_trust_damage_gain": 0.0344
+      "average_trust_damage_gain": 0.0344,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.0338,
+      "average_trust_expectation_gain": 0.0283
     },
     {
       "event_number": 7,
@@ -230,7 +284,9 @@
         "valence": 0.4388,
         "trauma_load": 0.0594,
         "trust_damage": 0.0852,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.0865,
+        "trust_expectation": 0.0699
       },
       "delta_from_previous": {
         "stress": 0.0175,
@@ -240,13 +296,19 @@
         "valence": -0.0128,
         "trauma_load": 0.0054,
         "trust_damage": 0.0052,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0081,
+        "trust_expectation": 0.0043
       },
       "impacted_agents": 116,
       "average_memory_multiplier": 1.5015,
       "average_trauma_sensitivity": 1.0174,
       "average_trauma_gain": 0.0224,
-      "average_trust_damage_gain": 0.0319
+      "average_trust_damage_gain": 0.0319,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.0325,
+      "average_trust_expectation_gain": 0.0263
     },
     {
       "event_number": 8,
@@ -259,7 +321,9 @@
         "valence": 0.4296,
         "trauma_load": 0.0641,
         "trust_damage": 0.0895,
-        "resilience": 0.5683
+        "resilience": 0.5683,
+        "threat_expectation": 0.0939,
+        "trust_expectation": 0.0734
       },
       "delta_from_previous": {
         "stress": 0.0172,
@@ -269,13 +333,19 @@
         "valence": -0.0116,
         "trauma_load": 0.0049,
         "trust_damage": 0.0044,
-        "resilience": 0.0
+        "resilience": 0.0,
+        "threat_expectation": 0.0076,
+        "trust_expectation": 0.0037
       },
       "impacted_agents": 117,
       "average_memory_multiplier": 1.5285,
       "average_trauma_sensitivity": 1.0199,
       "average_trauma_gain": 0.0213,
-      "average_trust_damage_gain": 0.0296
+      "average_trust_damage_gain": 0.0296,
+      "average_threat_appraisal_multiplier": 1.0,
+      "average_trust_appraisal_multiplier": 1.0,
+      "average_threat_expectation_gain": 0.0311,
+      "average_trust_expectation_gain": 0.0243
     }
   ],
   "delta": {
@@ -287,7 +357,9 @@
       "valence": -0.0945,
       "trauma_load": 0.0641,
       "trust_damage": 0.0895,
-      "resilience": 0.0
+      "resilience": 0.0,
+      "threat_expectation": 0.0939,
+      "trust_expectation": 0.0734
     },
     "post_event_recovery": {
       "stress": -0.0826,
@@ -297,7 +369,9 @@
       "valence": 0.0234,
       "trauma_load": -0.0023,
       "trust_damage": -0.0012,
-      "resilience": 0.0
+      "resilience": 0.0,
+      "threat_expectation": -0.0023,
+      "trust_expectation": -0.0018
     },
     "total": {
       "stress": 0.1169,
@@ -307,7 +381,9 @@
       "valence": -0.0711,
       "trauma_load": 0.0618,
       "trust_damage": 0.0883,
-      "resilience": 0.0
+      "resilience": 0.0,
+      "threat_expectation": 0.0916,
+      "trust_expectation": 0.0716
     }
   },
   "interpretation": {
@@ -316,6 +392,8 @@
     "event_phase_fear": "rose",
     "event_phase_trauma": "rose",
     "event_phase_trust_damage": "rose",
+    "event_phase_threat_expectation": "rose",
+    "event_phase_trust_expectation": "rose",
     "recovery_stress": "recovered",
     "recovery_fear": "recovered",
     "total_stress": "rose",
@@ -338,6 +416,8 @@
         "trauma_load": 0.2903,
         "trust_damage": 0.3197,
         "resilience": 0.4999,
+        "threat_expectation": 0.4362,
+        "trust_expectation": 0.257,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -356,6 +436,8 @@
         "trauma_load": 0.2817,
         "trust_damage": 0.3232,
         "resilience": 0.529,
+        "threat_expectation": 0.4227,
+        "trust_expectation": 0.2609,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -374,6 +456,8 @@
         "trauma_load": 0.2687,
         "trust_damage": 0.3331,
         "resilience": 0.3821,
+        "threat_expectation": 0.38,
+        "trust_expectation": 0.2638,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -392,6 +476,8 @@
         "trauma_load": 0.2648,
         "trust_damage": 0.3627,
         "resilience": 0.3512,
+        "threat_expectation": 0.3668,
+        "trust_expectation": 0.2862,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -410,6 +496,8 @@
         "trauma_load": 0.2585,
         "trust_damage": 0.2539,
         "resilience": 0.5053,
+        "threat_expectation": 0.3969,
+        "trust_expectation": 0.2042,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -428,6 +516,8 @@
         "trauma_load": 0.2581,
         "trust_damage": 0.238,
         "resilience": 0.4062,
+        "threat_expectation": 0.386,
+        "trust_expectation": 0.1889,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -446,6 +536,8 @@
         "trauma_load": 0.2533,
         "trust_damage": 0.2659,
         "resilience": 0.4229,
+        "threat_expectation": 0.3753,
+        "trust_expectation": 0.2117,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -464,6 +556,8 @@
         "trauma_load": 0.2508,
         "trust_damage": 0.2661,
         "resilience": 0.6178,
+        "threat_expectation": 0.3961,
+        "trust_expectation": 0.2176,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -482,6 +576,8 @@
         "trauma_load": 0.2483,
         "trust_damage": 0.414,
         "resilience": 0.3776,
+        "threat_expectation": 0.3297,
+        "trust_expectation": 0.3278,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -500,6 +596,8 @@
         "trauma_load": 0.2457,
         "trust_damage": 0.2079,
         "resilience": 0.5006,
+        "threat_expectation": 0.3842,
+        "trust_expectation": 0.1671,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -520,6 +618,8 @@
         "trauma_load": 0.2483,
         "trust_damage": 0.414,
         "resilience": 0.3776,
+        "threat_expectation": 0.3297,
+        "trust_expectation": 0.3278,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -538,6 +638,8 @@
         "trauma_load": 0.2436,
         "trust_damage": 0.3945,
         "resilience": 0.3925,
+        "threat_expectation": 0.3274,
+        "trust_expectation": 0.3127,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -556,6 +658,8 @@
         "trauma_load": 0.2362,
         "trust_damage": 0.3926,
         "resilience": 0.6397,
+        "threat_expectation": 0.3456,
+        "trust_expectation": 0.3223,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -574,6 +678,8 @@
         "trauma_load": 0.2443,
         "trust_damage": 0.3918,
         "resilience": 0.4311,
+        "threat_expectation": 0.337,
+        "trust_expectation": 0.3124,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -592,6 +698,8 @@
         "trauma_load": 0.2194,
         "trust_damage": 0.3902,
         "resilience": 0.5299,
+        "threat_expectation": 0.3039,
+        "trust_expectation": 0.3152,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -610,6 +718,8 @@
         "trauma_load": 0.2048,
         "trust_damage": 0.3823,
         "resilience": 0.6519,
+        "threat_expectation": 0.2962,
+        "trust_expectation": 0.3146,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -628,6 +738,8 @@
         "trauma_load": 0.2427,
         "trust_damage": 0.3818,
         "resilience": 0.5549,
+        "threat_expectation": 0.3514,
+        "trust_expectation": 0.3094,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -646,6 +758,8 @@
         "trauma_load": 0.2197,
         "trust_damage": 0.3794,
         "resilience": 0.5717,
+        "threat_expectation": 0.3141,
+        "trust_expectation": 0.3085,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -664,6 +778,8 @@
         "trauma_load": 0.2215,
         "trust_damage": 0.3643,
         "resilience": 0.8473,
+        "threat_expectation": 0.3598,
+        "trust_expectation": 0.3095,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -682,6 +798,8 @@
         "trauma_load": 0.2648,
         "trust_damage": 0.3627,
         "resilience": 0.3512,
+        "threat_expectation": 0.3668,
+        "trust_expectation": 0.2862,
         "negative_memory_count": 8,
         "last_negative_events": [
           "trauma_accumulation_failure",
@@ -702,6 +820,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.577,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -714,6 +834,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.3433,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -726,6 +848,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.6878,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -738,6 +862,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.4168,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -750,6 +876,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.6155,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -762,6 +890,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.6608,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -774,6 +904,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.398,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -786,6 +918,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.5722,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -798,6 +932,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.408,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       },
@@ -810,6 +946,8 @@
         "trauma_load": 0.0,
         "trust_damage": 0.0,
         "resilience": 0.8075,
+        "threat_expectation": 0.0,
+        "trust_expectation": 0.0,
         "negative_memory_count": 0,
         "last_negative_events": []
       }

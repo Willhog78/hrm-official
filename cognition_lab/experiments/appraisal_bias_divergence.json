@@ -1,0 +1,36 @@
+{
+  "name": "appraisal_bias_divergence",
+  "repeat": 1,
+  "gap_ticks": 0,
+  "ticks": 80,
+  "controlled_appraisal_triplets": true,
+  "appraisal_groups": [
+    {
+      "name": "low_prior_history",
+      "threat_expectation": 0.05,
+      "trust_expectation": 0.05
+    },
+    {
+      "name": "medium_prior_history",
+      "threat_expectation": 0.45,
+      "trust_expectation": 0.45
+    },
+    {
+      "name": "high_prior_history",
+      "threat_expectation": 0.85,
+      "trust_expectation": 0.85
+    }
+  ],
+  "event": {
+    "label": "ambiguous_social_threat",
+    "x": 50,
+    "y": 50,
+    "radius": 100,
+    "stress_delta": 0.03,
+    "trust_delta": -0.025,
+    "health_delta": 0.0,
+    "ambiguity": 1.0,
+    "threat_cue": 1.0,
+    "trust_cue": 1.0
+  }
+}

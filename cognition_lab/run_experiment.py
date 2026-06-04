@@ -27,6 +27,8 @@ COGNITION_FIELDS = (
     "trauma_load",
     "trust_damage",
     "resilience",
+    "threat_expectation",
+    "trust_expectation",
 )
 
 
@@ -148,12 +150,16 @@ def assign_agent_groups(kernel: HRMKernel, experiment: Dict[str, Any]) -> Dict[s
         {"name": "low_resilience", "resilience": 0.15, "fraction": 0.333},
         ...
       ]
+      appraisal_groups: [
+        {"name": "low_prior_history", "threat_expectation": 0.05, "trust_expectation": 0.05},
+        ...
+      ]
 
     Groups are deterministic. Agents are assigned by stable list order so repeated
     runs remain comparable. This is Cognition v0.4's test harness layer; it does
     not change the core cognition kernel.
     """
-    group_specs = experiment.get("resilience_groups", [])
+    group_specs = experiment.get("resilience_groups") or experiment.get("appraisal_groups", [])
     agents = kernel.state.agents
     groups: Dict[str, List[str]] = {}
 
@@ -166,16 +172,23 @@ def assign_agent_groups(kernel: HRMKernel, experiment: Dict[str, Any]) -> Dict[s
     # This keeps each cohort spread across the same deterministic world.
     for index, spec in enumerate(group_specs):
         name = str(spec["name"])
-        resilience = max(0.0, min(1.0, float(spec["resilience"])))
         selected = agents[index::len(group_specs)]
 
         for agent in selected:
-            agent.resilience = resilience
+            if "resilience" in spec:
+                agent.resilience = max(0.0, min(1.0, float(spec["resilience"])))
+            if "threat_expectation" in spec:
+                agent.threat_expectation = max(0.0, min(1.0, float(spec["threat_expectation"])))
+            if "trust_expectation" in spec:
+                agent.trust_expectation = max(0.0, min(1.0, float(spec["trust_expectation"])))
 
         groups[name] = [agent.id for agent in selected]
 
     if bool(experiment.get("controlled_resilience_triplets", False)):
         normalize_resilience_triplets(kernel, len(group_specs))
+
+    if bool(experiment.get("controlled_appraisal_triplets", False)):
+        normalize_appraisal_triplets(kernel, len(group_specs))
 
     return groups
 
@@ -206,6 +219,44 @@ def normalize_resilience_triplets(kernel: HRMKernel, group_count: int) -> None:
             agent.x = x
             agent.y = y
             agent.health = health
+            agent.baseline_stress = baseline_stress
+            agent.baseline_trust = baseline_trust
+            agent.baseline_fear = baseline_fear
+            agent.baseline_valence = baseline_valence
+            agent.stress = baseline_stress
+            agent.trust = baseline_trust
+            agent.fear = baseline_fear
+            agent.valence = baseline_valence
+            agent.trauma_load = 0.0
+            agent.trust_damage = 0.0
+            agent.threat_expectation = agent.threat_expectation
+            agent.trust_expectation = agent.trust_expectation
+            agent.memory.clear()
+
+
+def normalize_appraisal_triplets(kernel: HRMKernel, group_count: int) -> None:
+    """Normalize starting conditions while preserving assigned appraisal priors."""
+    agents = kernel.state.agents
+
+    for start in range(0, len(agents), group_count):
+        cohort = agents[start:start + group_count]
+        if len(cohort) < group_count:
+            continue
+
+        x = _safe_mean(a.x for a in cohort)
+        y = _safe_mean(a.y for a in cohort)
+        health = _safe_mean(a.health for a in cohort)
+        baseline_stress = _safe_mean(a.baseline_stress for a in cohort)
+        baseline_trust = _safe_mean(a.baseline_trust for a in cohort)
+        baseline_fear = _safe_mean(a.baseline_fear for a in cohort)
+        baseline_valence = _safe_mean(a.baseline_valence for a in cohort)
+        resilience = _safe_mean(a.resilience for a in cohort)
+
+        for agent in cohort:
+            agent.x = x
+            agent.y = y
+            agent.health = health
+            agent.resilience = resilience
             agent.baseline_stress = baseline_stress
             agent.baseline_trust = baseline_trust
             agent.baseline_fear = baseline_fear
@@ -266,6 +317,16 @@ def group_interpretation(total_group_delta: Dict[str, Dict[str, float]]) -> Dict
         key=lambda item: item[1].get("trust_damage", 0.0),
         reverse=True,
     )
+    by_threat_expectation = sorted(
+        total_group_delta.items(),
+        key=lambda item: item[1].get("threat_expectation", 0.0),
+        reverse=True,
+    )
+    by_trust_expectation = sorted(
+        total_group_delta.items(),
+        key=lambda item: item[1].get("trust_expectation", 0.0),
+        reverse=True,
+    )
 
     return {
         "most_traumatized_group": by_trauma[0][0],
@@ -276,9 +337,18 @@ def group_interpretation(total_group_delta: Dict[str, Dict[str, float]]) -> Dict
         "lowest_fear_scar_group": by_fear[-1][0],
         "highest_trust_damage_group": by_trust_damage[0][0],
         "lowest_trust_damage_group": by_trust_damage[-1][0],
+        "highest_threat_expectation_group": by_threat_expectation[0][0],
+        "lowest_threat_expectation_group": by_threat_expectation[-1][0],
+        "highest_trust_expectation_group": by_trust_expectation[0][0],
+        "lowest_trust_expectation_group": by_trust_expectation[-1][0],
         "resilience_divergence_detected": (
             by_trauma[0][0] != by_trauma[-1][0]
             and by_stress[0][0] != by_stress[-1][0]
+        ),
+        "appraisal_divergence_detected": (
+            by_stress[0][0] != by_stress[-1][0]
+            or by_fear[0][0] != by_fear[-1][0]
+            or by_trust_damage[0][0] != by_trust_damage[-1][0]
         ),
     }
 
@@ -297,6 +367,8 @@ def agent_life_history_report(state: Dict[str, Any], limit: int = 10) -> Dict[st
             "trauma_load": round(float(agent.get("trauma_load", 0.0)), 4),
             "trust_damage": round(float(agent.get("trust_damage", 0.0)), 4),
             "resilience": round(float(agent.get("resilience", 0.0)), 4),
+            "threat_expectation": round(float(agent.get("threat_expectation", 0.0)), 4),
+            "trust_expectation": round(float(agent.get("trust_expectation", 0.0)), 4),
             "negative_memory_count": len(negative_memories),
             "last_negative_events": [m.get("event") for m in negative_memories[-5:]],
         }
@@ -357,6 +429,10 @@ def run_experiment(path: Path) -> Dict[str, Any]:
             "average_trauma_sensitivity": average_memory_field(immediate_state, label, "trauma_sensitivity", 1.0),
             "average_trauma_gain": average_memory_field(immediate_state, label, "trauma_gain", 0.0),
             "average_trust_damage_gain": average_memory_field(immediate_state, label, "trust_damage_gain", 0.0),
+            "average_threat_appraisal_multiplier": average_memory_field(immediate_state, label, "threat_appraisal_multiplier", 1.0),
+            "average_trust_appraisal_multiplier": average_memory_field(immediate_state, label, "trust_appraisal_multiplier", 1.0),
+            "average_threat_expectation_gain": average_memory_field(immediate_state, label, "threat_expectation_gain", 0.0),
+            "average_trust_expectation_gain": average_memory_field(immediate_state, label, "trust_expectation_gain", 0.0),
         }
 
         if groups:
@@ -416,6 +492,8 @@ def run_experiment(path: Path) -> Dict[str, Any]:
             "event_phase_fear": "rose" if event_phase_delta["fear"] > 0 else "fell_or_stable",
             "event_phase_trauma": "rose" if event_phase_delta["trauma_load"] > 0 else "fell_or_stable",
             "event_phase_trust_damage": "rose" if event_phase_delta["trust_damage"] > 0 else "fell_or_stable",
+            "event_phase_threat_expectation": "rose" if event_phase_delta["threat_expectation"] > 0 else "fell_or_stable",
+            "event_phase_trust_expectation": "rose" if event_phase_delta["trust_expectation"] > 0 else "fell_or_stable",
             "recovery_stress": "recovered" if recovery_delta["stress"] < 0 else "increased_or_stable",
             "recovery_fear": "recovered" if recovery_delta["fear"] < 0 else "increased_or_stable",
             **classify_total_delta(total_delta),
@@ -467,6 +545,8 @@ def run_experiment(path: Path) -> Dict[str, Any]:
             f"trauma_sensitivity={step['average_trauma_sensitivity']} "
             f"trauma_gain={step['average_trauma_gain']} "
             f"trust_damage_gain={step['average_trust_damage_gain']} "
+            f"threat_appraisal={step['average_threat_appraisal_multiplier']} "
+            f"trust_appraisal={step['average_trust_appraisal_multiplier']} "
             f"impacted={step['impacted_agents']}"
         )
 
@@ -490,6 +570,8 @@ def run_experiment(path: Path) -> Dict[str, Any]:
         print(
             f"  {agent['id']}: trauma={agent['trauma_load']} "
             f"trust_damage={agent['trust_damage']} resilience={agent['resilience']} "
+            f"threat_expectation={agent['threat_expectation']} "
+            f"trust_expectation={agent['trust_expectation']} "
             f"negative_memories={agent['negative_memory_count']}"
         )
 

@@ -1,0 +1,18 @@
+{
+  "name": "appraisal_memory_carryover",
+  "repeat": 4,
+  "gap_ticks": 10,
+  "ticks": 100,
+  "event": {
+    "label": "repeated_ambiguous_warning",
+    "x": 50,
+    "y": 50,
+    "radius": 45,
+    "stress_delta": 0.035,
+    "trust_delta": -0.015,
+    "health_delta": 0.0,
+    "ambiguity": 1.0,
+    "threat_cue": 1.0,
+    "trust_cue": 0.75
+  }
+}

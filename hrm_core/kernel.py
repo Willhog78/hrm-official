@@ -39,6 +39,13 @@ class KernelConfig:
     trauma_recovery_drag_strength: float = 0.55
     minimum_recovery_drag: float = 0.18
 
+    # Cognition v0.5 tuning: appraisal bias.
+    # Expectations are learned interpretive priors. They do not directly change
+    # emotion every tick; they change how ambiguous events are perceived.
+    expectation_gain_strength: float = 0.50
+    expectation_decay_rate: float = 0.00030
+    max_appraisal_bias: float = 1.25
+
 
 class HRMKernel:
     """Generic HRM kernel. No frontend. No Jackson. No Simfeld.
@@ -136,6 +143,8 @@ class HRMKernel:
             trauma_load=0.0,
             trust_damage=0.0,
             resilience=self.rng.uniform(0.25, 0.85),
+            threat_expectation=0.0,
+            trust_expectation=0.0,
         )
 
     def inject_event(self, event: Dict[str, Any]) -> None:
@@ -148,6 +157,9 @@ class HRMKernel:
         e.setdefault("trust_delta", -0.03)
         e.setdefault("health_delta", 0.0)
         e.setdefault("label", "external_event")
+        e.setdefault("ambiguity", 0.0)
+        e.setdefault("threat_cue", 1.0)
+        e.setdefault("trust_cue", 1.0)
 
         self.state.events.append(e)
         self._apply_event(e)
@@ -203,6 +215,9 @@ class HRMKernel:
         base_stress_delta = float(e.get("stress_delta", 0.0))
         base_trust_delta = float(e.get("trust_delta", 0.0))
         base_health_delta = float(e.get("health_delta", 0.0))
+        ambiguity = clamp(float(e.get("ambiguity", 0.0)))
+        threat_cue = clamp(float(e.get("threat_cue", 1.0)))
+        trust_cue = clamp(float(e.get("trust_cue", 1.0)))
 
         is_negative_event = (
             base_stress_delta > 0.0
@@ -225,6 +240,23 @@ class HRMKernel:
             )
 
             trauma_sensitivity = 1.0 + (self._effective_trauma(agent) * 0.35)
+
+            threat_appraisal_bias = (
+                ambiguity
+                * threat_cue
+                * agent.threat_expectation
+                * self.config.max_appraisal_bias
+            )
+            trust_appraisal_bias = (
+                ambiguity
+                * trust_cue
+                * agent.trust_expectation
+                * self.config.max_appraisal_bias
+            )
+
+            threat_appraisal_multiplier = 1.0 + threat_appraisal_bias
+            trust_appraisal_multiplier = 1.0 + trust_appraisal_bias
+
             negative_multiplier = memory_multiplier * trauma_sensitivity if is_negative_event else 1.0
 
             stress_delta = base_stress_delta * spatial_weight
@@ -232,20 +264,20 @@ class HRMKernel:
             health_delta = base_health_delta * spatial_weight
 
             if base_stress_delta > 0.0:
-                stress_delta *= negative_multiplier
+                stress_delta *= negative_multiplier * threat_appraisal_multiplier
 
             if base_trust_delta < 0.0:
-                trust_delta *= negative_multiplier
+                trust_delta *= negative_multiplier * trust_appraisal_multiplier
 
             if base_health_delta < 0.0:
-                health_delta *= negative_multiplier
+                health_delta *= negative_multiplier * threat_appraisal_multiplier
 
             fear_delta = max(0.0, base_stress_delta) * 0.45 * spatial_weight
             valence_delta = -max(0.0, base_stress_delta) * 0.25 * spatial_weight
 
             if is_negative_event:
-                fear_delta *= negative_multiplier
-                valence_delta *= negative_multiplier
+                fear_delta *= negative_multiplier * threat_appraisal_multiplier
+                valence_delta *= negative_multiplier * max(threat_appraisal_multiplier, trust_appraisal_multiplier)
 
             old_stress = agent.stress
             old_trust = agent.trust
@@ -281,6 +313,23 @@ class HRMKernel:
                     )
                     agent.trust_damage = clamp(agent.trust_damage + trust_damage_gain)
 
+                threat_expectation_gain = (
+                    (actual_stress_gain * 0.55 + actual_fear_gain * 0.45)
+                    * self.config.expectation_gain_strength
+                    * (1.0 - agent.resilience * 0.30)
+                )
+                trust_expectation_gain = (
+                    actual_trust_loss
+                    * self.config.expectation_gain_strength
+                    * (1.0 - agent.resilience * 0.25)
+                )
+
+                agent.threat_expectation = clamp(agent.threat_expectation + threat_expectation_gain)
+                agent.trust_expectation = clamp(agent.trust_expectation + trust_expectation_gain)
+            else:
+                threat_expectation_gain = 0.0
+                trust_expectation_gain = 0.0
+
             agent.memory.append(
                 {
                     "tick": self.state.tick,
@@ -289,11 +338,17 @@ class HRMKernel:
                     "negative": is_negative_event,
                     "memory_multiplier": round(memory_multiplier, 3),
                     "trauma_sensitivity": round(trauma_sensitivity, 3),
+                    "threat_appraisal_multiplier": round(threat_appraisal_multiplier, 3),
+                    "trust_appraisal_multiplier": round(trust_appraisal_multiplier, 3),
+                    "threat_expectation": round(agent.threat_expectation, 4),
+                    "trust_expectation": round(agent.trust_expectation, 4),
                     "stress_delta": round(stress_delta, 4),
                     "trust_delta": round(trust_delta, 4),
                     "fear_delta": round(fear_delta, 4),
                     "trauma_gain": round(trauma_gain, 5),
                     "trust_damage_gain": round(trust_damage_gain, 5),
+                    "threat_expectation_gain": round(threat_expectation_gain, 5),
+                    "trust_expectation_gain": round(trust_expectation_gain, 5),
                 }
             )
 
@@ -318,6 +373,8 @@ class HRMKernel:
                 # Persistent trauma decays slowly. Trust damage decays slower.
                 agent.trauma_load = clamp(agent.trauma_load * (1.0 - self.config.trauma_decay_rate))
                 agent.trust_damage = clamp(agent.trust_damage * (1.0 - self.config.trust_damage_decay_rate))
+                agent.threat_expectation = clamp(agent.threat_expectation * (1.0 - self.config.expectation_decay_rate))
+                agent.trust_expectation = clamp(agent.trust_expectation * (1.0 - self.config.expectation_decay_rate))
 
                 # Recent negative memories and persistent trauma both slow recovery.
                 scar_load = self._agent_scar_load(agent)
