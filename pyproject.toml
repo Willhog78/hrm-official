@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hrm-coordination-stage1"
+version = "0.3.0"
+description = "Human Resonance Model — clean Stage-1 coordination rebuild"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+addopts = "-q -p no:ddtrace"
