@@ -113,6 +113,11 @@ class TransactionFabric:
             return self._ports[authority_id].snapshot(normalized)
 
     def _proposal_rank(self, proposal: TransactionProposal) -> str:
+        # Trust assumption (Stage-1 scope): proposal_id and transaction_id are
+        # proposer-chosen and run_seed is readable, so a kernel written to game
+        # arbitration could search for winning IDs. The hash removes accidental
+        # bias (ID naming/sort order); deliberate gaming requires a hostile kernel,
+        # which Stage 1 does not defend against (see architecture doc).
         payload = {
             "seed": self.run_seed,
             "epoch": proposal.logical_epoch,
@@ -122,21 +127,33 @@ class TransactionFabric:
         }
         return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
 
-    def _validate_shape(self, proposal: TransactionProposal) -> None:
+    def _validate_identity(self, proposal: TransactionProposal) -> None:
+        """Batch-level: without identities a proposal cannot be recorded as evidence."""
         if not proposal.proposal_id or not proposal.transaction_id or not proposal.proposer_id:
             raise ValueError("proposal, transaction and proposer ids are required")
+
+    def _mutation_shape_error(self, proposal: TransactionProposal) -> str | None:
+        """Proposer-attributable shape defects. `resolve` rejects only the offending
+        proposal for these; one malformed proposal must not fail the whole epoch."""
         if not proposal.mutations:
-            raise ValueError("transaction must contain at least one mutation")
+            return "transaction must contain at least one mutation"
         if len({m.ref.as_key() for m in proposal.mutations}) != len(proposal.mutations):
-            raise ValueError("duplicate mutation resource")
+            return "duplicate mutation resource"
         missing = sorted({m.ref.authority_id for m in proposal.mutations} - set(self._ports))
         if missing:
-            raise ValueError(f"unknown authority ids: {missing}")
+            return f"unknown authority ids: {missing}"
         unknown_resources = sorted(
             m.ref.as_key() for m in proposal.mutations if m.ref.as_key() not in self._resource_locks
         )
         if unknown_resources:
-            raise ValueError(f"unknown resource keys: {unknown_resources}")
+            return f"unknown resource keys: {unknown_resources}"
+        return None
+
+    def _validate_shape(self, proposal: TransactionProposal) -> None:
+        self._validate_identity(proposal)
+        error = self._mutation_shape_error(proposal)
+        if error is not None:
+            raise ValueError(error)
 
     def _component_indexes(self, proposals: Sequence[TransactionProposal]) -> list[list[int]]:
         # Union-find over resource conflicts. A multi-authority transaction is one
@@ -305,15 +322,24 @@ class TransactionFabric:
             self.ledger.validate_transaction_ids(proposals)
 
             for proposal in proposals:
-                self._validate_shape(proposal)
+                self._validate_identity(proposal)
                 if proposal.logical_epoch != epoch:
                     raise ValueError("proposal epoch mismatch")
 
-            # Validate authoritative provenance against prior evidence. Invalid
-            # provenance is a proposal rejection, not a whole-epoch admission error.
+            # Malformed mutations and invalid authoritative provenance are proposal
+            # rejections (recorded as evidence), not whole-epoch admission errors.
             valid: list[TransactionProposal] = []
             invalid_results: dict[str, ProposalResult] = {}
             for proposal in proposals:
+                shape_error = self._mutation_shape_error(proposal)
+                if shape_error is not None:
+                    invalid_results[proposal.proposal_id] = ProposalResult(
+                        proposal.proposal_id,
+                        proposal.transaction_id,
+                        "REJECTED",
+                        "ValueError: " + shape_error,
+                    )
+                    continue
                 try:
                     self.ledger.validate_proposal(proposal)
                     valid.append(proposal)

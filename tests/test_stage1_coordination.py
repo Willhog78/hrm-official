@@ -253,8 +253,9 @@ def test_s1_10_pathological_contention_is_deterministic():
 def test_s1_11_unknown_authority_cannot_be_mutated():
     _, _, fabric = make_system({"A": {"x": 0}})
     p = proposal("bad-owner", 0, [("NOT_A_KERNEL", "x", 0, 1)])
-    with pytest.raises(ValueError, match="unknown authority"):
-        fabric.resolve(0, [p])
+    result = fabric.resolve(0, [p]).results[0]
+    assert result.status == "REJECTED"
+    assert "unknown authority" in (result.reason or "")
     assert fabric.projection("A", ["x"])["x"].value == 0
 
 
@@ -567,3 +568,51 @@ def test_causal_state_digest_is_atomic_across_authorities():
 
     assert snapshot_values(fabric) == {"A": {"x": (1, 1)}, "B": {"y": (1, 1)}}
     assert observed in (pre, post)
+
+
+@pytest.mark.parametrize("bad_mutations, reason", [
+    ([], "at least one mutation"),
+    ([("B", "y", 0, 1), ("B", "y", 0, 2)], "duplicate mutation resource"),
+    ([("NOT_A_KERNEL", "x", 0, 1)], "unknown authority"),
+    ([("B", "missing", 0, 1)], "unknown resource keys"),
+])
+def test_malformed_proposal_rejects_only_itself(bad_mutations, reason):
+    from hrm_coordination import ProvenanceError
+
+    _, ledger, fabric = make_system({"A": {"x": 0}, "B": {"y": 0}}, seed="malformed-isolation")
+    good = proposal("good", 0, [("A", "x", 0, 1)])
+    bad = proposal("bad", 0, bad_mutations, txid="TX-BAD")
+    results = {r.proposal_id: r for r in fabric.resolve(0, [bad, good]).results}
+
+    assert results["good"].status == "COMMITTED"
+    assert results["bad"].status == "REJECTED"
+    assert reason in (results["bad"].reason or "")
+    assert snapshot_values(fabric) == {"A": {"x": (1, 1)}, "B": {"y": (0, 0)}}
+    assert {(r.transaction_id, r.status) for r in ledger.records} == {("tx-good", "COMMITTED"), ("TX-BAD", "REJECTED")}
+    assert ledger.verify_chain()
+    assert ledger.replay_state()["A"]["x"] == {"value": 1, "version": 1}
+    with pytest.raises(ProvenanceError, match="historical transaction_id reuse"):
+        fabric.resolve(1, [proposal("retry", 1, [("B", "y", 0, 1)], txid="TX-BAD")])
+
+
+def test_missing_identity_still_fails_whole_batch():
+    _, ledger, fabric = make_system({"A": {"x": 0}, "B": {"y": 0}}, seed="identity-batch")
+    good = proposal("good", 0, [("A", "x", 0, 1)])
+    anonymous = TransactionProposal(
+        proposal_id="anon",
+        transaction_id="",
+        proposer_id="worker-anon",
+        logical_epoch=0,
+        mutations=(Mutation(ResourceRef("B", "y"), 0, 1),),
+    )
+    with pytest.raises(ValueError, match="ids are required"):
+        fabric.resolve(0, [good, anonymous])
+    assert snapshot_values(fabric) == {"A": {"x": (0, 0)}, "B": {"y": (0, 0)}}
+    assert ledger.records == ()
+    assert ledger.epoch_blocks == ()
+
+
+def test_plan_conflict_domains_still_raises_on_malformed_proposal():
+    _, _, fabric = make_system({"A": {"x": 0}}, seed="plan-malformed")
+    with pytest.raises(ValueError, match="unknown authority"):
+        fabric.plan_conflict_domains([proposal("bad", 0, [("NOT_A_KERNEL", "x", 0, 1)])])

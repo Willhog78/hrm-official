@@ -33,6 +33,12 @@ The locked HM-S01-08 scored challenge observed 8 simultaneously active independe
 
 Within a real conflict domain, proposals are ranked by a hash of run seed, epoch, proposal ID, transaction ID and conflict keys. Enumeration order is not a priority rule. Duplicate proposal IDs and duplicate transaction IDs in the same batch are rejected.
 
+**Trust assumption (recorded post-Round-2, not a reviewed verdict):** proposal and transaction IDs are proposer-chosen and the run seed is readable by kernels, so a kernel deliberately written to game arbitration could search for IDs that win conflicts. The hash removes accidental bias from ID naming or sort order; it does not defend against deliberate gaming. Stage 1 treats kernels as non-hostile, consistent with deferring hostile-process isolation to a process/distributed boundary. Closing this gap would require ranking on non-proposer-chosen inputs or commit-reveal, and is not implemented.
+
+### Malformed proposals
+
+Batch-integrity errors fail the whole `resolve` call with no state or evidence change: missing proposal/transaction/proposer IDs, duplicate proposal or transaction IDs within the batch, proposal/epoch mismatch, inadmissible epoch, and historical transaction-ID reuse. Proposer-attributable defects reject only the offending proposal and are recorded as `REJECTED` ledger evidence (burning its transaction ID): empty mutation list, duplicate mutation resource, unknown authority, unknown resource key, and invalid authoritative provenance. Other proposals in the epoch proceed. `plan_conflict_domains` still raises on any shape defect.
+
 ### Stale reads
 
 Every mutation carries an expected version. The owning authority validates that version at prepare time. A stale read rejects rather than silently committing against newer state.
