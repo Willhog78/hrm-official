@@ -179,8 +179,12 @@ class ReplayLedger:
 
         # Revalidate against prior-epoch evidence only. Same-epoch causal provenance
         # is intentionally illegal under the explicit feedback-lag contract.
-        for proposal in proposals:
-            self._validate_provenance(proposal)
+        # REJECTED entries are evidence that a proposal was refused (including for
+        # invalid provenance); they carry no causal effect, so only COMMITTED
+        # entries must have admissible provenance.
+        for proposal, status, _, _ in entries:
+            if status == "COMMITTED":
+                self._validate_provenance(proposal)
             record_id = self._record_id_for(proposal)
             if record_id in self._record_ids:
                 raise ProvenanceError(f"historical record_id reuse: {record_id}")
@@ -259,6 +263,8 @@ class ReplayLedger:
         seen_tx_ids: set[str] = set()
         for rec in self._records:
             if rec.record_id in seen_ids or rec.transaction_id in seen_tx_ids:
+                return False
+            if rec.config_fingerprint != self.config_fingerprint:
                 return False
             seen_ids.add(rec.record_id)
             seen_tx_ids.add(rec.transaction_id)

@@ -113,6 +113,11 @@ class TransactionFabric:
             return self._ports[authority_id].snapshot(normalized)
 
     def _proposal_rank(self, proposal: TransactionProposal) -> str:
+        # Trust assumption (Stage-1 scope): proposal_id and transaction_id are
+        # proposer-chosen and run_seed is readable, so a kernel written to game
+        # arbitration could search for winning IDs. The hash removes accidental
+        # bias (ID naming/sort order); deliberate gaming requires a hostile kernel,
+        # which Stage 1 does not defend against (see architecture doc).
         payload = {
             "seed": self.run_seed,
             "epoch": proposal.logical_epoch,
@@ -122,21 +127,33 @@ class TransactionFabric:
         }
         return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
 
-    def _validate_shape(self, proposal: TransactionProposal) -> None:
+    def _validate_identity(self, proposal: TransactionProposal) -> None:
+        """Batch-level: without identities a proposal cannot be recorded as evidence."""
         if not proposal.proposal_id or not proposal.transaction_id or not proposal.proposer_id:
             raise ValueError("proposal, transaction and proposer ids are required")
+
+    def _mutation_shape_error(self, proposal: TransactionProposal) -> str | None:
+        """Proposer-attributable shape defects. `resolve` rejects only the offending
+        proposal for these; one malformed proposal must not fail the whole epoch."""
         if not proposal.mutations:
-            raise ValueError("transaction must contain at least one mutation")
+            return "transaction must contain at least one mutation"
         if len({m.ref.as_key() for m in proposal.mutations}) != len(proposal.mutations):
-            raise ValueError("duplicate mutation resource")
+            return "duplicate mutation resource"
         missing = sorted({m.ref.authority_id for m in proposal.mutations} - set(self._ports))
         if missing:
-            raise ValueError(f"unknown authority ids: {missing}")
+            return f"unknown authority ids: {missing}"
         unknown_resources = sorted(
             m.ref.as_key() for m in proposal.mutations if m.ref.as_key() not in self._resource_locks
         )
         if unknown_resources:
-            raise ValueError(f"unknown resource keys: {unknown_resources}")
+            return f"unknown resource keys: {unknown_resources}"
+        return None
+
+    def _validate_shape(self, proposal: TransactionProposal) -> None:
+        self._validate_identity(proposal)
+        error = self._mutation_shape_error(proposal)
+        if error is not None:
+            raise ValueError(error)
 
     def _component_indexes(self, proposals: Sequence[TransactionProposal]) -> list[list[int]]:
         # Union-find over resource conflicts. A multi-authority transaction is one
@@ -305,15 +322,24 @@ class TransactionFabric:
             self.ledger.validate_transaction_ids(proposals)
 
             for proposal in proposals:
-                self._validate_shape(proposal)
+                self._validate_identity(proposal)
                 if proposal.logical_epoch != epoch:
                     raise ValueError("proposal epoch mismatch")
 
-            # Validate authoritative provenance against prior evidence. Invalid
-            # provenance is a proposal rejection, not a whole-epoch admission error.
+            # Malformed mutations and invalid authoritative provenance are proposal
+            # rejections (recorded as evidence), not whole-epoch admission errors.
             valid: list[TransactionProposal] = []
             invalid_results: dict[str, ProposalResult] = {}
             for proposal in proposals:
+                shape_error = self._mutation_shape_error(proposal)
+                if shape_error is not None:
+                    invalid_results[proposal.proposal_id] = ProposalResult(
+                        proposal.proposal_id,
+                        proposal.transaction_id,
+                        "REJECTED",
+                        "ValueError: " + shape_error,
+                    )
+                    continue
                 try:
                     self.ledger.validate_proposal(proposal)
                     valid.append(proposal)
@@ -378,22 +404,34 @@ class TransactionFabric:
                     local.append((proposal.proposal_id, result, staged))
                 return local
 
-            if component_execution_order is not None or len(execution) <= 1 or self.max_parallel_domains == 1:
-                component_results = [execute_component(i) for i in execution]
-            else:
-                workers = min(len(execution), self.max_parallel_domains)
-                with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="hrm-domain") as pool:
-                    futures = [pool.submit(execute_component, i) for i in execution]
-                    component_results = [future.result() for future in futures]
+            try:
+                if component_execution_order is not None or len(execution) <= 1 or self.max_parallel_domains == 1:
+                    component_results = [execute_component(i) for i in execution]
+                else:
+                    workers = min(len(execution), self.max_parallel_domains)
+                    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="hrm-domain") as pool:
+                        futures = [pool.submit(execute_component, i) for i in execution]
+                        component_results = [future.result() for future in futures]
+            except BaseException:
+                # An unexpected failure in any domain must not leave other winners
+                # prepared/staged: that would block checkpoints indefinitely. The
+                # executor has joined every domain before this point; abort is
+                # idempotent, so aborting every winner is safe.
+                for proposal in winners_all:
+                    self._abort_staged(proposal)
+                raise
 
             for local in component_results:
                 for pid, result, staged in local:
                     result_map[pid] = result
                     committed_by_pid[pid] = staged
 
+            # Every proposal in the admitted batch, including provenance-rejected
+            # ones, leaves evidence. This records its transaction_id so it cannot
+            # be reused later in the run/replay domain.
             evidence_entries = [
                 (p, result_map[p.proposal_id].status, arbitration_digest, committed_by_pid.get(p.proposal_id, ()))
-                for p in sorted(valid, key=lambda x: (x.proposal_id, x.transaction_id))
+                for p in sorted(proposals, key=lambda x: (x.proposal_id, x.transaction_id))
             ]
 
             # Critical Round-2 correction: every rejection-capable ledger operation
@@ -423,10 +461,17 @@ class TransactionFabric:
             return ResolutionBatch(epoch, ordered_results, tuple(committed_all), arbitration_digest)
 
     def causal_state_digest(self) -> str:
+        # Hold every resource lock (canonical order, as in checkpoint) for the whole
+        # read. Per-authority projections would each be consistent, but a
+        # cross-authority transaction committing between them would yield a
+        # combined state that never existed.
         snapshot = {}
-        for aid in sorted(self._ports):
-            snap = self.projection(aid)
-            snapshot[aid] = {rid: {"value": v.value, "version": v.version} for rid, v in sorted(snap.items())}
+        with ExitStack() as stack:
+            for key in sorted(self._resource_locks):
+                stack.enter_context(self._resource_locks[key])
+            for aid in sorted(self._ports):
+                snap = self._ports[aid].snapshot()
+                snapshot[aid] = {rid: {"value": v.value, "version": v.version} for rid, v in sorted(snap.items())}
         return digest_obj(snapshot)
 
     def checkpoint(self) -> dict:
