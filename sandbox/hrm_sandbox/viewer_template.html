@@ -1,0 +1,480 @@
+<title>HRM Sandbox Runs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --ground: #eef0ec;
+  --panel: #fbfcfa;
+  --ink: #1d2320;
+  --muted: #5e6862;
+  --line: #d6dbd4;
+  --accent: #b5542c;
+  --accent-soft: #f3e1d7;
+  --water: #5b8fb9; --grass: #a9c47f; --forest: #5f8a4e; --rock: #a39c90;
+  --berry: #8e2a5c; --bare: #6f7d5c; --nut: #6b4520; --tree: #2f5327;
+  --rabbit: #f4f1e8; --crafted: #ffffff;
+  --b0: #d1462a; --b1: #1f8f8f; --b2: #d99100; --b3: #7a5cc7;
+  --winter: rgba(255,255,255,.28);
+  --outline: rgba(20,24,22,.85);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121714; --panel: #1a201c; --ink: #e5e9e4; --muted: #95a198; --line: #2c3530;
+    --accent: #e58a5c; --accent-soft: #3a2519;
+    --water: #2d5575; --grass: #5b7442; --forest: #35532c; --rock: #6d675e;
+    --berry: #d05591; --bare: #46523a; --nut: #b07a3f; --tree: #1f3a1a;
+    --winter: rgba(220,230,240,.16); --outline: rgba(0,0,0,.9);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121714; --panel: #1a201c; --ink: #e5e9e4; --muted: #95a198; --line: #2c3530;
+  --accent: #e58a5c; --accent-soft: #3a2519;
+  --water: #2d5575; --grass: #5b7442; --forest: #35532c; --rock: #6d675e;
+  --berry: #d05591; --bare: #46523a; --nut: #b07a3f; --tree: #1f3a1a;
+  --winter: rgba(220,230,240,.16); --outline: rgba(0,0,0,.9);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink);
+  font: 14px/1.5 "IBM Plex Sans", system-ui, sans-serif;
+  padding-inline: 16px; padding-block: 20px 40px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 { font: 800 26px/1.1 Archivo, system-ui, sans-serif; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+h1 span { color: var(--accent); }
+.tag { font: 500 11px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 3px; }
+h2 { font: 700 12px Archivo, system-ui, sans-serif; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--muted); margin: 0 0 8px; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.runs { display: flex; gap: 6px; flex-wrap: wrap; }
+.runs button, .ctl {
+  font: 500 13px "IBM Plex Sans", system-ui, sans-serif; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 4px; padding: 5px 10px; cursor: pointer;
+}
+.runs button[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.ctl.play { min-width: 76px; font-weight: 600; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select.ctl { padding-right: 6px; }
+.scrub { flex: 1 1 260px; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.scrub input { flex: 1; min-width: 0; accent-color: var(--accent); }
+.clock { font: 500 13px "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.mapbox { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+#map { width: 100%; height: auto; display: block; image-rendering: pixelated; border-radius: 3px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--ground);
+  font: 12px "IBM Plex Mono", monospace; padding: 4px 7px; border-radius: 3px; white-space: nowrap; }
+.side { display: grid; gap: 16px; }
+.block { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat b { display: block; font: 700 22px Archivo, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.season { font: 600 13px "IBM Plex Sans", sans-serif; }
+.bars { display: grid; gap: 5px; margin-top: 4px; }
+.bar { display: grid; grid-template-columns: 1fr 34px; gap: 8px; align-items: center; font-size: 12.5px; }
+.bar .lbl { overflow: hidden; }
+.bar .lbl i { display: block; height: 5px; border-radius: 2px; margin-top: 3px; background: var(--accent); }
+.bar .n { font: 500 12px "IBM Plex Mono", monospace; text-align: right; font-variant-numeric: tabular-nums; }
+.empty { color: var(--muted); font-size: 12.5px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid var(--outline); }
+.sq { width: 10px; height: 10px; display: inline-block; border-radius: 2px; }
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
+.chart canvas { width: 100%; height: 190px; display: block; cursor: pointer; }
+.feed { max-height: 300px; overflow-y: auto; font-size: 12.5px; display: grid; gap: 2px; }
+.ev { display: grid; grid-template-columns: 64px 1fr; gap: 8px; padding: 3px 0; border-bottom: 1px dashed var(--line); }
+.ev .t { font: 12px "IBM Plex Mono", monospace; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ev.first { color: var(--accent); font-weight: 600; }
+.note { font-size: 12.5px; color: var(--muted); max-width: 80ch; }
+.note code { font: 12px "IBM Plex Mono", monospace; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>HRM Sandbox <span>Runs</span></h1>
+    <span class="tag">Exploratory · not qualification evidence</span>
+  </header>
+
+  <div class="controls">
+    <div class="runs" id="runs" role="group" aria-label="Choose run"></div>
+    <button class="ctl play" id="play" type="button">Play</button>
+    <select class="ctl" id="speed" aria-label="Playback speed">
+      <option value="4">Slow</option>
+      <option value="12" selected>Normal</option>
+      <option value="30">Fast</option>
+    </select>
+    <div class="scrub">
+      <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Time">
+      <span class="clock" id="clock">t 0</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="mapbox">
+      <canvas id="map"></canvas>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <div class="side">
+      <div class="block">
+        <h2>World now</h2>
+        <div class="season" id="season"></div>
+        <div class="stats" style="margin-top:8px">
+          <div class="stat"><b id="sPop">0</b><span>people</span></div>
+          <div class="stat"><b id="sRab">0</b><span>rabbits</span></div>
+          <div class="stat"><b id="sHold">0</b><span>carrying</span></div>
+        </div>
+      </div>
+      <div class="block">
+        <h2>Population by origin</h2>
+        <div class="bars" id="bands"></div>
+      </div>
+      <div class="block">
+        <h2>Behaviours in use</h2>
+        <div class="bars" id="known"></div>
+      </div>
+      <div class="block">
+        <h2>Map key</h2>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="block chart">
+      <h2>People (stacked by origin) and rabbits</h2>
+      <canvas id="chartPop" aria-label="Population chart; click to jump"></canvas>
+    </div>
+    <div class="block chart">
+      <h2>Behaviour prevalence (people holding it)</h2>
+      <canvas id="chartKnow" aria-label="Behaviour prevalence chart; click to jump"></canvas>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Learning log — who figured out what, and from whom</h2>
+    <div class="feed" id="feed"></div>
+  </div>
+
+  <p class="note" id="about"></p>
+</div>
+
+<script>
+const RUNS = /*__DATA__*/null;
+
+const HELD = [
+  null,                                  // bare hand
+  ["soft", "--c-soft"], ["soft long", "--c-soft"], ["soft sharp", "--c-sharp"], ["soft sharp long", "--c-spear"],
+  ["hard", "--c-hard"], ["hard long", "--c-hardlong"], ["hard sharp", "--c-sharp"], ["hard sharp long", "--c-spear"],
+];
+const HELD_COLORS = { "--c-soft": "#c9a46a", "--c-hard": "#8f99a3", "--c-hardlong": "#4cc3f0", "--c-sharp": "#ffffff", "--c-spear": "#ff4f7b" };
+const LINE_COLORS = ["#b5542c", "#1f8f8f", "#7a5cc7", "#d99100", "#3f7fbf", "#8e2a5c"];
+const BAND_NAMES = ["North-west", "North-east", "South-west", "South-east", "Centre", "North", "South", "West"];
+
+const $ = (id) => document.getElementById(id);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+let run = null, idx = 0, playing = false, lastTs = 0, acc = 0;
+let terrainCanvas = null, popBase = null, knowBase = null, topKeys = [];
+const CELL = 12;
+
+function seasonName(t) { return run.meta.seasons[Math.floor((t % run.meta.year) * 4 / run.meta.year)]; }
+function bandColor(b) { return css("--b" + (b % 4)); }
+
+function buildRuns() {
+  const box = $("runs");
+  RUNS.forEach((r, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = "Seed " + r.meta.seed;
+    b.id = "run" + i;
+    b.addEventListener("click", () => selectRun(i));
+    box.appendChild(b);
+  });
+}
+
+function selectRun(i) {
+  run = RUNS[i];
+  feedCount = -1;
+  [...$("runs").children].forEach((b, j) => b.setAttribute("aria-pressed", String(i === j)));
+  const m = $("map");
+  m.width = run.meta.w * CELL; m.height = run.meta.h * CELL;
+  $("scrub").max = run.frames.length - 1;
+  // top behaviours = highest peak prevalence across the run
+  const peak = {};
+  run.series.forEach(s => { for (const k in s.known) peak[k] = Math.max(peak[k] || 0, s.known[k]); });
+  topKeys = Object.keys(peak).sort((a, b) => peak[b] - peak[a]).slice(0, 6);
+  paintStatic();
+  seek(0);
+  describeRun();
+}
+
+function describeRun() {
+  const m = run.meta, d = m.deaths;
+  const deaths = Object.keys(d).map(k => `${d[k]} ${k}`).join(", ");
+  const years = (m.ticks / m.year).toFixed(0);
+  $("about").innerHTML = `Seed ${m.seed}: ${m.w}×${m.h} cells, ${m.ticks} ticks (${years} simulated years of ${m.year} ticks), ` +
+    `${m.births} births, deaths: ${deaths || "none"}. Nobody starts out knowing any technique. The code has no named tools or technologies: ` +
+    `each person only learns how much food a (held object, action, target) combination tends to produce, from trying it or from watching someone nearby. ` +
+    `Labels here are the observer describing what people ended up valuing. Regenerate with <code>python -m hrm_sandbox.run --seed ${m.seed}</code>.`;
+}
+
+function paintStatic() {
+  const { w, h } = run.meta;
+  terrainCanvas = document.createElement("canvas");
+  terrainCanvas.width = w * CELL; terrainCanvas.height = h * CELL;
+  const g = terrainCanvas.getContext("2d");
+  const cols = [css("--water"), css("--grass"), css("--forest"), css("--rock")];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    g.fillStyle = cols[run.terrain[y * w + x]];
+    g.fillRect(x * CELL, y * CELL, CELL, CELL);
+  }
+  g.fillStyle = css("--tree");
+  for (let i = 0; i < run.trees.length; i += 2) {
+    const x = run.trees[i] * CELL, y = run.trees[i + 1] * CELL;
+    g.beginPath(); g.moveTo(x + CELL / 2, y + 2); g.lineTo(x + CELL - 2, y + CELL - 2); g.lineTo(x + 2, y + CELL - 2); g.fill();
+  }
+  popBase = drawPopChart();
+  knowBase = drawKnowChart();
+  buildLegend();
+}
+
+function drawMap() {
+  const m = $("map"), g = m.getContext("2d"), f = run.frames[idx], s = run.series[idx];
+  g.drawImage(terrainCanvas, 0, 0);
+  if (s.season === 3) { g.fillStyle = css("--winter"); g.fillRect(0, 0, m.width, m.height); }
+  const berry = css("--berry"), bare = css("--bare");
+  for (let i = 0; i < f.b.length; i++) {
+    const x = run.bushes[2 * i] * CELL + CELL / 2, y = run.bushes[2 * i + 1] * CELL + CELL / 2;
+    g.fillStyle = f.b[i] > 0 ? berry : bare;
+    g.beginPath(); g.arc(x, y, f.b[i] > 0 ? 1.8 + f.b[i] * 0.45 : 1.6, 0, 7); g.fill();
+  }
+  g.fillStyle = css("--nut");
+  for (let i = 0; i < f.n.length; i += 2) g.fillRect(f.n[i] * CELL + 3, f.n[i + 1] * CELL + 7, 3, 3);
+  g.fillStyle = css("--crafted"); g.strokeStyle = css("--outline"); g.lineWidth = 1;
+  for (let i = 0; i < f.m.length; i += 2) {
+    const x = f.m[i] * CELL + CELL / 2, y = f.m[i + 1] * CELL + CELL / 2;
+    g.beginPath(); g.moveTo(x, y - 3.5); g.lineTo(x + 3.5, y); g.lineTo(x, y + 3.5); g.lineTo(x - 3.5, y); g.closePath(); g.fill(); g.stroke();
+  }
+  g.fillStyle = css("--rabbit");
+  for (let i = 0; i < f.r.length; i += 2) g.fillRect(f.r[i] * CELL + 7, f.r[i + 1] * CELL + 2, 3, 3);
+  for (const [x, y, band, held, stage] of f.h) {
+    const cx = x * CELL + CELL / 2, cy = y * CELL + CELL / 2, r = [2.2, 3.2, 4.2][stage];
+    if (HELD[held]) {
+      g.strokeStyle = HELD_COLORS[HELD[held][1]]; g.lineWidth = 2.2;
+      g.beginPath(); g.arc(cx, cy, r + 2.2, 0, 7); g.stroke();
+    }
+    g.fillStyle = bandColor(band); g.strokeStyle = css("--outline"); g.lineWidth = 1;
+    g.beginPath(); g.arc(cx, cy, r, 0, 7); g.fill(); g.stroke();
+  }
+}
+
+function updatePanel() {
+  const s = run.series[idx], t = s.t;
+  const year = Math.floor(t / run.meta.year) + 1;
+  $("clock").textContent = `t ${t} · year ${year}`;
+  $("season").textContent = `Year ${year}, ${seasonName(t)}`;
+  $("sPop").textContent = s.pop; $("sRab").textContent = s.rabbits; $("sHold").textContent = s.holding;
+  const bands = Object.keys(run.series[0].bands).map(Number);
+  const maxB = Math.max(1, ...run.series.map(x => Math.max(0, ...Object.values(x.bands))));
+  $("bands").innerHTML = bands.map(b => {
+    const n = s.bands[b] || 0;
+    return `<div class="bar"><div class="lbl">${BAND_NAMES[b] || "Group " + b}<i style="width:${(n / maxB) * 100}%;background:${bandColor(b)}"></i></div><div class="n">${n}</div></div>`;
+  }).join("");
+  const ks = Object.keys(s.known).sort((a, b) => s.known[b] - s.known[a]).slice(0, 7);
+  $("known").innerHTML = ks.length ? ks.map(k => {
+    const n = s.known[k];
+    return `<div class="bar"><div class="lbl">${run.labels[k] || k}<i style="width:${(n / Math.max(1, s.pop)) * 100}%"></i></div><div class="n">${n}</div></div>`;
+  }).join("") : `<div class="empty">Nobody values anything beyond bare hands yet.</div>`;
+  updateFeed(t);
+}
+
+let feedCount = -1;
+function updateFeed(t) {
+  // events are time-ordered; binary search the cut
+  let lo = 0, hi = run.events.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (run.events[mid].t <= t) lo = mid + 1; else hi = mid; }
+  if (lo === feedCount) return;
+  feedCount = lo;
+  const seen = new Set(), firstIdx = new Set();
+  for (let i = 0; i < lo; i++) { const k = run.events[i].key; if (!seen.has(k)) { seen.add(k); firstIdx.add(i); } }
+  const rows = [];
+  for (let i = lo - 1; i >= 0 && rows.length < 60; i--) {
+    const e = run.events[i];
+    const who = `#${e.who} (${BAND_NAMES[e.band] || e.band})`;
+    const how = e.how === "discovered" ? "worked out" : `learned by watching #${e.from}:`;
+    const first = firstIdx.has(i);
+    rows.push(`<div class="ev${first ? " first" : ""}"><span class="t">t ${e.t}</span><span>${first ? "First in world — " : ""}${who} ${how} ${e.what}</span></div>`);
+  }
+  $("feed").innerHTML = rows.join("") || `<div class="empty">No learning events yet.</div>`;
+}
+
+// ----- charts --------------------------------------------------------------
+function setupCanvas(c) {
+  const dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { g, w, h };
+}
+const PAD = { l: 34, r: 38, t: 8, b: 20 };
+
+function axes(g, w, h, maxY, maxT, rightMax) {
+  g.font = "11px 'IBM Plex Mono', monospace"; g.fillStyle = css("--muted"); g.strokeStyle = css("--line"); g.lineWidth = 1;
+  const ticks = niceTicks(maxY);
+  ticks.forEach(v => {
+    const y = PAD.t + (h - PAD.t - PAD.b) * (1 - v / maxY);
+    g.beginPath(); g.moveTo(PAD.l, y + .5); g.lineTo(w - PAD.r, y + .5); g.stroke();
+    g.textAlign = "right"; g.fillText(v, PAD.l - 5, y + 4);
+  });
+  if (rightMax) niceTicks(rightMax).forEach(v => {
+    const y = PAD.t + (h - PAD.t - PAD.b) * (1 - v / rightMax);
+    g.textAlign = "left"; g.fillText(v, w - PAD.r + 5, y + 4);
+  });
+  g.textAlign = "center";
+  const yr = run.meta.year, step = Math.max(1, Math.ceil(maxT / yr / 6));
+  for (let k = 0; k * yr <= maxT; k += step) {
+    const x = PAD.l + (w - PAD.l - PAD.r) * (k * yr / maxT);
+    g.fillText("y" + k, x, h - 5);
+  }
+}
+function niceTicks(max) {
+  const raw = max / 4, mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  const step = [1, 2, 5, 10].map(m => m * mag).find(s => s >= raw) || mag;
+  const out = []; for (let v = 0; v <= max; v += step) out.push(Math.round(v)); return out;
+}
+const xOf = (t, w, maxT) => PAD.l + (w - PAD.l - PAD.r) * (t / maxT);
+const yOf = (v, h, maxY) => PAD.t + (h - PAD.t - PAD.b) * (1 - v / maxY);
+
+function drawPopChart() {
+  const c = $("chartPop"), { g, w, h } = setupCanvas(c), S = run.series, maxT = S[S.length - 1].t;
+  const bands = Object.keys(S[0].bands).map(Number);
+  const maxY = Math.max(10, ...S.map(s => s.pop)) * 1.1;
+  const maxR = Math.max(10, ...S.map(s => s.rabbits)) * 1.1;
+  axes(g, w, h, Math.ceil(maxY), maxT, Math.ceil(maxR));
+  const base = S.map(() => 0);
+  bands.forEach(b => {
+    g.fillStyle = bandColor(b); g.globalAlpha = .75; g.beginPath();
+    S.forEach((s, i) => { const v = base[i] + (s.bands[b] || 0); const x = xOf(s.t, w, maxT), y = yOf(v, h, maxY); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+    for (let i = S.length - 1; i >= 0; i--) g.lineTo(xOf(S[i].t, w, maxT), yOf(base[i], h, maxY));
+    g.closePath(); g.fill(); g.globalAlpha = 1;
+    S.forEach((s, i) => base[i] += (s.bands[b] || 0));
+  });
+  g.strokeStyle = css("--ink"); g.lineWidth = 1.4; g.setLineDash([4, 3]); g.beginPath();
+  S.forEach((s, i) => { const x = xOf(s.t, w, maxT), y = yOf(s.rabbits, h, maxR); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+  g.stroke(); g.setLineDash([]);
+  g.fillStyle = css("--muted"); g.textAlign = "right"; g.fillText("rabbits ┄ (right axis)", w - PAD.r - 4, PAD.t + 10);
+  return snapshot(c);
+}
+
+function drawKnowChart() {
+  const c = $("chartKnow"), { g, w, h } = setupCanvas(c), S = run.series, maxT = S[S.length - 1].t;
+  const maxY = Math.max(10, ...S.map(s => s.pop)) * 1.1;
+  axes(g, w, h, Math.ceil(maxY), maxT, 0);
+  topKeys.forEach((k, j) => {
+    g.strokeStyle = LINE_COLORS[j % LINE_COLORS.length]; g.lineWidth = 1.8; g.beginPath();
+    S.forEach((s, i) => { const x = xOf(s.t, w, maxT), y = yOf(s.known[k] || 0, h, maxY); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+    g.stroke();
+  });
+  g.font = "11px 'IBM Plex Sans', sans-serif"; g.textAlign = "left";
+  topKeys.slice(0, 4).forEach((k, j) => {
+    g.fillStyle = LINE_COLORS[j]; g.fillRect(PAD.l + 6, PAD.t + 6 + j * 14, 10, 3);
+    g.fillStyle = css("--ink"); g.fillText(run.labels[k] || k, PAD.l + 20, PAD.t + 11 + j * 14);
+  });
+  return snapshot(c);
+}
+
+function snapshot(c) { const img = document.createElement("canvas"); img.width = c.width; img.height = c.height; img.getContext("2d").drawImage(c, 0, 0); return img; }
+
+function drawCursor(c, baseImg) {
+  if (!baseImg) return;
+  const g = c.getContext("2d"), dpr = window.devicePixelRatio || 1;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height); g.drawImage(baseImg, 0, 0);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const S = run.series, maxT = S[S.length - 1].t, x = xOf(S[idx].t, c.clientWidth, maxT);
+  g.strokeStyle = css("--accent"); g.lineWidth = 1.5; g.beginPath(); g.moveTo(x, PAD.t); g.lineTo(x, c.clientHeight - PAD.b); g.stroke();
+}
+
+function chartSeek(ev) {
+  const c = ev.currentTarget, r = c.getBoundingClientRect(), S = run.series, maxT = S[S.length - 1].t;
+  const frac = (ev.clientX - r.left - PAD.l) / (r.width - PAD.l - PAD.r);
+  const t = Math.max(0, Math.min(1, frac)) * maxT;
+  seek(Math.round(t / run.meta.frame_every));
+}
+
+function buildLegend() {
+  const items = [0, 1, 2, 3].filter(b => run.series[0].bands[b] !== undefined)
+    .map(b => `<span><i class="sw" style="background:${bandColor(b)}"></i>${BAND_NAMES[b]}</span>`);
+  items.push(`<span><i class="sq" style="background:${css("--berry")}"></i>berries</span>`);
+  items.push(`<span><i class="sq" style="background:${css("--nut")}"></i>nuts</span>`);
+  items.push(`<span><i class="sq" style="background:${css("--rabbit")};border:1px solid var(--line)"></i>rabbit</span>`);
+  items.push(`<span><i class="sq" style="background:${css("--tree")}"></i>nut tree</span>`);
+  items.push(`<span><i class="sq" style="background:#fff;border:1px solid var(--outline);transform:rotate(45deg) scale(.8)"></i>made object</span>`);
+  const rings = [["soft (stick)", "--c-soft"], ["hard (stone)", "--c-hard"], ["hard + long", "--c-hardlong"], ["sharp", "--c-sharp"], ["sharp + long", "--c-spear"]];
+  rings.forEach(([n, k]) => items.push(`<span><i class="sw" style="background:transparent;border:2.5px solid ${HELD_COLORS[k]};box-shadow:0 0 0 1px var(--outline)"></i>carrying ${n}</span>`));
+  $("legend").innerHTML = items.join("");
+}
+
+// ----- playback --------------------------------------------------------------
+function seek(i) {
+  idx = Math.max(0, Math.min(run.frames.length - 1, i));
+  $("scrub").value = idx;
+  drawMap(); updatePanel();
+  drawCursor($("chartPop"), popBase); drawCursor($("chartKnow"), knowBase);
+}
+function tick(ts) {
+  if (!playing) return;
+  const fps = +$("speed").value;
+  acc += (ts - (lastTs || ts)) / 1000 * fps; lastTs = ts;
+  if (acc >= 1) {
+    const n = Math.floor(acc); acc -= n;
+    if (idx + n >= run.frames.length - 1) { seek(run.frames.length - 1); setPlaying(false); return; }
+    seek(idx + n);
+  }
+  requestAnimationFrame(tick);
+}
+function setPlaying(p) {
+  playing = p; $("play").textContent = p ? "Pause" : "Play";
+  if (p) { if (idx >= run.frames.length - 1) seek(0); lastTs = 0; acc = 0; requestAnimationFrame(tick); }
+}
+
+function hover(ev) {
+  const m = $("map"), r = m.getBoundingClientRect();
+  const x = Math.floor((ev.clientX - r.left) / r.width * run.meta.w), y = Math.floor((ev.clientY - r.top) / r.height * run.meta.h);
+  const hit = run.frames[idx].h.filter(p => Math.abs(p[0] - x) <= 0 && Math.abs(p[1] - y) <= 0);
+  const tip = $("tip");
+  if (!hit.length) { tip.hidden = true; return; }
+  tip.textContent = hit.slice(0, 3).map(([, , b, held, st, id]) =>
+    `#${id} ${BAND_NAMES[b]} ${["infant", "child", "adult"][st]}${HELD[held] ? " · " + HELD[held][0] + " object" : ""}`).join("  |  ");
+  tip.hidden = false;
+  const box = m.parentElement.getBoundingClientRect();
+  tip.style.left = Math.min(ev.clientX - box.left + 12, box.width - tip.offsetWidth - 4) + "px";
+  tip.style.top = (ev.clientY - box.top + 12) + "px";
+}
+
+function init() {
+  if (!RUNS || !RUNS.length) { $("about").textContent = "No run data embedded. Generate with python -m hrm_sandbox.run."; return; }
+  buildRuns();
+  $("play").addEventListener("click", () => setPlaying(!playing));
+  $("scrub").addEventListener("input", e => { seek(+e.target.value); });
+  $("chartPop").addEventListener("click", chartSeek);
+  $("chartKnow").addEventListener("click", chartSeek);
+  $("map").addEventListener("mousemove", hover);
+  $("map").addEventListener("mouseleave", () => $("tip").hidden = true);
+  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { popBase = drawPopChart(); knowBase = drawKnowChart(); seek(idx); }, 150); });
+  const repaint = () => { paintStatic(); seek(idx); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaint);
+  new MutationObserver(repaint).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  selectRun(0);
+  // open on an informative moment, then play
+  seek(Math.floor(run.frames.length * 0.35));
+  if (!reduceMotion) setPlaying(true);
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(init); else init();
+</script>

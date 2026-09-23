@@ -14,6 +14,8 @@ Build an emergent human-population simulation in a consequential world without s
 - **Stage 1 — Coordination Architecture:** active corrected implementation. Round-2 defects DAR-S1-004 through DAR-S1-006 have been corrected in code and regression-tested here. This repository does **not** claim the required independent freeze review has been supplied in the review chain currently stored here.
 - **Stage 2 — Matter / Materials:** a self-tested Slice-A candidate is preserved under `drafts/stage2/`. It is quarantined from the active baseline until Stage-1 governance is formally satisfied.
 
+- **Sandbox (exploratory, ungoverned):** `sandbox/` holds a runnable world simulation. It has terrain, seasons, plants, rabbits, and humans who learn by trial and by watching each other. It is for looking at behaviour now and is **not** qualification evidence. See `sandbox/README.md` and the proposed `governance/HRM_GOVERNANCE_AMENDMENT_v2_SANDBOX_TRACK.md`.
+
 ## Stage-1 architecture
 
 The active coordination layer separates:
