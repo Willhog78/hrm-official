@@ -80,7 +80,7 @@ def test_s1_2_explicit_multirate_scheduling():
         return inner
 
     orch.register(ScheduleSpec("clock-A", 1, 0, 1), cb("A"))
-    orch.register(ScheduleSpec("clock-B", 2, 0, 2), cb("B"))
+    orch.register(ScheduleSpec("clock-B", 2, 0, 1), cb("B"))
     orch.register(ScheduleSpec("clock-C", 3, 1, 1), cb("C"))
     orch.run(7)
     assert fabric.projection("A", ["n"])["n"].value == 7
@@ -541,32 +541,55 @@ def test_unexpected_domain_failure_aborts_all_staged_winners(monkeypatch, max_pa
 
 def test_causal_state_digest_is_atomic_across_authorities():
     import threading
+    from hrm_coordination import AuthorityPort
 
     _, _, fabric = make_system({"A": {"x": 0}, "B": {"y": 0}}, seed="digest-atomic")
     pre = fabric.causal_state_digest()
     cross = proposal("cross", 0, [("A", "x", 0, 1), ("B", "y", 0, 1)])
+    writer = threading.Thread(target=fabric.resolve, args=(0, [cross]))
 
-    # Commit a cross-authority transaction at the one point where a per-authority
-    # read loop would have released A's lock but not yet taken B's.
-    original = fabric._keys_for_projection
-    fired = threading.Event()
+    class InterleavingPort(AuthorityPort):
+        """After A has been read, try to commit a cross-authority transaction
+        before B is read. An atomic digest holds B's lock, so the writer blocks
+        until the digest finishes; a non-atomic one lets it commit in between."""
 
-    def interleave(authority_id, resource_ids):
-        if authority_id == "B" and not fired.is_set():
-            fired.set()
-            writer = threading.Thread(target=fabric.resolve, args=(0, [cross]))
-            writer.start()
-            writer.join(timeout=5)
-        return original(authority_id, resource_ids)
+        def __init__(self, delegate):
+            self.delegate = delegate
 
-    fabric._keys_for_projection = interleave
+        @property
+        def authority_id(self):
+            return self.delegate.authority_id
+
+        def snapshot(self, resource_ids=None):
+            out = self.delegate.snapshot(resource_ids)
+            if not writer.is_alive() and writer.ident is None:
+                writer.start()
+                writer.join(timeout=0.3)
+            return out
+
+        def prepare(self, transaction_id, mutations):
+            return self.delegate.prepare(transaction_id, mutations)
+
+        def stage_commit(self, transaction_id):
+            return self.delegate.stage_commit(transaction_id)
+
+        def abort(self, transaction_id):
+            return self.delegate.abort(transaction_id)
+
+        def materialize_published(self, transaction_id):
+            return self.delegate.materialize_published(transaction_id)
+
+        def checkpoint(self):
+            return self.delegate.checkpoint()
+
+    fabric._ports["A"] = InterleavingPort(fabric._ports["A"])
     observed = fabric.causal_state_digest()
-    del fabric._keys_for_projection
-    if not fired.is_set():
-        fabric.resolve(0, [cross])
+    writer.join(timeout=5)
     post = fabric.causal_state_digest()
 
+    assert not writer.is_alive()
     assert snapshot_values(fabric) == {"A": {"x": (1, 1)}, "B": {"y": (1, 1)}}
+    assert pre != post
     assert observed in (pre, post)
 
 
@@ -616,3 +639,91 @@ def test_plan_conflict_domains_still_raises_on_malformed_proposal():
     _, _, fabric = make_system({"A": {"x": 0}}, seed="plan-malformed")
     with pytest.raises(ValueError, match="unknown authority"):
         fabric.plan_conflict_domains([proposal("bad", 0, [("NOT_A_KERNEL", "x", 0, 1)])])
+
+
+def test_ids_containing_separators_cannot_collide_or_corrupt_the_ledger():
+    _, ledger, fabric = make_system({"A": {"x": 0}, "B": {"y": 0}}, seed="record-id-collision")
+    # Under the old "E{epoch}:{tx}:{pid}" scheme both became "E000000000000:a:b:c".
+    batch = fabric.resolve(0, [
+        proposal("c", 0, [("A", "x", 0, 1)], txid="a:b"),
+        proposal("b:c", 0, [("B", "y", 0, 1)], txid="a"),
+    ])
+    assert [r.status for r in batch.results] == ["COMMITTED", "COMMITTED"]
+    assert len({r.record_id for r in ledger.records}) == 2
+    assert ledger.verify_chain()
+    assert ReplayLedger.from_export(ledger.export()).digest() == ledger.digest()
+
+
+def test_rejected_transaction_cannot_be_a_causal_parent():
+    _, ledger, fabric = make_system({"A": {"x": 0}}, seed="rejected-parent")
+    stale = fabric.resolve(0, [proposal("stale", 0, [("A", "x", 99, 1)], txid="NEVER-HAPPENED")]).results[0]
+    assert stale.status == "REJECTED"
+
+    child = proposal(
+        "child", 1, [("A", "x", 0, 5)],
+        provenance=ProvenanceContribution(causal_parents=("NEVER-HAPPENED",), source_authority="A"),
+    )
+    result = fabric.resolve(1, [child]).results[0]
+    assert result.status == "REJECTED"
+    assert "rejected" in (result.reason or "")
+    assert snapshot_values(fabric) == {"A": {"x": (0, 0)}}
+
+    # A committed parent is still accepted.
+    fabric.resolve(2, [proposal("real", 2, [("A", "x", 0, 1)], txid="REAL")])
+    ok = proposal("ok", 3, [("A", "x", 1, 2)],
+                  provenance=ProvenanceContribution(causal_parents=("REAL",), source_authority="A"))
+    assert fabric.resolve(3, [ok]).results[0].status == "COMMITTED"
+    assert ledger.verify_chain()
+
+
+def test_imported_committed_record_citing_rejected_parent_is_rejected():
+    from hrm_coordination import ProvenanceError
+
+    _, ledger, fabric = make_system({"A": {"x": 0}}, seed="forged-parent")
+    fabric.resolve(0, [proposal("stale", 0, [("A", "x", 99, 1)], txid="NEVER-HAPPENED")])
+    fabric.resolve(1, [proposal("child", 1, [("A", "x", 0, 5)])])
+    exported = ledger.export()
+
+    # Forge the committed child's provenance and recompute every digest, so only
+    # the causal rule is violated.
+    child = next(r for r in exported["records"] if r["status"] == "COMMITTED")
+    child["causal_parents"] = ["NEVER-HAPPENED"]
+    for rec in exported["records"]:
+        rec["record_digest"] = digest_obj({k: v for k, v in rec.items() if k != "record_digest"})
+    previous = digest_obj({"genesis": exported["genesis"], "config": exported["config_fingerprint"]})
+    for block in exported["epoch_blocks"]:
+        digests = sorted(r["record_digest"] for r in exported["records"] if r["epoch"] == block["epoch"])
+        block["record_digests"] = digests
+        block["previous_epoch_digest"] = previous
+        block["epoch_digest"] = digest_obj({"epoch": block["epoch"], "previous_epoch_digest": previous, "record_digests": digests})
+        previous = block["epoch_digest"]
+
+    with pytest.raises(ProvenanceError, match="invalid imported ledger chain"):
+        ReplayLedger.from_export(exported)
+
+
+@pytest.mark.parametrize("lag", [0, 2, 5])
+def test_feedback_lag_other_than_one_is_rejected(lag):
+    with pytest.raises(ValueError, match="feedback_lag_ticks must be 1"):
+        ScheduleSpec("worker", 1, feedback_lag_ticks=lag)
+    assert ScheduleSpec("worker", 1, feedback_lag_ticks=1).feedback_lag_ticks == 1
+
+
+def test_imported_record_with_non_derived_record_id_is_rejected():
+    from hrm_coordination import ProvenanceError
+
+    _, ledger, fabric = make_system({"A": {"x": 0}}, seed="forged-record-id")
+    fabric.resolve(0, [proposal("p", 0, [("A", "x", 0, 1)])])
+    exported = ledger.export()
+
+    # Rename the record (digests recomputed): only the id derivation is violated.
+    rec = exported["records"][0]
+    rec["record_id"] = "E000000000000:tx-p:p"
+    rec["record_digest"] = digest_obj({k: v for k, v in rec.items() if k != "record_digest"})
+    previous = digest_obj({"genesis": exported["genesis"], "config": exported["config_fingerprint"]})
+    block = exported["epoch_blocks"][0]
+    block["record_digests"] = [rec["record_digest"]]
+    block["epoch_digest"] = digest_obj({"epoch": 0, "previous_epoch_digest": previous, "record_digests": block["record_digests"]})
+
+    with pytest.raises(ProvenanceError, match="invalid imported ledger chain"):
+        ReplayLedger.from_export(exported)

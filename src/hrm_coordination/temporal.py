@@ -20,8 +20,13 @@ class ScheduleSpec:
             raise ValueError("period_ticks must be positive")
         if self.phase_ticks < 0 or self.phase_ticks >= self.period_ticks:
             raise ValueError("phase_ticks outside cadence")
-        if self.feedback_lag_ticks < 1:
-            raise ValueError("cross-system feedback lag must be explicit and >= 1 tick")
+        if self.feedback_lag_ticks != 1:
+            # Stage 1 enforces exactly one epoch of lag (ledger: causal parents must
+            # be prior-epoch evidence). A larger declared lag would not be enforced,
+            # so it is rejected rather than accepted as a promise nothing keeps.
+            raise ValueError(
+                "feedback_lag_ticks must be 1 in Stage 1 (only a one-epoch lag is enforced)"
+            )
 
     def due(self, epoch: int) -> bool:
         return epoch >= self.phase_ticks and (epoch - self.phase_ticks) % self.period_ticks == 0
