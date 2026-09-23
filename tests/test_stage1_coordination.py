@@ -282,7 +282,9 @@ def test_malformed_authoritative_provenance_rejected_before_state_change():
     result = fabric.resolve(0, [p]).results[0]
     assert result.status == "REJECTED"
     assert snapshot_values(fabric) == {"A": {"x": (0, 0)}}
-    assert ledger.records == ()
+    # The rejection is evidence (so its transaction_id is burned), with no effect.
+    assert [(r.transaction_id, r.status, r.committed) for r in ledger.records] == [("tx-bad-prov", "REJECTED", ())]
+    assert ledger.verify_chain()
 
 
 def _continue_callback(ctx, fab):
@@ -440,3 +442,97 @@ def test_round2_dar_s1_006_ledger_admission_failure_precedes_materialization(mon
     assert ledger.epoch_blocks == ()
     assert ledger.verify_chain()
     assert fabric.checkpoint()["published"] == {}
+
+
+def test_provenance_rejected_transaction_id_cannot_be_reused():
+    from hrm_coordination import ProvenanceError
+
+    _, ledger, fabric = make_system({"A": {"x": 0}}, seed="prov-reject-reuse")
+    bad = proposal(
+        "bad", 0, [("A", "x", 0, 1)], txid="TX-1",
+        provenance=ProvenanceContribution(causal_parents=("no-such-parent",), source_authority="A"),
+    )
+    assert fabric.resolve(0, [bad]).results[0].status == "REJECTED"
+
+    with pytest.raises(ProvenanceError, match="historical transaction_id reuse"):
+        fabric.resolve(1, [proposal("retry", 1, [("A", "x", 0, 1)], txid="TX-1")])
+    assert snapshot_values(fabric) == {"A": {"x": (0, 0)}}
+
+    # The burned ID survives export/import.
+    imported = ReplayLedger.from_export(ledger.export())
+    with pytest.raises(ProvenanceError, match="historical transaction_id reuse"):
+        imported.validate_transaction_ids([proposal("retry", 1, [("A", "x", 0, 1)], txid="TX-1")])
+
+
+def test_checkpoint_with_state_diverging_from_ledger_is_rejected(tmp_path: Path):
+    from hrm_coordination import ProvenanceError, load_checkpoint
+
+    _, ledger, fabric = make_system({"A": {"x": 0}}, seed="checkpoint-tamper")
+    fabric.resolve(0, [proposal("p", 0, [("A", "x", 0, 5)])])
+    cp = tmp_path / "checkpoint.json"
+    write_checkpoint(cp, {"epoch": 1}, fabric, ledger)
+
+    _, clean_fabric, _, _ = load_checkpoint(cp)
+    assert snapshot_values(clean_fabric) == {"A": {"x": (5, 1)}}
+
+    for field, tamper in (("state", 999999), ("versions", 7)):
+        raw = json.loads(cp.read_text(encoding="utf-8"))
+        raw["fabric"]["authorities"][0][field]["x"] = tamper
+        bad = tmp_path / f"tampered-{field}.json"
+        bad.write_text(json.dumps(raw), encoding="utf-8")
+        with pytest.raises(ProvenanceError, match="does not match ledger replay"):
+            load_checkpoint(bad)
+
+
+def test_imported_record_with_foreign_config_fingerprint_is_rejected():
+    from hrm_coordination import ProvenanceError
+
+    _, ledger, fabric = make_system({"A": {"x": 0}}, seed="foreign-config")
+    fabric.resolve(0, [proposal("p", 0, [("A", "x", 0, 1)])])
+    exported = ledger.export()
+
+    # Rewrite the record under another config and recompute every digest so only
+    # the fingerprint mismatch remains.
+    for rec in exported["records"]:
+        rec["config_fingerprint"] = "FOREIGN"
+        rec["record_digest"] = digest_obj({k: v for k, v in rec.items() if k != "record_digest"})
+    previous = digest_obj({"genesis": exported["genesis"], "config": exported["config_fingerprint"]})
+    for block in exported["epoch_blocks"]:
+        digests = sorted(r["record_digest"] for r in exported["records"] if r["epoch"] == block["epoch"])
+        block["record_digests"] = digests
+        block["previous_epoch_digest"] = previous
+        block["epoch_digest"] = digest_obj({"epoch": block["epoch"], "previous_epoch_digest": previous, "record_digests": digests})
+        previous = block["epoch_digest"]
+
+    with pytest.raises(ProvenanceError, match="invalid imported ledger chain"):
+        ReplayLedger.from_export(exported)
+
+
+@pytest.mark.parametrize("max_parallel_domains", [1, 4])
+def test_unexpected_domain_failure_aborts_all_staged_winners(monkeypatch, max_parallel_domains):
+    authorities = [StateAuthority("A", {"x": 0}), StateAuthority("B", {"y": 0})]
+    ledger = ReplayLedger(digest_obj({"seed": "domain-failure"}))
+    ledger.register_genesis("A", {"x": 0})
+    ledger.register_genesis("B", {"y": 0})
+    fabric = TransactionFabric("domain-failure", [a.port() for a in authorities], ledger,
+                               max_parallel_domains=max_parallel_domains)
+
+    original = TransactionFabric._execute_transaction
+
+    def failing(self, epoch, p):
+        if p.proposal_id == "p2":
+            raise RuntimeError("unexpected kernel failure")
+        return original(self, epoch, p)
+
+    monkeypatch.setattr(TransactionFabric, "_execute_transaction", failing)
+    with pytest.raises(RuntimeError, match="unexpected kernel failure"):
+        fabric.resolve(0, [proposal("p1", 0, [("A", "x", 0, 1)]), proposal("p2", 0, [("B", "y", 0, 1)])])
+    monkeypatch.undo()
+
+    assert snapshot_values(fabric) == {"A": {"x": (0, 0)}, "B": {"y": (0, 0)}}
+    assert ledger.records == ()
+    checkpoint = fabric.checkpoint()  # raised "clean transaction boundary" before the fix
+    assert checkpoint["published"] == {}
+    batch = fabric.resolve(0, [proposal("p3", 0, [("A", "x", 0, 7)])])
+    assert batch.results[0].status == "COMMITTED"
+    fabric.checkpoint()

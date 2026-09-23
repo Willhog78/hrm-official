@@ -378,22 +378,34 @@ class TransactionFabric:
                     local.append((proposal.proposal_id, result, staged))
                 return local
 
-            if component_execution_order is not None or len(execution) <= 1 or self.max_parallel_domains == 1:
-                component_results = [execute_component(i) for i in execution]
-            else:
-                workers = min(len(execution), self.max_parallel_domains)
-                with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="hrm-domain") as pool:
-                    futures = [pool.submit(execute_component, i) for i in execution]
-                    component_results = [future.result() for future in futures]
+            try:
+                if component_execution_order is not None or len(execution) <= 1 or self.max_parallel_domains == 1:
+                    component_results = [execute_component(i) for i in execution]
+                else:
+                    workers = min(len(execution), self.max_parallel_domains)
+                    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="hrm-domain") as pool:
+                        futures = [pool.submit(execute_component, i) for i in execution]
+                        component_results = [future.result() for future in futures]
+            except BaseException:
+                # An unexpected failure in any domain must not leave other winners
+                # prepared/staged: that would block checkpoints indefinitely. The
+                # executor has joined every domain before this point; abort is
+                # idempotent, so aborting every winner is safe.
+                for proposal in winners_all:
+                    self._abort_staged(proposal)
+                raise
 
             for local in component_results:
                 for pid, result, staged in local:
                     result_map[pid] = result
                     committed_by_pid[pid] = staged
 
+            # Every proposal in the admitted batch, including provenance-rejected
+            # ones, leaves evidence. This records its transaction_id so it cannot
+            # be reused later in the run/replay domain.
             evidence_entries = [
                 (p, result_map[p.proposal_id].status, arbitration_digest, committed_by_pid.get(p.proposal_id, ()))
-                for p in sorted(valid, key=lambda x: (x.proposal_id, x.transaction_id))
+                for p in sorted(proposals, key=lambda x: (x.proposal_id, x.transaction_id))
             ]
 
             # Critical Round-2 correction: every rejection-capable ledger operation
