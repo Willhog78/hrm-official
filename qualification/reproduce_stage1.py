@@ -23,7 +23,14 @@ def run(cmd, *, cwd, env):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-benchmark", action="store_true")
+    ap.add_argument(
+        "--require-upstream",
+        action="store_true",
+        help="fail if the UPSTREAM Agentus archive is absent (use for scored/reviewer runs)",
+    )
     args = ap.parse_args()
+    if args.require_upstream and not UPSTREAM.is_file():
+        raise SystemExit(f"missing required upstream archive: {UPSTREAM}")
 
     env = os.environ.copy()
     env["PYTHONPATH"] = f"{ROOT / 'src'}:{ROOT}"
@@ -42,6 +49,13 @@ def main():
 
     if not args.skip_benchmark:
         run([sys.executable, "qualification/benchmark_stage1.py"], cwd=ROOT, env=env)
+
+    if not UPSTREAM.is_file():
+        # S1.12 (preserved Agentus tests) cannot be evidenced without the archive.
+        # Never report a full reproduction pass when that step did not run.
+        print(f"NOTICE: {UPSTREAM.relative_to(ROOT)} not found; Agentus S1.12 step SKIPPED", flush=True)
+        print("STAGE1_REPRODUCTION_PARTIAL (S1.12 not evidenced)", flush=True)
+        return
 
     with tempfile.TemporaryDirectory(prefix="hrm_stage1_agentus_") as td:
         out = Path(td)

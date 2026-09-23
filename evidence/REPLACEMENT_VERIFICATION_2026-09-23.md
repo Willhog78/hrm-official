@@ -69,7 +69,9 @@ The monolithic gate completed on this host. This supersedes, for this host only,
 
 **Caveat — pytest not used.** pytest could not be installed on this host. The pytest suites were run by a minimal stand-in, not committed, that implements only `raises(match=)`, `mark.parametrize`, `tmp_path` and `monkeypatch` and calls the unmodified test functions. The stand-in's detection was confirmed: new tests failed on pre-fix source. A real `pytest` run remains outstanding.
 
-**`reproduce_stage1.py` not testable here.** It stops at its first step (no pytest), and it requires `UPSTREAM/AGE_OF_AGENTUS_MASTER_GATE9_REVIEW_CANDIDATE_2026-09-04_RESUBMISSION.zip`, which is not in the repository. It cannot pass on a fresh clone until that archive is supplied or the step is made optional.
+**`reproduce_stage1.py` not testable here.** It stops at its first step (no pytest), and it requires `UPSTREAM/AGE_OF_AGENTUS_MASTER_GATE9_REVIEW_CANDIDATE_2026-09-04_RESUBMISSION.zip`, which is not in the repository. It could not pass on a fresh clone until that archive was supplied or the step made optional.
+
+Follow-up (after `1283a1d`): without the archive the script now skips the Agentus step and prints `STAGE1_REPRODUCTION_PARTIAL (S1.12 not evidenced)`, never a full pass; `--require-upstream` fails fast when the archive is absent. Both paths were checked with the script's command runner stubbed out (pytest unavailable here). S1.12 remains NOT TESTABLE until the archive is supplied.
 
 ### Recorded, not corrected
 

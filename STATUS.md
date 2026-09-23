@@ -35,7 +35,7 @@ Current verification at `03b8eff`:
 
 - Stage-1 coordination regression suite: **36/36 PASS** (24 original + 12 new). Run via a minimal pytest stand-in because pytest was unavailable on that host. **A real pytest run is still outstanding.**
 - HMT Stage-1 Gate: **14/14 PASS as one monolithic run** (≈36 s).
-- `qualification/reproduce_stage1.py` is **not runnable on a fresh clone**: it needs pytest and the `UPSTREAM/` Agentus archive, which is not in the repository.
+- `qualification/reproduce_stage1.py` now runs on a fresh clone when pytest is installed. Without the `UPSTREAM/` Agentus archive (not in the repository) it skips the Agentus step and prints `STAGE1_REPRODUCTION_PARTIAL (S1.12 not evidenced)` instead of a pass; `--require-upstream` fails immediately if the archive is absent. **S1.12 remains unevidenced until the archive is supplied.**
 
 These corrections were made by the same session that reviewed the code. They are dependent evidence only. The required independent review must cover them.
 
