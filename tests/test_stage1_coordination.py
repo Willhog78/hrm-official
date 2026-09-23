@@ -536,3 +536,34 @@ def test_unexpected_domain_failure_aborts_all_staged_winners(monkeypatch, max_pa
     batch = fabric.resolve(0, [proposal("p3", 0, [("A", "x", 0, 7)])])
     assert batch.results[0].status == "COMMITTED"
     fabric.checkpoint()
+
+
+def test_causal_state_digest_is_atomic_across_authorities():
+    import threading
+
+    _, _, fabric = make_system({"A": {"x": 0}, "B": {"y": 0}}, seed="digest-atomic")
+    pre = fabric.causal_state_digest()
+    cross = proposal("cross", 0, [("A", "x", 0, 1), ("B", "y", 0, 1)])
+
+    # Commit a cross-authority transaction at the one point where a per-authority
+    # read loop would have released A's lock but not yet taken B's.
+    original = fabric._keys_for_projection
+    fired = threading.Event()
+
+    def interleave(authority_id, resource_ids):
+        if authority_id == "B" and not fired.is_set():
+            fired.set()
+            writer = threading.Thread(target=fabric.resolve, args=(0, [cross]))
+            writer.start()
+            writer.join(timeout=5)
+        return original(authority_id, resource_ids)
+
+    fabric._keys_for_projection = interleave
+    observed = fabric.causal_state_digest()
+    del fabric._keys_for_projection
+    if not fired.is_set():
+        fabric.resolve(0, [cross])
+    post = fabric.causal_state_digest()
+
+    assert snapshot_values(fabric) == {"A": {"x": (1, 1)}, "B": {"y": (1, 1)}}
+    assert observed in (pre, post)

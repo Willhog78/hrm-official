@@ -435,10 +435,17 @@ class TransactionFabric:
             return ResolutionBatch(epoch, ordered_results, tuple(committed_all), arbitration_digest)
 
     def causal_state_digest(self) -> str:
+        # Hold every resource lock (canonical order, as in checkpoint) for the whole
+        # read. Per-authority projections would each be consistent, but a
+        # cross-authority transaction committing between them would yield a
+        # combined state that never existed.
         snapshot = {}
-        for aid in sorted(self._ports):
-            snap = self.projection(aid)
-            snapshot[aid] = {rid: {"value": v.value, "version": v.version} for rid, v in sorted(snap.items())}
+        with ExitStack() as stack:
+            for key in sorted(self._resource_locks):
+                stack.enter_context(self._resource_locks[key])
+            for aid in sorted(self._ports):
+                snap = self._ports[aid].snapshot()
+                snapshot[aid] = {rid: {"value": v.value, "version": v.version} for rid, v in sorted(snap.items())}
         return digest_obj(snapshot)
 
     def checkpoint(self) -> dict:
