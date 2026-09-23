@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Sequence
 import copy
 
-from .model import CommittedMutation, JSONValue, TransactionProposal, digest_obj
+from .model import CommittedMutation, JSONValue, TransactionProposal, canonical_json, digest_obj
 
 
 class ProvenanceError(ValueError):
@@ -97,6 +97,9 @@ class ReplayLedger:
         self._blocks: list[EpochEvidenceBlock] = []
         self._record_ids: set[str] = set()
         self._transaction_ids: set[str] = set()
+        # IDs (record and transaction) of COMMITTED records only: the only legal
+        # causal parents. REJECTED evidence burns IDs but never caused anything.
+        self._committed_ids: set[str] = set()
         self._genesis: dict[str, dict[str, JSONValue]] = {}
 
     @property
@@ -118,7 +121,9 @@ class ReplayLedger:
         return digest_obj({"genesis": self._genesis, "config": self.config_fingerprint})
 
     def _record_id_for(self, proposal: TransactionProposal) -> str:
-        return f"E{proposal.logical_epoch:012d}:{proposal.transaction_id}:{proposal.proposal_id}"
+        # JSON-encode the id pair so ids containing separators cannot collide
+        # (plain "tx:pid" made ("a:b", "c") and ("a", "b:c") identical).
+        return f"E{proposal.logical_epoch:012d}:" + canonical_json([proposal.transaction_id, proposal.proposal_id])
 
     def _validate_provenance(self, proposal: TransactionProposal) -> None:
         prov = proposal.provenance
@@ -129,9 +134,9 @@ class ReplayLedger:
             raise ProvenanceError("self provenance edge")
         if len(set(prov.causal_parents)) != len(prov.causal_parents):
             raise ProvenanceError("duplicate causal parent")
-        unknown = [p for p in prov.causal_parents if p not in self._record_ids and p not in self._transaction_ids]
+        unknown = [p for p in prov.causal_parents if p not in self._committed_ids]
         if unknown:
-            raise ProvenanceError(f"unknown or same-epoch causal parent(s): {unknown}")
+            raise ProvenanceError(f"unknown, rejected or same-epoch causal parent(s): {unknown}")
 
     @property
     def expected_epoch(self) -> int:
@@ -179,6 +184,7 @@ class ReplayLedger:
 
         # Revalidate against prior-epoch evidence only. Same-epoch causal provenance
         # is intentionally illegal under the explicit feedback-lag contract.
+        batch_record_ids: set[str] = set()
         # REJECTED entries are evidence that a proposal was refused (including for
         # invalid provenance); they carry no causal effect, so only COMMITTED
         # entries must have admissible provenance.
@@ -188,6 +194,9 @@ class ReplayLedger:
             record_id = self._record_id_for(proposal)
             if record_id in self._record_ids:
                 raise ProvenanceError(f"historical record_id reuse: {record_id}")
+            if record_id in batch_record_ids:
+                raise ProvenanceError(f"duplicate record_id in batch: {record_id}")
+            batch_record_ids.add(record_id)
 
         previous_epoch_digest = self._blocks[-1].epoch_digest if self._blocks else self._genesis_digest()
         built: list[LedgerRecord] = []
@@ -243,6 +252,8 @@ class ReplayLedger:
         for rec in prepared.records:
             self._record_ids.add(rec.record_id)
             self._transaction_ids.add(rec.transaction_id)
+            if rec.status == "COMMITTED":
+                self._committed_ids.update((rec.record_id, rec.transaction_id))
         return prepared.records
 
     def append_batch(
@@ -266,6 +277,8 @@ class ReplayLedger:
                 return False
             if rec.config_fingerprint != self.config_fingerprint:
                 return False
+            if rec.record_id != f"E{rec.epoch:012d}:" + canonical_json([rec.transaction_id, rec.proposal_id]):
+                return False
             seen_ids.add(rec.record_id)
             seen_tx_ids.add(rec.transaction_id)
             if digest_obj(rec.canonical_without_digest()) != rec.record_digest:
@@ -273,6 +286,7 @@ class ReplayLedger:
             records_by_epoch.setdefault(rec.epoch, []).append(rec)
 
         previous = self._genesis_digest()
+        committed_before: set[str] = set()
         covered: set[int] = set()
         expected_epoch = 0
         for block in self._blocks:
@@ -287,6 +301,13 @@ class ReplayLedger:
             digests = tuple(sorted(r.record_digest for r in recs))
             if digests != block.record_digests:
                 return False
+            # A committed record may only cite committed records from earlier epochs.
+            for r in recs:
+                if r.status == "COMMITTED" and any(p not in committed_before for p in r.causal_parents):
+                    return False
+            for r in recs:
+                if r.status == "COMMITTED":
+                    committed_before.update((r.record_id, r.transaction_id))
             if digest_obj(block.canonical_without_digest()) != block.epoch_digest:
                 return False
             covered.add(block.epoch)
@@ -349,6 +370,8 @@ class ReplayLedger:
                 previous_epoch_digest=str(raw["previous_epoch_digest"]), record_digest=str(raw["record_digest"]),
             )
             ledger._records.append(rec); ledger._record_ids.add(rec.record_id); ledger._transaction_ids.add(rec.transaction_id)
+            if rec.status == "COMMITTED":
+                ledger._committed_ids.update((rec.record_id, rec.transaction_id))
         for raw in payload["epoch_blocks"]:
             ledger._blocks.append(EpochEvidenceBlock(
                 epoch=int(raw["epoch"]), previous_epoch_digest=str(raw["previous_epoch_digest"]),

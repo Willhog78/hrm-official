@@ -55,7 +55,8 @@ def main():
         # Never report a full reproduction pass when that step did not run.
         print(f"NOTICE: {UPSTREAM.relative_to(ROOT)} not found; Agentus S1.12 step SKIPPED", flush=True)
         print("STAGE1_REPRODUCTION_PARTIAL (S1.12 not evidenced)", flush=True)
-        return
+        # Distinct non-zero code: automation must not read a partial run as a pass.
+        raise SystemExit(2)
 
     with tempfile.TemporaryDirectory(prefix="hrm_stage1_agentus_") as td:
         out = Path(td)

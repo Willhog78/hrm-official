@@ -6,7 +6,7 @@ Corrected post-HMT implementation. The locked Hugh Mann Test v0.2 Stage-1 Gate b
 
 ## 1. Temporal Orchestrator
 
-`TemporalOrchestrator` owns logical contract epochs and schedule metadata only. Each scheduled producer has an explicit integer cadence, phase and feedback-lag declaration. All due producers read the same pre-commit epoch state. Their proposals are collected before arbitration, so callback enumeration order cannot create same-epoch recursive read-after-write priority.
+`TemporalOrchestrator` owns logical contract epochs and schedule metadata only. Each scheduled producer has an explicit integer cadence, phase and feedback-lag declaration. In Stage 1 the feedback lag must be exactly 1 tick: that is the only lag the ledger enforces (causal parents must be prior-epoch evidence), so larger declared lags are rejected at registration rather than accepted unenforced. All due producers read the same pre-commit epoch state. Their proposals are collected before arbitration, so callback enumeration order cannot create same-epoch recursive read-after-write priority.
 
 The implementation uses an exact rational `contract_dt` plus integer logical epochs. Host wall-clock timestamps do not control causality. Stale/future logical epochs are rejected by the transaction fabric.
 
@@ -65,7 +65,7 @@ Each valid proposal receives an independently hashable evidence record anchored 
 
 The ledger records proposal and arbitration digests, committed version/value transitions, causal parents, source authority, operation label, run/config fingerprint, fallible claims and prior epoch root. Replay reconstructs synthetic canonical state from genesis and verifies version continuity.
 
-Authoritative causal parents must already exist in prior-epoch evidence. Same-epoch causal-parent claims are rejected under the explicit feedback-lag contract.
+Authoritative causal parents must be **committed** records from prior-epoch evidence. Same-epoch causal-parent claims are rejected under the explicit feedback-lag contract, and so are citations of REJECTED records, which record a refusal rather than an event. `verify_chain` enforces the same rule on imported evidence. Record IDs encode the (transaction ID, proposal ID) pair as canonical JSON, so IDs containing separators cannot collide.
 
 ### Authoritative versus fallible information
 
