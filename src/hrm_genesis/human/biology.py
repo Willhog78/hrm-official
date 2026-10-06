@@ -239,7 +239,7 @@ def evolve_humans(
     for human in sorted(humans["humans"], key=lambda h: h["id"]):
         origin = (int(human["x"]), int(human["y"]))
         if cognition_enabled:
-            perception = perceive_local(human, producers, matter)
+            perception = perceive_local(human, producers, matter, humans["humans"])
             target = choose_destination(human, perception, human["cognition"])
         else:
             perception = None
