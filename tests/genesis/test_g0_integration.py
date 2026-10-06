@@ -13,7 +13,7 @@ def canonical_snapshot(sim: GenesisSimulation):
 
 
 def test_blank_world_advances_deterministically():
-    config = GenesisConfig(master_seed="g0-determinism")
+    config = GenesisConfig(master_seed="g0-determinism", physical_world_enabled=False)
 
     a = GenesisSimulation(config)
     b = GenesisSimulation(config)
@@ -27,7 +27,7 @@ def test_blank_world_advances_deterministically():
 
 
 def test_checkpoint_restore_matches_uninterrupted_run(tmp_path: Path):
-    config = GenesisConfig(master_seed="g0-checkpoint")
+    config = GenesisConfig(master_seed="g0-checkpoint", physical_world_enabled=False)
 
     uninterrupted = GenesisSimulation(config)
     uninterrupted.run(40)
@@ -45,7 +45,7 @@ def test_checkpoint_restore_matches_uninterrupted_run(tmp_path: Path):
 
 
 def test_restore_rejects_config_mismatch(tmp_path: Path):
-    original = GenesisConfig(master_seed="g0-original")
+    original = GenesisConfig(master_seed="g0-original", physical_world_enabled=False)
     sim = GenesisSimulation(original)
     sim.run(2)
     checkpoint = tmp_path / "g0.json"
@@ -59,7 +59,7 @@ def test_restore_rejects_config_mismatch(tmp_path: Path):
 
 
 def test_seed_namespaces_are_isolated():
-    config = GenesisConfig(master_seed="g0-seeds")
+    config = GenesisConfig(master_seed="g0-seeds", physical_world_enabled=False)
     sim = GenesisSimulation(config)
 
     first = sim.seed_bank.stream("world.weather")
