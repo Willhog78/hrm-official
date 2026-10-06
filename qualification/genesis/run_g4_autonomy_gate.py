@@ -37,11 +37,19 @@ def main() -> int:
     sim = GenesisSimulation(config)
     samples = []
     occupied = []
+    yearly_populations = []
 
-    for _ in range(100):
+    for year in range(1, 101):
         sim.run(config.ticks_per_year)
-        samples.append(ecology_snapshot(sim.ecology_state(), sim.consumer_state()))
+        snap = ecology_snapshot(sim.ecology_state(), sim.consumer_state())
+        samples.append(snap)
         occupied.append(occupied_consumer_cells(sim.consumer_state()))
+        yearly_populations.append({
+            "year": year,
+            "populations": population_counts(sim.consumer_state()),
+            "producer_biomass_kg": float(snap["producer_biomass_kg"]),
+            "consumer_occupied_cells": len(occupied[-1]),
+        })
 
     biomass_values = [float(s["producer_biomass_kg"]) for s in samples]
     population_values = [
@@ -66,6 +74,23 @@ def main() -> int:
     failed = [k for k,v in checks.items() if not v]
     for k,v in checks.items():
         print(f"{k}: {'PASS' if v else 'FAIL'}")
+
+    if not checks["grazer_survives_century"]:
+        extinction_year = next(
+            (row["year"] for row in yearly_populations if row["populations"].get("grazer", 0) == 0),
+            None,
+        )
+        print(f"grazer_extinction_year: {extinction_year}")
+        if extinction_year is not None:
+            for row in yearly_populations[max(0, extinction_year - 6):extinction_year]:
+                print(
+                    "grazer_trace: "
+                    f"year={row['year']} "
+                    f"grazer={row['populations'].get('grazer', 0)} "
+                    f"browser={row['populations'].get('browser', 0)} "
+                    f"producer_biomass_kg={row['producer_biomass_kg']:.6f} "
+                    f"consumer_cells={row['consumer_occupied_cells']}"
+                )
     if failed:
         print("G4_GATE_FAIL:", ", ".join(failed))
         return 1
