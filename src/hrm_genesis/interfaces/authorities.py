@@ -14,6 +14,9 @@ WORLD_STATE_RESOURCE = "state"
 MATTER_AUTHORITY = "matter.environment"
 MATTER_STATE_RESOURCE = "state"
 
+ECOLOGY_AUTHORITY = "ecology.producers"
+ECOLOGY_STATE_RESOURCE = "state"
+
 
 @dataclass(frozen=True)
 class AuthorityRegistration:
