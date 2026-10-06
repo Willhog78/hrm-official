@@ -142,6 +142,7 @@ class GenesisSimulation:
                 width=config.world_width,
                 height=config.world_height,
                 seed_bank=self.seed_bank,
+                cognition_enabled=config.human_cognition_enabled,
             )
             human_state, producer_state, matter_state = seed_initial_humans(
                 human_state,
@@ -510,6 +511,7 @@ class GenesisSimulation:
             matter_after_consumers,
             dict(world.value),
             ctx.epoch,
+            cognition_enabled=self.config.human_cognition_enabled,
         )
 
         return [
