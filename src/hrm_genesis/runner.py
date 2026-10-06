@@ -23,6 +23,11 @@ from .ecology.plants import (
     evolve_producers,
     seed_initial_producers,
 )
+from .ecology.animals import (
+    build_consumer_state,
+    evolve_consumers,
+    seed_initial_consumers,
+)
 from .interfaces.authorities import (
     AuthorityRegistration,
     GENESIS_SYSTEM_AUTHORITY,
@@ -33,6 +38,8 @@ from .interfaces.authorities import (
     MATTER_STATE_RESOURCE,
     ECOLOGY_AUTHORITY,
     ECOLOGY_STATE_RESOURCE,
+    CONSUMER_AUTHORITY,
+    CONSUMER_STATE_RESOURCE,
     validate_registrations,
 )
 from .interfaces.snapshots import GenesisSnapshot, capture_snapshot
@@ -45,16 +52,18 @@ CLOCK_SCHEDULE_ID = "genesis.clock"
 WORLD_SCHEDULE_ID = "world.environment"
 MATTER_SCHEDULE_ID = "matter.environment"
 BIOSPHERE_SCHEDULE_ID = "ecology.producers"
+CONSUMER_BIOSPHERE_SCHEDULE_ID = "ecology.consumers"
 
 
 class GenesisSimulation:
-    """Genesis runner through G2.
+    """Genesis runner through G3.
 
-    World owns terrain/climate forcing. Matter owns conserved environmental
-    material reservoirs. Producer ecology owns living/seed/detrital plant matter.
+    World owns terrain/climate forcing. Matter owns environmental reservoirs.
+    Producer ecology owns plants/seeds/detritus. Consumer ecology owns animals
+    and carcasses.
 
-    When producer ecology is enabled, Matter hydrology and producer changes are
-    resolved in one atomic cross-authority transaction per epoch.
+    With consumers enabled, hydrology, producers and consumers are committed
+    atomically so feeding/drinking cannot race lower-level material updates.
     """
 
     def __init__(self, config: GenesisConfig):
@@ -82,6 +91,7 @@ class GenesisSimulation:
 
         matter_state = None
         producer_state = None
+        consumer_state = None
         if config.matter_enabled:
             matter_state = build_matter_state(
                 width=config.world_width,
@@ -102,6 +112,20 @@ class GenesisSimulation:
                 self.seed_bank,
             )
 
+        if config.consumer_ecology_enabled:
+            if matter_state is None or producer_state is None:
+                raise ValueError("consumer ecology requires Matter and producer state")
+            consumer_state = build_consumer_state(
+                width=config.world_width,
+                height=config.world_height,
+                seed_bank=self.seed_bank,
+            )
+            consumer_state, producer_state, matter_state = seed_initial_consumers(
+                consumer_state,
+                producer_state,
+                matter_state,
+            )
+
         if matter_state is not None:
             authorities.append(
                 StateAuthority(MATTER_AUTHORITY, {MATTER_STATE_RESOURCE: matter_state})
@@ -110,6 +134,11 @@ class GenesisSimulation:
         if producer_state is not None:
             authorities.append(
                 StateAuthority(ECOLOGY_AUTHORITY, {ECOLOGY_STATE_RESOURCE: producer_state})
+            )
+
+        if consumer_state is not None:
+            authorities.append(
+                StateAuthority(CONSUMER_AUTHORITY, {CONSUMER_STATE_RESOURCE: consumer_state})
             )
 
         self.authorities = authorities
@@ -171,6 +200,8 @@ class GenesisSimulation:
             expected.add(MATTER_AUTHORITY)
         if config.producer_ecology_enabled:
             expected.add(ECOLOGY_AUTHORITY)
+        if config.consumer_ecology_enabled:
+            expected.add(CONSUMER_AUTHORITY)
         if set(fabric.authority_ids) != expected:
             raise ValueError("checkpoint authority set does not match GenesisConfig")
 
@@ -193,7 +224,12 @@ class GenesisSimulation:
                 self._world_callback,
             )
 
-        if self.config.producer_ecology_enabled:
+        if self.config.consumer_ecology_enabled:
+            self.orchestrator.register(
+                ScheduleSpec(CONSUMER_BIOSPHERE_SCHEDULE_ID, 1, 0, 1),
+                self._consumer_biosphere_callback,
+            )
+        elif self.config.producer_ecology_enabled:
             self.orchestrator.register(
                 ScheduleSpec(BIOSPHERE_SCHEDULE_ID, 1, 0, 1),
                 self._biosphere_callback,
@@ -332,6 +368,70 @@ class GenesisSimulation:
             )
         ]
 
+
+    def _consumer_biosphere_callback(self, ctx, fabric: TransactionFabric):
+        matter = fabric.projection(
+            MATTER_AUTHORITY,
+            [MATTER_STATE_RESOURCE],
+        )[MATTER_STATE_RESOURCE]
+        producers = fabric.projection(
+            ECOLOGY_AUTHORITY,
+            [ECOLOGY_STATE_RESOURCE],
+        )[ECOLOGY_STATE_RESOURCE]
+        consumers = fabric.projection(
+            CONSUMER_AUTHORITY,
+            [CONSUMER_STATE_RESOURCE],
+        )[CONSUMER_STATE_RESOURCE]
+        world = fabric.projection(
+            WORLD_AUTHORITY,
+            [WORLD_STATE_RESOURCE],
+        )[WORLD_STATE_RESOURCE]
+
+        hydrated_matter = evolve_matter(dict(matter.value), dict(world.value), ctx.epoch)
+        next_producers, matter_after_plants = evolve_producers(
+            dict(producers.value),
+            hydrated_matter,
+            dict(world.value),
+            ctx.epoch,
+        )
+        next_consumers, final_producers, final_matter = evolve_consumers(
+            dict(consumers.value),
+            next_producers,
+            matter_after_plants,
+            dict(world.value),
+            ctx.epoch,
+        )
+
+        return [
+            TransactionProposal(
+                proposal_id=f"g3-biosphere-{ctx.epoch:012d}",
+                transaction_id=f"g3-tx-biosphere-{ctx.epoch:012d}",
+                proposer_id=CONSUMER_BIOSPHERE_SCHEDULE_ID,
+                logical_epoch=ctx.epoch,
+                mutations=(
+                    Mutation(
+                        ref=ResourceRef(MATTER_AUTHORITY, MATTER_STATE_RESOURCE),
+                        expected_version=matter.version,
+                        new_value=final_matter,
+                    ),
+                    Mutation(
+                        ref=ResourceRef(ECOLOGY_AUTHORITY, ECOLOGY_STATE_RESOURCE),
+                        expected_version=producers.version,
+                        new_value=final_producers,
+                    ),
+                    Mutation(
+                        ref=ResourceRef(CONSUMER_AUTHORITY, CONSUMER_STATE_RESOURCE),
+                        expected_version=consumers.version,
+                        new_value=next_consumers,
+                    ),
+                ),
+                provenance=ProvenanceContribution(
+                    source_authority=CONSUMER_AUTHORITY,
+                    operation="CONSUMER_ECOLOGY_STEP",
+                ),
+            )
+        ]
+
     def run(self, ticks: int):
         if ticks < 0:
             raise ValueError("ticks must be >= 0")
@@ -368,6 +468,15 @@ class GenesisSimulation:
         return dict(
             self.fabric.projection(ECOLOGY_AUTHORITY, [ECOLOGY_STATE_RESOURCE])[
                 ECOLOGY_STATE_RESOURCE
+            ].value
+        )
+
+    def consumer_state(self) -> dict:
+        if not self.config.consumer_ecology_enabled:
+            raise RuntimeError("consumer ecology is disabled")
+        return dict(
+            self.fabric.projection(CONSUMER_AUTHORITY, [CONSUMER_STATE_RESOURCE])[
+                CONSUMER_STATE_RESOURCE
             ].value
         )
 
