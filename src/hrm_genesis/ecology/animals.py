@@ -193,6 +193,20 @@ def _move_one_step(origin: tuple[int, int], target: tuple[int, int]) -> tuple[in
     return origin
 
 
+def _local_forage_per_consumer(animal: dict, consumers: dict, producers: dict) -> float:
+    width, height = int(producers["width"]), int(producers["height"])
+    pcells = _cell_lookup(producers["cells"])
+    traits = trait_for(str(animal["species"]))
+    visible = _visible_cells(int(animal["x"]), int(animal["y"]), width, height, traits.perception_radius)
+    forage = sum(_plant_mass(pcells[xy]) for xy in visible)
+    competitors = 0
+    visible_set = set(visible)
+    for other in consumers["animals"]:
+        if (int(other["x"]), int(other["y"])) in visible_set:
+            competitors += 1
+    return forage / max(1, competitors)
+
+
 def _consume_plants(animal: dict, pcell: dict) -> float:
     traits = trait_for(str(animal["species"]))
     available = _plant_mass(pcell)
@@ -328,14 +342,14 @@ def evolve_consumers(
             ccell["water_kg"] += float(animal["body_water_kg"])
             continue
 
-        local_forage = _plant_mass(pcell)
+        local_forage_per_consumer = _local_forage_per_consumer(animal, consumers, producers)
         since_reproduction = epoch - int(animal.get("last_reproduction_epoch", -1000000))
         reproduction_ready = (
             int(animal["age_ticks"]) >= traits.maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= 0.015
             and float(animal["last_forage_success"]) > 0.0
-            and local_forage >= traits.minimum_forage_reserve_kg
+            and local_forage_per_consumer >= traits.minimum_forage_reserve_kg
             and since_reproduction >= traits.reproduction_cooldown_ticks
         )
         if reproduction_ready:
