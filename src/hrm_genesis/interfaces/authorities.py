@@ -20,6 +20,9 @@ ECOLOGY_STATE_RESOURCE = "state"
 CONSUMER_AUTHORITY = "ecology.consumers"
 CONSUMER_STATE_RESOURCE = "state"
 
+HUMAN_AUTHORITY = "human.biology"
+HUMAN_STATE_RESOURCE = "state"
+
 
 @dataclass(frozen=True)
 class AuthorityRegistration:

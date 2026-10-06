@@ -28,6 +28,11 @@ from .ecology.animals import (
     evolve_consumers,
     seed_initial_consumers,
 )
+from .human.biology import (
+    build_human_state,
+    evolve_humans,
+    seed_initial_humans,
+)
 from .interfaces.authorities import (
     AuthorityRegistration,
     GENESIS_SYSTEM_AUTHORITY,
@@ -40,6 +45,8 @@ from .interfaces.authorities import (
     ECOLOGY_STATE_RESOURCE,
     CONSUMER_AUTHORITY,
     CONSUMER_STATE_RESOURCE,
+    HUMAN_AUTHORITY,
+    HUMAN_STATE_RESOURCE,
     validate_registrations,
 )
 from .interfaces.snapshots import GenesisSnapshot, capture_snapshot
@@ -53,6 +60,7 @@ WORLD_SCHEDULE_ID = "world.environment"
 MATTER_SCHEDULE_ID = "matter.environment"
 BIOSPHERE_SCHEDULE_ID = "ecology.producers"
 CONSUMER_BIOSPHERE_SCHEDULE_ID = "ecology.consumers"
+HUMAN_BIOSPHERE_SCHEDULE_ID = "human.biology"
 
 
 class GenesisSimulation:
@@ -92,6 +100,7 @@ class GenesisSimulation:
         matter_state = None
         producer_state = None
         consumer_state = None
+        human_state = None
         if config.matter_enabled:
             matter_state = build_matter_state(
                 width=config.world_width,
@@ -126,6 +135,20 @@ class GenesisSimulation:
                 matter_state,
             )
 
+        if config.human_biology_enabled:
+            if matter_state is None or producer_state is None or consumer_state is None:
+                raise ValueError("human biology requires Matter, producers, and consumers")
+            human_state = build_human_state(
+                width=config.world_width,
+                height=config.world_height,
+                seed_bank=self.seed_bank,
+            )
+            human_state, producer_state, matter_state = seed_initial_humans(
+                human_state,
+                producer_state,
+                matter_state,
+            )
+
         if matter_state is not None:
             authorities.append(
                 StateAuthority(MATTER_AUTHORITY, {MATTER_STATE_RESOURCE: matter_state})
@@ -139,6 +162,11 @@ class GenesisSimulation:
         if consumer_state is not None:
             authorities.append(
                 StateAuthority(CONSUMER_AUTHORITY, {CONSUMER_STATE_RESOURCE: consumer_state})
+            )
+
+        if human_state is not None:
+            authorities.append(
+                StateAuthority(HUMAN_AUTHORITY, {HUMAN_STATE_RESOURCE: human_state})
             )
 
         self.authorities = authorities
@@ -202,6 +230,8 @@ class GenesisSimulation:
             expected.add(ECOLOGY_AUTHORITY)
         if config.consumer_ecology_enabled:
             expected.add(CONSUMER_AUTHORITY)
+        if config.human_biology_enabled:
+            expected.add(HUMAN_AUTHORITY)
         if set(fabric.authority_ids) != expected:
             raise ValueError("checkpoint authority set does not match GenesisConfig")
 
@@ -224,7 +254,12 @@ class GenesisSimulation:
                 self._world_callback,
             )
 
-        if self.config.consumer_ecology_enabled:
+        if self.config.human_biology_enabled:
+            self.orchestrator.register(
+                ScheduleSpec(HUMAN_BIOSPHERE_SCHEDULE_ID, 1, 0, 1),
+                self._human_biosphere_callback,
+            )
+        elif self.config.consumer_ecology_enabled:
             self.orchestrator.register(
                 ScheduleSpec(CONSUMER_BIOSPHERE_SCHEDULE_ID, 1, 0, 1),
                 self._consumer_biosphere_callback,
@@ -432,6 +467,86 @@ class GenesisSimulation:
             )
         ]
 
+
+    def _human_biosphere_callback(self, ctx, fabric: TransactionFabric):
+        matter = fabric.projection(
+            MATTER_AUTHORITY,
+            [MATTER_STATE_RESOURCE],
+        )[MATTER_STATE_RESOURCE]
+        producers = fabric.projection(
+            ECOLOGY_AUTHORITY,
+            [ECOLOGY_STATE_RESOURCE],
+        )[ECOLOGY_STATE_RESOURCE]
+        consumers = fabric.projection(
+            CONSUMER_AUTHORITY,
+            [CONSUMER_STATE_RESOURCE],
+        )[CONSUMER_STATE_RESOURCE]
+        humans = fabric.projection(
+            HUMAN_AUTHORITY,
+            [HUMAN_STATE_RESOURCE],
+        )[HUMAN_STATE_RESOURCE]
+        world = fabric.projection(
+            WORLD_AUTHORITY,
+            [WORLD_STATE_RESOURCE],
+        )[WORLD_STATE_RESOURCE]
+
+        hydrated_matter = evolve_matter(dict(matter.value), dict(world.value), ctx.epoch)
+        next_producers, matter_after_plants = evolve_producers(
+            dict(producers.value),
+            hydrated_matter,
+            dict(world.value),
+            ctx.epoch,
+        )
+        next_consumers, producers_after_consumers, matter_after_consumers = evolve_consumers(
+            dict(consumers.value),
+            next_producers,
+            matter_after_plants,
+            dict(world.value),
+            ctx.epoch,
+        )
+        next_humans, final_producers, final_matter = evolve_humans(
+            dict(humans.value),
+            producers_after_consumers,
+            matter_after_consumers,
+            dict(world.value),
+            ctx.epoch,
+        )
+
+        return [
+            TransactionProposal(
+                proposal_id=f"g5-biosphere-{ctx.epoch:012d}",
+                transaction_id=f"g5-tx-biosphere-{ctx.epoch:012d}",
+                proposer_id=HUMAN_BIOSPHERE_SCHEDULE_ID,
+                logical_epoch=ctx.epoch,
+                mutations=(
+                    Mutation(
+                        ref=ResourceRef(MATTER_AUTHORITY, MATTER_STATE_RESOURCE),
+                        expected_version=matter.version,
+                        new_value=final_matter,
+                    ),
+                    Mutation(
+                        ref=ResourceRef(ECOLOGY_AUTHORITY, ECOLOGY_STATE_RESOURCE),
+                        expected_version=producers.version,
+                        new_value=final_producers,
+                    ),
+                    Mutation(
+                        ref=ResourceRef(CONSUMER_AUTHORITY, CONSUMER_STATE_RESOURCE),
+                        expected_version=consumers.version,
+                        new_value=next_consumers,
+                    ),
+                    Mutation(
+                        ref=ResourceRef(HUMAN_AUTHORITY, HUMAN_STATE_RESOURCE),
+                        expected_version=humans.version,
+                        new_value=next_humans,
+                    ),
+                ),
+                provenance=ProvenanceContribution(
+                    source_authority=HUMAN_AUTHORITY,
+                    operation="HUMAN_BIOLOGY_STEP",
+                ),
+            )
+        ]
+
     def run(self, ticks: int):
         if ticks < 0:
             raise ValueError("ticks must be >= 0")
@@ -477,6 +592,15 @@ class GenesisSimulation:
         return dict(
             self.fabric.projection(CONSUMER_AUTHORITY, [CONSUMER_STATE_RESOURCE])[
                 CONSUMER_STATE_RESOURCE
+            ].value
+        )
+
+    def human_state(self) -> dict:
+        if not self.config.human_biology_enabled:
+            raise RuntimeError("human biology is disabled")
+        return dict(
+            self.fabric.projection(HUMAN_AUTHORITY, [HUMAN_STATE_RESOURCE])[
+                HUMAN_STATE_RESOURCE
             ].value
         )
 
