@@ -37,7 +37,7 @@ def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
 
-def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False) -> dict:
+def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False, actions_enabled: bool = False) -> dict:
     humans = []
     for index, sex in enumerate(("female", "male")):
         rng = seed_bank.stream(f"human.genesis.{index}")
@@ -60,6 +60,9 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
                 "uncertainty": 1.0,
                 "last_reward": 0.0,
             }
+        if actions_enabled:
+            person["learned_sequences"] = []
+            person["last_teacher_id"] = None
         humans.append(person)
     return {
         "width": width,
@@ -208,6 +211,11 @@ def _offspring(mother: dict, ordinal: int) -> dict:
                 }
             }
             if "cognition" in mother
+            else {}
+        ),
+        **(
+            {"learned_sequences": [], "last_teacher_id": None}
+            if "learned_sequences" in mother
             else {}
         ),
     }
