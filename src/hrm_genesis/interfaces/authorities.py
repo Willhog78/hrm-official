@@ -17,6 +17,9 @@ MATTER_STATE_RESOURCE = "state"
 ECOLOGY_AUTHORITY = "ecology.producers"
 ECOLOGY_STATE_RESOURCE = "state"
 
+CONSUMER_AUTHORITY = "ecology.consumers"
+CONSUMER_STATE_RESOURCE = "state"
+
 
 @dataclass(frozen=True)
 class AuthorityRegistration:
