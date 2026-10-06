@@ -343,13 +343,20 @@ def evolve_consumers(
             continue
 
         local_forage_per_consumer = _local_forage_per_consumer(animal, consumers, producers)
+        expected_tick_cost = traits.basal_cost + 0.25 * traits.movement_cost
+        required_forage_support = (
+            expected_tick_cost
+            * traits.reproduction_cooldown_ticks
+            * 2.0
+            / (2200.0 * traits.assimilation_efficiency)
+        )
         since_reproduction = epoch - int(animal.get("last_reproduction_epoch", -1000000))
         reproduction_ready = (
             int(animal["age_ticks"]) >= traits.maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= 0.015
             and float(animal["last_forage_success"]) > 0.0
-            and local_forage_per_consumer >= traits.minimum_forage_reserve_kg
+            and local_forage_per_consumer >= required_forage_support
             and since_reproduction >= traits.reproduction_cooldown_ticks
         )
         if reproduction_ready:
