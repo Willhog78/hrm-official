@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from .elements import water_element_mass
-from .pools import total_elements, total_water
+from .pools import total_elements, total_water, water_element_mass
 
 
 def water_balance_error(state: dict) -> float:
