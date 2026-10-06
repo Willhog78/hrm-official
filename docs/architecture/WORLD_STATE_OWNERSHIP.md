@@ -13,7 +13,7 @@ Each causal domain owns only the state it is responsible for. Coordination route
 | Coordination | time, arbitration, replay/provenance, coordination checkpoints | terrain, resources, organisms, cognition |
 | World (G1) | coordinates, elevation, temperature, solar input, precipitation | material inventories, organisms, observer labels |
 | Matter (G1.5+) | water reservoirs, elemental pools, conserved material transfers | climate generation, ecological goals, technologies |
-| Ecology (G2+) | living producer biomass, seed material, detritus; later animal state | climate truth, environmental Matter reservoirs, human cognition |
+| Ecology (G2+) | producer biomass/seeds/detritus and, in G3, individual consumers/carcasses | climate truth, environmental Matter reservoirs, human cognition |
 | Human (G5+) | body and cognition state | global simulation truth |
 | Observer (G9) | derived measurements/classifications only | any causal state |
 
