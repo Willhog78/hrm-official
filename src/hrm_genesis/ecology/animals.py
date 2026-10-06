@@ -44,7 +44,7 @@ def build_consumer_state(
             rng = seed_bank.stream(f"ecology.consumer.genesis.{species}.{local_index}")
             animals.append(
                 {
-                    "id": _animal_id(seed_bank._master_seed if hasattr(seed_bank, "_master_seed") else species, species, ordinal),
+                    "id": f"{species}-g{ordinal:08d}",
                     "species": species,
                     "x": rng.randrange(width),
                     "y": rng.randrange(height),
@@ -84,13 +84,22 @@ def seed_initial_consumers(
     pcells = _cell_lookup(producers["cells"])
     mcells = _cell_lookup(matter["cells"])
 
+    vegetated = sorted(
+        pcells,
+        key=lambda xy: (-_plant_mass(pcells[xy]), xy[1], xy[0]),
+    )
+    if not vegetated or _plant_mass(pcells[vegetated[0]]) <= 0.0:
+        consumers["animals"] = []
+        return consumers, producers, matter
+
     survivors: list[dict] = []
-    for animal in consumers["animals"]:
-        xy = (int(animal["x"]), int(animal["y"]))
+    for index, animal in enumerate(consumers["animals"]):
+        xy = vegetated[index % len(vegetated)]
+        animal["x"], animal["y"] = xy
         pcell = pcells[xy]
         mcell = mcells[xy]
 
-        requested_body = 0.018
+        requested_body = 0.012
         available_fraction = 1.0
         for symbol in ANIMAL_TRACKED_ELEMENTS:
             needed = requested_body * PLANT_ELEMENT_FRACTIONS[symbol]
@@ -290,13 +299,10 @@ def evolve_consumers(
         _consume_plants(animal, pcell)
 
         animal["energy"] = float(animal["energy"]) - traits.basal_cost
-        animal["body_water_kg"] = max(
-            0.0, float(animal["body_water_kg"]) - traits.water_loss_per_tick_kg
-        )
-        matter["water_output_kg"] = float(matter["water_output_kg"]) + min(
-            traits.water_loss_per_tick_kg,
-            max(0.0, float(animal["body_water_kg"]) + traits.water_loss_per_tick_kg),
-        )
+        water_before_loss = max(0.0, float(animal["body_water_kg"]))
+        water_loss = min(water_before_loss, traits.water_loss_per_tick_kg)
+        animal["body_water_kg"] = water_before_loss - water_loss
+        matter["water_output_kg"] = float(matter["water_output_kg"]) + water_loss
         animal["age_ticks"] = int(animal["age_ticks"]) + 1
 
         body_mass = _element_mass(animal["body_elements_kg"])
