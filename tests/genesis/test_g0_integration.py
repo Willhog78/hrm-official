@@ -54,7 +54,7 @@ def test_restore_rejects_config_mismatch(tmp_path: Path):
     with pytest.raises(ValueError, match="fingerprint"):
         GenesisSimulation.load_checkpoint(
             checkpoint,
-            GenesisConfig(master_seed="different"),
+            GenesisConfig(master_seed="different", physical_world_enabled=False),
         )
 
 
