@@ -45,6 +45,8 @@ jobs:
         run: python qualification/genesis/run_g2_gate.py
       - name: Genesis G3 consumer gate
         run: python qualification/genesis/run_g3_gate.py
+      - name: Genesis G4 autonomy gate
+        run: python qualification/genesis/run_g4_autonomy_gate.py
       - name: Stage-2 draft suite (quarantined; informational)
         working-directory: drafts/stage2
         run: python -m pytest -o addopts='' -q tests
