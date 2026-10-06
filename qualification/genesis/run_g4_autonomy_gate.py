@@ -50,6 +50,8 @@ def main() -> int:
             "populations": population_counts(consumers_now),
             "producer_biomass_kg": float(snap["producer_biomass_kg"]),
             "consumer_occupied_cells": len(occupied[-1]),
+            "births_last_tick": int(consumers_now.get("last_tick_births", 0)),
+            "deaths_last_tick": dict(consumers_now.get("last_tick_deaths_by_cause", {})),
             "grazers": [
                 {
                     "id": a["id"],
@@ -103,6 +105,8 @@ def main() -> int:
                     f"browser={row['populations'].get('browser', 0)} "
                     f"producer_biomass_kg={row['producer_biomass_kg']:.6f} "
                     f"consumer_cells={row['consumer_occupied_cells']} "
+                    f"births_last_tick={row['births_last_tick']} "
+                    f"deaths_last_tick={row['deaths_last_tick']} "
                     f"grazers={row['grazers']}"
                 )
     if failed:
