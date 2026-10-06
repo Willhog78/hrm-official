@@ -35,7 +35,7 @@ def build_consumer_state(
     width: int,
     height: int,
     seed_bank: SeedBank,
-    initial_per_species: int = 5,
+    initial_per_species: int = 2,
 ) -> dict:
     animals: list[dict] = []
     ordinal = 0
@@ -198,7 +198,7 @@ def _consume_plants(animal: dict, pcell: dict) -> float:
         animal["forage_bias"] = max(-0.25, float(animal["forage_bias"]) - 0.01)
         return 0.0
 
-    bite = min(available * traits.bite_fraction, 0.012)
+    bite = min(available * traits.bite_fraction, 0.004)
     fraction = min(1.0, bite / available)
     consumed = 0.0
     assimilated = 0.0
@@ -212,7 +212,7 @@ def _consume_plants(animal: dict, pcell: dict) -> float:
         consumed += amount
         assimilated += keep
 
-    animal["energy"] = float(animal["energy"]) + consumed * 380.0 * traits.assimilation_efficiency
+    animal["energy"] = float(animal["energy"]) + consumed * 2200.0 * traits.assimilation_efficiency
     animal["last_forage_success"] = consumed
     animal["forage_bias"] = min(0.25, float(animal["forage_bias"]) + 0.018)
     return assimilated
