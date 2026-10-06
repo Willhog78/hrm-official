@@ -4,6 +4,7 @@ from hrm_genesis import GenesisConfig, GenesisSimulation
 from hrm_genesis.ecology.autonomy import ecology_snapshot, occupied_consumer_cells
 from hrm_genesis.ecology.animals import consumer_element_totals, consumer_water_total_kg
 from hrm_genesis.ecology.plants import ecology_element_totals
+from hrm_genesis.ecology.populations import population_counts
 from hrm_genesis.matter.pools import total_elements, total_water
 
 
@@ -48,6 +49,8 @@ def main() -> int:
         for s in samples
     ]
 
+    final_populations = population_counts(sim.consumer_state())
+
     checks = {
         "century_completed": sim.snapshot().epoch == 100 * config.ticks_per_year,
         "ledger_valid": sim.ledger.verify_chain(),
@@ -55,6 +58,8 @@ def main() -> int:
         "water_accounting": abs(combined_water_error(sim)) < 5e-5,
         "producer_state_changed": max(biomass_values) != min(biomass_values),
         "consumer_state_changed": max(population_values) != min(population_values) or len({frozenset(x) for x in occupied}) > 1,
+        "grazer_survives_century": final_populations.get("grazer", 0) > 0,
+        "browser_survives_century": final_populations.get("browser", 0) > 0,
         "no_human_state": not any(aid.startswith("human.") for aid in sim.fabric.authority_ids),
     }
 
