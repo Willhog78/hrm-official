@@ -44,11 +44,24 @@ def main() -> int:
         snap = ecology_snapshot(sim.ecology_state(), sim.consumer_state())
         samples.append(snap)
         occupied.append(occupied_consumer_cells(sim.consumer_state()))
+        consumers_now = sim.consumer_state()
         yearly_populations.append({
             "year": year,
-            "populations": population_counts(sim.consumer_state()),
+            "populations": population_counts(consumers_now),
             "producer_biomass_kg": float(snap["producer_biomass_kg"]),
             "consumer_occupied_cells": len(occupied[-1]),
+            "grazers": [
+                {
+                    "id": a["id"],
+                    "age_ticks": int(a["age_ticks"]),
+                    "energy": float(a["energy"]),
+                    "body_mass_kg": sum(float(v) for v in a["body_elements_kg"].values()),
+                    "last_forage_success": float(a["last_forage_success"]),
+                    "last_reproduction_epoch": int(a.get("last_reproduction_epoch", -1000000)),
+                }
+                for a in consumers_now["animals"]
+                if a["species"] == "grazer"
+            ],
         })
 
     biomass_values = [float(s["producer_biomass_kg"]) for s in samples]
@@ -89,7 +102,8 @@ def main() -> int:
                     f"grazer={row['populations'].get('grazer', 0)} "
                     f"browser={row['populations'].get('browser', 0)} "
                     f"producer_biomass_kg={row['producer_biomass_kg']:.6f} "
-                    f"consumer_cells={row['consumer_occupied_cells']}"
+                    f"consumer_cells={row['consumer_occupied_cells']} "
+                    f"grazers={row['grazers']}"
                 )
     if failed:
         print("G4_GATE_FAIL:", ", ".join(failed))
