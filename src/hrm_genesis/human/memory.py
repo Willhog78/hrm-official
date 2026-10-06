@@ -36,5 +36,5 @@ def remember(memory: dict, perception: dict, epoch: int, reward: float) -> dict:
     return {
         "episodes": episodes,
         "locations": locations,
-        "recognized": list(memory.get("recognized", [])),
+        "recognized": sorted(set(memory.get("recognized", [])) | set(perception.get("recognized", []))),
     }
