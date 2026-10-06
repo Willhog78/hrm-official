@@ -46,7 +46,7 @@ SPECIES: dict[str, ConsumerTraits] = {
         water_capacity_kg=0.30,
         water_loss_per_tick_kg=0.009,
         reproduction_cooldown_ticks=30,
-        minimum_forage_reserve_kg=0.016,
+        minimum_forage_reserve_kg=0.0,
     ),
     "browser": ConsumerTraits(
         species="browser",
