@@ -12,6 +12,10 @@ class GenesisConfig:
     contract_dt_numerator: int = 1
     contract_dt_denominator: int = 1
     max_parallel_domains: int = 32
+    physical_world_enabled: bool = True
+    world_width: int = 8
+    world_height: int = 8
+    ticks_per_year: int = 120
 
     def __post_init__(self) -> None:
         if not self.master_seed:
@@ -20,6 +24,10 @@ class GenesisConfig:
             raise ValueError("contract_dt must be positive")
         if self.max_parallel_domains < 1:
             raise ValueError("max_parallel_domains must be >= 1")
+        if self.world_width < 2 or self.world_height < 2:
+            raise ValueError("world dimensions must be >= 2")
+        if self.ticks_per_year < 4:
+            raise ValueError("ticks_per_year must be >= 4")
 
     @property
     def contract_dt(self) -> Fraction:
@@ -31,7 +39,11 @@ class GenesisConfig:
             "contract_dt_numerator": self.contract_dt_numerator,
             "contract_dt_denominator": self.contract_dt_denominator,
             "max_parallel_domains": self.max_parallel_domains,
-            "genesis_phase": "G0",
+            "physical_world_enabled": self.physical_world_enabled,
+            "world_width": self.world_width,
+            "world_height": self.world_height,
+            "ticks_per_year": self.ticks_per_year,
+            "genesis_phase": "G1",
         }
 
     def fingerprint(self) -> str:

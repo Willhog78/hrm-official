@@ -8,6 +8,9 @@ from hrm_coordination.authority import AuthorityPort
 GENESIS_SYSTEM_AUTHORITY = "genesis.system"
 GENESIS_TICK_RESOURCE = "tick"
 
+WORLD_AUTHORITY = "world.environment"
+WORLD_STATE_RESOURCE = "state"
+
 
 @dataclass(frozen=True)
 class AuthorityRegistration:
