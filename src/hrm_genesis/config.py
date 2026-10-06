@@ -15,6 +15,7 @@ class GenesisConfig:
     physical_world_enabled: bool = True
     matter_enabled: bool = True
     producer_ecology_enabled: bool = False
+    consumer_ecology_enabled: bool = False
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -34,6 +35,8 @@ class GenesisConfig:
             raise ValueError("matter_enabled requires physical_world_enabled in G1.5")
         if self.producer_ecology_enabled and not self.matter_enabled:
             raise ValueError("producer_ecology_enabled requires matter_enabled")
+        if self.consumer_ecology_enabled and not self.producer_ecology_enabled:
+            raise ValueError("consumer_ecology_enabled requires producer_ecology_enabled")
 
     @property
     def contract_dt(self) -> Fraction:
@@ -48,10 +51,11 @@ class GenesisConfig:
             "physical_world_enabled": self.physical_world_enabled,
             "matter_enabled": self.matter_enabled,
             "producer_ecology_enabled": self.producer_ecology_enabled,
+            "consumer_ecology_enabled": self.consumer_ecology_enabled,
             "world_width": self.world_width,
             "world_height": self.world_height,
             "ticks_per_year": self.ticks_per_year,
-            "genesis_phase": "G2",
+            "genesis_phase": "G3",
         }
 
     def fingerprint(self) -> str:
