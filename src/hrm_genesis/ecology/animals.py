@@ -55,6 +55,7 @@ def build_consumer_state(
                     "forage_bias": rng.uniform(-0.05, 0.05),
                     "last_forage_success": 0.0,
                     "generation": 0,
+                    "last_reproduction_epoch": -1000000,
                 }
             )
             ordinal += 1
@@ -260,6 +261,7 @@ def _offspring(parent: dict, ordinal: int) -> dict:
         "forage_bias": max(-0.25, min(0.25, float(parent["forage_bias"]) + delta)),
         "last_forage_success": 0.0,
         "generation": int(parent["generation"]) + 1,
+        "last_reproduction_epoch": -1000000,
     }
 
 
@@ -317,15 +319,22 @@ def evolve_consumers(
             ccell["water_kg"] += float(animal["body_water_kg"])
             continue
 
-        if (
+        local_forage = _plant_mass(pcell)
+        reproduction_ready = (
             int(animal["age_ticks"]) >= traits.maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= 0.015
-        ):
+            and float(animal["last_forage_success"]) > 0.0005
+            and local_forage >= traits.minimum_forage_reserve_kg
+            and ctx_epoch_distance := epoch - int(animal.get("last_reproduction_epoch", -1000000))
+        )
+        if reproduction_ready and ctx_epoch_distance >= traits.reproduction_cooldown_ticks:
             ordinal = int(consumers["next_birth_ordinal"])
             consumers["next_birth_ordinal"] = ordinal + 1
             child = _offspring(animal, ordinal)
-            animal["energy"] -= traits.reproduction_energy * 0.42
+            child_energy = float(child["energy"])
+            animal["energy"] = max(0.0, float(animal["energy"]) - child_energy)
+            animal["last_reproduction_epoch"] = epoch
             births.append(child)
 
         survivors.append(animal)
