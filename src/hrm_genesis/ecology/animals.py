@@ -64,6 +64,8 @@ def build_consumer_state(
         "height": height,
         "epoch_applied": -1,
         "next_birth_ordinal": ordinal,
+        "cumulative_births": 0,
+        "cumulative_deaths_by_cause": {"old_age": 0, "starvation": 0, "dehydration": 0},
         "animals": animals,
         "carcass_cells": [
             {"x": x, "y": y, "elements_kg": _blank_elements(), "water_kg": 0.0}
@@ -350,6 +352,11 @@ def evolve_consumers(
     consumers["animals"] = survivors + births
     consumers["last_tick_births"] = len(births)
     consumers["last_tick_deaths_by_cause"] = deaths_by_cause
+    consumers["cumulative_births"] = int(consumers.get("cumulative_births", 0)) + len(births)
+    cumulative_deaths = dict(consumers.get("cumulative_deaths_by_cause", {}))
+    for cause, count in deaths_by_cause.items():
+        cumulative_deaths[cause] = int(cumulative_deaths.get(cause, 0)) + int(count)
+    consumers["cumulative_deaths_by_cause"] = cumulative_deaths
 
     # Carcass decomposition returns consumer material to environmental Matter.
     for xy, ccell in carcasses.items():
