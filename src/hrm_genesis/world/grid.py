@@ -40,9 +40,6 @@ def build_grid(width: int, height: int, seed_bank: SeedBank) -> list[dict[str, f
                     "temperature": 0.0,
                     "solar": 0.0,
                     "precipitation": 0.0,
-                    "surface_water": 8.0,
-                    "soil_moisture": 45.0,
-                    "nutrients": round(80.0 + stream.uniform(-8.0, 8.0), 6),
                 }
             )
     return cells

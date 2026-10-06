@@ -11,40 +11,38 @@ Each causal domain owns only the state it is responsible for. Coordination route
 | Domain | Owns | Must not own |
 |---|---|---|
 | Coordination | time, arbitration, replay/provenance, coordination checkpoints | terrain, resources, organisms, cognition |
-| World (G1) | spatial/environmental state | organisms, human memory, observer labels |
-| Matter (G1+) | declared material pools/transfers | ecological goals, technologies |
+| World (G1) | coordinates, elevation, temperature, solar input, precipitation | material inventories, organisms, observer labels |
+| Matter (G1.5+) | water reservoirs, elemental pools, conserved material transfers | climate generation, ecological goals, technologies |
 | Ecology (G2+) | plant/animal organism or population state | climate truth, human cognition |
 | Human (G5+) | body and cognition state | global simulation truth |
 | Observer (G9) | derived measurements/classifications only | any causal state |
 
-## G0 system authority
+## Authorities
 
-The `genesis.system` authority contains only the logical tick marker needed to qualify runner/checkpoint/replay wiring.
+`genesis.system` owns only the logical tick marker.
 
-It is not permission to create a global dictionary of later world state.
+`world.environment` owns the physical forcing field: terrain, temperature, solar input and precipitation.
 
-## G1 physical-world authority
+`matter.environment` owns environmental material inventory. In G1.5 that means surface water, soil water and per-cell elemental pools.
 
-The G1 authority is:
+There is deliberately no second copy of water or nutrients in World state.
 
-- authority: `world.environment`
-- resource: `state`
+## Matter bridge
 
-Its state contains only physical-environment information: bounded coordinates, elevation, temperature, solar input, precipitation, surface water, soil moisture, nutrients, and cumulative open-system water accounting.
+The G1.5 Matter layer uses a canonical element registry and tracks biologically/materially relevant elements separately. Water remains a compound reservoir, with its H/O elemental consequence available through accounting rather than duplicated as an independent store.
 
-It does not contain plants, animals, humans, social state, observer labels, target populations, or repair instructions.
-
-For G1 the physical state is carried through the existing Stage-1 authority adapter so transaction, replay and checkpoint semantics remain exercised. Semantic ownership is nevertheless separate from `genesis.system`; future ecology/human phases must create their own authorities rather than append state to `world.environment`.
+The quarantined Stage-2 Slice-A work informed the conservation and ownership rules. Its illustrative thermodynamic threshold table is not promoted into Genesis as validated physics.
 
 ## Cross-domain rule
 
-If an operation changes state owned by more than one authority, it must be represented as a Stage-1 transaction spanning those authorities.
+If an operation changes state owned by more than one authority, it must be represented as a Stage-1 transaction spanning those authorities. A kernel may legally read declared projections of another authority without taking ownership of that state.
 
 ## Dependency rule
 
 Lower-level causal domains must never import higher-level semantic labels to decide outcomes. In particular:
 
 - world physics does not know settlements;
+- matter does not know organisms or technologies;
 - plant ecology does not know economies;
 - animal ecology does not know institutions;
 - human biology does not know professions;
