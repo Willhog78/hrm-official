@@ -45,6 +45,8 @@ hrm-official/
 │       │   └── energy.py
 │       │
 │       ├── matter/
+│       │   ├── __init__.py
+│       │   ├── elements.py
 │       │   ├── pools.py
 │       │   ├── transfers.py
 │       │   └── accounting.py
@@ -83,6 +85,7 @@ hrm-official/
 │   └── genesis/
 │       ├── test_g0_integration.py
 │       ├── test_g1_physical_world.py
+│       ├── test_g1_5_matter.py
 │       ├── test_g2_plants.py
 │       ├── test_g3_consumers.py
 │       ├── test_g4_ecological_loop.py
@@ -98,6 +101,7 @@ hrm-official/
 │   └── genesis/
 │       ├── run_g0_gate.py
 │       ├── run_g1_gate.py
+│       ├── run_g1_5_gate.py
 │       ├── run_g2_gate.py
 │       ├── run_g3_gate.py
 │       ├── run_g4_autonomy_gate.py

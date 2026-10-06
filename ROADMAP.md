@@ -75,6 +75,29 @@ The world runs for at least 10 simulated years with no organisms and exhibits de
 
 ---
 
+# Phase G1.5 — Matter & Elements
+
+## Goal
+Replace generic environmental resource numbers with conserved elemental/material reservoirs before biology begins.
+
+## Required mechanisms
+- canonical real-element registry;
+- water represented as a material reservoir with explicit H/O composition;
+- per-cell elemental soil pools;
+- separate Matter authority;
+- hydrological transfer through Matter state;
+- elemental diffusion/conservation;
+- explicit open-system accounting for precipitation and evaporation;
+- deterministic checkpoint/replay through Stage-1 coordination.
+
+## Scientific status
+Element identities and atomic masses are canonical reference data. Thermodynamic/reaction behavior remains deliberately limited; the quarantined Stage-2 placeholder phase constants are **not** promoted as validated science.
+
+## Exit condition
+Matter and World remain separate authorities; water and soil elements survive a 10-year run with deterministic replay and conservation within tolerance, except for explicitly accounted open-system water exchange. Plants remain blocked until this gate passes.
+
+---
+
 # Phase G2 — Producer Ecology
 
 ## Goal

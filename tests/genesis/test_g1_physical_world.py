@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from hrm_genesis import GenesisConfig, GenesisSimulation
-from hrm_genesis.world.state import nutrient_balance_error, water_balance_error
 
 
 def mean_field(world: dict, field: str) -> float:
@@ -29,9 +28,8 @@ def test_g1_grid_is_bounded_and_heterogeneous():
     assert world["height"] == 4
     assert len(world["cells"]) == 20
     elevations = {float(c["elevation"]) for c in world["cells"]}
-    nutrients = {float(c["nutrients"]) for c in world["cells"]}
     assert len(elevations) > 1
-    assert len(nutrients) > 1
+    assert all("surface_water" not in c and "nutrients" not in c for c in world["cells"])
 
 
 def test_g1_seasonality_changes_temperature_and_solar_input():
@@ -50,31 +48,11 @@ def test_g1_seasonality_changes_temperature_and_solar_input():
 
     sim.run(10)
     later = sim.world_state()
-    later_temp = mean_field(later, "temperature")
-    later_solar = mean_field(later, "solar")
-
-    assert early_temp != later_temp
-    assert early_solar != later_solar
+    assert early_temp != mean_field(later, "temperature")
+    assert early_solar != mean_field(later, "solar")
 
 
-def test_g1_water_and_nutrients_account_for_long_run():
-    config = GenesisConfig(
-        master_seed="g1-balance",
-        world_width=4,
-        world_height=4,
-        ticks_per_year=24,
-    )
-    sim = GenesisSimulation(config)
-    sim.run(config.ticks_per_year * 10)
-    world = sim.world_state()
-
-    assert abs(water_balance_error(world)) < 1e-5
-    assert abs(nutrient_balance_error(world)) < 1e-5
-    assert float(world["water_input"]) > 0.0
-    assert float(world["water_output"]) > 0.0
-
-
-def test_g1_ten_year_run_is_deterministic():
+def test_g1_ten_year_climate_run_is_deterministic():
     config = GenesisConfig(
         master_seed="g1-ten-years",
         world_width=4,
@@ -83,8 +61,8 @@ def test_g1_ten_year_run_is_deterministic():
     )
     a = GenesisSimulation(config)
     b = GenesisSimulation(config)
-
     ticks = config.ticks_per_year * 10
+
     a.run(ticks)
     b.run(ticks)
 
