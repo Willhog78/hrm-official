@@ -17,6 +17,8 @@ class ConsumerTraits:
     offspring_mass_fraction: float
     water_capacity_kg: float
     water_loss_per_tick_kg: float
+    reproduction_cooldown_ticks: int
+    minimum_forage_reserve_kg: float
 
     def __post_init__(self) -> None:
         if self.perception_radius < 1:
@@ -43,6 +45,8 @@ SPECIES: dict[str, ConsumerTraits] = {
         offspring_mass_fraction=0.18,
         water_capacity_kg=0.30,
         water_loss_per_tick_kg=0.012,
+        reproduction_cooldown_ticks=24,
+        minimum_forage_reserve_kg=0.020,
     ),
     "browser": ConsumerTraits(
         species="browser",
@@ -57,6 +61,8 @@ SPECIES: dict[str, ConsumerTraits] = {
         offspring_mass_fraction=0.15,
         water_capacity_kg=0.34,
         water_loss_per_tick_kg=0.010,
+        reproduction_cooldown_ticks=30,
+        minimum_forage_reserve_kg=0.018,
     ),
 }
 
