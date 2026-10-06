@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-def perceive_local(human: dict, producer_state: dict, matter_state: dict) -> dict:
+def perceive_local(human: dict, producer_state: dict, matter_state: dict, peers: list[dict] | None = None) -> dict:
     """Return only the organism's current cell plus immediate orthogonal neighbors."""
     width, height = int(producer_state["width"]), int(producer_state["height"])
     pcells = {(int(c["x"]), int(c["y"])): c for c in producer_state["cells"]}
@@ -29,4 +29,11 @@ def perceive_local(human: dict, producer_state: dict, matter_state: dict) -> dic
                 "water_kg": round(float(m["surface_water_kg"]) + float(m["soil_water_kg"]), 10),
             }
         )
-    return {"origin": [x, y], "cells": observations}
+    recognized = []
+    for peer in peers or []:
+        if peer.get("id") == human.get("id"):
+            continue
+        px, py = int(peer["x"]), int(peer["y"])
+        if abs(px - x) + abs(py - y) <= 1:
+            recognized.append(str(peer["id"]))
+    return {"origin": [x, y], "cells": observations, "recognized": sorted(recognized)}
