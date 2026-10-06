@@ -194,16 +194,23 @@ def _move_one_step(origin: tuple[int, int], target: tuple[int, int]) -> tuple[in
 
 
 def _local_forage_per_consumer(animal: dict, consumers: dict, producers: dict) -> float:
+    """Estimate reproductive support from the immediate feeding patch.
+
+    Perception controls movement choice, not carrying-capacity accounting.
+    Using perception radius here would perversely punish animals that can see
+    farther by charging them for more competitors simply because they detect
+    them.
+    """
     width, height = int(producers["width"]), int(producers["height"])
     pcells = _cell_lookup(producers["cells"])
-    traits = trait_for(str(animal["species"]))
-    visible = _visible_cells(int(animal["x"]), int(animal["y"]), width, height, traits.perception_radius)
-    forage = sum(_plant_mass(pcells[xy]) for xy in visible)
-    competitors = 0
-    visible_set = set(visible)
-    for other in consumers["animals"]:
-        if (int(other["x"]), int(other["y"])) in visible_set:
-            competitors += 1
+    patch = _visible_cells(int(animal["x"]), int(animal["y"]), width, height, 1)
+    forage = sum(_plant_mass(pcells[xy]) for xy in patch)
+    patch_set = set(patch)
+    competitors = sum(
+        1
+        for other in consumers["animals"]
+        if (int(other["x"]), int(other["y"])) in patch_set
+    )
     return forage / max(1, competitors)
 
 
