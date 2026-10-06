@@ -14,6 +14,7 @@ class GenesisConfig:
     max_parallel_domains: int = 32
     physical_world_enabled: bool = True
     matter_enabled: bool = True
+    producer_ecology_enabled: bool = False
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -31,6 +32,8 @@ class GenesisConfig:
             raise ValueError("ticks_per_year must be >= 4")
         if self.matter_enabled and not self.physical_world_enabled:
             raise ValueError("matter_enabled requires physical_world_enabled in G1.5")
+        if self.producer_ecology_enabled and not self.matter_enabled:
+            raise ValueError("producer_ecology_enabled requires matter_enabled")
 
     @property
     def contract_dt(self) -> Fraction:
@@ -44,10 +47,11 @@ class GenesisConfig:
             "max_parallel_domains": self.max_parallel_domains,
             "physical_world_enabled": self.physical_world_enabled,
             "matter_enabled": self.matter_enabled,
+            "producer_ecology_enabled": self.producer_ecology_enabled,
             "world_width": self.world_width,
             "world_height": self.world_height,
             "ticks_per_year": self.ticks_per_year,
-            "genesis_phase": "G1.5",
+            "genesis_phase": "G2",
         }
 
     def fingerprint(self) -> str:
