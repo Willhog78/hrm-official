@@ -35,7 +35,7 @@ def build_consumer_state(
     width: int,
     height: int,
     seed_bank: SeedBank,
-    initial_per_species: int = 5,
+    initial_per_species: int = 2,
 ) -> dict:
     animals: list[dict] = []
     ordinal = 0
@@ -55,6 +55,7 @@ def build_consumer_state(
                     "forage_bias": rng.uniform(-0.05, 0.05),
                     "last_forage_success": 0.0,
                     "generation": 0,
+                    "last_reproduction_epoch": -1000000,
                 }
             )
             ordinal += 1
@@ -63,6 +64,8 @@ def build_consumer_state(
         "height": height,
         "epoch_applied": -1,
         "next_birth_ordinal": ordinal,
+        "cumulative_births": 0,
+        "cumulative_deaths_by_cause": {"old_age": 0, "starvation": 0, "dehydration": 0},
         "animals": animals,
         "carcass_cells": [
             {"x": x, "y": y, "elements_kg": _blank_elements(), "water_kg": 0.0}
@@ -190,6 +193,27 @@ def _move_one_step(origin: tuple[int, int], target: tuple[int, int]) -> tuple[in
     return origin
 
 
+def _local_forage_per_consumer(animal: dict, consumers: dict, producers: dict) -> float:
+    """Estimate reproductive support from the immediate feeding patch.
+
+    Perception controls movement choice, not carrying-capacity accounting.
+    Using perception radius here would perversely punish animals that can see
+    farther by charging them for more competitors simply because they detect
+    them.
+    """
+    width, height = int(producers["width"]), int(producers["height"])
+    pcells = _cell_lookup(producers["cells"])
+    patch = _visible_cells(int(animal["x"]), int(animal["y"]), width, height, 1)
+    forage = sum(_plant_mass(pcells[xy]) for xy in patch)
+    patch_set = set(patch)
+    competitors = sum(
+        1
+        for other in consumers["animals"]
+        if (int(other["x"]), int(other["y"])) in patch_set
+    )
+    return forage / max(1, competitors)
+
+
 def _consume_plants(animal: dict, pcell: dict) -> float:
     traits = trait_for(str(animal["species"]))
     available = _plant_mass(pcell)
@@ -198,7 +222,7 @@ def _consume_plants(animal: dict, pcell: dict) -> float:
         animal["forage_bias"] = max(-0.25, float(animal["forage_bias"]) - 0.01)
         return 0.0
 
-    bite = min(available * traits.bite_fraction, 0.012)
+    bite = min(available * traits.bite_fraction, 0.004)
     fraction = min(1.0, bite / available)
     consumed = 0.0
     assimilated = 0.0
@@ -212,7 +236,7 @@ def _consume_plants(animal: dict, pcell: dict) -> float:
         consumed += amount
         assimilated += keep
 
-    animal["energy"] = float(animal["energy"]) + consumed * 380.0 * traits.assimilation_efficiency
+    animal["energy"] = float(animal["energy"]) + consumed * 2200.0 * traits.assimilation_efficiency
     animal["last_forage_success"] = consumed
     animal["forage_bias"] = min(0.25, float(animal["forage_bias"]) + 0.018)
     return assimilated
@@ -260,6 +284,7 @@ def _offspring(parent: dict, ordinal: int) -> dict:
         "forage_bias": max(-0.25, min(0.25, float(parent["forage_bias"]) + delta)),
         "last_forage_success": 0.0,
         "generation": int(parent["generation"]) + 1,
+        "last_reproduction_epoch": -1000000,
     }
 
 
@@ -280,6 +305,7 @@ def evolve_consumers(
 
     births: list[dict] = []
     survivors: list[dict] = []
+    deaths_by_cause = {"old_age": 0, "starvation": 0, "dehydration": 0}
 
     for animal in sorted(consumers["animals"], key=lambda a: a["id"]):
         traits = trait_for(str(animal["species"]))
@@ -311,26 +337,54 @@ def evolve_consumers(
         old = int(animal["age_ticks"]) >= traits.max_age_ticks
 
         if dehydrated or starved or old:
+            if dehydrated:
+                deaths_by_cause["dehydration"] += 1
+            elif starved:
+                deaths_by_cause["starvation"] += 1
+            elif old:
+                deaths_by_cause["old_age"] += 1
             ccell = carcasses[xy]
             for symbol in ANIMAL_TRACKED_ELEMENTS:
                 ccell["elements_kg"][symbol] += float(animal["body_elements_kg"][symbol])
             ccell["water_kg"] += float(animal["body_water_kg"])
             continue
 
-        if (
+        local_forage_per_consumer = _local_forage_per_consumer(animal, consumers, producers)
+        expected_tick_cost = traits.basal_cost + 0.25 * traits.movement_cost
+        required_forage_support = (
+            expected_tick_cost
+            * traits.reproduction_cooldown_ticks
+            * 2.0
+            / (2200.0 * traits.assimilation_efficiency)
+        )
+        since_reproduction = epoch - int(animal.get("last_reproduction_epoch", -1000000))
+        reproduction_ready = (
             int(animal["age_ticks"]) >= traits.maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= 0.015
-        ):
+            and float(animal["last_forage_success"]) > 0.0
+            and local_forage_per_consumer >= required_forage_support
+            and since_reproduction >= traits.reproduction_cooldown_ticks
+        )
+        if reproduction_ready:
             ordinal = int(consumers["next_birth_ordinal"])
             consumers["next_birth_ordinal"] = ordinal + 1
             child = _offspring(animal, ordinal)
-            animal["energy"] -= traits.reproduction_energy * 0.42
+            child_energy = float(child["energy"])
+            animal["energy"] = max(0.0, float(animal["energy"]) - child_energy)
+            animal["last_reproduction_epoch"] = epoch
             births.append(child)
 
         survivors.append(animal)
 
     consumers["animals"] = survivors + births
+    consumers["last_tick_births"] = len(births)
+    consumers["last_tick_deaths_by_cause"] = deaths_by_cause
+    consumers["cumulative_births"] = int(consumers.get("cumulative_births", 0)) + len(births)
+    cumulative_deaths = dict(consumers.get("cumulative_deaths_by_cause", {}))
+    for cause, count in deaths_by_cause.items():
+        cumulative_deaths[cause] = int(cumulative_deaths.get(cause, 0)) + int(count)
+    consumers["cumulative_deaths_by_cause"] = cumulative_deaths
 
     # Carcass decomposition returns consumer material to environmental Matter.
     for xy, ccell in carcasses.items():
