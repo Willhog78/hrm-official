@@ -320,15 +320,16 @@ def evolve_consumers(
             continue
 
         local_forage = _plant_mass(pcell)
+        since_reproduction = epoch - int(animal.get("last_reproduction_epoch", -1000000))
         reproduction_ready = (
             int(animal["age_ticks"]) >= traits.maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= 0.015
             and float(animal["last_forage_success"]) > 0.0005
             and local_forage >= traits.minimum_forage_reserve_kg
-            and ctx_epoch_distance := epoch - int(animal.get("last_reproduction_epoch", -1000000))
+            and since_reproduction >= traits.reproduction_cooldown_ticks
         )
-        if reproduction_ready and ctx_epoch_distance >= traits.reproduction_cooldown_ticks:
+        if reproduction_ready:
             ordinal = int(consumers["next_birth_ordinal"])
             consumers["next_birth_ordinal"] = ordinal + 1
             child = _offspring(animal, ordinal)
