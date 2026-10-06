@@ -33,8 +33,8 @@ SPECIES: dict[str, ConsumerTraits] = {
     "grazer": ConsumerTraits(
         species="grazer",
         perception_radius=1,
-        movement_cost=0.28,
-        basal_cost=0.34,
+        movement_cost=0.18,
+        basal_cost=0.20,
         bite_fraction=0.10,
         assimilation_efficiency=0.58,
         reproduction_energy=13.0,
@@ -47,8 +47,8 @@ SPECIES: dict[str, ConsumerTraits] = {
     "browser": ConsumerTraits(
         species="browser",
         perception_radius=2,
-        movement_cost=0.42,
-        basal_cost=0.29,
+        movement_cost=0.26,
+        basal_cost=0.18,
         bite_fraction=0.075,
         assimilation_efficiency=0.66,
         reproduction_energy=15.0,
