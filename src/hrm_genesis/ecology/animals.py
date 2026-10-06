@@ -325,7 +325,7 @@ def evolve_consumers(
             int(animal["age_ticks"]) >= traits.maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= 0.015
-            and float(animal["last_forage_success"]) > 0.0005
+            and float(animal["last_forage_success"]) > 0.0
             and local_forage >= traits.minimum_forage_reserve_kg
             and since_reproduction >= traits.reproduction_cooldown_ticks
         )
