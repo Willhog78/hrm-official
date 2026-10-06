@@ -282,6 +282,7 @@ def evolve_consumers(
 
     births: list[dict] = []
     survivors: list[dict] = []
+    deaths_by_cause = {"old_age": 0, "starvation": 0, "dehydration": 0}
 
     for animal in sorted(consumers["animals"], key=lambda a: a["id"]):
         traits = trait_for(str(animal["species"]))
@@ -313,6 +314,12 @@ def evolve_consumers(
         old = int(animal["age_ticks"]) >= traits.max_age_ticks
 
         if dehydrated or starved or old:
+            if dehydrated:
+                deaths_by_cause["dehydration"] += 1
+            elif starved:
+                deaths_by_cause["starvation"] += 1
+            elif old:
+                deaths_by_cause["old_age"] += 1
             ccell = carcasses[xy]
             for symbol in ANIMAL_TRACKED_ELEMENTS:
                 ccell["elements_kg"][symbol] += float(animal["body_elements_kg"][symbol])
@@ -341,6 +348,8 @@ def evolve_consumers(
         survivors.append(animal)
 
     consumers["animals"] = survivors + births
+    consumers["last_tick_births"] = len(births)
+    consumers["last_tick_deaths_by_cause"] = deaths_by_cause
 
     # Carcass decomposition returns consumer material to environmental Matter.
     for xy, ccell in carcasses.items():
