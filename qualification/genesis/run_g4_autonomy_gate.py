@@ -92,27 +92,28 @@ def main() -> int:
     for k,v in checks.items():
         print(f"{k}: {'PASS' if v else 'FAIL'}")
 
-    if not checks["grazer_survives_century"]:
-        extinction_year = next(
-            (row["year"] for row in yearly_populations if row["populations"].get("grazer", 0) == 0),
-            None,
-        )
-        print(f"grazer_extinction_year: {extinction_year}")
-        if extinction_year is not None:
-            for row in yearly_populations[max(0, extinction_year - 6):extinction_year]:
-                print(
-                    "grazer_trace: "
-                    f"year={row['year']} "
-                    f"grazer={row['populations'].get('grazer', 0)} "
-                    f"browser={row['populations'].get('browser', 0)} "
-                    f"producer_biomass_kg={row['producer_biomass_kg']:.6f} "
-                    f"consumer_cells={row['consumer_occupied_cells']} "
-                    f"births_last_tick={row['births_last_tick']} "
-                    f"deaths_last_tick={row['deaths_last_tick']} "
-                    f"cumulative_births={row['cumulative_births']} "
-                    f"cumulative_deaths={row['cumulative_deaths']} "
-                    f"grazers={row['grazers']}"
-                )
+    for species in ("grazer", "browser"):
+        key = f"{species}_survives_century"
+        if not checks[key]:
+            extinction_year = next(
+                (row["year"] for row in yearly_populations if row["populations"].get(species, 0) == 0),
+                None,
+            )
+            print(f"{species}_extinction_year: {extinction_year}")
+            if extinction_year is not None:
+                for row in yearly_populations[max(0, extinction_year - 6):extinction_year]:
+                    print(
+                        f"{species}_trace: "
+                        f"year={row['year']} "
+                        f"grazer={row['populations'].get('grazer', 0)} "
+                        f"browser={row['populations'].get('browser', 0)} "
+                        f"producer_biomass_kg={row['producer_biomass_kg']:.6f} "
+                        f"consumer_cells={row['consumer_occupied_cells']} "
+                        f"births_last_tick={row['births_last_tick']} "
+                        f"deaths_last_tick={row['deaths_last_tick']} "
+                        f"cumulative_births={row['cumulative_births']} "
+                        f"cumulative_deaths={row['cumulative_deaths']}"
+                    )
     if failed:
         print("G4_GATE_FAIL:", ", ".join(failed))
         return 1
