@@ -5,6 +5,11 @@ from copy import deepcopy
 from hrm_coordination.seeds import SeedBank
 from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
 
+from .learning import update_expectations
+from .memory import empty_memory, remember
+from .perception import perceive_local
+from .planning import choose_destination
+
 
 HUMAN_TRACKED_ELEMENTS = tuple(sorted(PLANT_ELEMENT_FRACTIONS))
 HUMAN_BASAL_COST = 0.42
@@ -32,12 +37,11 @@ def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
 
-def build_human_state(*, width: int, height: int, seed_bank: SeedBank) -> dict:
+def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False) -> dict:
     humans = []
     for index, sex in enumerate(("female", "male")):
         rng = seed_bank.stream(f"human.genesis.{index}")
-        humans.append(
-            {
+        person = {
                 "id": f"human-g{index:08d}",
                 "sex": sex,
                 "x": rng.randrange(width),
@@ -49,7 +53,14 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank) -> dict:
                 "generation": 0,
                 "last_reproduction_epoch": -1000000,
             }
-        )
+        if cognition_enabled:
+            person["cognition"] = {
+                "memory": empty_memory(),
+                "expectations": {},
+                "uncertainty": 1.0,
+                "last_reward": 0.0,
+            }
+        humans.append(person)
     return {
         "width": width,
         "height": height,
@@ -187,6 +198,18 @@ def _offspring(mother: dict, ordinal: int) -> dict:
         "body_water_kg": water,
         "generation": int(mother["generation"]) + 1,
         "last_reproduction_epoch": -1000000,
+        **(
+            {
+                "cognition": {
+                    "memory": empty_memory(),
+                    "expectations": {},
+                    "uncertainty": 1.0,
+                    "last_reward": 0.0,
+                }
+            }
+            if "cognition" in mother
+            else {}
+        ),
     }
 
 
@@ -196,6 +219,8 @@ def evolve_humans(
     matter_state: dict,
     world_state: dict,
     epoch: int,
+    *,
+    cognition_enabled: bool = False,
 ) -> tuple[dict, dict, dict]:
     humans = deepcopy(human_state)
     producers = deepcopy(producer_state)
@@ -213,7 +238,12 @@ def evolve_humans(
     births = []
     for human in sorted(humans["humans"], key=lambda h: h["id"]):
         origin = (int(human["x"]), int(human["y"]))
-        target = _move_toward_food(human, producers)
+        if cognition_enabled:
+            perception = perceive_local(human, producers, matter)
+            target = choose_destination(human, perception, human["cognition"])
+        else:
+            perception = None
+            target = _move_toward_food(human, producers)
         if target != origin:
             human["energy"] = float(human["energy"]) - HUMAN_MOVE_COST
             human["x"], human["y"] = target
@@ -221,6 +251,14 @@ def evolve_humans(
         xy = (int(human["x"]), int(human["y"]))
         _drink(human, mcells[xy])
         ate = _eat(human, pcells[xy])
+        if cognition_enabled and perception is not None:
+            reward = ate * 2200.0 * HUMAN_ASSIMILATION
+            cognition = dict(human["cognition"])
+            cognition["memory"] = remember(cognition.get("memory", empty_memory()), perception, epoch, reward)
+            cognition["expectations"] = update_expectations(cognition.get("expectations", {}), perception, reward)
+            cognition["last_reward"] = round(float(reward), 10)
+            cognition["uncertainty"] = round(max(0.05, float(cognition.get("uncertainty", 1.0)) * 0.97), 10)
+            human["cognition"] = cognition
 
         human["energy"] = float(human["energy"]) - HUMAN_BASAL_COST
         loss = min(float(human["body_water_kg"]), HUMAN_WATER_LOSS_PER_TICK_KG)
