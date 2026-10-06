@@ -24,49 +24,68 @@ from .interfaces.authorities import (
     GENESIS_TICK_RESOURCE,
     WORLD_AUTHORITY,
     WORLD_STATE_RESOURCE,
+    MATTER_AUTHORITY,
+    MATTER_STATE_RESOURCE,
     validate_registrations,
 )
 from .interfaces.snapshots import GenesisSnapshot, capture_snapshot
+from .matter.pools import build_matter_state
+from .matter.transfers import evolve_matter
 from .world.state import build_world_state, evolve_world
 
 
 CLOCK_SCHEDULE_ID = "genesis.clock"
 WORLD_SCHEDULE_ID = "world.environment"
+MATTER_SCHEDULE_ID = "matter.environment"
 
 
 class GenesisSimulation:
-    """Genesis runner through G1.
+    """Genesis runner through G1.5.
 
-    The G0 system authority owns only the logical tick marker.
-    The G1 world authority separately owns the physical-environment state.
-    Later ecological and human phases must add their own authorities rather than
-    extending either authority into a universal state bucket.
+    World owns terrain and climate fields. Matter separately owns conserved water
+    and elemental reservoirs. Ecology and human state remain absent.
     """
 
     def __init__(self, config: GenesisConfig):
         self.config = config
         self.seed_bank = SeedBank(config.master_seed)
 
-        system = StateAuthority(
-            GENESIS_SYSTEM_AUTHORITY,
-            {GENESIS_TICK_RESOURCE: 0},
-        )
-        authorities = [system]
+        authorities = [
+            StateAuthority(
+                GENESIS_SYSTEM_AUTHORITY,
+                {GENESIS_TICK_RESOURCE: 0},
+            )
+        ]
 
         if config.physical_world_enabled:
-            world = StateAuthority(
-                WORLD_AUTHORITY,
-                {
-                    WORLD_STATE_RESOURCE: build_world_state(
-                        width=config.world_width,
-                        height=config.world_height,
-                        ticks_per_year=config.ticks_per_year,
-                        master_seed=config.master_seed,
-                        seed_bank=self.seed_bank,
-                    )
-                },
+            authorities.append(
+                StateAuthority(
+                    WORLD_AUTHORITY,
+                    {
+                        WORLD_STATE_RESOURCE: build_world_state(
+                            width=config.world_width,
+                            height=config.world_height,
+                            ticks_per_year=config.ticks_per_year,
+                            master_seed=config.master_seed,
+                            seed_bank=self.seed_bank,
+                        )
+                    },
+                )
             )
-            authorities.append(world)
+
+        if config.matter_enabled:
+            authorities.append(
+                StateAuthority(
+                    MATTER_AUTHORITY,
+                    {
+                        MATTER_STATE_RESOURCE: build_matter_state(
+                            width=config.world_width,
+                            height=config.world_height,
+                            seed_bank=self.seed_bank,
+                        )
+                    },
+                )
+            )
 
         self.authorities = authorities
         registrations = tuple(
@@ -123,6 +142,8 @@ class GenesisSimulation:
         expected = {GENESIS_SYSTEM_AUTHORITY}
         if config.physical_world_enabled:
             expected.add(WORLD_AUTHORITY)
+        if config.matter_enabled:
+            expected.add(MATTER_AUTHORITY)
         if set(fabric.authority_ids) != expected:
             raise ValueError("checkpoint authority set does not match GenesisConfig")
 
@@ -154,6 +175,16 @@ class GenesisSimulation:
                 ),
                 self._world_callback,
             )
+        if self.config.matter_enabled:
+            self.orchestrator.register(
+                ScheduleSpec(
+                    authority_id=MATTER_SCHEDULE_ID,
+                    period_ticks=1,
+                    phase_ticks=0,
+                    feedback_lag_ticks=1,
+                ),
+                self._matter_callback,
+            )
 
     def _clock_callback(self, ctx, fabric: TransactionFabric):
         current = fabric.projection(
@@ -161,20 +192,15 @@ class GenesisSimulation:
             [GENESIS_TICK_RESOURCE],
         )[GENESIS_TICK_RESOURCE]
         next_value = int(current.value) + 1
-        proposal_id = f"g0-clock-{ctx.epoch:012d}"
-        transaction_id = f"g0-tx-clock-{ctx.epoch:012d}"
         return [
             TransactionProposal(
-                proposal_id=proposal_id,
-                transaction_id=transaction_id,
+                proposal_id=f"g0-clock-{ctx.epoch:012d}",
+                transaction_id=f"g0-tx-clock-{ctx.epoch:012d}",
                 proposer_id=CLOCK_SCHEDULE_ID,
                 logical_epoch=ctx.epoch,
                 mutations=(
                     Mutation(
-                        ref=ResourceRef(
-                            GENESIS_SYSTEM_AUTHORITY,
-                            GENESIS_TICK_RESOURCE,
-                        ),
+                        ref=ResourceRef(GENESIS_SYSTEM_AUTHORITY, GENESIS_TICK_RESOURCE),
                         expected_version=current.version,
                         new_value=next_value,
                     ),
@@ -194,12 +220,10 @@ class GenesisSimulation:
             [WORLD_STATE_RESOURCE],
         )[WORLD_STATE_RESOURCE]
         next_state = evolve_world(dict(current.value), ctx.epoch)
-        proposal_id = f"g1-world-{ctx.epoch:012d}"
-        transaction_id = f"g1-tx-world-{ctx.epoch:012d}"
         return [
             TransactionProposal(
-                proposal_id=proposal_id,
-                transaction_id=transaction_id,
+                proposal_id=f"g1-world-{ctx.epoch:012d}",
+                transaction_id=f"g1-tx-world-{ctx.epoch:012d}",
                 proposer_id=WORLD_SCHEDULE_ID,
                 logical_epoch=ctx.epoch,
                 mutations=(
@@ -213,6 +237,38 @@ class GenesisSimulation:
                     causal_parents=(),
                     source_authority=WORLD_AUTHORITY,
                     operation="PHYSICAL_WORLD_STEP",
+                ),
+                fallible_claims={},
+            )
+        ]
+
+    def _matter_callback(self, ctx, fabric: TransactionFabric):
+        matter = fabric.projection(
+            MATTER_AUTHORITY,
+            [MATTER_STATE_RESOURCE],
+        )[MATTER_STATE_RESOURCE]
+        world = fabric.projection(
+            WORLD_AUTHORITY,
+            [WORLD_STATE_RESOURCE],
+        )[WORLD_STATE_RESOURCE]
+        next_state = evolve_matter(dict(matter.value), dict(world.value), ctx.epoch)
+        return [
+            TransactionProposal(
+                proposal_id=f"g1-5-matter-{ctx.epoch:012d}",
+                transaction_id=f"g1-5-tx-matter-{ctx.epoch:012d}",
+                proposer_id=MATTER_SCHEDULE_ID,
+                logical_epoch=ctx.epoch,
+                mutations=(
+                    Mutation(
+                        ref=ResourceRef(MATTER_AUTHORITY, MATTER_STATE_RESOURCE),
+                        expected_version=matter.version,
+                        new_value=next_state,
+                    ),
+                ),
+                provenance=ProvenanceContribution(
+                    causal_parents=(),
+                    source_authority=MATTER_AUTHORITY,
+                    operation="MATTER_ENVIRONMENT_STEP",
                 ),
                 fallible_claims={},
             )
@@ -236,6 +292,15 @@ class GenesisSimulation:
         return dict(
             self.fabric.projection(WORLD_AUTHORITY, [WORLD_STATE_RESOURCE])[
                 WORLD_STATE_RESOURCE
+            ].value
+        )
+
+    def matter_state(self) -> dict:
+        if not self.config.matter_enabled:
+            raise RuntimeError("matter is disabled")
+        return dict(
+            self.fabric.projection(MATTER_AUTHORITY, [MATTER_STATE_RESOURCE])[
+                MATTER_STATE_RESOURCE
             ].value
         )
 
