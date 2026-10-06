@@ -16,7 +16,7 @@ def state(sim: GenesisSimulation):
 
 
 def main() -> int:
-    config = GenesisConfig(master_seed="genesis-g0-gate")
+    config = GenesisConfig(master_seed="genesis-g0-gate", physical_world_enabled=False, matter_enabled=False)
 
     direct = GenesisSimulation(config)
     direct.run(64)
