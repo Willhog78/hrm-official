@@ -143,6 +143,7 @@ class GenesisSimulation:
                 height=config.world_height,
                 seed_bank=self.seed_bank,
                 cognition_enabled=config.human_cognition_enabled,
+                actions_enabled=config.human_actions_enabled,
             )
             human_state, producer_state, matter_state = seed_initial_humans(
                 human_state,

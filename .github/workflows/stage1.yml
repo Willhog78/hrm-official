@@ -51,6 +51,8 @@ jobs:
         run: python qualification/genesis/run_g5_human_biology_gate.py
       - name: Genesis G6 cognition gate
         run: python qualification/genesis/run_g6_cognition_gate.py
+      - name: Genesis G7 emergence gate
+        run: python qualification/genesis/run_g7_emergence_gate.py
       - name: Stage-2 draft suite (quarantined; informational)
         working-directory: drafts/stage2
         run: python -m pytest -o addopts='' -q tests
