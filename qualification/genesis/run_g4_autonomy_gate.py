@@ -52,6 +52,8 @@ def main() -> int:
             "consumer_occupied_cells": len(occupied[-1]),
             "births_last_tick": int(consumers_now.get("last_tick_births", 0)),
             "deaths_last_tick": dict(consumers_now.get("last_tick_deaths_by_cause", {})),
+            "cumulative_births": int(consumers_now.get("cumulative_births", 0)),
+            "cumulative_deaths": dict(consumers_now.get("cumulative_deaths_by_cause", {})),
             "grazers": [
                 {
                     "id": a["id"],
@@ -107,6 +109,8 @@ def main() -> int:
                     f"consumer_cells={row['consumer_occupied_cells']} "
                     f"births_last_tick={row['births_last_tick']} "
                     f"deaths_last_tick={row['deaths_last_tick']} "
+                    f"cumulative_births={row['cumulative_births']} "
+                    f"cumulative_deaths={row['cumulative_deaths']} "
                     f"grazers={row['grazers']}"
                 )
     if failed:
