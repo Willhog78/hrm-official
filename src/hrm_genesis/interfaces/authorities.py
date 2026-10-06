@@ -11,6 +11,9 @@ GENESIS_TICK_RESOURCE = "tick"
 WORLD_AUTHORITY = "world.environment"
 WORLD_STATE_RESOURCE = "state"
 
+MATTER_AUTHORITY = "matter.environment"
+MATTER_STATE_RESOURCE = "state"
+
 
 @dataclass(frozen=True)
 class AuthorityRegistration:
