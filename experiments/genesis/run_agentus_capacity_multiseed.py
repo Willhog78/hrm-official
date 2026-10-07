@@ -20,6 +20,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import json
 from collections import Counter
 
@@ -206,7 +207,8 @@ def main() -> int:
         result = run(seed, args.arm, args.days)
         results.append(result)
         compact = {k: v for k, v in result.items() if k != "weekly_series"}
-        print("CAPACITY_RESULT:", json.dumps(compact, sort_keys=True), flush=True)
+        if not os.environ.get("HRM_COMPACT_ONLY"):
+            print("CAPACITY_RESULT:", json.dumps(compact, sort_keys=True), flush=True)
         print("CAPACITY_COMPACT:", json.dumps(compact_summary(result), sort_keys=True, separators=(",", ":")), flush=True)
     if args.out:
         with open(args.out, "w", encoding="utf-8") as handle:

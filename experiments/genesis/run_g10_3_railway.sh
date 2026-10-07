@@ -4,6 +4,9 @@
 # aggregator prints one CAPACITY_AGGREGATE line per arm and paired comparisons.
 cd "$(dirname "$0")/../.."
 export PYTHONPATH=src:.
+# Each 730-day run holds its full replay ledger in memory (~1.6 GB at the end);
+# keep PARALLEL x 1.6 GB under the service memory limit.
+export HRM_COMPACT_ONLY="${HRM_COMPACT_ONLY:-1}"
 PARALLEL="${HRM_PARALLEL:-3}"
 DAYS="${HRM_DAYS:-730}"
 OUT="${HRM_OUT:-/tmp/hrm_capacity_runs}"
@@ -18,5 +21,6 @@ for arm in ${HRM_ARMS:-v0 v1 plant_diet no_interactions no_recall}; do
     echo "$arm $seed"
   done
 done | xargs -P "$PARALLEL" -L 1 sh -c 'python experiments/genesis/run_agentus_capacity_multiseed.py --arm "$0" --seed "$1" --days "'"$DAYS"'" --out "'"$OUT"'/$0__$1.json" || echo "CAPACITY_FAILED: $0 $1"'
-python experiments/genesis/aggregate_capacity_runs.py "$OUT/*.json" "${HRM_REFERENCE:-v0}"
+echo "CAPACITY_RUN_FILES: $(ls "$OUT" | wc -l)"
+python experiments/genesis/aggregate_capacity_runs.py "$OUT/*.json" "${HRM_REFERENCE:-v0}" 2>&1
 echo "CAPACITY_ALL_DONE"
