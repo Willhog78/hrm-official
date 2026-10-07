@@ -437,6 +437,7 @@ def evolve_humans(
             )
             human.update(updated_human)
             pcells[xy].update(updated_cell)
+            human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
             human["last_action_trace"] = trace
         _drink(human, mcells[xy], profile)
         ate = _eat(human, pcells[xy], profile)
