@@ -56,6 +56,11 @@ WITNESSED_MEMORY = 32
 # consequence makes a witnessed event survive as if it had happened this many
 # days later (declared). Routine events with no visible consequence age out first.
 RETENTION_DAYS_PER_CONSEQUENCE = 30
+# G10.7a step 3: chance of trying an untried, physically available act that one
+# has seen followed by visible consequences: 0.15 per remembered consequence,
+# capped at 0.5 (declared). Imitation chooses what to try; it never sets value.
+IMITATION_PER_CONSEQUENCE = 0.15
+IMITATION_CAP = 0.5
 EXPLORE_HUNGRY = 0.25
 EXPLORE_SATED = 0.08
 RETRY_KNOWN = 0.03
@@ -298,6 +303,7 @@ class Context:
         self.consumers = consumers
         self.epoch = epoch
         self.xy = (int(human["x"]), int(human["y"]))
+        self.imitated: dict[str, list[str]] = {}  # key -> actors it was seen from
         self.access_bonus: dict[str, float] = {}
         self.produced: dict[str, float] = {}
         self.stats = humans.setdefault("capacity_stats", empty_stats())
@@ -945,6 +951,14 @@ def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: boo
         return None
     values = ctx.human["cognition"].get("affordance_values", {})
     untried = [o for o in options if o[0] not in values]
+    if untried and ctx.humans.get("imitation"):
+        candidate = imitation_candidate(ctx, untried)
+        if candidate is not None:
+            option, salience, actors = candidate
+            if ctx.draw("imitate", step) < min(IMITATION_CAP, IMITATION_PER_CONSEQUENCE * salience):
+                ctx.imitated[option[0]] = actors
+                _bump_map(ctx.stats, "imitation_tries", option[0], 1)
+                return option
     explore_p = EXPLORE_HUNGRY if hungry else EXPLORE_SATED
     if untried and ctx.draw("explore", step) < explore_p:
         return untried[int(ctx.draw("explore-pick", step) * len(untried)) % len(untried)]
@@ -1036,6 +1050,12 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
             gain += max(0.0, kcal_by_kind["fresh_tissue"]) * share
         reward = (gain - out["effort_kcal"]) / basal - out["injury"] * 2.0
         _update_value(values, key, reward, VALUE_LEARNING_RATE)
+        if key in ctx.imitated:
+            # The world, not the model, decides whether copying paid.
+            _bump_map(ctx.stats, "imitation_paid" if reward > 0.0 else "imitation_unpaid", key, 1)
+            sources = dict(ctx.stats.get("imitated_from", {}))
+            sources[key] = sorted(set(sources.get(key, [])) | set(ctx.imitated[key]))
+            ctx.stats["imitated_from"] = sources
         if gain > 0.0:
             _credit_preparation(values, trace, out.get("tool_history", []), gain / basal)
         if _legacy_observation(ctx):
@@ -1112,6 +1132,27 @@ def _own_appraisal(peer: dict, profile_basal: float, visible: dict) -> float | N
     if visible["injury"] > 0.0:
         parts.append(-visible["injury"] * 2.0)
     return sum(parts) if parts else None
+
+
+def imitation_candidate(ctx: Context, untried: list[tuple[str, dict]]) -> tuple[tuple[str, dict], int, list[str]] | None:
+    """G10.7a step 3. Among acts this agent has never tried and can physically
+    do here and now (the offered options), the one it has most conspicuously
+    seen others do: total salience of matching remembered events. Matching is
+    by the visible act alone (verb and object classes). Returns the option,
+    that salience, and who it was seen from; None if nothing seen applies."""
+    seen: dict[str, tuple[int, set[str]]] = {}
+    for event in ctx.human["cognition"].get("witnessed", []):
+        salience = witnessed_salience(event)
+        if salience > 0:
+            total, actors = seen.get(event["act"], (0, set()))
+            seen[event["act"]] = (total + salience, actors | {event["actor"]})
+    matches = [o for o in untried if o[0] in seen]
+    if not matches:
+        return None
+    # Several offered options can share a key (two stones of one class): the
+    # first offered is taken, as exploration does.
+    option = max(matches, key=lambda o: (seen[o[0]][0], o[0]))
+    return option, seen[option[0]][0], sorted(seen[option[0]][1])
 
 
 def witnessed_salience(event: dict) -> int:

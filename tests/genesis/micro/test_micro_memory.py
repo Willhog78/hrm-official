@@ -107,16 +107,16 @@ def test_memory_off_and_legacy_observation_store_nothing():
         assert "witnessed" not in w["cognition"], kwargs
 
 
-def test_no_decision_code_reads_witnessed_memory():
-    """Perception -> memory only: every reference to the memory anywhere in the
-    model sits inside the function that writes it."""
+def test_only_the_writer_and_the_imitation_reader_touch_witnessed_memory():
+    """Every reference to the memory in the model sits inside the function that
+    writes it or the one declared reader, imitation (step 3)."""
     src = Path(__file__).resolve().parents[3] / "src" / "hrm_genesis"
     outside = []
 
     def visit(node, enclosing):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             enclosing = node.name
-        if isinstance(node, ast.Constant) and node.value == "witnessed" and enclosing != "remember_witnessed":
+        if isinstance(node, ast.Constant) and node.value == "witnessed" and enclosing not in {"remember_witnessed", "imitation_candidate"}:
             outside.append(f"{path.name}:{node.lineno} in {enclosing}")
         for child in ast.iter_child_nodes(node):
             visit(child, enclosing)

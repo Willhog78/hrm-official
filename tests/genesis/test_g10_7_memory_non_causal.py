@@ -22,6 +22,7 @@ def _strip(human_state: dict) -> dict:
     state = dict(human_state)
     state.pop("event_memory", None)
     state.pop("event_memory_retention", None)
+    state.pop("imitation", None)
     state["capacity_stats"] = {k: v for k, v in state.get("capacity_stats", {}).items() if k not in MEMORY_STATS}
     people = []
     for person in state["humans"]:
@@ -36,7 +37,9 @@ def _strip(human_state: dict) -> dict:
 
 def _run(memory: bool, retention: str = "consequence") -> GenesisSimulation:
     config = GenesisConfig(**{**config_for("agentus-demography-a", "v1").__dict__,
-                              "agentus_event_memory_enabled": memory, "agentus_event_memory_retention": retention})
+                              "agentus_event_memory_enabled": memory, "agentus_event_memory_retention": retention,
+                              # Steps 2/2.5 are write-only memory; imitation (step 3) is the reader.
+                              "agentus_imitation_enabled": False})
     sim = GenesisSimulation(config)
     sim.run(DAYS)
     return sim

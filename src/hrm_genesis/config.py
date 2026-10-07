@@ -50,6 +50,9 @@ class GenesisConfig:
     # "consequence" (default): conspicuous events stick better; "fifo"
     # reproduces step 2 (newest kept).
     agentus_event_memory_retention: str = "consequence"
+    # G10.7a step 3: remembered conspicuous acts raise the chance of trying the
+    # same act when physically possible. No value or recipe is transferred.
+    agentus_imitation_enabled: bool = True
     # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
     # catabolism, realistic lactation and size^0.75 child metabolism.
     agentus_physiology_version: str = "reference-v1"
@@ -119,6 +122,10 @@ class GenesisConfig:
                 and self.agentus_observation_model != "g10.4-legacy")
 
     @property
+    def imitation_active(self) -> bool:
+        return self.agentus_imitation_enabled and self.event_memory_active
+
+    @property
     def contract_dt(self) -> Fraction:
         return Fraction(self.contract_dt_numerator, self.contract_dt_denominator)
 
@@ -155,6 +162,8 @@ class GenesisConfig:
             canonical["agentus_observation_model"] = self.agentus_observation_model
         if self.event_memory_active:
             canonical["agentus_event_memory"] = "witnessed-v2" if self.agentus_event_memory_retention == "consequence" else "witnessed-v1"
+        if self.imitation_active:
+            canonical["agentus_imitation"] = "witnessed-act-v1"
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":

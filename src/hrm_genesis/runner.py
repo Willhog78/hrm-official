@@ -184,6 +184,8 @@ class GenesisSimulation:
                     human_state["event_memory"] = True
                     if config.agentus_event_memory_retention == "consequence":
                         human_state["event_memory_retention"] = "consequence"
+                    if config.imitation_active:
+                        human_state["imitation"] = True
                 matter_state["initial_lithic_kg"] = lithic_total
                 consumer_state = enable_fresh_tissue(consumer_state)
                 human_state = enable_capacities(human_state)

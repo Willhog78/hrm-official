@@ -14,6 +14,7 @@ question. Arms use the multiseed names plus an optional `@physiology`:
   observation   v1-g104obs   vs v1                (G10.7a: only visible acts and consequences travel)
   memory        v1-nomem     vs v1                (G10.7a step 2: witnessed memory; outcomes must not differ)
   retention     v1-fifo      vs v1                (G10.7a step 2.5: what is kept; outcomes must not differ)
+  imitation     v1-noimit    vs v1                (G10.7a step 3: remembered acts raise the chance of trying them)
 
   python -m qualification.genesis.tiers diagnostic infant
   python -m qualification.genesis.tiers diagnostic custom --arms v1 v1@reference-v2 --days 365
@@ -42,6 +43,7 @@ SETS: dict[str, tuple[str, ...]] = {
     "observation": ("v1-g104obs", "v1"),
     "memory": ("v1-nomem", "v1"),
     "retention": ("v1-fifo", "v1"),
+    "imitation": ("v1-noimit", "v1"),
 }
 DIAGNOSTIC_SEEDS = ("agentus-demography-a", "agentus-demography-b", "agentus-demography-c", "agentus-demography-d")
 DIAGNOSTIC_DAYS = 180
@@ -82,6 +84,10 @@ def arm_summary(arm: str, results: list[dict]) -> dict:
         "observed_ingestions": dict(_sum(ok, lambda r: r.get("observed_ingestions", {}))),
         "food_learned_after_observation": dict(_sum(ok, lambda r: r.get("food_learned_after_observation", {}))),
         "memory": [r.get("memory", {}) for r in ok],
+        "imitation_tries": dict(_sum(ok, lambda r: r.get("imitation", {}).get("tries", {}))),
+        "imitation_paid": dict(_sum(ok, lambda r: r.get("imitation", {}).get("paid", {}))),
+        "imitation_unpaid": dict(_sum(ok, lambda r: r.get("imitation", {}).get("unpaid", {}))),
+        "valued_after_imitation": dict(_sum(ok, lambda r: r.get("imitation", {}).get("valued_after_imitation", {}))),
         "fatigue_blocked_share": round(sum(r["fatigue_blocked_share"] for r in ok) / n, 3),
         "ledgers_valid": all(r["ledger_valid"] for r in ok),
         "max_element_balance_error": max((r["conservation"]["element_rel_error"] for r in ok), default=0.0),
@@ -105,6 +111,10 @@ def print_comparison(summaries: list[dict], seeds: int, days: int) -> None:
         print(f"  observed transmissions {s['observed_transmissions']}")
         print(f"  food: legacy adoptions {s['observed_food_adoptions']}  ingestions seen {s['observed_ingestions']}  "
               f"learned by eating after seeing {s['food_learned_after_observation']}")
+        if s["imitation_tries"]:
+            print(f"  imitation tries {s['imitation_tries']}")
+            print(f"  imitation paid {s['imitation_paid']}  unpaid {s['imitation_unpaid']}  "
+                  f"valued by living agents after imitation {s['valued_after_imitation']}")
         for m in s["memory"]:
             if m.get("events_witnessed"):
                 print(f"  memory: {m}")
