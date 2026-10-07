@@ -56,3 +56,25 @@ Current verification:
 ## Stage 2
 
 **DRAFT / QUARANTINED.** The supplied Matter Slice-A candidate passes **25/25** of its own tests, but its contract contains a Stage-1-freeze assertion that is not established by the supplied review chain. It is retained under `drafts/stage2/` without promotion to the active baseline.
+
+
+## Genesis vertical slice
+
+**ACTIVE.** The executable Genesis stack has advanced beyond the stale status text that previously ended at the quarantined Stage-2 draft.
+
+Merged implementation and qualification assets now exist through:
+- G0 integration;
+- G1 physical world;
+- G1.5 matter/elements;
+- G2 producers;
+- G3 consumers;
+- G4 autonomous ecology;
+- G5 human biology;
+- G6 cognition;
+- G7 general actions/learning;
+- G8 multi-population;
+- G9 read-only observer;
+- G10.1 scaled substrate;
+- G10.2 calibrated reference humans.
+
+**Current active correction:** G10.2A survival affordances, adding terrain-conditioned rock/cave cover and condition-grown woody biomass before any long-run calibrated-human survival claim.

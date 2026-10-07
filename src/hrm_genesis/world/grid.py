@@ -40,8 +40,37 @@ def build_grid(width: int, height: int, seed_bank: SeedBank) -> list[dict[str, f
                     "temperature": 0.0,
                     "solar": 0.0,
                     "precipitation": 0.0,
+                    "terrain_relief": 0.0,
+                    "rock_exposure": 0.0,
+                    "terrain_cover": 0.0,
                 }
             )
+
+    lookup = {(int(cell["x"]), int(cell["y"])): cell for cell in cells}
+    for cell in cells:
+        x, y = int(cell["x"]), int(cell["y"])
+        adjacent = neighbors(x, y, width, height)
+        relief = max(
+            (abs(float(cell["elevation"]) - float(lookup[xy]["elevation"])) for xy in adjacent),
+            default=0.0,
+        )
+        elevation_factor = min(1.0, max(0.0, (float(cell["elevation"]) - 35.0) / 45.0))
+        relief_factor = min(1.0, relief / 28.0)
+        rock_exposure = min(1.0, 0.35 * elevation_factor + 0.65 * relief_factor)
+
+        # Terrain cover is terrain-derived, not independently scattered.
+        # Strong relief plus exposed rock can create cave/overhang-like shelter.
+        cover = 0.0
+        if rock_exposure >= 0.88 and relief >= 30.0:
+            cover = min(
+                0.85,
+                0.35 + (rock_exposure - 0.88) * 2.5 + (relief - 30.0) / 60.0,
+            )
+
+        cell["terrain_relief"] = round(relief, 6)
+        cell["rock_exposure"] = round(rock_exposure, 6)
+        cell["terrain_cover"] = round(max(0.0, cover), 6)
+
     return cells
 
 
