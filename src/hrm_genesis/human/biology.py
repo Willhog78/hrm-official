@@ -5,6 +5,7 @@ from copy import deepcopy
 from hrm_coordination.seeds import SeedBank
 from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
 
+from .actions import execute_live_sequence
 from .learning import update_contextual_expectations, update_expectations
 from .memory import empty_memory, remember
 from .perception import perceive_local
@@ -71,6 +72,8 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
                 "fatigue": 0.0,
                 "injury": 0.0,
                 "core_temperature_c": 37.0,
+        "held_material_elements_kg": _blank_elements(),
+                "held_material_elements_kg": _blank_elements(),
             }
         if population_id is not None:
             region_cells = cells_for_population(population_id, width, height)
@@ -285,9 +288,13 @@ def _structural_protection(world_cell: dict, producer_cell: dict | None = None) 
     """Return canopy and terrain protection from physical state, not named techniques."""
     producer_cell = producer_cell or {}
     woody_mass = sum(float(v) for v in producer_cell.get("woody_elements_kg", {}).values())
+    arranged_mass = sum(
+        float(v) for v in producer_cell.get("arranged_material_elements_kg", {}).values()
+    )
     canopy = min(0.80, max(0.0, woody_mass / 8.0))
     terrain_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
-    return canopy, terrain_cover
+    arranged_cover = min(0.45, max(0.0, arranged_mass / 2.0 * 0.45))
+    return canopy, min(0.95, terrain_cover + arranged_cover)
 
 def _experienced_reward(
     *,
@@ -380,6 +387,7 @@ def evolve_humans(
     epoch: int,
     *,
     cognition_enabled: bool = False,
+    actions_enabled: bool = False,
 ) -> tuple[dict, dict, dict]:
     humans = deepcopy(human_state)
     producers = deepcopy(producer_state)
@@ -420,6 +428,16 @@ def evolve_humans(
             human["x"], human["y"] = target
 
         xy = (int(human["x"]), int(human["y"]))
+        if actions_enabled and human.get("learned_sequences"):
+            sequence = human["learned_sequences"][-1]
+            updated_human, updated_cell, trace = execute_live_sequence(
+                sequence,
+                human,
+                pcells[xy],
+            )
+            human.update(updated_human)
+            pcells[xy].update(updated_cell)
+            human["last_action_trace"] = trace
         _drink(human, mcells[xy], profile)
         ate = _eat(human, pcells[xy], profile)
         human["energy"] = float(human["energy"]) - float(profile["basal_energy_kcal_per_tick"])
@@ -475,6 +493,9 @@ def evolve_humans(
             cell = remains[xy]
             for symbol in HUMAN_TRACKED_ELEMENTS:
                 cell["elements_kg"][symbol] += float(human["body_elements_kg"][symbol])
+                cell["elements_kg"][symbol] += float(
+                    human.get("held_material_elements_kg", {}).get(symbol, 0.0)
+                )
             cell["water_kg"] += float(human["body_water_kg"])
             humans["cumulative_deaths"] = int(humans.get("cumulative_deaths", 0)) + 1
             continue
@@ -536,6 +557,8 @@ def human_element_totals(state: dict) -> dict[str, float]:
     totals = _blank_elements()
     for human in state["humans"]:
         for symbol, amount in human["body_elements_kg"].items():
+            totals[symbol] += float(amount)
+        for symbol, amount in human.get("held_material_elements_kg", {}).items():
             totals[symbol] += float(amount)
     for cell in state["remains_cells"]:
         for symbol, amount in cell["elements_kg"].items():
