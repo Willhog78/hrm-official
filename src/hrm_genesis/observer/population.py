@@ -27,7 +27,8 @@ def population_metrics(human_state: dict) -> dict:
             cross_origin_cells += 1
 
     return {
-        "human_count": len(human_state["humans"]),
+        "agentus_count": len(human_state["humans"]),
+        "human_count": len(human_state["humans"]),  # legacy compatibility alias
         "by_population_origin": dict(sorted(by_origin.items())),
         "occupied_cells": len(occupied),
         "cross_origin_shared_cells": cross_origin_cells,
