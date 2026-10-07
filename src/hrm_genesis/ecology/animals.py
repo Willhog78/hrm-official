@@ -7,7 +7,7 @@ from hrm_coordination.seeds import SeedBank
 from hrm_genesis.world.grid import neighbors
 
 from .plants import PLANT_ELEMENT_FRACTIONS
-from .traits import SPECIES, trait_for
+from .traits import SPECIES, scaled_life_history_ticks, trait_for
 
 
 ANIMAL_TRACKED_ELEMENTS = tuple(sorted(PLANT_ELEMENT_FRACTIONS))
@@ -35,6 +35,7 @@ def build_consumer_state(
     width: int,
     height: int,
     seed_bank: SeedBank,
+    ticks_per_year: int = 12,
     initial_per_species: int = 2,
 ) -> dict:
     animals: list[dict] = []
@@ -45,13 +46,17 @@ def build_consumer_state(
             species_initial = max(1, initial_per_species // 2)
         for local_index in range(species_initial):
             rng = seed_bank.stream(f"ecology.consumer.genesis.{species}.{local_index}")
+            maturity_ticks = scaled_life_history_ticks(
+                trait_for(species).maturity_ticks,
+                ticks_per_year,
+            )
             animals.append(
                 {
                     "id": f"{species}-g{ordinal:08d}",
                     "species": species,
                     "x": rng.randrange(width),
                     "y": rng.randrange(height),
-                    "age_ticks": rng.randrange(0, max(1, trait_for(species).maturity_ticks // 2)),
+                    "age_ticks": rng.randrange(0, max(1, maturity_ticks // 2)),
                     "energy": rng.uniform(8.0, 12.0),
                     "body_elements_kg": _blank_elements(),
                     "body_water_kg": rng.uniform(0.08, 0.16),
@@ -66,6 +71,7 @@ def build_consumer_state(
     return {
         "width": width,
         "height": height,
+        "ticks_per_year": int(ticks_per_year),
         "epoch_applied": -1,
         "next_birth_ordinal": ordinal,
         "cumulative_births": 0,
@@ -384,6 +390,13 @@ def evolve_consumers(
 
     for animal in sorted(consumers["animals"], key=lambda a: a["id"]):
         traits = trait_for(str(animal["species"]))
+        ticks_per_year = int(consumers.get("ticks_per_year", 12))
+        maturity_ticks = scaled_life_history_ticks(traits.maturity_ticks, ticks_per_year)
+        max_age_ticks = scaled_life_history_ticks(traits.max_age_ticks, ticks_per_year)
+        reproduction_cooldown_ticks = scaled_life_history_ticks(
+            traits.reproduction_cooldown_ticks,
+            ticks_per_year,
+        )
         origin = (int(animal["x"]), int(animal["y"]))
         if str(animal["id"]) in killed_ids:
             continue
@@ -439,7 +452,7 @@ def evolve_consumers(
         body_mass = _element_mass(animal["body_elements_kg"])
         dehydrated = float(animal["body_water_kg"]) <= 1e-6
         starved = float(animal["energy"]) <= 0.0 or body_mass <= 0.002
-        old = int(animal["age_ticks"]) >= traits.max_age_ticks
+        old = int(animal["age_ticks"]) >= max_age_ticks
 
         if dehydrated or starved or old:
             if dehydrated:
@@ -459,7 +472,7 @@ def evolve_consumers(
             expected_tick_cost = traits.basal_cost + 0.25 * traits.movement_cost
             required_forage_support = (
                 expected_tick_cost
-                * traits.reproduction_cooldown_ticks
+                * reproduction_cooldown_ticks
                 * 4.0
                 / (2200.0 * traits.assimilation_efficiency)
             )
@@ -476,11 +489,11 @@ def evolve_consumers(
         )
         since_reproduction = epoch - int(animal.get("last_reproduction_epoch", -1000000))
         reproduction_ready = (
-            int(animal["age_ticks"]) >= traits.maturity_ticks
+            int(animal["age_ticks"]) >= maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= traits.adult_body_mass_kg * 0.45
-            and int(animal["support_streak"]) >= max(5, traits.reproduction_cooldown_ticks // 3)
-            and since_reproduction >= traits.reproduction_cooldown_ticks
+            and int(animal["support_streak"]) >= max(5, reproduction_cooldown_ticks // 3)
+            and since_reproduction >= reproduction_cooldown_ticks
         )
         if reproduction_ready:
             ordinal = int(consumers["next_birth_ordinal"])
