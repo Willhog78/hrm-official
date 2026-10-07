@@ -88,6 +88,11 @@ def summarize(sim: GenesisSimulation, year: int) -> dict:
         "agentus": len(people),
         "births_cumulative": int(humans.get("cumulative_births", 0)),
         "deaths_cumulative": int(humans.get("cumulative_deaths", 0)),
+        "agentus_deaths_by_cause": dict(humans.get("cumulative_deaths_by_cause", {})),
+        "dependent_agentus": sum(
+            1 for person in people
+            if int(person.get("age_ticks", 0)) < int(humans["physiology_profile"].get("dependent_age_ticks", 0))
+        ),
         "by_generation": dict(sorted(by_generation.items())),
         "mean_mass_kg": round(sum(masses) / len(masses), 6) if masses else None,
         "min_mass_kg": round(min(masses), 6) if masses else None,
