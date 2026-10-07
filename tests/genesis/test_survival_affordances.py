@@ -21,7 +21,7 @@ def test_terrain_shelter_requires_exposed_rock_and_relief():
         GenesisConfig(master_seed="survival-terrain", world_width=16, world_height=16)
     ).world_state()
 
-    sheltered = [c for c in world["cells"] if float(c["natural_shelter"]) > 0.0]
+    sheltered = [c for c in world["cells"] if float(c["terrain_cover"]) > 0.0]
     assert sheltered
     assert all(float(c["rock_exposure"]) >= 0.58 for c in sheltered)
     assert all(float(c["terrain_relief"]) >= 12.0 for c in sheltered)
@@ -90,8 +90,8 @@ def test_physical_cover_reduces_heat_exposure_without_named_shelter_action():
         "core_temperature_c": 37.0,
     }
     protected = deepcopy(exposed)
-    hot_exposed = {"temperature": 60.0, "natural_shelter": 0.0}
-    hot_protected = {"temperature": 60.0, "natural_shelter": 0.8}
+    hot_exposed = {"temperature": 60.0, "terrain_cover": 0.0}
+    hot_protected = {"temperature": 60.0, "terrain_cover": 0.8}
 
     _apply_physiology(exposed, hot_exposed, moved=False, profile=profile)
     _apply_physiology(
@@ -125,13 +125,13 @@ def test_experienced_protection_can_be_learned_without_a_shelter_rule():
     protected = deepcopy(base)
     _apply_physiology(
         exposed,
-        {"temperature": 60.0, "natural_shelter": 0.0},
+        {"temperature": 60.0, "terrain_cover": 0.0},
         moved=False,
         profile=profile,
     )
     _apply_physiology(
         protected,
-        {"temperature": 60.0, "natural_shelter": 0.8},
+        {"temperature": 60.0, "terrain_cover": 0.8},
         moved=False,
         profile=profile,
         producer_cell={"woody_elements_kg": {"C": 8.0}},
