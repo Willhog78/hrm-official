@@ -96,6 +96,7 @@ def test_worn_material_saves_cold_stress_and_reinforces_its_making():
 
 
 def test_success_is_observed_by_agents_sharing_the_cell_only():
+    """g10.4-legacy observation path (hand-built state has no observation_model)."""
     teacher, near, far = _agent("t"), _agent("n"), _agent("f", x=2)
     humans = _humans(teacher, near, far)
     ctx = _ctx(humans, teacher)
@@ -107,6 +108,7 @@ def test_success_is_observed_by_agents_sharing_the_cell_only():
 
 
 def test_observed_beneficial_eating_gives_a_cautious_food_prior():
+    """g10.4-legacy observation path (hand-built state has no observation_model)."""
     eater, watcher = _agent("e"), _agent("w")
     humans = _humans(eater, watcher)
     ctx = _ctx(humans, eater)

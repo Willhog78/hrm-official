@@ -105,7 +105,7 @@ def test_fresh_meat_without_prior_knowledge_is_learned_only_by_tasting():
     assert sc.agent["cognition"]["food_values"]["fresh_tissue"] > 0.0
 
 
-def test_meat_knowledge_can_spread_by_observation_in_the_same_cell_only():
+def test_meat_eating_is_seen_only_in_the_same_cell_and_gives_no_value():
     sc = Scenario(capacities=True, width=4)
     _hungry(sc, 0, 0)
     sc.agent["cognition"]["food_values"]["fresh_tissue"] = 4000.0  # eater already knows
@@ -117,8 +117,11 @@ def test_meat_knowledge_can_spread_by_observation_in_the_same_cell_only():
     far["cognition"]["food_values"] = innate_food_prior(sc.profile)
     sc.step()
     people = {h["id"]: h for h in sc.humans["humans"]}
-    assert "fresh_tissue" in people["watcher-near"]["cognition"]["food_values"]
-    assert "fresh_tissue" not in people["watcher-far"]["cognition"]["food_values"]
+    # G10.7a: the near watcher saw meat eaten without distress; it does not get
+    # a value for meat until it eats some itself.
+    assert people["watcher-near"]["cognition"]["observed_ingestion"]["fresh_tissue"]["harmless"] >= 1
+    assert "fresh_tissue" not in people["watcher-near"]["cognition"]["food_values"]
+    assert "fresh_tissue" not in people["watcher-far"]["cognition"].get("observed_ingestion", {})
 
 
 def test_rotten_meat_stays_hazardous_and_is_then_avoided():

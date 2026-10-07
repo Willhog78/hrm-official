@@ -38,6 +38,11 @@ class GenesisConfig:
     # anchors a hungry agent, dependents move physically, sleep recovers fatigue.
     # False reproduces pre-G10.6 runs exactly.
     agentus_behavior_integrity_enabled: bool = True
+    # G10.7a: what observers can learn from others. "visible-v1" (default)
+    # passes only visible acts and visible consequences, appraised by the
+    # observer's own values; "g10.4-legacy" reproduces the G10.4 path that
+    # copied the actor's reward and the eater's energy yield.
+    agentus_observation_model: str = "visible-v1"
     # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
     # catabolism, realistic lactation and size^0.75 child metabolism.
     agentus_physiology_version: str = "reference-v1"
@@ -83,6 +88,8 @@ class GenesisConfig:
         parts = [p for p in self.agentus_capacity_ablation.split("+") if p]
         if not set(parts) <= {"plant_diet", "no_interactions", "no_recall"} or len(parts) != len(set(parts)):
             raise ValueError("unknown agentus_capacity_ablation")
+        if self.agentus_observation_model not in {"visible-v1", "g10.4-legacy"}:
+            raise ValueError("unknown agentus_observation_model")
         if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
             raise ValueError("agentus_capacity_ablation requires agentus_capacities_enabled")
         if self.multi_population_enabled and not self.human_actions_enabled:
@@ -130,6 +137,8 @@ class GenesisConfig:
             canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
         if self.thirst_planning_active:
             canonical["agentus_thirst_enabled"] = True
+        if self.agentus_capacities_enabled and self.agentus_observation_model != "g10.4-legacy":
+            canonical["agentus_observation_model"] = self.agentus_observation_model
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":

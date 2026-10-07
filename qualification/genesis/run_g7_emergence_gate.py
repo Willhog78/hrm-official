@@ -8,7 +8,7 @@ from hrm_genesis.human.actions import (
     validate_sequence,
 )
 from hrm_genesis.human.biology import _apply_physiology
-from hrm_genesis.human.communication import imitate_signal, signal_sequence
+from hrm_genesis.human.communication import G7_LEGACY, imitate_signal, signal_sequence
 
 
 ELEMENTS = {"C": 0.86, "N": 0.08, "K": 0.025, "P": 0.012, "Mg": 0.013, "S": 0.01}
@@ -101,8 +101,8 @@ def main() -> int:
     if teacher_score > baseline_score:
         teacher["learned_sequences"] = [list(sequence)]
 
-    signal = signal_sequence(teacher, sequence)
-    learner = imitate_signal(_human("human-learner"), signal)
+    signal = signal_sequence(teacher, sequence, compatibility=G7_LEGACY)
+    learner = imitate_signal(_human("human-learner"), signal, compatibility=G7_LEGACY)
     imitated = tuple(learner["learned_sequences"][-1])
 
     learner_after, learner_cell, learner_trace = execute_live_sequence(

@@ -55,6 +55,8 @@ EXPLORE_SATED = 0.08
 RETRY_KNOWN = 0.03
 FOOD_SAMPLE_HUNGRY = 0.5
 FOOD_SAMPLE_SATED = 0.1
+# G10.7a: readiness to taste a kind seen eaten by others without distress.
+FOOD_SAMPLE_OBSERVED = 0.5
 FATIGUE_PER_INTERACTION = 0.02
 MIN_INTERACTION_KCAL = 2.0
 INSULATION_MAX_C = 8.0
@@ -594,6 +596,8 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
     out = _execute_physical(ctx, key, spec)
     out["tool_history"] = tool_history
     after_ids = {o["id"] for o in ctx.humans["objects"]}
+    # What anyone present can see appear: the classes of objects this act made.
+    out["created_classes"] = sorted(object_class(o) for o in ctx.humans["objects"] if o["id"] not in before)
     consumed = [hist for oid, (_, hist, _) in before.items() if oid not in after_ids]
     for obj in ctx.humans["objects"]:
         prior = before.get(obj["id"])
@@ -977,6 +981,8 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
         observed = (rec["kcal"] - rec["handling_kcal"]) / rec["kg"] - rec["hazard"] * basal * 2.0 / rec["kg"]
         prior = food_values.get(rec["kind"])
         food_values[rec["kind"]] = round(observed if prior is None else float(prior) + FOOD_LEARNING_RATE * (observed - float(prior)), 10)
+        if prior is None and rec["kind"] in cognition.get("observed_ingestion", {}):
+            _bump_map(ctx.stats, "food_learned_after_observation", rec["kind"], 1)
 
     # Attribute food gains to the interactions that made them possible.
     kcal_by_kind: dict[str, float] = {}
@@ -997,7 +1003,11 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
         _update_value(values, key, reward, VALUE_LEARNING_RATE)
         if gain > 0.0:
             _credit_preparation(values, trace, out.get("tool_history", []), gain / basal)
-            observe_outcome(ctx, key, reward)
+        if _legacy_observation(ctx):
+            if gain > 0.0:
+                observe_outcome(ctx, key, reward)
+        else:
+            observe_outcome(ctx, key, visible=_visible_consequence(out, gain, kcal_by_kind, kg_by_kind))
         trace = (trace + [key])[-TRACE_LENGTH:]
 
     for rec in intake:
@@ -1031,21 +1041,69 @@ def _credit_preparation(values: dict, trace: list[str], tool_history: list[str],
             values[prior_key] = entry
 
 
-def observe_outcome(ctx: Context, key: str, reward: float) -> None:
-    """Agents sharing the cell see an interaction succeed and update their own
-    expectation of it (declared assumption: a visible, beneficial outcome is
-    observable; failures and internal costs are not transmitted)."""
-    if reward <= 0.0:
+def _legacy_observation(ctx: Context) -> bool:
+    return ctx.humans.get("observation_model") != "visible-v1"
+
+
+def _visible_consequence(out: dict, gain: float, kcal_by_kind: dict, kg_by_kind: dict) -> dict:
+    """What a bystander can see follow an act: food the actor then ate because
+    of it (kind and amount, not its energy), objects that appeared, and the
+    actor being hurt. Effort and reward are internal and are not included."""
+    eaten: dict[str, float] = {}
+    fresh_kcal = max(0.0, kcal_by_kind.get("fresh_tissue", 0.0))
+    if gain > 0.0 and fresh_kcal > 0.0:
+        eaten["fresh_tissue"] = kg_by_kind["fresh_tissue"] * min(1.0, gain / fresh_kcal)
+    return {"eaten_kg": eaten, "created": list(out.get("created_classes", [])), "injury": float(out.get("injury", 0.0))}
+
+
+def _own_appraisal(peer: dict, profile_basal: float, visible: dict) -> float | None:
+    """The observer's own reading of what it saw, from its own history only.
+    None when nothing it saw means anything to it yet."""
+    cognition = peer.get("cognition", {})
+    food_values = cognition.get("food_values", {})
+    values = cognition.get("affordance_values", {})
+    parts: list[float] = []
+    for kind, kg in visible["eaten_kg"].items():
+        if kind in food_values:  # it has eaten this itself
+            parts.append(float(food_values[kind]) * kg / profile_basal)
+    for cls in visible["created"]:
+        # Worth to this observer of having such an object: the best value it has
+        # itself found in acts that use that class as the tool.
+        used = [float(e["v"]) for k, e in values.items() if k.endswith(f"|{cls}")]
+        if used:
+            parts.append(max(0.0, max(used)))
+    if visible["injury"] > 0.0:
+        parts.append(-visible["injury"] * 2.0)
+    return sum(parts) if parts else None
+
+
+def observe_outcome(ctx: Context, key: str, reward: float | None = None, visible: dict | None = None) -> None:
+    """Agents sharing the cell see an act and what visibly followed.
+
+    visible-v1 (G10.7a): the observer sees the act (verb and object classes,
+    which is all an affordance key encodes) and its visible consequence, and
+    appraises it with its own values. The actor's reward never travels.
+    g10.4-legacy: the observer copies the actor's positive reward (kept only to
+    reproduce G10.4 runs)."""
+    legacy = _legacy_observation(ctx)
+    if legacy and (reward is None or reward <= 0.0):
         return
     for peer in ctx.humans["humans"]:
         if peer is ctx.human or "cognition" not in peer:
             continue
         if (int(peer["x"]), int(peer["y"])) != ctx.xy:
             continue
+        if legacy:
+            target = float(reward)
+        else:
+            appraisal = _own_appraisal(peer, max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"])), visible)
+            if appraisal is None:
+                continue
+            target = appraisal
         cognition = dict(peer["cognition"])
         values = dict(cognition.get("affordance_values", {}))
         entry = dict(values.get(key, {"n": 0, "v": 0.0}))
-        entry["v"] = round(float(entry["v"]) + OBSERVATION_RATE * (reward - float(entry["v"])) * (1.0 if int(entry["n"]) == 0 else VALUE_LEARNING_RATE), 10)
+        entry["v"] = round(float(entry["v"]) + OBSERVATION_RATE * (target - float(entry["v"])) * (1.0 if int(entry["n"]) == 0 else VALUE_LEARNING_RATE), 10)
         values[key] = entry
         cognition["affordance_values"] = values
         peer["cognition"] = cognition
@@ -1053,10 +1111,19 @@ def observe_outcome(ctx: Context, key: str, reward: float) -> None:
 
 
 def observe_food(ctx: Context, intake: list[dict]) -> None:
-    """Agents sharing the cell see what another eats repeatedly without harm and
-    may adopt a cautious prior for a kind they have never valued."""
+    """Agents sharing the cell see another eat.
+
+    visible-v1 (G10.7a): the observer records only that this material was eaten
+    and whether visible distress followed. That changes its own readiness to
+    taste the kind (choose_food_samples); the kind's value still comes only
+    from eating it. g10.4-legacy: the observer adopted half the eater's energy
+    per kg as a prior (kept only to reproduce G10.4 runs)."""
+    legacy = _legacy_observation(ctx)
     for rec in intake:
-        if rec["kg"] <= 0.0 or rec.get("hazard", 0.0) > 0.0 or rec["kcal"] <= 0.0:
+        if rec["kg"] <= 0.0:
+            continue
+        harmful = rec.get("hazard", 0.0) > 0.0
+        if legacy and (harmful or rec["kcal"] <= 0.0):
             continue
         for peer in ctx.humans["humans"]:
             if peer is ctx.human or "cognition" not in peer:
@@ -1064,14 +1131,24 @@ def observe_food(ctx: Context, intake: list[dict]) -> None:
             if (int(peer["x"]), int(peer["y"])) != ctx.xy:
                 continue
             known = peer["cognition"].get("food_values", {})
-            if rec["kind"] in known:
+            if legacy:
+                if rec["kind"] in known:
+                    continue
+                cognition = dict(peer["cognition"])
+                food_values = dict(known)
+                food_values[rec["kind"]] = round(OBSERVATION_RATE * rec["kcal"] / rec["kg"], 10)
+                cognition["food_values"] = food_values
+                peer["cognition"] = cognition
+                _bump_map(ctx.stats, "observed_food_adoptions", rec["kind"], 1)
                 continue
             cognition = dict(peer["cognition"])
-            food_values = dict(known)
-            food_values[rec["kind"]] = round(OBSERVATION_RATE * rec["kcal"] / rec["kg"], 10)
-            cognition["food_values"] = food_values
+            seen = dict(cognition.get("observed_ingestion", {}))
+            entry = dict(seen.get(rec["kind"], {"harmless": 0, "harmful": 0}))
+            entry["harmful" if harmful else "harmless"] += 1
+            seen[rec["kind"]] = entry
+            cognition["observed_ingestion"] = seen
             peer["cognition"] = cognition
-            _bump_map(ctx.stats, "observed_food_adoptions", rec["kind"], 1)
+            _bump_map(ctx.stats, "observed_ingestions", rec["kind"], 1)
 
 
 def credit_worn_benefit(humans: dict, human: dict, saving_kcal: float, profile: dict) -> None:
@@ -1092,9 +1169,21 @@ def credit_worn_benefit(humans: dict, human: dict, saving_kcal: float, profile: 
 
 
 def choose_food_samples(human: dict, pcell: dict, ccell: dict | None, epoch: int, hungry: bool) -> tuple[str, ...]:
-    """Bounded exploration of unknown kinds present here: at most one per tick."""
+    """Bounded exploration of unknown kinds present here: at most one per tick.
+
+    G10.7a: having seen others eat a kind without visible distress makes an
+    agent readier to taste it; having seen distress makes it decline. The
+    information is only that the material was eaten and what visibly followed."""
     known = human["cognition"].get("food_values", {})
     unknown = [k for k in FOOD_KINDS if k not in known and available_kg(k, pcell, ccell) > 0.0]
+    seen = human["cognition"].get("observed_ingestion")
+    if seen is not None:
+        unknown = [k for k in unknown if seen.get(k, {}).get("harmful", 0) <= seen.get(k, {}).get("harmless", 0)]
+        encouraged = [k for k in unknown if seen.get(k, {}).get("harmless", 0) > 0]
+        if encouraged:
+            if mo.unit_draw(human["id"], epoch, "food-sample") >= FOOD_SAMPLE_OBSERVED:
+                return ()
+            return (encouraged[int(mo.unit_draw(human["id"], epoch, "food-pick") * len(encouraged)) % len(encouraged)],)
     if not unknown:
         return ()
     p = FOOD_SAMPLE_HUNGRY if hungry else FOOD_SAMPLE_SATED

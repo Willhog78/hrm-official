@@ -113,7 +113,13 @@ Specification, audit and limits: `docs/architecture/G10_3_AGENTUS_CAPACITIES.md`
 - Fatigue recovers with sleep.
 - Blocked agent-days fell from 27% to 0% in the targeted diagnostic.
 
-**Next: G10.7 communication and teaching** (see ROADMAP).
+**G10.7a step 1 (leak closure): IMPLEMENTED** (`docs/architecture/G10_7_COMMUNICATION_TEACHING.md`, flag `agentus_observation_model`, default `visible-v1`; `g10.4-legacy` is bit-identical to before).
+- G7 recipe transfer works only with a legacy flag.
+- Observers get visible acts and consequences, appraised by their own values.
+- Seen eating changes only readiness to taste.
+- Legacy food adoptions fell from 11 to 0, as expected.
+
+Next: perceptual event memory → imitation → following → measurement. The call is deferred to G10.7b.
 
 **Infrastructure ticket.** GitHub Actions `verify` fails before any step runs, on `main` as well as on PRs (runs 99–104). This is an Actions environment problem (billing or runner) and is tracked separately. Until it is fixed, the local fast tier and gates are the verification record.
 

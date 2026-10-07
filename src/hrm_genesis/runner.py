@@ -176,6 +176,9 @@ class GenesisSimulation:
                 )
                 matter_state = dict(matter_state)
                 matter_state["lithic_cells"] = lithic_cells
+                if config.agentus_observation_model != "g10.4-legacy":
+                    human_state = dict(human_state)
+                    human_state["observation_model"] = config.agentus_observation_model
                 matter_state["initial_lithic_kg"] = lithic_total
                 consumer_state = enable_fresh_tissue(consumer_state)
                 human_state = enable_capacities(human_state)
