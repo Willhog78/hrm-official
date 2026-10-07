@@ -20,6 +20,78 @@ def _step_toward(origin: tuple[int, int], target: tuple[int, int], cells: list[d
     return min(options, key=lambda xy: (abs(xy[0] - target[0]) + abs(xy[1] - target[1]), xy[1], xy[0]))
 
 
+def _least_visited_neighbor(perception: dict, cognition: dict, prefer) -> tuple[int, int] | None:
+    ox, oy = map(int, perception["origin"])
+    visits: dict[tuple[int, int], int] = {}
+    for episode in cognition.get("memory", {}).get("episodes", []):
+        key = tuple(map(int, episode.get("origin", (ox, oy))))
+        visits[key] = visits.get(key, 0) + 1
+    candidates = [c for c in perception["cells"] if (int(c["x"]), int(c["y"])) != (ox, oy)]
+    if not candidates:
+        return None
+    best = min(candidates, key=lambda c: (visits.get((int(c["x"]), int(c["y"])), 0), -prefer(c), int(c["y"]), int(c["x"])))
+    return int(best["x"]), int(best["y"])
+
+
+def _thirst_destination(
+    perception: dict,
+    cognition: dict,
+    forage_need: float,
+    reserve_fraction: float,
+) -> tuple[int, int] | None:
+    """Thirst as an interoceptive drive (enabled by `agentus_thirst_enabled`).
+
+    The agent feels how many days its water and energy reserves would last
+    (`hydration_days`, `energy_days`). When the cell it stands on cannot refill
+    today's water need, it seeks visible water, then remembered water, then
+    unexplored ground. If hunger is also pressing and would kill sooner, the
+    hunger rules decide instead. Without the perception keys this is inert.
+    """
+    if "water_need_kg" not in perception:
+        return None
+    ox, oy = map(int, perception["origin"])
+    need = float(perception["water_need_kg"])
+    here = next(c for c in perception["cells"] if (int(c["x"]), int(c["y"])) == (ox, oy))
+    if float(here["water_kg"]) >= need:
+        return None
+    wet = [c for c in perception["cells"] if float(c["water_kg"]) >= need]
+    # A visible cell that offers both today's water and today's food satisfies
+    # hunger and thirst at once; hunger has no reason to hold the agent back.
+    wet_and_fed = [c for c in wet if _food(c) >= forage_need]
+    if wet_and_fed:
+        best = min(wet_and_fed, key=lambda c: (
+            abs(int(c["x"]) - ox) + abs(int(c["y"]) - oy), -float(c["water_kg"]), int(c["y"]), int(c["x"]),
+        ))
+        return int(best["x"]), int(best["y"])
+
+    # Otherwise going for water would cost the day's food. If starvation is
+    # closer than dehydration, the hunger rules decide.
+    hungry = forage_need > 0.0 and reserve_fraction < 0.75
+    if hungry and float(perception.get("energy_days", 1e9)) < float(perception.get("hydration_days", 0.0)):
+        return None
+
+    if wet:
+        best = min(wet, key=lambda c: (
+            0 if _food(c) >= forage_need else 1,
+            abs(int(c["x"]) - ox) + abs(int(c["y"]) - oy),
+            -float(c["water_kg"]),
+            int(c["y"]), int(c["x"]),
+        ))
+        return int(best["x"]), int(best["y"])
+
+    recalled = [
+        (abs(int(px) - ox) + abs(int(py) - oy), -int(seen), int(py), int(px))
+        for px, py, water, seen in perception.get("remembered_water", [])
+        if float(water) >= need
+    ]
+    if recalled:
+        _, _, ty, tx = min(recalled)
+        step = _step_toward((ox, oy), (tx, ty), perception["cells"])
+        if step is not None:
+            return step
+    return _least_visited_neighbor(perception, cognition, lambda c: float(c["water_kg"]))
+
+
 def choose_destination(
     human: dict,
     perception: dict,
@@ -33,6 +105,10 @@ def choose_destination(
     forage_need = max(0.0, float(perception.get("forage_need_kg", 0.0)))
     reserve_fraction = max(0.0, min(1.0, float(perception.get("energy_reserve_fraction", 1.0))))
     visible_max_food = max(_food(cell) for cell in perception["cells"])
+
+    thirst_target = _thirst_destination(perception, cognition, forage_need, reserve_fraction)
+    if thirst_target is not None:
+        return thirst_target
     if forage_need > 0.0 and reserve_fraction < 0.75 and visible_max_food >= forage_need:
         # When reserves are low, satisfy a visible daily food requirement before
         # comparing surplus water or rewards learned under different conditions.

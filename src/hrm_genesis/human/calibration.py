@@ -62,7 +62,47 @@ def reference_adult_profile(ticks_per_year: int) -> dict[str, float | int | bool
     }
 
 
-def physiology_profile(*, calibrated: bool, ticks_per_year: int) -> dict[str, float | int | bool]:
+def reference_adult_profile_v2(ticks_per_year: int) -> dict[str, float | int | bool | str]:
+    """Energy-budget realism revision of the reference adult (G10.5).
+
+    Declared reference values (broad human ranges, not an individual model):
+    - Energy reserve is body fat: capacity 120,000 kcal (about 15.6 kg at
+      7,700 kcal/kg, within adult 15-25% fat of 70 kg). Founders start lean at
+      60,000 kcal (about 7.8 kg, about 11%).
+    - Below an empty reserve, lean dry tissue is catabolized at 4,000 kcal/kg
+      (protein). Death follows at the existing 50% dry-mass floor, so total
+      fasting survival is roughly six to eight weeks.
+    - Hunger tracks short-term balance: the planner's reserve fraction keeps the
+      v1 30,000 kcal reference, so planning is not changed by fat storage.
+    - Milk: up to 550 kcal/day at full dependence (about 750 ml/day at
+      ~0.7 kcal/ml), costing the mother 1/0.8 of that (synthesis efficiency).
+      Output tapers when the mother's own reserve falls below 10%.
+    - Child basal energy and water turnover scale with body size^0.75 (Kleiber).
+    - The reproduction energy threshold keeps its v1 share of the reserve
+      (4,000/30,000), i.e. 16,000 kcal.
+    """
+    profile = dict(reference_adult_profile(ticks_per_year))
+    profile.update({
+        "physiology_version": "reference-v2",
+        "energy_capacity_kcal": 120000.0,
+        "initial_energy_kcal": 60000.0,
+        "satiety_reference_kcal": 30000.0,
+        "lean_catabolism_kcal_per_kg": 4000.0,
+        "nursing_energy_kcal_per_tick": 550.0,
+        "lactation_efficiency": 0.8,
+        "lactation_taper_reserve_fraction": 0.1,
+        "metabolic_scaling_exponent": 0.75,
+        "reproduction_energy_kcal": 16000.0,
+    })
+    return profile
+
+
+PHYSIOLOGY_VERSIONS = ("reference-v1", "reference-v2")
+
+
+def physiology_profile(*, calibrated: bool, ticks_per_year: int, version: str = "reference-v1") -> dict[str, float | int | bool]:
     if calibrated:
+        if version == "reference-v2":
+            return reference_adult_profile_v2(ticks_per_year)
         return reference_adult_profile(ticks_per_year)
     return qualification_profile()

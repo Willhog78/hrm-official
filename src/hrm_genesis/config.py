@@ -30,6 +30,13 @@ class GenesisConfig:
     # manipulation or capture) and "no_recall" (no travel toward remembered
     # food).
     agentus_capacity_ablation: str = ""
+    # Thirst as an interoceptive planning drive (G10.4 baseline correction).
+    # On by default wherever Agentus cognition is enabled; set False only to
+    # reproduce pre-G10.4 results, whose fingerprints omit this key.
+    agentus_thirst_enabled: bool = True
+    # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
+    # catabolism, realistic lactation and size^0.75 child metabolism.
+    agentus_physiology_version: str = "reference-v1"
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -65,6 +72,10 @@ class GenesisConfig:
             raise ValueError("human_actions_enabled requires human_cognition_enabled")
         if self.agentus_capacities_enabled and not (self.human_actions_enabled and self.human_calibration_enabled):
             raise ValueError("agentus_capacities_enabled requires human_actions_enabled and human_calibration_enabled")
+        if self.agentus_physiology_version not in {"reference-v1", "reference-v2"}:
+            raise ValueError("unknown agentus_physiology_version")
+        if self.agentus_physiology_version != "reference-v1" and not self.human_calibration_enabled:
+            raise ValueError("agentus_physiology_version requires human_calibration_enabled")
         parts = [p for p in self.agentus_capacity_ablation.split("+") if p]
         if not set(parts) <= {"plant_diet", "no_interactions", "no_recall"} or len(parts) != len(set(parts)):
             raise ValueError("unknown agentus_capacity_ablation")
@@ -72,6 +83,11 @@ class GenesisConfig:
             raise ValueError("agentus_capacity_ablation requires agentus_capacities_enabled")
         if self.multi_population_enabled and not self.human_actions_enabled:
             raise ValueError("multi_population_enabled requires human_actions_enabled")
+
+    @property
+    def thirst_planning_active(self) -> bool:
+        """Thirst needs a planner to act on; it is inert without cognition."""
+        return self.agentus_thirst_enabled and self.human_cognition_enabled
 
     @property
     def contract_dt(self) -> Fraction:
@@ -101,9 +117,13 @@ class GenesisConfig:
         if self.agentus_capacities_enabled:
             # Present only when enabled so earlier fingerprints do not change.
             canonical["agentus_capacities_enabled"] = True
-            canonical["agentus_capacity_model"] = "capacity-v1"
+            canonical["agentus_capacity_model"] = "capacity-v2"
         if self.agentus_capacity_ablation:
             canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
+        if self.thirst_planning_active:
+            canonical["agentus_thirst_enabled"] = True
+        if self.agentus_physiology_version != "reference-v1":
+            canonical["agentus_physiology_version"] = self.agentus_physiology_version
         return canonical
 
     def fingerprint(self) -> str:

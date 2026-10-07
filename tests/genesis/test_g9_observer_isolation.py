@@ -7,7 +7,7 @@ def test_observer_is_pure_over_snapshot_data():
     world = {"cells": [{"temperature": 20.0}]}
     matter = {"cells": [{"surface_water_kg": 1.0, "soil_water_kg": 2.0}]}
     producers = {"cells": [{"plant_elements_kg": {"C": 0.5}}]}
-    consumers = {"consumers": []}
+    consumers = {"animals": [], "carcass_cells": []}
     humans = {"humans": []}
 
     original = deepcopy((world, matter, producers, consumers, humans))

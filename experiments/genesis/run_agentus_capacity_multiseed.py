@@ -20,6 +20,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import json
 from collections import Counter
 
@@ -32,13 +33,20 @@ SEEDS = [
     "agentus-demography-b",
     "agentus-demography-c",
     "agentus-demography-d",
-]
+] + [f"agentus-g10-4-{i:02d}" for i in range(1, 17)]
 DAYS = 730
 ARMS = ("v0", "v1", "plant_diet", "no_interactions", "no_recall", "null")
 NULL_ABLATION = "plant_diet+no_interactions+no_recall"
 
 
 def config_for(seed: str, arm: str) -> GenesisConfig:
+    """`arm` is a base arm. Thirst is the G10.4 baseline; suffix `-nothirst`
+    reproduces the pre-G10.4 planner. The older `+thirst` suffix is accepted
+    and means the baseline."""
+    thirst = not arm.endswith("-nothirst")
+    arm = arm.removesuffix("-nothirst").removesuffix("+thirst")
+    if arm not in ARMS:
+        raise ValueError(f"unknown arm: {arm}")
     return GenesisConfig(
         master_seed=seed,
         world_width=16,
@@ -54,6 +62,7 @@ def config_for(seed: str, arm: str) -> GenesisConfig:
         human_calibration_enabled=True,
         agentus_capacities_enabled=arm != "v0",
         agentus_capacity_ablation="" if arm in {"v0", "v1"} else (NULL_ABLATION if arm == "null" else arm),
+        agentus_thirst_enabled=thirst,
     )
 
 
@@ -143,6 +152,14 @@ def run(seed: str, arm: str, days: int) -> dict:
         "interaction_counts": stats.get("interaction_counts", {}),
         "interaction_effort_kcal": stats.get("interaction_effort_kcal", 0.0),
         "interaction_injury": stats.get("interaction_injury", 0.0),
+        "learned_practice": {
+            "exploit_by_key": stats.get("exploit_by_key", {}),
+            "exploit_agent_counts": {k: len(v) for k, v in stats.get("exploit_agents", {}).items()},
+            "observed_transmissions": stats.get("observed_transmissions", {}),
+            "observed_food_adoptions": stats.get("observed_food_adoptions", {}),
+            "insulation_saving_kcal": stats.get("insulation_saving_kcal", 0.0),
+        },
+        "encounters": {k: stats.get(f"encounter_{k}", 0) for k in ("kill", "contact_failed", "outrun", "reached_cover")},
         "material_events": {k: stats.get(k, 0) for k in (
             "capture_attempts", "captures", "capture_escapes", "fractures", "sharp_flakes",
             "fibers_extracted", "wood_pieces", "bindings", "binding_failures",
@@ -158,20 +175,43 @@ def run(seed: str, arm: str, days: int) -> dict:
     }
 
 
+def compact_summary(r: dict) -> dict:
+    """One short line per run for log-only runners."""
+    d = r["deaths_by_cause"]
+    lp = r.get("learned_practice", {})
+    return {
+        "arm": r["arm"], "seed": r["seed"], "fp": r["config_fingerprint"][:8],
+        "alive": r["agentus_final"], "adults": r["adults_final"], "births": r["births"], "deaths": r["deaths"],
+        "dehyd": d.get("dehydration", 0), "energy": d.get("energy", 0), "injury": d.get("injury", 0),
+        "pairs": r["breeding_pairs_final"],
+        "intake": {k: round(v, 3) for k, v in r["intake_kg_by_kind"].items()},
+        "enc": r.get("encounters", {}), "kills": r["animal_deaths_by_cause"].get("agentus", 0),
+        "animals_end": r["availability"]["animals"]["final"],
+        "ev": {k: v for k, v in r["material_events"].items() if v},
+        "exploit": lp.get("exploit_by_key", {}), "exploit_agents": lp.get("exploit_agent_counts", {}),
+        "observed": sum(lp.get("observed_transmissions", {}).values()),
+        "food_adopt": lp.get("observed_food_adoptions", {}),
+        "warmth_kcal": round(lp.get("insulation_saving_kcal", 0.0), 1),
+        "effort": round(r["interaction_effort_kcal"]), "ledger": r["ledger_valid"],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--arm", choices=ARMS, required=True)
-    parser.add_argument("--seed", choices=SEEDS + ["all"], default="all")
+    parser.add_argument("--arm", required=True, help="base arm, optionally with +thirst")
+    parser.add_argument("--seed", default="all", help="a seed name, 'all', or 'first4'")
     parser.add_argument("--days", type=int, default=DAYS)
     parser.add_argument("--out")
     args = parser.parse_args()
-    seeds = SEEDS if args.seed == "all" else [args.seed]
+    seeds = SEEDS if args.seed == "all" else (SEEDS[:4] if args.seed == "first4" else [args.seed])
     results = []
     for seed in seeds:
         result = run(seed, args.arm, args.days)
         results.append(result)
         compact = {k: v for k, v in result.items() if k != "weekly_series"}
-        print("CAPACITY_RESULT:", json.dumps(compact, sort_keys=True), flush=True)
+        if not os.environ.get("HRM_COMPACT_ONLY"):
+            print("CAPACITY_RESULT:", json.dumps(compact, sort_keys=True), flush=True)
+        print("CAPACITY_COMPACT:", json.dumps(compact_summary(result), sort_keys=True, separators=(",", ":")), flush=True)
     if args.out:
         with open(args.out, "w", encoding="utf-8") as handle:
             json.dump(results, handle, sort_keys=True)

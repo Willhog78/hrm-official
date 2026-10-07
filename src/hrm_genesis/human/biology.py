@@ -49,8 +49,8 @@ def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
 
-def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False, actions_enabled: bool = False, multi_population_enabled: bool = False, calibrated: bool = False, ticks_per_year: int = 120) -> dict:
-    profile = physiology_profile(calibrated=calibrated, ticks_per_year=ticks_per_year)
+def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False, actions_enabled: bool = False, multi_population_enabled: bool = False, calibrated: bool = False, ticks_per_year: int = 120, physiology_version: str = "reference-v1") -> dict:
+    profile = physiology_profile(calibrated=calibrated, ticks_per_year=ticks_per_year, version=physiology_version)
     humans = []
     founders = []
     if multi_population_enabled:
@@ -211,9 +211,15 @@ def _age_profile(human: dict, profile: dict) -> dict:
     adjusted["target_dry_mass_kg"] = float(profile["seed_dry_mass_kg"]) * scale
     adjusted["water_capacity_kg"] = float(profile["water_capacity_kg"]) * scale
     adjusted["bite_cap_kg"] = float(profile["bite_cap_kg"]) * max(0.10, scale)
-    adjusted["basal_energy_kcal_per_tick"] = float(profile["basal_energy_kcal_per_tick"]) * max(0.10, scale)
+    if "metabolic_scaling_exponent" in profile:
+        # reference-v2: maintenance scales with body size^0.75 (Kleiber).
+        metabolic = scale ** float(profile["metabolic_scaling_exponent"])
+    else:
+        metabolic = max(0.10, scale)
+    adjusted["adult_basal_energy_kcal_per_tick"] = float(profile["basal_energy_kcal_per_tick"])
+    adjusted["basal_energy_kcal_per_tick"] = float(profile["basal_energy_kcal_per_tick"]) * metabolic
     adjusted["move_energy_kcal_per_tick"] = float(profile["move_energy_kcal_per_tick"]) * max(0.10, scale)
-    adjusted["water_loss_per_tick_kg"] = float(profile["water_loss_per_tick_kg"]) * max(0.10, scale)
+    adjusted["water_loss_per_tick_kg"] = float(profile["water_loss_per_tick_kg"]) * metabolic
     adjusted["min_dry_mass_kg"] = float(profile["min_dry_mass_kg"]) * scale
     adjusted["thermal_scale"] = max(0.08, scale)
     dependent_age = int(profile.get("dependent_age_ticks", 0))
@@ -410,10 +416,21 @@ def _provision_dependent(
     child["body_water_kg"] += water
 
     energy_cap = float(profile.get("nursing_energy_kcal_per_tick", 0.0)) * dependence
-    caregiver_energy_floor = max(0.0, float(profile.get("basal_energy_kcal_per_tick", 0.0)))
-    energy_available = max(0.0, float(caregiver["energy"]) - caregiver_energy_floor)
-    energy = min(energy_cap, energy_available)
-    caregiver["energy"] -= energy
+    if "lactation_efficiency" in profile:
+        # reference-v2: milk is drawn from the mother's own reserve, tapering
+        # as that reserve runs low; synthesis costs her 1/efficiency per kcal.
+        efficiency = float(profile["lactation_efficiency"])
+        reserve_reference = float(profile["energy_capacity_kcal"]) * float(profile["lactation_taper_reserve_fraction"])
+        taper = max(0.0, min(1.0, float(caregiver["energy"]) / max(1e-9, reserve_reference)))
+        mother_floor = float(profile.get("adult_basal_energy_kcal_per_tick", profile["basal_energy_kcal_per_tick"]))
+        energy_available = max(0.0, float(caregiver["energy"]) - mother_floor) * efficiency
+        energy = min(energy_cap * taper, energy_available)
+        caregiver["energy"] -= energy / efficiency
+    else:
+        caregiver_energy_floor = max(0.0, float(profile.get("basal_energy_kcal_per_tick", 0.0)))
+        energy_available = max(0.0, float(caregiver["energy"]) - caregiver_energy_floor)
+        energy = min(energy_cap, energy_available)
+        caregiver["energy"] -= energy
     child["energy"] = min(
         float(profile.get("energy_capacity_kcal", float("inf"))) * max(0.10, float(profile.get("development_scale", 1.0))),
         float(child["energy"]) + energy,
@@ -440,6 +457,49 @@ def _structural_protection(world_cell: dict, producer_cell: dict | None = None) 
     if arranged_mass <= 0.0:
         arranged_cover = 0.0
     return canopy, min(0.95, terrain_cover + arranged_cover)
+
+def _add_interoception(perception: dict, human: dict, profile: dict, base_profile: dict) -> None:
+    """Thirst and hunger as felt reserves, in days (agentus_thirst_enabled).
+
+    Declared assumption: an organism senses how depleted its water and energy
+    are. It does not sense where water is beyond its perception radius; it may
+    recall places it has seen.
+    """
+    capacity = float(profile["water_capacity_kg"])
+    loss = max(1e-9, float(profile["water_loss_per_tick_kg"]))
+    floor = capacity * float(base_profile["min_water_fraction"])
+    body_water = float(human["body_water_kg"])
+    perception["water_need_kg"] = max(0.0, capacity - body_water) + loss
+    perception["hydration_days"] = max(0.0, (body_water - floor) / loss)
+    perception["energy_days"] = max(0.0, float(human["energy"])) / max(1e-9, float(profile["basal_energy_kcal_per_tick"]))
+    visible = {(int(c["x"]), int(c["y"])) for c in perception["cells"]}
+    perception["remembered_water"] = [
+        [int(k.split(",")[0]), int(k.split(",")[1]), float(v.get("water_kg", 0.0)), int(v.get("last_seen_epoch", 0))]
+        for k, v in sorted(human.get("cognition", {}).get("memory", {}).get("locations", {}).items())
+        if (int(k.split(",")[0]), int(k.split(",")[1])) not in visible
+    ]
+
+
+def _catabolize_lean_tissue(human: dict, profile: dict, detritus: dict) -> float:
+    """reference-v2: an empty fat reserve is covered by breaking down lean dry
+    tissue. Its tracked elements leave the body as excreta into the cell's
+    detritus, so mass is conserved. Returns kg catabolized."""
+    deficit = -float(human["energy"])
+    per_kg = float(profile["lean_catabolism_kcal_per_kg"])
+    mass = _mass(human["body_elements_kg"])
+    take = min(mass, deficit / per_kg)
+    if take <= 0.0:
+        return 0.0
+    fraction = take / mass
+    for symbol in sorted(human["body_elements_kg"]):
+        amount = float(human["body_elements_kg"][symbol]) * fraction
+        human["body_elements_kg"][symbol] = float(human["body_elements_kg"][symbol]) - amount
+        detritus[symbol] = float(detritus.get(symbol, 0.0)) + amount
+    human["energy"] = float(human["energy"]) + take * per_kg
+    if abs(float(human["energy"])) < 1e-9:
+        human["energy"] = 0.0
+    return take
+
 
 def _experienced_reward(
     *,
@@ -486,6 +546,7 @@ def _apply_physiology(
     if terrain_cover > 0.0:
         moderation = min(0.55, terrain_cover * 0.55)
         ambient = ambient * (1.0 - moderation) + 15.0 * moderation
+    uninsulated_ambient = ambient
     if insulation_c > 0.0 and ambient < HUMAN_COMFORT_TEMPERATURE_C:
         # Worn interlaced material slows heat loss in the cold (capacity v1).
         ambient = min(HUMAN_COMFORT_TEMPERATURE_C, ambient + insulation_c)
@@ -499,10 +560,16 @@ def _apply_physiology(
     else:
         fatigue = max(0.0, fatigue - HUMAN_FATIGUE_REST_RECOVERY)
 
+    thermal_scale = max(0.08, float(profile.get("thermal_scale", 1.0)))
+    thermal_cost_cap = (300.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.30
+    thermal_cost_rate = (10.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.01
+    if insulation_c > 0.0:
+        # Experienced benefit of worn material: cold-stress energy not spent.
+        bare_excess = max(0.0, abs(uninsulated_ambient - HUMAN_COMFORT_TEMPERATURE_C) - HUMAN_THERMAL_TOLERANCE_C)
+        bare_cost = min(thermal_cost_cap, bare_excess * thermal_cost_rate)
+        worn_cost = min(thermal_cost_cap, excess * thermal_cost_rate)
+        human["insulation_saving_kcal"] = round(max(0.0, bare_cost - worn_cost), 10)
     if excess > 0.0:
-        thermal_scale = max(0.08, float(profile.get("thermal_scale", 1.0)))
-        thermal_cost_cap = (300.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.30
-        thermal_cost_rate = (10.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.01
         human["energy"] = float(human["energy"]) - min(thermal_cost_cap, excess * thermal_cost_rate)
         if ambient > HUMAN_COMFORT_TEMPERATURE_C:
             human["body_water_kg"] = max(
@@ -650,8 +717,10 @@ def evolve_agentus_step(
             perception["forage_need_kg"] = forage_need
             perception["energy_reserve_fraction"] = (
                 float(human["energy"])
-                / max(1e-9, float(effective_profile.get("energy_capacity_kcal", 1.0)))
+                / max(1e-9, float(effective_profile.get("satiety_reference_kcal", effective_profile.get("energy_capacity_kcal", 1.0))))
             )
+            if humans.get("thirst_planning"):
+                _add_interoception(perception, human, effective_profile, profile)
             if capacities:
                 scale = max(0.10, float(effective_profile.get("development_scale", 1.0)))
                 extend_perception_with_materials(
@@ -698,7 +767,7 @@ def evolve_agentus_step(
             _drink(human, mcells[xy], effective_profile)
             hungry = (
                 float(human["energy"])
-                / max(1e-9, float(effective_profile.get("energy_capacity_kcal", 1.0)))
+                / max(1e-9, float(effective_profile.get("satiety_reference_kcal", effective_profile.get("energy_capacity_kcal", 1.0))))
             ) < 0.75
             ctx = None
             samples: tuple[str, ...] = ()
@@ -731,6 +800,7 @@ def evolve_agentus_step(
                 human, wcells[xy], moved, effective_profile, pcells[xy],
                 insulation_c=cap.insulation_c(humans, str(human["id"])),
             )
+            cap.credit_worn_benefit(humans, human, float(human.pop("insulation_saving_kcal", 0.0)), effective_profile)
         else:
             _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
         attacks = _apply_predator_threat(human, consumer_state)
@@ -776,16 +846,22 @@ def evolve_agentus_step(
             )
             human["cognition"] = cognition
 
+        if "lean_catabolism_kcal_per_kg" in profile and float(human["energy"]) < 0.0:
+            _catabolize_lean_tissue(human, profile, pcells[xy]["detritus_elements_kg"])
         body_mass = _mass(human["body_elements_kg"])
+        energy_exhausted = (
+            float(human["energy"]) < -1e-9 if "lean_catabolism_kcal_per_kg" in profile
+            else float(human["energy"]) <= 0.0
+        )
         dead = (
-            float(human["energy"]) <= 0.0
+            energy_exhausted
             or float(human["body_water_kg"]) <= max(1e-6, float(effective_profile["water_capacity_kg"]) * float(profile["min_water_fraction"]))
             or body_mass <= float(effective_profile["min_dry_mass_kg"])
             or float(human.get("injury", 0.0)) >= HUMAN_INJURY_DEATH_THRESHOLD
             or int(human["age_ticks"]) >= int(profile["max_age_ticks"])
         )
         if dead:
-            if float(human["energy"]) <= 0.0:
+            if energy_exhausted:
                 death_cause = "energy"
             elif float(human["body_water_kg"]) <= max(1e-6, float(effective_profile["water_capacity_kg"]) * float(profile["min_water_fraction"])):
                 death_cause = "dehydration"
