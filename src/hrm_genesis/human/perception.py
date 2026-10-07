@@ -41,7 +41,7 @@ def perceive_local(
                 "water_kg": round(float(m["surface_water_kg"]) + float(m["soil_water_kg"]), 10),
                 "woody_kg": round(sum(float(v) for v in p.get("woody_elements_kg", {}).values()), 10),
                 "rock_exposure": round(float(w.get("rock_exposure", 0.0)), 10),
-                "natural_shelter": round(float(w.get("natural_shelter", 0.0)), 10),
+                "terrain_cover": round(float(w.get("terrain_cover", 0.0)), 10),
             }
         )
     recognized = []
