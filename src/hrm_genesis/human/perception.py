@@ -42,6 +42,7 @@ def perceive_local(
                 "woody_kg": round(sum(float(v) for v in p.get("woody_elements_kg", {}).values()), 10),
                 "rock_exposure": round(float(w.get("rock_exposure", 0.0)), 10),
                 "terrain_cover": round(float(w.get("terrain_cover", 0.0)), 10),
+                "temperature": round(float(w.get("temperature", 22.0)), 10),
             }
         )
     recognized = []
@@ -51,4 +52,17 @@ def perceive_local(
         px, py = int(peer["x"]), int(peer["y"])
         if abs(px - x) + abs(py - y) <= 1:
             recognized.append(str(peer["id"]))
-    return {"origin": [x, y], "cells": observations, "recognized": sorted(recognized)}
+    origin_cell = next(cell for cell in observations if int(cell["x"]) == x and int(cell["y"]) == y)
+    ambient = float(origin_cell.get("temperature", 22.0))
+    if ambient >= 36.0:
+        context = "hot"
+    elif ambient <= 8.0:
+        context = "cold"
+    else:
+        context = "mild"
+    return {
+        "origin": [x, y],
+        "cells": observations,
+        "recognized": sorted(recognized),
+        "context": context,
+    }
