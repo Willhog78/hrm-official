@@ -10,8 +10,9 @@ from hrm_genesis.matter.pools import total_elements, total_water
 from hrm_genesis.observer import observe_genesis
 
 
-YEARS = 5
+YEARS = 1
 TICKS_PER_YEAR = 365
+REPORT_INTERVAL_DAYS = 30
 
 
 def combined_element_errors(sim: GenesisSimulation) -> dict[str, float]:
@@ -128,13 +129,17 @@ def main() -> int:
     reports = [summarize(sim, 0)]
     print("LONG_RUN_YEAR:", json.dumps(reports[-1], sort_keys=True), flush=True)
 
-    for year in range(1, YEARS + 1):
-        sim.run(TICKS_PER_YEAR)
-        report = summarize(sim, year)
+    day = 0
+    while day < YEARS * TICKS_PER_YEAR:
+        step = min(REPORT_INTERVAL_DAYS, YEARS * TICKS_PER_YEAR - day)
+        sim.run(step)
+        day += step
+        report = summarize(sim, round(day / TICKS_PER_YEAR, 6))
+        report["day"] = day
         reports.append(report)
-        print("LONG_RUN_YEAR:", json.dumps(report, sort_keys=True), flush=True)
+        print("LONG_RUN_CHECKPOINT:", json.dumps(report, sort_keys=True), flush=True)
         if report["humans"] == 0:
-            print("LONG_RUN_EXTINCTION_YEAR:", year, flush=True)
+            print("LONG_RUN_EXTINCTION_DAY:", day, flush=True)
             break
 
     integrity = {
@@ -148,7 +153,7 @@ def main() -> int:
     final = reports[-1]
     outcome = {
         "planned_years": YEARS,
-        "completed_years": int(final["year"]),
+        "completed_years": float(final["year"]),
         "human_outcome": "surviving" if int(final["humans"]) > 0 else "extinct",
         "final_humans": int(final["humans"]),
         "births": int(final["births_cumulative"]),
