@@ -4,6 +4,7 @@ from copy import deepcopy
 
 from hrm_coordination.seeds import SeedBank
 from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
+from hrm_genesis.ecology.traits import trait_for
 
 from .actions import execute_live_sequence
 from .learning import update_contextual_expectations, update_expectations
@@ -422,6 +423,33 @@ def _apply_physiology(
     human["core_temperature_c"] = 37.0 + max(-2.5, min(2.5, (ambient - 22.0) * 0.03))
 
 
+
+def _apply_predator_threat(human: dict, consumer_state: dict | None) -> int:
+    if not consumer_state:
+        return 0
+    xy = (int(human["x"]), int(human["y"]))
+    attackers = []
+    for animal in consumer_state.get("animals", []):
+        traits = trait_for(str(animal["species"]))
+        if traits.trophic_role != "predator":
+            continue
+        if (int(animal["x"]), int(animal["y"])) != xy:
+            continue
+        if float(animal["energy"]) >= traits.reproduction_energy * 2.0:
+            continue
+        attackers.append(animal)
+
+    if not attackers:
+        return 0
+
+    body_mass = _mass(human["body_elements_kg"]) + float(human["body_water_kg"])
+    juvenile_scale = max(0.25, min(1.0, body_mass / 70.0))
+    vulnerability = 1.0 / juvenile_scale
+    injury_gain = min(0.45, len(attackers) * 0.08 * vulnerability)
+    human["injury"] = min(1.5, float(human.get("injury", 0.0)) + injury_gain)
+    return len(attackers)
+
+
 def evolve_humans(
     human_state: dict,
     producer_state: dict,
@@ -431,6 +459,7 @@ def evolve_humans(
     *,
     cognition_enabled: bool = False,
     actions_enabled: bool = False,
+    consumer_state: dict | None = None,
 ) -> tuple[dict, dict, dict]:
     humans = deepcopy(human_state)
     producers = deepcopy(producer_state)
@@ -487,6 +516,9 @@ def evolve_humans(
         ate = _eat(human, pcells[xy], effective_profile)
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
         _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
+        attacks = _apply_predator_threat(human, consumer_state)
+        if attacks:
+            humans["predator_attack_events"] = int(humans.get("predator_attack_events", 0)) + attacks
         loss = min(float(human["body_water_kg"]), float(effective_profile["water_loss_per_tick_kg"]))
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
