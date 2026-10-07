@@ -42,7 +42,7 @@ def build_grid(width: int, height: int, seed_bank: SeedBank) -> list[dict[str, f
                     "precipitation": 0.0,
                     "terrain_relief": 0.0,
                     "rock_exposure": 0.0,
-                    "natural_shelter": 0.0,
+                    "terrain_cover": 0.0,
                 }
             )
 
@@ -58,7 +58,7 @@ def build_grid(width: int, height: int, seed_bank: SeedBank) -> list[dict[str, f
         relief_factor = min(1.0, relief / 28.0)
         rock_exposure = min(1.0, 0.35 * elevation_factor + 0.65 * relief_factor)
 
-        # Natural shelter is terrain-derived, not independently scattered.
+        # Terrain cover is terrain-derived, not independently scattered.
         # Strong relief plus exposed rock can create cave/overhang-like shelter.
         shelter = 0.0
         if rock_exposure >= 0.58 and relief >= 12.0:
@@ -66,7 +66,7 @@ def build_grid(width: int, height: int, seed_bank: SeedBank) -> list[dict[str, f
 
         cell["terrain_relief"] = round(relief, 6)
         cell["rock_exposure"] = round(rock_exposure, 6)
-        cell["natural_shelter"] = round(max(0.0, shelter), 6)
+        cell["terrain_cover"] = round(max(0.0, shelter), 6)
 
     return cells
 
