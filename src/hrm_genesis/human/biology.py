@@ -72,7 +72,6 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
                 "fatigue": 0.0,
                 "injury": 0.0,
                 "core_temperature_c": 37.0,
-        "held_material_elements_kg": _blank_elements(),
                 "held_material_elements_kg": _blank_elements(),
             }
         if population_id is not None:
@@ -255,6 +254,7 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
         "fatigue": 0.0,
         "injury": 0.0,
         "core_temperature_c": 37.0,
+        "held_material_elements_kg": _blank_elements(),
         **(
             {
                 "population_id": mother["population_id"],
@@ -542,6 +542,10 @@ def evolve_humans(
         human["body_elements_kg"] = {
             s: round(max(0.0, float(v)), 10)
             for s, v in sorted(human["body_elements_kg"].items())
+        }
+        human["held_material_elements_kg"] = {
+            s: round(max(0.0, float(v)), 10)
+            for s, v in sorted(human.get("held_material_elements_kg", {}).items())
         }
     for cell in humans["remains_cells"]:
         cell["water_kg"] = round(max(0.0, float(cell["water_kg"])), 10)
