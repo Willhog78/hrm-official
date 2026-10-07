@@ -80,7 +80,7 @@ SPECIES: dict[str, ConsumerTraits] = {
     ),
     "stalker": ConsumerTraits(
         species="stalker",
-        perception_radius=3,
+        perception_radius=6,
         movement_cost=0.34,
         basal_cost=0.30,
         bite_fraction=0.0,
