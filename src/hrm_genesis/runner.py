@@ -160,7 +160,7 @@ class GenesisSimulation:
                 producer_state,
                 matter_state,
             )
-            if config.agentus_thirst_enabled:
+            if config.thirst_planning_active:
                 human_state = dict(human_state)
                 human_state["thirst_planning"] = True
             if config.agentus_capacities_enabled:

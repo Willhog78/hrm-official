@@ -30,8 +30,10 @@ class GenesisConfig:
     # manipulation or capture) and "no_recall" (no travel toward remembered
     # food).
     agentus_capacity_ablation: str = ""
-    # Thirst as an interoceptive planning drive (G10.4). Off by default.
-    agentus_thirst_enabled: bool = False
+    # Thirst as an interoceptive planning drive (G10.4 baseline correction).
+    # On by default wherever Agentus cognition is enabled; set False only to
+    # reproduce pre-G10.4 results, whose fingerprints omit this key.
+    agentus_thirst_enabled: bool = True
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -72,10 +74,13 @@ class GenesisConfig:
             raise ValueError("unknown agentus_capacity_ablation")
         if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
             raise ValueError("agentus_capacity_ablation requires agentus_capacities_enabled")
-        if self.agentus_thirst_enabled and not self.human_cognition_enabled:
-            raise ValueError("agentus_thirst_enabled requires human_cognition_enabled")
         if self.multi_population_enabled and not self.human_actions_enabled:
             raise ValueError("multi_population_enabled requires human_actions_enabled")
+
+    @property
+    def thirst_planning_active(self) -> bool:
+        """Thirst needs a planner to act on; it is inert without cognition."""
+        return self.agentus_thirst_enabled and self.human_cognition_enabled
 
     @property
     def contract_dt(self) -> Fraction:
@@ -108,7 +113,7 @@ class GenesisConfig:
             canonical["agentus_capacity_model"] = "capacity-v2"
         if self.agentus_capacity_ablation:
             canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
-        if self.agentus_thirst_enabled:
+        if self.thirst_planning_active:
             canonical["agentus_thirst_enabled"] = True
         return canonical
 

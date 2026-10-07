@@ -71,12 +71,28 @@ def test_interoception_reports_days_of_reserve_and_recalls_only_unseen_places():
     assert perception["remembered_water"] == [[5, 5, 900.0, 2]]
 
 
-def test_flag_is_versioned_and_inert_when_off():
+def test_thirst_is_baseline_and_opt_out_reproduces_earlier_fingerprints():
     kwargs = dict(master_seed="t", world_width=8, world_height=8, producer_ecology_enabled=True,
                   consumer_ecology_enabled=True, human_biology_enabled=True, human_cognition_enabled=True)
-    off = GenesisConfig(**kwargs)
-    on = GenesisConfig(**kwargs, agentus_thirst_enabled=True)
-    assert "agentus_thirst_enabled" not in off.canonical()
-    assert on.fingerprint() != off.fingerprint()
-    assert "thirst_planning" not in GenesisSimulation(off).human_state()
-    assert GenesisSimulation(on).human_state()["thirst_planning"] is True
+    baseline = GenesisConfig(**kwargs)
+    earlier = GenesisConfig(**kwargs, agentus_thirst_enabled=False)
+    assert baseline.canonical()["agentus_thirst_enabled"] is True
+    assert "agentus_thirst_enabled" not in earlier.canonical()
+    assert baseline.fingerprint() != earlier.fingerprint()
+    assert GenesisSimulation(baseline).human_state()["thirst_planning"] is True
+    assert "thirst_planning" not in GenesisSimulation(earlier).human_state()
+    # Without cognition there is no planner to feel thirst; nothing changes.
+    no_mind = dict(kwargs, human_cognition_enabled=False)
+    assert "agentus_thirst_enabled" not in GenesisConfig(**no_mind).canonical()
+
+
+def test_starving_agent_still_moves_to_a_cell_with_both_water_and_food():
+    """Regression (seed b): adults at the energy floor stayed on a dry food cell
+    because hunger looked more urgent, although the neighbour offered both."""
+    cells = [
+        {"x": 1, "y": 1, "food_kg": 5060.0, "water_kg": 0.0},
+        {"x": 1, "y": 2, "food_kg": 669.0, "water_kg": 39686.0},
+        {"x": 2, "y": 1, "food_kg": 4251.0, "water_kg": 0.0},
+    ]
+    perception = _perception(cells, energy_reserve_fraction=0.01, water_need_kg=17.9, hydration_days=2.2, energy_days=0.1)
+    assert choose_destination({}, perception, {}) == (1, 2)

@@ -54,11 +54,22 @@ def _thirst_destination(
     here = next(c for c in perception["cells"] if (int(c["x"]), int(c["y"])) == (ox, oy))
     if float(here["water_kg"]) >= need:
         return None
+    wet = [c for c in perception["cells"] if float(c["water_kg"]) >= need]
+    # A visible cell that offers both today's water and today's food satisfies
+    # hunger and thirst at once; hunger has no reason to hold the agent back.
+    wet_and_fed = [c for c in wet if _food(c) >= forage_need]
+    if wet_and_fed:
+        best = min(wet_and_fed, key=lambda c: (
+            abs(int(c["x"]) - ox) + abs(int(c["y"]) - oy), -float(c["water_kg"]), int(c["y"]), int(c["x"]),
+        ))
+        return int(best["x"]), int(best["y"])
+
+    # Otherwise going for water would cost the day's food. If starvation is
+    # closer than dehydration, the hunger rules decide.
     hungry = forage_need > 0.0 and reserve_fraction < 0.75
     if hungry and float(perception.get("energy_days", 1e9)) < float(perception.get("hydration_days", 0.0)):
         return None
 
-    wet = [c for c in perception["cells"] if float(c["water_kg"]) >= need]
     if wet:
         best = min(wet, key=lambda c: (
             0 if _food(c) >= forage_need else 1,

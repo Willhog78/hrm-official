@@ -40,9 +40,11 @@ NULL_ABLATION = "plant_diet+no_interactions+no_recall"
 
 
 def config_for(seed: str, arm: str) -> GenesisConfig:
-    """`arm` is a base arm, optionally suffixed `+thirst` (G10.4 thirst drive)."""
-    thirst = arm.endswith("+thirst")
-    arm = arm.removesuffix("+thirst")
+    """`arm` is a base arm. Thirst is the G10.4 baseline; suffix `-nothirst`
+    reproduces the pre-G10.4 planner. The older `+thirst` suffix is accepted
+    and means the baseline."""
+    thirst = not arm.endswith("-nothirst")
+    arm = arm.removesuffix("-nothirst").removesuffix("+thirst")
     if arm not in ARMS:
         raise ValueError(f"unknown arm: {arm}")
     return GenesisConfig(

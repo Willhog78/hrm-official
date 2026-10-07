@@ -1,10 +1,10 @@
 # G10.4 — Survival bottlenecks: thirst, physical hunting, delayed credit, observation
 
-G10.3 added abilities but did not show learned technology or a sustainable population. This phase works on the bottlenecks that evidence identified, in order of impact. Every causal change is behind versioned configuration, and with all flags off, ledgers match `main` exactly.
+G10.3 added abilities but did not show learned technology or a sustainable population. This phase works on the bottlenecks that evidence identified, in order of impact. Every causal change is versioned. With thirst opted out and capacities off, ledgers match the pre-G10.4 `main` exactly.
 
 | # | Change | Kind | Switch |
 |---|---|---|---|
-| 1 | Thirst as a planning drive | Implementation repair: the body had a need its decisions could not see | `agentus_thirst_enabled` |
+| 1 | Thirst as a planning drive | **Baseline correction**: the body had a need its decisions could not see | On by default with cognition; `agentus_thirst_enabled=False` reproduces pre-G10.4 |
 | 2 | Animal population diagnosis | Diagnosis only; no ecology change | — |
 | 3 | Physical approach and contact before capture | Capacity correction (removes an unearned opportunity) | `capacity-v2` |
 | 4 | Delayed credit through object history; warmth as reward | Cognition extension | `capacity-v2` |
@@ -12,7 +12,17 @@ G10.3 added abilities but did not show learned technology or a sustainable popul
 
 The capacity model version is now `capacity-v2`. G10.3 evidence remains tied to its recorded commits.
 
-## 1. Thirst
+## 1. Thirst (baseline correction)
+
+Thirst is a normal biological signal, not a solution handed to Agentus. It is therefore part of the baseline, not an experimental arm. It is on by default wherever Agentus cognition is enabled, and the canonical config records it (`agentus_thirst_enabled: true`). Setting it to `False` restores the earlier planner and its earlier fingerprints, for reproducing old results only.
+
+Validation is limited to implementation sanity (`experiments/genesis/run_thirst_sanity.py`):
+- thirst competes with hunger rather than overriding it;
+- it uses only perceived or remembered water;
+- dehydration deaths drop for the right reason;
+- no new pathological behaviour appears.
+
+It is not tested as an open research question.
 
 **Diagnosis (v0, seed A).** Every adult dehydration death followed 5 or more days standing on a cell with **0 kg** of water, while an adjacent cell held **30–68 t**. Most of these adults had full energy reserves, so the hunger rule never fired. The default score weighted water at 0.002 per kg and food dominated.
 
