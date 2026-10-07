@@ -44,6 +44,7 @@ class Scenario:
         thirst: bool = True,
         physiology: str = "reference-v1",
         cognition: bool = True,
+        integrity: bool = True,
     ) -> None:
         config = GenesisConfig(
             master_seed=seed, world_width=max(2, width), world_height=max(2, height), ticks_per_year=365,
@@ -51,7 +52,7 @@ class Scenario:
             human_cognition_enabled=cognition, human_actions_enabled=capacities or cognition,
             material_scale_factor=1000.0, human_calibration_enabled=True,
             agentus_capacities_enabled=capacities, agentus_thirst_enabled=thirst,
-            agentus_physiology_version=physiology,
+            agentus_physiology_version=physiology, agentus_behavior_integrity_enabled=integrity,
         )
         sim = GenesisSimulation(config)
         self.config = config

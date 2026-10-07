@@ -53,9 +53,10 @@ def test_evaluate_turns_broken_invariants_into_failures():
         "conservation": {"element_rel_error": 1e-3, "water_rel_error": 0.0, "lithic_abs_error_kg": None},
         "observer": {"FAIL_duplicate_kill": 1, "interactions": 10, "exploited_noops": 1},
         "max_interactions_per_agent_day": 9, "hunting": {"captures": 0},
+        "max_noop_habit_repeats": 12, "noop_habits": {"a|k": 12},
         "death_context": {"dehydration|adult|water_visible": 1}, "founders": 8, "alive_min": 8,
         "fatigue_blocked_share": 0.0,
     }
     fails = " ".join(evaluate(run)["fail"])
-    for needle in ("ledger", "non_finite", "element balance", "duplicate_kill", "budget", "no-op", "water-seeking"):
+    for needle in ("ledger", "non_finite", "element balance", "duplicate_kill", "budget", "superstition", "water-seeking"):
         assert needle in fails, needle

@@ -3,6 +3,11 @@ from __future__ import annotations
 from .learning import contextual_expectation_for, expectation_for
 
 
+# G10.6 giving-up level: a patch yielding less than this fraction of the daily
+# need is left to explore (declared; cf. giving-up density in foraging theory).
+PARTIAL_FOOD_GIVING_UP = 0.25
+
+
 def _food(cell: dict) -> float:
     """The agent's own estimate of edible food in a cell.
 
@@ -138,6 +143,20 @@ def choose_destination(
             step = _step_toward((ox, oy), (tx, ty), perception["cells"])
             if step is not None:
                 return step
+
+    if hungry_local_failure and perception.get("partial_food_anchor"):
+        # G10.6: food that is physically here or in view is not abandoned just
+        # because it cannot cover a whole day. Go to (or stay at) the richest
+        # visible cell unless it is below the giving-up level, a declared
+        # fraction of daily need; only then explore.
+        worth = [cell for cell in perception["cells"] if _food(cell) >= PARTIAL_FOOD_GIVING_UP * forage_need]
+        if worth:
+            best = max(worth, key=lambda cell: (
+                _food(cell),
+                -abs(int(cell["x"]) - ox) - abs(int(cell["y"]) - oy),
+                -int(cell["y"]), -int(cell["x"]),
+            ))
+            return int(best["x"]), int(best["y"])
 
     if hungry_local_failure:
         episodes = cognition.get("memory", {}).get("episodes", [])

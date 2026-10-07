@@ -33,6 +33,11 @@ HUMAN_COMFORT_TEMPERATURE_C = 22.0
 HUMAN_THERMAL_TOLERANCE_C = 14.0
 HUMAN_FATIGUE_MOVE_GAIN = 0.08
 HUMAN_FATIGUE_REST_RECOVERY = 0.04
+# G10.6: a night's sleep removes a fraction of the day's fatigue whether or not
+# the agent walked, so ordinary daily walking reaches a steady state
+# (0.08 x 0.75 / 0.25 = 0.24) instead of saturating. Declared values.
+HUMAN_FATIGUE_SLEEP_RECOVERY_MOVED = 0.25
+HUMAN_FATIGUE_SLEEP_RECOVERY_RESTED = 0.40
 HUMAN_HEALING_PER_TICK = 0.03
 HUMAN_INJURY_DEATH_THRESHOLD = 1.0
 
@@ -523,6 +528,17 @@ def _experienced_reward(
 
 
 
+def _one_step_toward(origin: tuple[int, int], target: tuple[int, int]) -> tuple[int, int]:
+    """One grid cell toward target (x first, then y). Both lie on the grid, so
+    every intermediate cell does too."""
+    (ox, oy), (tx, ty) = origin, target
+    if ox != tx:
+        return (ox + (1 if tx > ox else -1), oy)
+    if oy != ty:
+        return (ox, oy + (1 if ty > oy else -1))
+    return origin
+
+
 def _apply_physiology(
     human: dict,
     world_cell: dict,
@@ -530,6 +546,7 @@ def _apply_physiology(
     profile: dict | None = None,
     producer_cell: dict | None = None,
     insulation_c: float = 0.0,
+    sleep_recovery: bool = False,
 ) -> None:
     """Apply bounded fatigue, thermoregulation cost, injury, and healing."""
     profile = profile or physiology_profile(calibrated=False, ticks_per_year=120)
@@ -555,7 +572,11 @@ def _apply_physiology(
     excess = max(0.0, thermal_delta - HUMAN_THERMAL_TOLERANCE_C)
 
     fatigue = float(human.get("fatigue", 0.0))
-    if moved:
+    if sleep_recovery:
+        load = HUMAN_FATIGUE_MOVE_GAIN if moved else 0.0
+        recovery = HUMAN_FATIGUE_SLEEP_RECOVERY_MOVED if moved else HUMAN_FATIGUE_SLEEP_RECOVERY_RESTED
+        fatigue = min(1.0, fatigue + load) * (1.0 - recovery)
+    elif moved:
         fatigue = min(1.0, fatigue + HUMAN_FATIGUE_MOVE_GAIN)
     else:
         fatigue = max(0.0, fatigue - HUMAN_FATIGUE_REST_RECOVERY)
@@ -687,7 +708,18 @@ def evolve_agentus_step(
     births = []
     fed_ids = set()
     people_by_id = {str(person["id"]): person for person in humans["humans"]}
-    for human in sorted(humans["humans"], key=lambda h: h["id"]):
+    integrity = bool(humans.get("behavior_integrity"))
+    # Where everyone stood at the start of the tick: a dependent is carried only
+    # if it was with its caregiver before the caregiver moved.
+    start_xy = {str(p["id"]): (int(p["x"]), int(p["y"])) for p in humans["humans"]}
+    if integrity:
+        # Caregivers act before their dependents, so a carried child ends the
+        # day wherever its caregiver walked, and is nursed after she has eaten.
+        order = sorted(humans["humans"], key=lambda h: (
+            float(_age_profile(h, profile).get("caregiver_dependence", 0.0)) > 0.0, h["id"]))
+    else:
+        order = sorted(humans["humans"], key=lambda h: h["id"])
+    for human in order:
         origin = (int(human["x"]), int(human["y"]))
         effective_profile = _age_profile(human, profile)
         start_energy = float(human["energy"])
@@ -697,6 +729,9 @@ def evolve_agentus_step(
         dependence = float(effective_profile.get("caregiver_dependence", 0.0))
         if dependence > 0.0 and caregiver is not None:
             target = (int(caregiver["x"]), int(caregiver["y"]))
+            if integrity and origin != start_xy.get(str(caregiver["id"]), target):
+                # Not being carried: a separated dependent covers one cell a day.
+                target = _one_step_toward(origin, target)
             perception = None
         elif cognition_enabled:
             perception = perceive_local(
@@ -721,6 +756,8 @@ def evolve_agentus_step(
             )
             if humans.get("thirst_planning"):
                 _add_interoception(perception, human, effective_profile, profile)
+            if integrity:
+                perception["partial_food_anchor"] = True
             if capacities:
                 scale = max(0.10, float(effective_profile.get("development_scale", 1.0)))
                 extend_perception_with_materials(
@@ -799,10 +836,11 @@ def evolve_agentus_step(
             _apply_physiology(
                 human, wcells[xy], moved, effective_profile, pcells[xy],
                 insulation_c=cap.insulation_c(humans, str(human["id"])),
+                sleep_recovery=integrity,
             )
             cap.credit_worn_benefit(humans, human, float(human.pop("insulation_saving_kcal", 0.0)), effective_profile)
         else:
-            _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
+            _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy], sleep_recovery=integrity)
         attacks = _apply_predator_threat(human, consumer_state)
         if attacks:
             humans["predator_attack_events"] = int(humans.get("predator_attack_events", 0)) + attacks

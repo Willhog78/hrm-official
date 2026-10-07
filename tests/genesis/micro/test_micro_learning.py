@@ -104,10 +104,6 @@ def test_a_world_without_payoffs_teaches_no_positive_habits():
     assert not sc.humans["capacity_stats"].get("exploit_by_key"), "repeated an action that never paid"
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "Suspected defect (pre-existing): a sated agent in a uniform rich world moves on most days; "
-    "fatigue gains 0.08 per move and recovers 0.04 per rest, saturates at 1.0, and interactions "
-    "stop above 0.8. In production v1 runs 30-50% of agent-days are above 0.8."))
 def test_a_sated_agent_stays_rested_enough_to_explore():
     sc = Scenario(capacities=True, width=3)
     sc.set_agent(1, 0)
@@ -115,3 +111,20 @@ def test_a_sated_agent_stays_rested_enough_to_explore():
     sc.step(150)
     assert float(sc.agent["fatigue"]) <= 0.8
     assert sum(sc.humans["capacity_stats"]["interaction_counts"].values()) > 0
+
+
+def test_daily_walking_reaches_a_steady_fatigue_well_below_the_block():
+    from hrm_genesis.human.biology import _apply_physiology
+    sc = Scenario()
+    a = sc.agent
+    for _ in range(200):
+        _apply_physiology(a, sc.world["cells"][0], True, sc.profile, sleep_recovery=True)
+    assert 0.2 < a["fatigue"] < 0.3  # 0.08 x 0.75 / 0.25 = 0.24
+
+
+def test_pre_g10_6_fatigue_saturation_is_reproduced_with_integrity_off():
+    sc = Scenario(capacities=True, width=3, integrity=False)
+    sc.set_agent(1, 0)
+    _barren_but_rich_in_materials(sc)
+    sc.step(150)
+    assert float(sc.agent["fatigue"]) > 0.8

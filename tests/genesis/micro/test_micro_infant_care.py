@@ -7,8 +7,9 @@ import pytest
 from _scenario import Scenario, el
 
 
-def _family(physiology: str = "reference-v1", mother_energy: float | None = None, infant_age: int = 60, distance: int = 0):
-    sc = Scenario(physiology=physiology, width=5)
+def _family(physiology: str = "reference-v1", mother_energy: float | None = None, infant_age: int = 60, distance: int = 0,
+            integrity: bool = True):
+    sc = Scenario(physiology=physiology, width=5, integrity=integrity)
     mother = sc.set_agent(0, 0, sex="female")
     if mother_energy is not None:
         mother["energy"] = mother_energy
@@ -63,16 +64,33 @@ def test_caregiver_elsewhere_does_not_nurse():
     assert infant["energy"] == e0, "nursed across cells"
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "KNOWN MODEL QUIRK (micro tier, 2026-10-07): a dependent child moves straight "
-    "to its caregiver's cell however far away it is (no one-step limit). Latent "
-    "in live runs, where caregiver and child are never more than one cell apart."))
 def test_dependent_child_moves_at_most_one_cell_per_day():
-    sc, _ = _family(distance=2)
+    """G10.6: a separated dependent walks toward its caregiver one cell a day."""
+    sc, infant = _family(distance=3)
+    infant["energy"] = 5000.0  # enough reserve to survive three days apart
     sc.set_pool(0, 0, "plant_elements_kg", 50000.0)
     sc.step(1)
-    infant = _infant(sc)
-    assert abs(infant["x"] - 2) <= 1, f"child jumped from x=2 to x={infant['x']} in one day"
+    assert _infant(sc)["x"] == 2, f"child moved from x=3 to x={_infant(sc)['x']} in one day"
+    sc.step(2)
+    assert _infant(sc)["x"] == 0 and _infant(sc)["caregiver_present"] is True
+
+
+def test_a_carried_child_ends_the_day_where_its_caregiver_walked():
+    sc, infant = _family()
+    infant["energy"] = 5000.0
+    sc.set_pool(2, 0, "plant_elements_kg", 50000.0)  # food only to the east: the mother walks
+    sc.agent["energy"] = 0.5 * float(sc.profile["energy_capacity_kcal"])  # hungry, viable
+    for _ in range(4):
+        sc.step(1)
+        assert (_infant(sc)["x"], _infant(sc)["y"]) == sc.xy, "carried child left behind"
+    assert sc.xy != (0, 0), "scenario did not make the mother walk"
+
+
+def test_pre_g10_6_teleport_is_reproduced_with_integrity_off():
+    sc, _ = _family(distance=3, integrity=False)
+    sc.set_pool(0, 0, "plant_elements_kg", 50000.0)
+    sc.step(1)
+    assert _infant(sc)["x"] == 0
 
 
 def _scarce_daily_food(sc, kg_per_day: float, days: int):

@@ -58,12 +58,6 @@ def test_unknown_seed_is_tasted_survived_and_learned_then_eaten():
     assert eaten > 0.1, f"learned seeds are food but ate only {eaten:.3f} kg"
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "KNOWN MODEL DEFECT (micro tier, 2026-10-07): when the only reachable food "
-    "yields less than a day's need (e.g. seeds at 0.45 kg/day by hand), the "
-    "hungry-exploration rule moves the agent to an empty neighbour before it "
-    "eats, and it starves beside known food. Not fixed here; needs a design "
-    "decision on whether partial food anchors a hungry agent."))
 def test_partial_food_is_not_abandoned_for_empty_ground():
     sc = Scenario(capacities=True)
     _hungry(sc, 0, 0)
@@ -71,6 +65,34 @@ def test_partial_food_is_not_abandoned_for_empty_ground():
     sc.set_pool(0, 0, "seed_elements_kg", 200.0)
     sc.step()
     assert sc.xy == (0, 0), f"left the only food for empty ground: {sc.xy}"
+
+
+def test_hungry_agent_moves_to_richer_visible_partial_food():
+    sc = Scenario(capacities=True)
+    _hungry(sc, 0, 0)
+    sc.agent["cognition"]["food_values"]["seed"] = 2790.0
+    sc.set_pool(0, 0, "seed_elements_kg", 0.05)   # almost nothing here
+    sc.set_pool(1, 0, "seed_elements_kg", 200.0)  # a real patch in view
+    sc.step()
+    assert sc.xy == (1, 0)
+
+
+def test_a_trickle_below_the_giving_up_level_is_left_to_explore():
+    sc = Scenario(capacities=True)
+    _hungry(sc, 0, 0)
+    sc.agent["cognition"]["food_values"]["seed"] = 2790.0
+    sc.set_pool(0, 0, "seed_elements_kg", 0.02)
+    sc.step()
+    assert sc.xy != (0, 0)
+
+
+def test_pre_g10_6_abandonment_is_reproduced_with_integrity_off():
+    sc = Scenario(capacities=True, integrity=False)
+    _hungry(sc, 0, 0)
+    sc.agent["cognition"]["food_values"]["seed"] = 2790.0
+    sc.set_pool(0, 0, "seed_elements_kg", 200.0)
+    sc.step()
+    assert sc.xy != (0, 0)
 
 
 def test_fresh_meat_without_prior_knowledge_is_learned_only_by_tasting():

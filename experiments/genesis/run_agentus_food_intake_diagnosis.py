@@ -139,9 +139,9 @@ def instrumented(recorder: Recorder):
         }
         return consumed
 
-    def physiology(human, world_cell, moved, profile=None, producer_cell=None):
+    def physiology(human, world_cell, moved, profile=None, producer_cell=None, **kwargs):
         energy_before = float(human["energy"])
-        originals["physiology"](human, world_cell, moved, profile, producer_cell)
+        originals["physiology"](human, world_cell, moved, profile, producer_cell, **kwargs)
         dependence = float((profile or {}).get("caregiver_dependence", 0.0))
         move_cost = 0.0
         if moved:
