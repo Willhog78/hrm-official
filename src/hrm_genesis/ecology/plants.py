@@ -203,11 +203,15 @@ def evolve_producers(
         seed_mass = _mass(pcell["seed_elements_kg"])
         if seed_mass >= GERMINATION_SEED_MASS_KG and min(light, temp, water) > 0.28:
             fraction = min(1.0, GERMINATION_SEED_MASS_KG / seed_mass)
+            established = _live_mass(pcell)
             moved = _transfer_fraction(pcell["seed_elements_kg"], fraction)
             for symbol, amount in moved.items():
                 pcell["plant_elements_kg"][symbol] += amount
-            if _mass(pcell["plant_elements_kg"]) > 0:
-                pcell["age_ticks"] = 0
+            # Cell age is the biomass-weighted age of its vegetation: seedlings
+            # enter at age 0 without rejuvenating established plants.
+            total = _live_mass(pcell)
+            if total > 0.0:
+                pcell["age_ticks"] = int(round(int(pcell["age_ticks"]) * established / total))
 
     # 3. Existing biomass grows by consuming Matter pools and water.
     for xy, pcell in pcells.items():

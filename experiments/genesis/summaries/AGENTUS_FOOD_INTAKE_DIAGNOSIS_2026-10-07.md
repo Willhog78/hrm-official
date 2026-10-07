@@ -2,7 +2,7 @@
 
 This is a measurement-only experiment. No resource quantities, physiology calibration, ecology constants, or agent behavior were changed. It reruns the four seeds and 730 days from `AGENTUS_SURVIVAL_DIAGNOSIS_2026-10-07.md` at the corrected code (`d7bfbcc`).
 
-**Result:** the Agentus collapse comes from how food is produced, not from how agents eat or move. Producer biomass grows purely exponentially with a long net-negative winter. Agentus feeding at the seasonal low point suppresses the next season roughly tenfold. By the second winter, almost no edible food remains anywhere on the map. Physiology then leaves almost no margin to bridge the gap.
+**Result:** two separate failures, both of which matter. First-year adult deaths (days 102–175) are mainly behavioral: food adequate for a day was within 3 steps for 8 of 14 agents, and their local search did not reach it. Later deaths (days 355–439) are actual shortage: in half of them no cell on the map held a day's food. That shortage traces to plant lifecycle defects, namely exponential growth with a long net-negative winter, the germination age reset, and fixed-mass germination at the scaled world size. Physiology leaves little margin to bridge either failure. These are model defects. They are not grounds for changing Agentus physiology.
 
 ## Method
 
@@ -63,7 +63,7 @@ Edible stock, map-wide (kg):
 | C | 666 / 2,110 | 3,955 / 35,384 | 17 / 2,331 | 2,643 |
 | D | 478 / 1,927 | 2,833 / 24,471 | 28 / 1,491 | 2,274 |
 
-Agentus intake is 8–11% of gross plant growth over two years. However, the gap between the two runs grows from about 0.6 × cumulative intake at day 60 to about 1.1× at day 120 and about 10–12× at day 300.
+Agentus intake is 8–11% of gross plant growth over two years. The edible-stock gap between the two runs grows from about 0.6× cumulative intake at day 60 to about 1.1× at day 120 and about 10–12× at day 300. **This compares whole trajectories. It is not a verified marginal conversion rate** (kg lost later per kg eaten). The no-Agentus run also starts with 216 kg more plant material, because founder bodies are not debited from plants. Trajectories also differ in where biomass is removed and when cells empty. A verified marginal rate would need matched removal experiments.
 
 At the winter minimum, about 8 adults eat 1–2% of the standing stock per day while plants are already losing 3–5% per day. Every kilogram removed then would have compounded through the growing season. The year-1 summer peak never recovers. Second-winter minimum stock is 12–27 kg map-wide, with 0–2 cells holding one adult-day of food.
 
@@ -88,9 +88,9 @@ Adult deaths came in two waves:
 
 ## Conclusions
 
-1. **Main driver:** the dominant cause of collapse is the producer model's seasonal dynamics combined with harvest at the seasonal minimum. No foraging change can supply food that does not exist in the second winter.
+1. **Shortage deaths:** second-winter deaths follow the producer model's seasonal dynamics combined with feeding near the seasonal minimum. No foraging change can supply food that does not exist.
 2. **Physiology margin:** the bite cap and reserve size leave no capacity to bank food against a shortage of more than about 30 days. Nursing consumes almost the whole surplus.
-3. **Behavior:** this matters only for the first wave. Food within 3 steps went unreached in 8 of 14 first-wave deaths.
+3. **Behavioral deaths:** behavior is the main factor in the first wave. Food within 3 steps went unreached in 8 of 14 deaths, so this is a separate defect, not a side issue.
 4. **Ruled out:** movement cost, thermal cost, animal grazing, and soil nutrient or water limits are not material.
 
 ## Decisions required before further changes (not made here)
@@ -115,3 +115,6 @@ PYTHONPATH=src:. python3 experiments/genesis/run_producer_breakeven_sampling.py 
 - `tests/genesis/test_food_intake_diagnosis.py`: 2 passed. These cover wrapper read-only behavior and restore, and adult energy budget closure.
 
 Sustainable-survival qualification remains blocked.
+
+
+**Follow-up:** see `AGENTUS_PLANT_LIFECYCLE_CORRECTIONS_2026-10-07.md` for the germination age and seed turnover corrections, rerun under the same fixed resources and physiology.

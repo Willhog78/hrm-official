@@ -466,8 +466,8 @@ def aggregate(results: list[dict], counterfactual: list[dict]) -> dict:
     deaths = [d for result in results for d in result["deaths"]]
     adult_deaths = [d for d in deaths if d["stage_at_death"] == "adult"]
     waves = {
-        "first_year": [d for d in adult_deaths if d["day"] < 300],
-        "second_winter": [d for d in adult_deaths if d["day"] >= 300],
+        "before_day_300": [d for d in adult_deaths if d["day"] < 300],
+        "from_day_300": [d for d in adult_deaths if d["day"] >= 300],
     }
 
     def wave_stats(rows: list[dict]) -> dict:
