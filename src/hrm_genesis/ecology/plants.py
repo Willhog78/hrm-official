@@ -19,6 +19,12 @@ PLANT_ELEMENT_FRACTIONS: dict[str, float] = {
 }
 
 GERMINATION_SEED_MASS_KG = 0.002
+# Per viable tick, a fraction of the seed pool germinates so turnover scales
+# with seed production (itself proportional to biomass). 0.0165/tick lets 95%
+# of a seed cohort germinate within ~180 viable days (one growing season).
+# GERMINATION_SEED_MASS_KG remains the minimum germinating mass, so small
+# pools behave exactly as before.
+SEED_GERMINATION_FRACTION = 0.0165
 BASE_GROWTH_FRACTION = 0.055
 WATER_KG_PER_KG_GROWTH = 2.5
 BASE_MORTALITY_FRACTION = 0.004
@@ -202,12 +208,17 @@ def evolve_producers(
         light, temp, water = _environment_factors(wcells[xy], mcells[xy])
         seed_mass = _mass(pcell["seed_elements_kg"])
         if seed_mass >= GERMINATION_SEED_MASS_KG and min(light, temp, water) > 0.28:
-            fraction = min(1.0, GERMINATION_SEED_MASS_KG / seed_mass)
+            germinating = max(GERMINATION_SEED_MASS_KG, seed_mass * SEED_GERMINATION_FRACTION)
+            fraction = min(1.0, germinating / seed_mass)
+            established = _live_mass(pcell)
             moved = _transfer_fraction(pcell["seed_elements_kg"], fraction)
             for symbol, amount in moved.items():
                 pcell["plant_elements_kg"][symbol] += amount
-            if _mass(pcell["plant_elements_kg"]) > 0:
-                pcell["age_ticks"] = 0
+            # Cell age is the biomass-weighted age of its vegetation: seedlings
+            # enter at age 0 without rejuvenating established plants.
+            total = _live_mass(pcell)
+            if total > 0.0:
+                pcell["age_ticks"] = int(round(int(pcell["age_ticks"]) * established / total))
 
     # 3. Existing biomass grows by consuming Matter pools and water.
     for xy, pcell in pcells.items():
