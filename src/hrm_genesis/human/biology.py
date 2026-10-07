@@ -247,7 +247,10 @@ def _eat(human: dict, pcell: dict, profile: dict) -> float:
         human["body_elements_kg"][symbol] += keep
         pcell["detritus_elements_kg"][symbol] += amount - keep
         consumed += amount
-    human["energy"] = float(human["energy"]) + consumed * float(profile["food_energy_kcal_per_kg"]) * float(profile["assimilation"])
+    human["energy"] = min(
+        float(profile.get("energy_capacity_kcal", float("inf"))),
+        float(human["energy"]) + consumed * float(profile["food_energy_kcal_per_kg"]) * float(profile["assimilation"]),
+    )
     return consumed
 
 
