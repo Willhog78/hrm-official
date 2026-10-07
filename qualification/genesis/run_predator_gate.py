@@ -71,9 +71,23 @@ def main() -> int:
             for y in range(3) for x in range(3)
         ]
     }
-    after, producers_after, matter_after = evolve_consumers(
-        consumers, producers, matter, world, epoch=1
-    )
+    after = consumers
+    producers_after = producers
+    matter_after = matter
+    for epoch in range(1, 13):
+        live_stalkers = [a for a in after["animals"] if a["species"] == "stalker"]
+        live_browsers = [a for a in after["animals"] if a["species"] == "browser"]
+        if not live_stalkers or not live_browsers:
+            break
+        live_stalkers[0]["x"] = live_browsers[0]["x"] = 1
+        live_stalkers[0]["y"] = live_browsers[0]["y"] = 1
+        live_stalkers[0]["energy"] = 1.0
+        after, producers_after, matter_after = evolve_consumers(
+            after, producers_after, matter_after, world, epoch=epoch
+        )
+        if int(after.get("cumulative_deaths_by_cause", {}).get("predation", 0)) > 0:
+            break
+
     after_consumers = consumer_element_totals(after)
     after_ecology = ecology_element_totals(producers_after)
     matter_after_totals = {
@@ -87,7 +101,7 @@ def main() -> int:
         for symbol in symbols
     }
 
-    predation_deaths = int(after.get("last_tick_deaths_by_cause", {}).get("predation", 0))
+    predation_deaths = int(after.get("cumulative_deaths_by_cause", {}).get("predation", 0))
     browser_ids_after = {a["id"] for a in after["animals"] if a["species"] == "browser"}
 
     agentus = {
