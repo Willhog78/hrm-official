@@ -20,6 +20,7 @@ class GenesisConfig:
     human_cognition_enabled: bool = False
     human_actions_enabled: bool = False
     multi_population_enabled: bool = False
+    material_scale_factor: float = 1.0
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -35,6 +36,8 @@ class GenesisConfig:
             raise ValueError("world dimensions must be >= 2")
         if self.ticks_per_year < 4:
             raise ValueError("ticks_per_year must be >= 4")
+        if self.material_scale_factor < 1.0:
+            raise ValueError("material_scale_factor must be >= 1.0")
         if self.matter_enabled and not self.physical_world_enabled:
             raise ValueError("matter_enabled requires physical_world_enabled in G1.5")
         if self.producer_ecology_enabled and not self.matter_enabled:
@@ -68,6 +71,7 @@ class GenesisConfig:
             "human_cognition_enabled": self.human_cognition_enabled,
             "human_actions_enabled": self.human_actions_enabled,
             "multi_population_enabled": self.multi_population_enabled,
+            "material_scale_factor": self.material_scale_factor,
             "world_width": self.world_width,
             "world_height": self.world_height,
             "ticks_per_year": self.ticks_per_year,
