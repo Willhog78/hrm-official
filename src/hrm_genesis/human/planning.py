@@ -17,7 +17,7 @@ def choose_destination(
         x, y = int(cell["x"]), int(cell["y"])
         food = float(cell["food_kg"])
         water = float(cell["water_kg"])
-        learned = expectation_for(expectations, x, y)
+        learned = expectation_for(expectations, x, y, perception.get("context"))
         distance = abs(x - ox) + abs(y - oy)
         # Direct evidence dominates; history biases ambiguous choices.
         value = food + 0.002 * water + learned * (1.0 - min(0.95, uncertainty))
