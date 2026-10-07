@@ -100,6 +100,13 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
         "next_birth_ordinal": len(humans),
         "cumulative_births": 0,
         "cumulative_deaths": 0,
+        "cumulative_deaths_by_cause": {
+            "energy": 0,
+            "dehydration": 0,
+            "low_body_mass": 0,
+            "injury": 0,
+            "old_age": 0,
+        },
         "physiology_profile": profile,
         "humans": humans,
         "remains_cells": [
@@ -332,6 +339,41 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
 
 
 
+
+def _resolve_caregiver(
+    child: dict,
+    people_by_id: dict[str, dict],
+    profile: dict,
+) -> dict | None:
+    if float(profile.get("caregiver_dependence", 0.0)) <= 0.0:
+        return None
+
+    current = people_by_id.get(str(child.get("caregiver_id", "")))
+    if current is not None and int(current.get("age_ticks", 0)) >= int(profile.get("maturity_ticks", 0)):
+        return current
+
+    cx, cy = int(child["x"]), int(child["y"])
+    same_population = child.get("population_id")
+    candidates = []
+    for other in people_by_id.values():
+        if str(other["id"]) == str(child["id"]):
+            continue
+        if int(other.get("age_ticks", 0)) < int(profile.get("maturity_ticks", 0)):
+            continue
+        if same_population is not None and other.get("population_id") != same_population:
+            continue
+        distance = abs(int(other["x"]) - cx) + abs(int(other["y"]) - cy)
+        if distance <= 1:
+            candidates.append((distance, str(other["id"]), other))
+
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: (item[0], item[1]))
+    replacement = candidates[0][2]
+    child["caregiver_id"] = str(replacement["id"])
+    return replacement
+
+
 def _provision_dependent(
     child: dict,
     caregiver: dict | None,
@@ -551,7 +593,7 @@ def evolve_humans(
         start_energy = float(human["energy"])
         start_water = float(human["body_water_kg"])
         start_injury = float(human.get("injury", 0.0))
-        caregiver = people_by_id.get(str(human.get("caregiver_id", "")))
+        caregiver = _resolve_caregiver(human, people_by_id, effective_profile)
         dependence = float(effective_profile.get("caregiver_dependence", 0.0))
         if dependence > 0.0 and caregiver is not None:
             target = (int(caregiver["x"]), int(caregiver["y"]))
@@ -646,6 +688,19 @@ def evolve_humans(
             or int(human["age_ticks"]) >= int(profile["max_age_ticks"])
         )
         if dead:
+            if float(human["energy"]) <= 0.0:
+                death_cause = "energy"
+            elif float(human["body_water_kg"]) <= max(1e-6, float(effective_profile["water_capacity_kg"]) * float(profile["min_water_fraction"])):
+                death_cause = "dehydration"
+            elif body_mass <= float(effective_profile["min_dry_mass_kg"]):
+                death_cause = "low_body_mass"
+            elif float(human.get("injury", 0.0)) >= HUMAN_INJURY_DEATH_THRESHOLD:
+                death_cause = "injury"
+            else:
+                death_cause = "old_age"
+            death_counts = dict(humans.get("cumulative_deaths_by_cause", {}))
+            death_counts[death_cause] = int(death_counts.get(death_cause, 0)) + 1
+            humans["cumulative_deaths_by_cause"] = death_counts
             cell = remains[xy]
             for symbol in HUMAN_TRACKED_ELEMENTS:
                 cell["elements_kg"][symbol] += float(human["body_elements_kg"][symbol])
