@@ -10,7 +10,7 @@ from hrm_genesis.ecology.plants import (
     producer_woody_biomass_kg,
     seed_initial_producers,
 )
-from hrm_genesis.human.biology import _apply_physiology, _experienced_reward
+from hrm_genesis.human.biology import _apply_physiology, _eat, _experienced_reward
 from hrm_genesis.human.learning import update_expectations
 from hrm_genesis.human.planning import choose_destination
 from hrm_genesis.matter.pools import build_matter_state
@@ -178,3 +178,27 @@ def test_experienced_protection_can_be_learned_without_a_shelter_rule():
         {"expectations": expectations, "uncertainty": 0.05},
     )
     assert choice == (1, 0)
+
+
+def test_woody_biomass_is_not_implicitly_edible():
+    human = {
+        "energy": 100.0,
+        "body_elements_kg": {"C": 0.0, "N": 0.0, "K": 0.0, "P": 0.0, "Mg": 0.0, "S": 0.0},
+    }
+    cell = {
+        "plant_elements_kg": {"C": 0.0, "N": 0.0, "K": 0.0, "P": 0.0, "Mg": 0.0, "S": 0.0},
+        "woody_elements_kg": {"C": 10.0, "N": 1.0, "K": 0.2, "P": 0.1, "Mg": 0.1, "S": 0.1},
+        "detritus_elements_kg": {"C": 0.0, "N": 0.0, "K": 0.0, "P": 0.0, "Mg": 0.0, "S": 0.0},
+    }
+    before = deepcopy(cell["woody_elements_kg"])
+    consumed = _eat(
+        human,
+        cell,
+        {
+            "bite_cap_kg": 1.0,
+            "assimilation": 0.8,
+            "food_energy_kcal_per_kg": 2200.0,
+        },
+    )
+    assert consumed == 0.0
+    assert cell["woody_elements_kg"] == before
