@@ -61,6 +61,10 @@ def execute_live_sequence(
     wood = cell.setdefault("woody_elements_kg", {})
     loose = cell.setdefault("loose_material_elements_kg", _blank_like(wood))
     arranged = cell.setdefault("arranged_material_elements_kg", _blank_like(wood))
+    geometry = cell.setdefault(
+        "arrangement_geometry",
+        {"span_m": 0.0, "height_m": 0.0, "density": 0.0, "surface_area_m2": 0.0},
+    )
     held = h.setdefault("held_material_elements_kg", _blank_like(wood))
 
     trace = {
@@ -103,8 +107,16 @@ def execute_live_sequence(
             for symbol in loose:
                 loose[symbol] = 0.0
             _add_elements(arranged, moved)
+            moved_mass = _mass(moved)
+            total_mass = _mass(arranged)
+            geometry["span_m"] = min(2.5, float(geometry["span_m"]) + 0.45 + moved_mass * 0.35)
+            geometry["height_m"] = min(2.2, float(geometry["height_m"]) + 0.20 + moved_mass * 0.30)
+            geometry["surface_area_m2"] = min(
+                8.0, float(geometry["surface_area_m2"]) + 0.5 + moved_mass * 0.9
+            )
+            geometry["density"] = min(1.0, total_mass / max(0.5, float(geometry["surface_area_m2"])))
             trace["arranged"] = True
-            trace["effort_energy_kcal"] += 8.0 + 5.0 * _mass(moved)
+            trace["effort_energy_kcal"] += 8.0 + 5.0 * moved_mass
 
         elif action == "separate" and _mass(arranged) > 0.0:
             fraction = min(1.0, MANIPULATION_MASS_KG / _mass(arranged))
@@ -132,6 +144,7 @@ def execute_live_sequence(
     cell["woody_elements_kg"] = wood
     cell["loose_material_elements_kg"] = loose
     cell["arranged_material_elements_kg"] = arranged
+    cell["arrangement_geometry"] = geometry
     return h, cell, trace
 
 
