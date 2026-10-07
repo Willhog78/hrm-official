@@ -14,7 +14,7 @@
 |---|---|
 | Commit | `4fd0224f2594fac1cd1aa3a2568ae50a934d0de9` (`main`, after PR #33) |
 | Host | Claude Code cloud container, Linux 6.18.44 |
-| Python | 3.13.16 (CI pins 3.11; no 3.11 run has happened) |
+| Python | 3.13.16 (CI pins 3.11; see the addendum for the 3.11 run) |
 | pytest | 9.1.1, installed with `pip install pytest` for this run |
 
 ## Commands and results
@@ -44,3 +44,11 @@ CI has never produced a test result for this repository. All 119 runs of the `St
 > The job was not started because your account is locked due to a billing issue.
 
 See STATUS.md, "Verification infrastructure".
+
+## Addendum — Python 3.11
+
+The same day, every step of `.github/workflows/stage1.yml` was run serially under Python 3.11.17 and pytest 9.1.1 (`/usr/bin/python3.11` venv). Results relevant to Stage 1:
+- `tests/test_stage1_coordination.py`: exit 0, 1.1 s;
+- `qualification/hmt_stage1_gate.py`: exit 0, 43.2 s.
+
+Per-step timings are in STATUS.md, "Verification infrastructure". The `tests/test_stage1_hmt_contract.py` cards were not re-run under 3.11; the monolithic HMT gate covers the same cards.

@@ -44,7 +44,7 @@ Under Governance Amendment v2, independent review is replaced by self-review. Th
 Current verification:
 
 - Stage-1 coordination regression suite: **43/43 PASS**, originally run via a minimal pytest stand-in because pytest was unavailable on that host. Every correction's test was shown to fail with that correction removed.
-- **Real pytest run (2026-10-07):** `tests/test_stage1_coordination.py` **43 passed**, `tests/test_stage1_hmt_contract.py` **14 passed**. Commit `4fd0224`, Python 3.13.16, pytest 9.1.1; exact commands in `evidence/STAGE1_PYTEST_RUN_2026-10-07.md`. CI pins Python 3.11, and no 3.11 run has happened.
+- **Real pytest run (2026-10-07):** `tests/test_stage1_coordination.py` **43 passed**, `tests/test_stage1_hmt_contract.py` **14 passed**. Commit `4fd0224`, Python 3.13.16, pytest 9.1.1; exact commands in `evidence/STAGE1_PYTEST_RUN_2026-10-07.md`. The coordination suite also passed under Python 3.11.17 (the version CI pins), in the local workflow-step run under "Verification infrastructure".
 - HMT Stage-1 Gate: **14/14 PASS as one monolithic run** (≈36 s).
 - `qualification/reproduce_stage1.py`: without the `UPSTREAM/` Agentus archive (not in the repository) it skips the Agentus step, prints `STAGE1_REPRODUCTION_PARTIAL (S1.12 not evidenced)` and exits 2. `--require-upstream` fails immediately if the archive is absent.
 
@@ -151,10 +151,30 @@ The earlier note that it failed "since runs 99–104" was wrong. No CI result ex
 **To restore it:**
 1. The account owner resolves the billing lock under GitHub *Settings → Billing and plans*. Nothing in the repository can fix this. For a public repository, standard GitHub-hosted runners are free, but a locked account still blocks them.
 2. Re-run the latest `main` workflow to confirm that a runner is assigned.
-3. Bring `.github/workflows/stage1.yml` up to date before relying on it:
-   - it stops at the G10.2 gate and omits the G10.2A, development, conditional-adaptation, physical-interaction, predator and weather-persistence gates and the micro/smoke tiers;
-   - `tests/genesis` plus 14 gates must fit in its 20-minute timeout (timing below).
+3. Bring `.github/workflows/stage1.yml` up to date before relying on it. It stops at the G10.2 gate and omits:
+   - the G10.2A, development, conditional-adaptation, physical-interaction, predator and weather-persistence gates;
+   - the micro and smoke tiers.
 4. Note: `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19 (GitHub notice on the same jobs).
+
+**Local run of the workflow's steps under Python 3.11 (2026-10-07).** Every step in `stage1.yml` passed. The steps were run serially with Python 3.11.17 and pytest 9.1.1 on an otherwise idle 4-CPU container, at commit `4fd0224` plus this branch's census files:
+
+| Step | Seconds |
+|---|---|
+| Stage-1 regression suite (43 tests) | 1.1 |
+| HMT Stage-1 Gate | 43.2 |
+| Genesis regression suite (`tests/genesis`) | 564.3 |
+| G4 autonomy gate | 228.6 |
+| other 13 gates and Stage-2 draft suite, combined | 92.1 |
+| **total** | **924.8 (15.4 min)** |
+
+The six gates not in the workflow also pass, together in under 3 s.
+
+This run also covers Python 3.11 for the Stage-1 tests. The 20-minute job timeout is not yet established either way:
+- the steps above took 15.4 min on this host;
+- checkout, Python setup and `pip install` are not included;
+- GitHub-hosted runner speed was not measured.
+
+The first real CI run will settle it. If it is tight, splitting the Genesis suite and the G4 gate into their own jobs removes the risk.
 
 Until CI runs, the local tiers and gate scripts are the only verification record. Because nothing runs automatically, a failure can sit unnoticed on `main`. The G5 gate failure below is the example.
 

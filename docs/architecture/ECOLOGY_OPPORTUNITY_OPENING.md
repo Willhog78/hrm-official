@@ -124,13 +124,28 @@ Over 2 years, the 4 seeds end with 12–14 agents each under `v1` and 11–14 un
 The planner calls an agent hungry when energy / satiety reference < 0.75. The same label describes different physical states.
 
 - **reference-v1.** Hunger is a founding transient. Founders start at a reserve of about 0.67, and hunger clears by the end of year 1 Q2 as they eat from abundant visible food. After that, mean reserve is 0.93 with nothing below 0.75. The label then means *recovering from a low starting reserve with food in view*.
-- **reference-v2.** Founders start full (reserve 1.00). Hunger appears in year 2 Q3–Q4 on 4.4% of year-2 agent-days, and it is deep: 400 of 544 hungry days are below 0.25. A full day's food was in view on every one of those days, and there were no starvation deaths. The label then means *a sharp reserve drop with food in view*. That points to a demand or intake limit, such as lactation or a fat-reserve accounting effect, rather than food access. **Unverified.** The `caring` column (agents caring for a dependent that day) tests the lactation explanation. Result: see section 5.1.
+- **reference-v2.** Founders start full (reserve 1.00). Hunger appears in year 2 Q3–Q4 on 4.4% of year-2 agent-days, and it is deep: 400 of 544 hungry days are below 0.25. A full day's food was in view on every one of those days, and there were no starvation deaths. The label then means *a sharp reserve drop with food in view*. That points to a demand or intake limit rather than food access. Section 5.1 shows that every one of these days belongs to a caregiver.
 
 Consequence. A "hungry" rate cannot be compared across physiologies, or used as a scarcity measure, without the reserve level and intake behind it. Any experiment below reports the reserve bins, not the label alone.
 
 ### 5.1 Caregiving check (reference-v2)
 
-*Pending: filled in from the `caring` columns of the reference-v2 rerun.*
+The census marks an agent as *caring* on days when it is the caregiver of a living dependent. The reference-v2 rerun is deterministic, and every other number matches the run in section 4.
+
+| reference-v2, 4 seeds × 730 days | agent-days | of which caring |
+|---|---|---|
+| all independent agent-days | 23,360 | 8,080 (34.6%) |
+| hungry (reserve < 0.75) | 544 | **544 (100%)** |
+| reserve < 0.25 | 400 | **400 (100%)** |
+
+- Under reference-v2, every hungry agent-day, deep or not, belongs to a caregiver.
+- A full day's food was in view on all of them, and none ended in starvation.
+
+The reference-v2 hunger signal is therefore the **cost of caregiving**, not scarcity.
+
+**Contrast with reference-v1.** Under v1, caregivers make up 45.7% of year-2 agent-days and are never hungry in year 2 (mean reserve 0.93 for everyone). V1 hunger is the founding transient: 1,459 of its 1,525 hungry days fall in year 1 Q1, and only 121 of them are caregivers. So the two physiologies differ precisely in what caregiving costs the caregiver. V2 makes nursing draw down the reserve (G10.5's "corrected nursing"). Under v1 it does not visibly do so.
+
+Not yet separated: whether the limit is lactation demand outrunning a daily intake ceiling, or the fat-reserve accounting during nursing. The census records reserves, not intake. Separating them needs per-day intake against demand for caregivers, which is a diagnostic addition, not a model change.
 
 ## 6. Foundations to check before changing ecology
 
@@ -195,7 +210,7 @@ Concrete differences measured here (4 seeds × 730 days):
 | imitation tries | 18 | 46 |
 | outcome | births 21, deaths 2 (injury) | births 19, deaths 0 |
 
-**Recommendation:** decide after section 5.1 explains `reference-v2`'s late deep drops. If those drops are lactation running ahead of intake, v2 is the more faithful model, and its hunger rate is a physiological signal rather than a scarcity signal.
+**Recommendation:** section 5.1 shows that reference-v2's late deep drops occur only in caregivers, with food in view. Its hunger is a physiological signal of caregiving cost, not a scarcity signal. Before choosing it as the default, measure caregiver intake against demand, to confirm that the drops are physical (lactation outrunning a daily intake ceiling) and not an accounting artefact. If they are physical, v2 is the more faithful baseline. Either way, no census or experiment should read the hunger label as scarcity without the reserve bins and the caring split.
 
 ## 8. Proposed controlled experiments (not implemented)
 
