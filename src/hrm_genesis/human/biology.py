@@ -10,6 +10,7 @@ from .memory import empty_memory, remember
 from .perception import perceive_local
 from .planning import choose_destination
 from .regions import POPULATION_IDS, cells_for_population
+from .calibration import physiology_profile
 
 
 HUMAN_TRACKED_ELEMENTS = tuple(sorted(PLANT_ELEMENT_FRACTIONS))
@@ -44,7 +45,8 @@ def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
 
-def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False, actions_enabled: bool = False, multi_population_enabled: bool = False) -> dict:
+def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False, actions_enabled: bool = False, multi_population_enabled: bool = False, calibrated: bool = False, ticks_per_year: int = 120) -> dict:
+    profile = physiology_profile(calibrated=calibrated, ticks_per_year=ticks_per_year)
     humans = []
     founders = []
     if multi_population_enabled:
@@ -60,8 +62,8 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
                 "sex": sex,
                 "x": rng.randrange(width),
                 "y": rng.randrange(height),
-                "age_ticks": HUMAN_MATURITY_TICKS + rng.randrange(0, 24),
-                "energy": 14.0 + rng.uniform(0.0, 2.0),
+                "age_ticks": int(profile["maturity_ticks"]) + rng.randrange(0, max(1, ticks_per_year // 12)),
+                "energy": float(profile["initial_energy_kcal"]) + rng.uniform(0.0, float(profile["initial_energy_kcal"]) * 0.05),
                 "body_elements_kg": _blank_elements(),
                 "body_water_kg": 0.0,
                 "generation": 0,
@@ -94,6 +96,7 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
         "next_birth_ordinal": len(humans),
         "cumulative_births": 0,
         "cumulative_deaths": 0,
+        "physiology_profile": profile,
         "humans": humans,
         "remains_cells": [
             {"x": x, "y": y, "elements_kg": _blank_elements(), "water_kg": 0.0}
@@ -142,7 +145,8 @@ def seed_initial_humans(human_state: dict, producer_state: dict, matter_state: d
         human["x"], human["y"] = xy
         pcell, mcell = pcells[xy], mcells[xy]
 
-        requested_body = 0.08
+        profile = humans.get("physiology_profile", physiology_profile(calibrated=False, ticks_per_year=120))
+        requested_body = float(profile["seed_dry_mass_kg"])
         available_fraction = 1.0
         for symbol, frac in PLANT_ELEMENT_FRACTIONS.items():
             need = requested_body * frac
@@ -151,7 +155,7 @@ def seed_initial_humans(human_state: dict, producer_state: dict, matter_state: d
                     available_fraction,
                     float(pcell["plant_elements_kg"][symbol]) / need,
                 )
-        requested_water = 0.55
+        requested_water = float(profile["water_capacity_kg"])
         available_water = float(mcell["surface_water_kg"]) + float(mcell["soil_water_kg"])
         available_fraction = min(available_fraction, available_water / requested_water)
         fraction = max(0.0, min(1.0, available_fraction))
@@ -195,26 +199,26 @@ def _move_toward_food(human: dict, producers: dict) -> tuple[int, int]:
     return max(candidates, key=lambda xy: (_food_mass(pcells[xy]), -xy[1], -xy[0]))
 
 
-def _eat(human: dict, pcell: dict) -> float:
+def _eat(human: dict, pcell: dict, profile: dict) -> float:
     available = _food_mass(pcell)
     if available <= 0.0:
         return 0.0
-    bite = min(HUMAN_BITE_CAP_KG, available)
+    bite = min(float(profile["bite_cap_kg"]), available)
     fraction = bite / available
     consumed = 0.0
     for symbol in HUMAN_TRACKED_ELEMENTS:
         amount = float(pcell["plant_elements_kg"][symbol]) * fraction
         pcell["plant_elements_kg"][symbol] -= amount
-        keep = amount * HUMAN_ASSIMILATION
+        keep = amount * float(profile["assimilation"])
         human["body_elements_kg"][symbol] += keep
         pcell["detritus_elements_kg"][symbol] += amount - keep
         consumed += amount
-    human["energy"] = float(human["energy"]) + consumed * 2200.0 * HUMAN_ASSIMILATION
+    human["energy"] = float(human["energy"]) + consumed * float(profile["food_energy_kcal_per_kg"]) * float(profile["assimilation"])
     return consumed
 
 
-def _drink(human: dict, mcell: dict) -> float:
-    need = max(0.0, HUMAN_WATER_CAPACITY_KG - float(human["body_water_kg"]))
+def _drink(human: dict, mcell: dict, profile: dict) -> float:
+    need = max(0.0, float(profile["water_capacity_kg"]) - float(human["body_water_kg"]))
     from_surface = min(float(mcell["surface_water_kg"]), need)
     mcell["surface_water_kg"] -= from_surface
     remaining = need - from_surface
@@ -225,13 +229,13 @@ def _drink(human: dict, mcell: dict) -> float:
     return drank
 
 
-def _offspring(mother: dict, ordinal: int) -> dict:
+def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
     body = _blank_elements()
     for symbol in HUMAN_TRACKED_ELEMENTS:
-        amount = float(mother["body_elements_kg"][symbol]) * HUMAN_OFFSPRING_MASS_FRACTION
+        amount = float(mother["body_elements_kg"][symbol]) * float(profile["offspring_mass_fraction"])
         mother["body_elements_kg"][symbol] -= amount
         body[symbol] = amount
-    water = float(mother["body_water_kg"]) * HUMAN_OFFSPRING_MASS_FRACTION
+    water = float(mother["body_water_kg"]) * float(profile["offspring_mass_fraction"])
     mother["body_water_kg"] -= water
     return {
         "id": f"human-b{ordinal:08d}",
@@ -239,7 +243,7 @@ def _offspring(mother: dict, ordinal: int) -> dict:
         "x": int(mother["x"]),
         "y": int(mother["y"]),
         "age_ticks": 0,
-        "energy": 4.0,
+        "energy": max(4.0, float(profile["initial_energy_kcal"]) * float(profile["offspring_mass_fraction"])),
         "body_elements_kg": body,
         "body_water_kg": water,
         "generation": int(mother["generation"]) + 1,
@@ -275,8 +279,9 @@ def _offspring(mother: dict, ordinal: int) -> dict:
     }
 
 
-def _apply_physiology(human: dict, world_cell: dict, moved: bool) -> None:
+def _apply_physiology(human: dict, world_cell: dict, moved: bool, profile: dict | None = None) -> None:
     """Apply bounded fatigue, thermoregulation cost, injury, and healing."""
+    profile = profile or physiology_profile(calibrated=False, ticks_per_year=120)
     ambient = float(world_cell["temperature"])
     thermal_delta = abs(ambient - HUMAN_COMFORT_TEMPERATURE_C)
     excess = max(0.0, thermal_delta - HUMAN_THERMAL_TOLERANCE_C)
@@ -288,11 +293,16 @@ def _apply_physiology(human: dict, world_cell: dict, moved: bool) -> None:
         fatigue = max(0.0, fatigue - HUMAN_FATIGUE_REST_RECOVERY)
 
     if excess > 0.0:
-        human["energy"] = float(human["energy"]) - min(0.30, excess * 0.01)
+        thermal_cost_cap = 300.0 if bool(profile.get("calibrated")) else 0.30
+        thermal_cost_rate = 10.0 if bool(profile.get("calibrated")) else 0.01
+        human["energy"] = float(human["energy"]) - min(thermal_cost_cap, excess * thermal_cost_rate)
         if ambient > HUMAN_COMFORT_TEMPERATURE_C:
             human["body_water_kg"] = max(
                 0.0,
-                float(human["body_water_kg"]) - min(0.02, excess * 0.001),
+                float(human["body_water_kg"]) - min(
+                    0.75 if bool(profile.get("calibrated")) else 0.02,
+                    excess * (0.03 if bool(profile.get("calibrated")) else 0.001),
+                ),
             )
 
     injury = float(human.get("injury", 0.0))
@@ -303,7 +313,7 @@ def _apply_physiology(human: dict, world_cell: dict, moved: bool) -> None:
     can_heal = (
         injury > 0.0
         and float(human["energy"]) > 6.0
-        and float(human["body_water_kg"]) > HUMAN_WATER_CAPACITY_KG * 0.35
+        and float(human["body_water_kg"]) > float(profile["water_capacity_kg"]) * 0.35
         and excess <= 8.0
     )
     if can_heal:
@@ -330,10 +340,11 @@ def evolve_humans(
     mcells = _cell_lookup(matter["cells"])
     remains = _cell_lookup(humans["remains_cells"])
     wcells = _cell_lookup(world_state["cells"])
+    profile = humans.get("physiology_profile", physiology_profile(calibrated=False, ticks_per_year=120))
 
     adults_by_cell: dict[tuple[int, int], set[str]] = {}
     for person in humans["humans"]:
-        if int(person["age_ticks"]) >= HUMAN_MATURITY_TICKS:
+        if int(person["age_ticks"]) >= int(profile["maturity_ticks"]):
             adults_by_cell.setdefault((int(person["x"]), int(person["y"])), set()).add(str(person["sex"]))
 
     survivors = []
@@ -348,14 +359,14 @@ def evolve_humans(
             target = _move_toward_food(human, producers)
         moved = target != origin
         if moved:
-            human["energy"] = float(human["energy"]) - HUMAN_MOVE_COST
+            human["energy"] = float(human["energy"]) - float(profile["move_energy_kcal_per_tick"])
             human["x"], human["y"] = target
 
         xy = (int(human["x"]), int(human["y"]))
-        _drink(human, mcells[xy])
-        ate = _eat(human, pcells[xy])
+        _drink(human, mcells[xy], profile)
+        ate = _eat(human, pcells[xy], profile)
         if cognition_enabled and perception is not None:
-            reward = ate * 2200.0 * HUMAN_ASSIMILATION
+            reward = ate * float(profile["food_energy_kcal_per_kg"]) * float(profile["assimilation"])
             cognition = dict(human["cognition"])
             cognition["memory"] = remember(cognition.get("memory", empty_memory()), perception, epoch, reward)
             cognition["expectations"] = update_expectations(cognition.get("expectations", {}), perception, reward)
@@ -363,9 +374,9 @@ def evolve_humans(
             cognition["uncertainty"] = round(max(0.05, float(cognition.get("uncertainty", 1.0)) * 0.97), 10)
             human["cognition"] = cognition
 
-        human["energy"] = float(human["energy"]) - HUMAN_BASAL_COST
-        _apply_physiology(human, wcells[xy], moved)
-        loss = min(float(human["body_water_kg"]), HUMAN_WATER_LOSS_PER_TICK_KG)
+        human["energy"] = float(human["energy"]) - float(profile["basal_energy_kcal_per_tick"])
+        _apply_physiology(human, wcells[xy], moved, profile)
+        loss = min(float(human["body_water_kg"]), float(profile["water_loss_per_tick_kg"]))
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
         human["age_ticks"] = int(human["age_ticks"]) + 1
@@ -373,10 +384,10 @@ def evolve_humans(
         body_mass = _mass(human["body_elements_kg"])
         dead = (
             float(human["energy"]) <= 0.0
-            or float(human["body_water_kg"]) <= 1e-6
-            or body_mass <= 0.01
+            or float(human["body_water_kg"]) <= max(1e-6, float(profile["water_capacity_kg"]) * float(profile["min_water_fraction"]))
+            or body_mass <= float(profile["min_dry_mass_kg"])
             or float(human.get("injury", 0.0)) >= HUMAN_INJURY_DEATH_THRESHOLD
-            or int(human["age_ticks"]) >= HUMAN_MAX_AGE_TICKS
+            or int(human["age_ticks"]) >= int(profile["max_age_ticks"])
         )
         if dead:
             cell = remains[xy]
@@ -390,15 +401,15 @@ def evolve_humans(
         can_reproduce = (
             human["sex"] == "female"
             and {"female", "male"}.issubset(adults_by_cell.get(xy, set()))
-            and float(human["energy"]) >= HUMAN_REPRODUCTION_ENERGY
-            and body_mass >= 0.09
+            and float(human["energy"]) >= float(profile["reproduction_energy_kcal"])
+            and body_mass >= float(profile["seed_dry_mass_kg"]) * 0.9
             and ate > 0.0
-            and since_birth >= HUMAN_REPRODUCTION_COOLDOWN
+            and since_birth >= int(profile["reproduction_cooldown_ticks"])
         )
         if can_reproduce:
             ordinal = int(humans["next_birth_ordinal"])
             humans["next_birth_ordinal"] = ordinal + 1
-            child = _offspring(human, ordinal)
+            child = _offspring(human, ordinal, profile)
             human["energy"] = max(0.0, float(human["energy"]) - float(child["energy"]))
             human["last_reproduction_epoch"] = epoch
             births.append(child)

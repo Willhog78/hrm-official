@@ -147,6 +147,8 @@ class GenesisSimulation:
                 cognition_enabled=config.human_cognition_enabled,
                 actions_enabled=config.human_actions_enabled,
                 multi_population_enabled=config.multi_population_enabled,
+                calibrated=config.human_calibration_enabled,
+                ticks_per_year=config.ticks_per_year,
             )
             human_state, producer_state, matter_state = seed_initial_humans(
                 human_state,

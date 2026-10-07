@@ -59,6 +59,8 @@ jobs:
         run: python qualification/genesis/run_g9_observer_gate.py
       - name: Genesis G10.1 scaled substrate gate
         run: python qualification/genesis/run_g10_1_scale_gate.py
+      - name: Genesis G10.2 calibrated human gate
+        run: python qualification/genesis/run_g10_2_human_calibration_gate.py
       - name: Stage-2 draft suite (quarantined; informational)
         working-directory: drafts/stage2
         run: python -m pytest -o addopts='' -q tests
