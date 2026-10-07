@@ -10,7 +10,7 @@ from .elements import WATER_H_MASS_FRACTION, WATER_O_MASS_FRACTION, require_elem
 ACTIVE_SOIL_ELEMENTS = ("C", "N", "P", "K", "Ca", "Mg", "S", "Fe", "Si")
 
 
-def _element_pool(seed_bank: SeedBank, x: int, y: int) -> dict[str, float]:
+def _element_pool(seed_bank: SeedBank, x: int, y: int, scale_factor: float = 1.0) -> dict[str, float]:
     stream = seed_bank.stream(f"matter.soil.{x}.{y}")
     baseline = {
         "C": 18.0,
@@ -24,12 +24,12 @@ def _element_pool(seed_bank: SeedBank, x: int, y: int) -> dict[str, float]:
         "Si": 45.0,
     }
     return {
-        symbol: round(value * stream.uniform(0.88, 1.12), 10)
+        symbol: round(value * scale_factor * stream.uniform(0.88, 1.12), 10)
         for symbol, value in baseline.items()
     }
 
 
-def build_matter_state(*, width: int, height: int, seed_bank: SeedBank) -> dict:
+def build_matter_state(*, width: int, height: int, seed_bank: SeedBank, scale_factor: float = 1.0) -> dict:
     cells: list[dict] = []
     for y in range(height):
         for x in range(width):
@@ -37,9 +37,9 @@ def build_matter_state(*, width: int, height: int, seed_bank: SeedBank) -> dict:
                 {
                     "x": x,
                     "y": y,
-                    "surface_water_kg": 8.0,
-                    "soil_water_kg": 45.0,
-                    "elements_kg": _element_pool(seed_bank, x, y),
+                    "surface_water_kg": 8.0 * scale_factor,
+                    "soil_water_kg": 45.0 * scale_factor,
+                    "elements_kg": _element_pool(seed_bank, x, y, scale_factor),
                 }
             )
 
