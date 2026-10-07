@@ -441,6 +441,28 @@ def _structural_protection(world_cell: dict, producer_cell: dict | None = None) 
         arranged_cover = 0.0
     return canopy, min(0.95, terrain_cover + arranged_cover)
 
+def _add_interoception(perception: dict, human: dict, profile: dict, base_profile: dict) -> None:
+    """Thirst and hunger as felt reserves, in days (agentus_thirst_enabled).
+
+    Declared assumption: an organism senses how depleted its water and energy
+    are. It does not sense where water is beyond its perception radius; it may
+    recall places it has seen.
+    """
+    capacity = float(profile["water_capacity_kg"])
+    loss = max(1e-9, float(profile["water_loss_per_tick_kg"]))
+    floor = capacity * float(base_profile["min_water_fraction"])
+    body_water = float(human["body_water_kg"])
+    perception["water_need_kg"] = max(0.0, capacity - body_water) + loss
+    perception["hydration_days"] = max(0.0, (body_water - floor) / loss)
+    perception["energy_days"] = max(0.0, float(human["energy"])) / max(1e-9, float(profile["basal_energy_kcal_per_tick"]))
+    visible = {(int(c["x"]), int(c["y"])) for c in perception["cells"]}
+    perception["remembered_water"] = [
+        [int(k.split(",")[0]), int(k.split(",")[1]), float(v.get("water_kg", 0.0)), int(v.get("last_seen_epoch", 0))]
+        for k, v in sorted(human.get("cognition", {}).get("memory", {}).get("locations", {}).items())
+        if (int(k.split(",")[0]), int(k.split(",")[1])) not in visible
+    ]
+
+
 def _experienced_reward(
     *,
     start_energy: float,
@@ -486,6 +508,7 @@ def _apply_physiology(
     if terrain_cover > 0.0:
         moderation = min(0.55, terrain_cover * 0.55)
         ambient = ambient * (1.0 - moderation) + 15.0 * moderation
+    uninsulated_ambient = ambient
     if insulation_c > 0.0 and ambient < HUMAN_COMFORT_TEMPERATURE_C:
         # Worn interlaced material slows heat loss in the cold (capacity v1).
         ambient = min(HUMAN_COMFORT_TEMPERATURE_C, ambient + insulation_c)
@@ -499,10 +522,16 @@ def _apply_physiology(
     else:
         fatigue = max(0.0, fatigue - HUMAN_FATIGUE_REST_RECOVERY)
 
+    thermal_scale = max(0.08, float(profile.get("thermal_scale", 1.0)))
+    thermal_cost_cap = (300.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.30
+    thermal_cost_rate = (10.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.01
+    if insulation_c > 0.0:
+        # Experienced benefit of worn material: cold-stress energy not spent.
+        bare_excess = max(0.0, abs(uninsulated_ambient - HUMAN_COMFORT_TEMPERATURE_C) - HUMAN_THERMAL_TOLERANCE_C)
+        bare_cost = min(thermal_cost_cap, bare_excess * thermal_cost_rate)
+        worn_cost = min(thermal_cost_cap, excess * thermal_cost_rate)
+        human["insulation_saving_kcal"] = round(max(0.0, bare_cost - worn_cost), 10)
     if excess > 0.0:
-        thermal_scale = max(0.08, float(profile.get("thermal_scale", 1.0)))
-        thermal_cost_cap = (300.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.30
-        thermal_cost_rate = (10.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.01
         human["energy"] = float(human["energy"]) - min(thermal_cost_cap, excess * thermal_cost_rate)
         if ambient > HUMAN_COMFORT_TEMPERATURE_C:
             human["body_water_kg"] = max(
@@ -652,6 +681,8 @@ def evolve_agentus_step(
                 float(human["energy"])
                 / max(1e-9, float(effective_profile.get("energy_capacity_kcal", 1.0)))
             )
+            if humans.get("thirst_planning"):
+                _add_interoception(perception, human, effective_profile, profile)
             if capacities:
                 scale = max(0.10, float(effective_profile.get("development_scale", 1.0)))
                 extend_perception_with_materials(
@@ -731,6 +762,7 @@ def evolve_agentus_step(
                 human, wcells[xy], moved, effective_profile, pcells[xy],
                 insulation_c=cap.insulation_c(humans, str(human["id"])),
             )
+            cap.credit_worn_benefit(humans, human, float(human.pop("insulation_saving_kcal", 0.0)), effective_profile)
         else:
             _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
         attacks = _apply_predator_threat(human, consumer_state)

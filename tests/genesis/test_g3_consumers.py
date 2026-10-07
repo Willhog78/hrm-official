@@ -4,6 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from hrm_genesis import GenesisConfig, GenesisSimulation
+from hrm_genesis.ecology.traits import trait_for
 from hrm_genesis.ecology.animals import (
     consumer_element_totals,
     consumer_water_total_kg,
@@ -143,10 +144,18 @@ def test_g3_no_food_causes_consumer_collapse():
             cell["plant_elements_kg"][symbol] = 0.0
             cell["seed_elements_kg"][symbol] = 0.0
 
-    for epoch in range(100):
+    # Herbivores starve first. A predator can outlive them on the energy of its
+    # last kill (fallible predation postdates this test), so collapse of the
+    # whole community is checked over a longer horizon.
+    for epoch in range(300):
         consumers, producers, matter = evolve_consumers(
             consumers, producers, matter, world, epoch
         )
+        if epoch == 99:
+            assert not any(
+                trait_for(str(a["species"])).trophic_role == "herbivore"
+                for a in consumers["animals"]
+            )
 
     assert living_population(consumers) == 0
 

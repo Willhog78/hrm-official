@@ -23,6 +23,9 @@ Declared assumptions:
 
 from __future__ import annotations
 
+import json
+import math
+
 from hrm_genesis.ecology.animals import displace_animal, kill_animal
 from hrm_genesis.ecology.traits import trait_for
 from hrm_genesis.matter import objects as mo
@@ -31,7 +34,7 @@ from .actions import execute_live_sequence
 from .diet import FOOD_KINDS, available_kg, innate_food_prior
 
 
-CAPACITY_MODEL = "capacity-v1"
+CAPACITY_MODEL = "capacity-v2"
 
 MAX_INTERACTIONS_PER_TICK = 3
 MAX_RIGID_IN_HAND = 2
@@ -42,8 +45,11 @@ HAND_SPEED_M_S = 9.0
 MAX_PULL_TENSION_N = 250.0
 VALUE_LEARNING_RATE = 0.3
 FOOD_LEARNING_RATE = 0.4
-TRACE_DECAY = 0.5
-TRACE_LENGTH = 3
+TRACE_DECAY = 0.7
+TRACE_LENGTH = 8
+HISTORY_DECAY = 0.8
+HISTORY_LENGTH = 16
+OBSERVATION_RATE = 0.5
 EXPLORE_HUNGRY = 0.25
 EXPLORE_SATED = 0.08
 RETRY_KNOWN = 0.03
@@ -414,6 +420,79 @@ def enumerate_affordances(ctx: Context) -> list[tuple[str, dict]]:
 
 
 # ---------------------------------------------------------------------------
+# Encounters with animals: approach and contact are physical stages.
+#
+# Declared encounter geometry (the grid declares no cell size): an animal in
+# the agent's cell is visible but starts 10-60 m away. The agent must close to
+# within reach (arm plus any held shaft) before it can grab or strike.
+# - Stalk: each metre closed carries a detection hazard that grows with the
+#   prey's perception and the agent's fatigue.
+# - Chase: a detected animal flees toward cover 25 m away. The agent closes
+#   the gap only if faster; sprinting is limited to 12 s. Prey in poor
+#   condition run slower.
+# - Contact: a held striking head kills if impact energy exceeds a mass-scaled
+#   threshold; bare hands must grab and hold the animal.
+
+ARM_REACH_M = 0.7
+ENCOUNTER_MIN_M = 10.0
+ENCOUNTER_MAX_M = 60.0
+COVER_DISTANCE_M = 25.0
+AGENT_SPRINT_M_S = 7.0
+SPRINT_LIMIT_S = 12.0
+ENCOUNTER_WALK_KCAL_PER_M = 0.04
+ENCOUNTER_SPRINT_KCAL_PER_M = 0.15
+KILL_J_PER_KG = 40.0
+
+
+def resolve_encounter(
+    *,
+    capability: float,
+    fatigue: float,
+    reach_m: float,
+    strike_energy_j: float,
+    prey_mass_kg: float,
+    prey_perception: int,
+    prey_condition: float,
+    draws: list[float],
+) -> dict:
+    """Resolve one approach. Returns stage outcome and distances covered."""
+    separation = ENCOUNTER_MIN_M + (ENCOUNTER_MAX_M - ENCOUNTER_MIN_M) * draws[0]
+    to_close = max(0.0, separation - reach_m)
+    hazard = (0.02 + 0.02 * prey_perception) * (1.0 + fatigue)
+    undetected_m = -math.log(max(1e-12, draws[1])) / hazard
+    result = {"separation_m": separation, "walked_m": 0.0, "sprinted_m": 0.0, "sprint_s": 0.0, "contact": False}
+    if undetected_m >= to_close:
+        result["walked_m"] = to_close
+        result["contact"] = True
+    else:
+        result["walked_m"] = undetected_m
+        gap = to_close - undetected_m
+        prey_speed = (6.0 + 1.0 * prey_perception) * (0.4 + 0.6 * max(0.0, min(1.0, prey_condition)))
+        agent_speed = AGENT_SPRINT_M_S * max(0.0, capability)
+        if agent_speed <= prey_speed:
+            result["sprint_s"] = min(SPRINT_LIMIT_S, COVER_DISTANCE_M / prey_speed)
+            result["sprinted_m"] = agent_speed * result["sprint_s"]
+            result["outcome"] = "outrun"
+            return result
+        close_s = gap / (agent_speed - prey_speed)
+        if close_s > min(SPRINT_LIMIT_S, COVER_DISTANCE_M / prey_speed):
+            result["sprint_s"] = min(SPRINT_LIMIT_S, COVER_DISTANCE_M / prey_speed)
+            result["sprinted_m"] = agent_speed * result["sprint_s"]
+            result["outcome"] = "reached_cover"
+            return result
+        result["sprint_s"] = close_s
+        result["sprinted_m"] = agent_speed * close_s
+        result["contact"] = True
+    kill_j = KILL_J_PER_KG * prey_mass_kg + 1.0
+    if strike_energy_j > 0.0:
+        killed = strike_energy_j * (0.5 + 0.5 * draws[2]) >= kill_j
+    else:
+        killed = draws[3] < 0.6 * max(0.0, capability) * (1.0 - 0.3 * max(0.0, min(1.0, prey_condition)))
+    result["outcome"] = "kill" if killed else "contact_failed"
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Execution. Each returns an outcome with effort, injury and produced food.
 
 
@@ -467,7 +546,42 @@ def _swing(ctx: Context, tool: dict | None) -> tuple[float, float, float, float,
     return energy, hardness, edge, head_mass, fragment
 
 
+def _signature(obj: dict) -> str:
+    # Putting something down is not preparation; picking it up is detected separately.
+    return json.dumps({k: v for k, v in obj.items() if k not in {"history", "x", "y", "holder"}}, sort_keys=True, default=str)
+
+
+def _merge_history(*histories: list[str]) -> list[str]:
+    merged: list[str] = []
+    for history in histories:
+        for key in history:
+            if key in merged:
+                merged.remove(key)
+            merged.append(key)
+    return merged[-HISTORY_LENGTH:]
+
+
 def execute(ctx: Context, key: str, spec: dict) -> dict:
+    """Run one interaction and record it in the history of every object it
+    made, shaped or picked up. Object history is how later benefit reaches the
+    preparation that made it possible, however long ago that was."""
+    before = {o["id"]: (_signature(o), o.get("history", []), o.get("holder")) for o in ctx.humans["objects"]}
+    tool = _find(ctx.humans, spec.get("tool"))
+    tool_history = list(tool.get("history", [])) if tool is not None else []
+    out = _execute_physical(ctx, key, spec)
+    out["tool_history"] = tool_history
+    after_ids = {o["id"] for o in ctx.humans["objects"]}
+    consumed = [hist for oid, (_, hist, _) in before.items() if oid not in after_ids]
+    for obj in ctx.humans["objects"]:
+        prior = before.get(obj["id"])
+        if prior is None:
+            obj["history"] = _merge_history(*consumed, tool_history, obj.get("history", []), [key])
+        elif prior[0] != _signature(obj) or (obj.get("holder") == ctx.agent_id and prior[2] != ctx.agent_id):
+            obj["history"] = _merge_history(prior[1], [key])
+    return out
+
+
+def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
     verb = spec["verb"]
     out = {"effort_kcal": 0.0, "injury": 0.0, "gain_kcal": 0.0, "event": verb}
     scale = max(0.1, float(ctx.profile.get("development_scale", 1.0)))
@@ -543,17 +657,25 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
         tool = _find(humans, spec.get("tool"))
         if animal is not None:
             traits = trait_for(str(animal["species"]))
-            cap = _capability(ctx.human, ctx.profile)
             energy, _, edge, _, _ = _swing(ctx, tool)
-            escape = 0.15 * traits.perception_radius + 0.25 * min(1.0, float(animal["energy"]) / traits.reproduction_energy)
-            chance = 0.10 + 0.35 * cap + min(0.30, energy / 150.0) + (0.10 if _reach_m(tool) >= 0.8 else 0.0) + 0.05 * edge - 0.6 * escape
-            chance = max(0.02, min(0.85, chance))
+            enc = resolve_encounter(
+                capability=_capability(ctx.human, ctx.profile),
+                fatigue=float(ctx.human.get("fatigue", 0.0)),
+                reach_m=ARM_REACH_M + _reach_m(tool),
+                strike_energy_j=energy if tool is not None else 0.0,
+                prey_mass_kg=_mass(animal["body_elements_kg"]),
+                prey_perception=traits.perception_radius,
+                prey_condition=min(1.0, float(animal["energy"]) / traits.reproduction_energy),
+                draws=[ctx.draw("encounter", key, i) for i in range(4)],
+            )
             _bump(ctx.stats, "capture_attempts")
-            out["effort_kcal"] = 60.0 * scale
-            ctx.human["fatigue"] = min(1.0, float(ctx.human.get("fatigue", 0.0)) + 0.05)
-            if traits.trophic_role == "predator" and ctx.draw("resist", key) < 0.5:
-                out["injury"] += _injure(ctx, 0.05 + 0.10 * ctx.draw("bite", key))
-            if ctx.draw("capture", key) < chance:
+            _bump(ctx.stats, f"encounter_{enc['outcome']}")
+            out["encounter"] = enc
+            out["effort_kcal"] = (5.0 + ENCOUNTER_WALK_KCAL_PER_M * enc["walked_m"] + ENCOUNTER_SPRINT_KCAL_PER_M * enc["sprinted_m"]) * scale
+            ctx.human["fatigue"] = min(1.0, float(ctx.human.get("fatigue", 0.0)) + 0.004 * enc["sprint_s"])
+            if enc["contact"] and traits.trophic_role == "predator" and ctx.draw("bite", key) < 0.6:
+                out["injury"] += _injure(ctx, 0.05 + 0.10 * ctx.draw("bite-amount", key))
+            if enc["outcome"] == "kill":
                 killed = kill_animal(ctx.consumers, animal["id"], "agentus")
                 if killed is not None:
                     _bump(ctx.stats, "captures")
@@ -562,7 +684,7 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
             else:
                 displace_animal(ctx.consumers, animal["id"], ctx.draw("flee", key))
                 _bump(ctx.stats, "capture_escapes")
-            if tool is not None:
+            if tool is not None and enc["contact"]:
                 _strike_load_test(ctx, tool, energy, out)
 
     elif verb == "cut_tissue":
@@ -759,7 +881,13 @@ def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: boo
     known = [o for o in options if o[0] in values]
     positive = [o for o in known if float(values[o[0]]["v"]) > 0.0]
     if positive:
-        return max(positive, key=lambda o: (float(values[o[0]]["v"]), o[0]))
+        picked = max(positive, key=lambda o: (float(values[o[0]]["v"]), o[0]))
+        # Repeated use because it paid before: the measure of learned practice.
+        _bump_map(ctx.stats, "exploit_by_key", picked[0], 1)
+        users = dict(ctx.stats.get("exploit_agents", {}))
+        users[picked[0]] = sorted(set(users.get(picked[0], [])) | {ctx.agent_id})
+        ctx.stats["exploit_agents"] = users
+        return picked
     if known and ctx.draw("retry", step) < RETRY_KNOWN:
         return known[int(ctx.draw("retry-pick", step) * len(known)) % len(known)]
     return None
@@ -837,11 +965,8 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
         reward = (gain - out["effort_kcal"]) / basal - out["injury"] * 2.0
         _update_value(values, key, reward, VALUE_LEARNING_RATE)
         if gain > 0.0:
-            for depth, prior_key in enumerate(reversed(trace), start=1):
-                if prior_key in values:
-                    entry = dict(values[prior_key])
-                    entry["v"] = round(float(entry["v"]) + VALUE_LEARNING_RATE * (TRACE_DECAY ** depth) * gain / basal, 10)
-                    values[prior_key] = entry
+            _credit_preparation(values, trace, out.get("tool_history", []), gain / basal)
+            observe_outcome(ctx, key, reward)
         trace = (trace + [key])[-TRACE_LENGTH:]
 
     for rec in intake:
@@ -853,6 +978,86 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
     cognition["food_values"] = food_values
     cognition["trace"] = trace
     ctx.human["cognition"] = cognition
+    observe_food(ctx, intake)
+
+
+def _credit_preparation(values: dict, trace: list[str], tool_history: list[str], gain_basal: float) -> None:
+    """Pass a realized benefit back to the actions that prepared it.
+
+    Two routes: recent actions (a decaying time trace) and the recorded history
+    of the object that was used, regardless of how long ago it was made. A key
+    reached by both routes is credited once, at the larger share.
+    """
+    shares: dict[str, float] = {}
+    for depth, prior_key in enumerate(reversed(trace), start=1):
+        shares[prior_key] = max(shares.get(prior_key, 0.0), TRACE_DECAY ** depth)
+    for depth, prior_key in enumerate(reversed(tool_history)):
+        shares[prior_key] = max(shares.get(prior_key, 0.0), HISTORY_DECAY ** depth)
+    for prior_key, share in sorted(shares.items()):
+        if prior_key in values:
+            entry = dict(values[prior_key])
+            entry["v"] = round(float(entry["v"]) + VALUE_LEARNING_RATE * share * gain_basal, 10)
+            values[prior_key] = entry
+
+
+def observe_outcome(ctx: Context, key: str, reward: float) -> None:
+    """Agents sharing the cell see an interaction succeed and update their own
+    expectation of it (declared assumption: a visible, beneficial outcome is
+    observable; failures and internal costs are not transmitted)."""
+    if reward <= 0.0:
+        return
+    for peer in ctx.humans["humans"]:
+        if peer is ctx.human or "cognition" not in peer:
+            continue
+        if (int(peer["x"]), int(peer["y"])) != ctx.xy:
+            continue
+        cognition = dict(peer["cognition"])
+        values = dict(cognition.get("affordance_values", {}))
+        entry = dict(values.get(key, {"n": 0, "v": 0.0}))
+        entry["v"] = round(float(entry["v"]) + OBSERVATION_RATE * (reward - float(entry["v"])) * (1.0 if int(entry["n"]) == 0 else VALUE_LEARNING_RATE), 10)
+        values[key] = entry
+        cognition["affordance_values"] = values
+        peer["cognition"] = cognition
+        _bump_map(ctx.stats, "observed_transmissions", key, 1)
+
+
+def observe_food(ctx: Context, intake: list[dict]) -> None:
+    """Agents sharing the cell see what another eats repeatedly without harm and
+    may adopt a cautious prior for a kind they have never valued."""
+    for rec in intake:
+        if rec["kg"] <= 0.0 or rec.get("hazard", 0.0) > 0.0 or rec["kcal"] <= 0.0:
+            continue
+        for peer in ctx.humans["humans"]:
+            if peer is ctx.human or "cognition" not in peer:
+                continue
+            if (int(peer["x"]), int(peer["y"])) != ctx.xy:
+                continue
+            known = peer["cognition"].get("food_values", {})
+            if rec["kind"] in known:
+                continue
+            cognition = dict(peer["cognition"])
+            food_values = dict(known)
+            food_values[rec["kind"]] = round(OBSERVATION_RATE * rec["kcal"] / rec["kg"], 10)
+            cognition["food_values"] = food_values
+            peer["cognition"] = cognition
+            _bump_map(ctx.stats, "observed_food_adoptions", rec["kind"], 1)
+
+
+def credit_worn_benefit(humans: dict, human: dict, saving_kcal: float, profile: dict) -> None:
+    """Warmth retained by worn material is an experienced benefit. It reinforces
+    wearing and the preparation recorded in the worn object's history."""
+    if saving_kcal <= 0.0 or "cognition" not in human:
+        return
+    basal = max(1e-9, float(profile["basal_energy_kcal_per_tick"]))
+    cognition = dict(human["cognition"])
+    values = dict(cognition.get("affordance_values", {}))
+    for obj in humans.get("objects", []):
+        if obj.get("holder") == human["id"] and obj.get("worn"):
+            _credit_preparation(values, [], list(obj.get("history", [])), saving_kcal / basal)
+    cognition["affordance_values"] = values
+    human["cognition"] = cognition
+    stats = humans.setdefault("capacity_stats", empty_stats())
+    _bump(stats, "insulation_saving_kcal", saving_kcal)
 
 
 def choose_food_samples(human: dict, pcell: dict, ccell: dict | None, epoch: int, hungry: bool) -> tuple[str, ...]:

@@ -434,7 +434,7 @@ def test_flag_off_keeps_earlier_fingerprints():
         material_scale_factor=1000.0, human_calibration_enabled=True,
     ).canonical()
     assert "agentus_capacities_enabled" not in off
-    assert base["agentus_capacity_model"] == "capacity-v1"
+    assert base["agentus_capacity_model"] == "capacity-v2"
     sim = GenesisSimulation(GenesisConfig(master_seed="x", producer_ecology_enabled=True, consumer_ecology_enabled=True))
     assert all("fresh_elements_kg" not in c for c in sim.consumer_state()["carcass_cells"])
 

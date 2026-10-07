@@ -32,13 +32,18 @@ SEEDS = [
     "agentus-demography-b",
     "agentus-demography-c",
     "agentus-demography-d",
-]
+] + [f"agentus-g10-4-{i:02d}" for i in range(1, 17)]
 DAYS = 730
 ARMS = ("v0", "v1", "plant_diet", "no_interactions", "no_recall", "null")
 NULL_ABLATION = "plant_diet+no_interactions+no_recall"
 
 
 def config_for(seed: str, arm: str) -> GenesisConfig:
+    """`arm` is a base arm, optionally suffixed `+thirst` (G10.4 thirst drive)."""
+    thirst = arm.endswith("+thirst")
+    arm = arm.removesuffix("+thirst")
+    if arm not in ARMS:
+        raise ValueError(f"unknown arm: {arm}")
     return GenesisConfig(
         master_seed=seed,
         world_width=16,
@@ -54,6 +59,7 @@ def config_for(seed: str, arm: str) -> GenesisConfig:
         human_calibration_enabled=True,
         agentus_capacities_enabled=arm != "v0",
         agentus_capacity_ablation="" if arm in {"v0", "v1"} else (NULL_ABLATION if arm == "null" else arm),
+        agentus_thirst_enabled=thirst,
     )
 
 
@@ -143,6 +149,14 @@ def run(seed: str, arm: str, days: int) -> dict:
         "interaction_counts": stats.get("interaction_counts", {}),
         "interaction_effort_kcal": stats.get("interaction_effort_kcal", 0.0),
         "interaction_injury": stats.get("interaction_injury", 0.0),
+        "learned_practice": {
+            "exploit_by_key": stats.get("exploit_by_key", {}),
+            "exploit_agent_counts": {k: len(v) for k, v in stats.get("exploit_agents", {}).items()},
+            "observed_transmissions": stats.get("observed_transmissions", {}),
+            "observed_food_adoptions": stats.get("observed_food_adoptions", {}),
+            "insulation_saving_kcal": stats.get("insulation_saving_kcal", 0.0),
+        },
+        "encounters": {k: stats.get(f"encounter_{k}", 0) for k in ("kill", "contact_failed", "outrun", "reached_cover")},
         "material_events": {k: stats.get(k, 0) for k in (
             "capture_attempts", "captures", "capture_escapes", "fractures", "sharp_flakes",
             "fibers_extracted", "wood_pieces", "bindings", "binding_failures",
@@ -160,12 +174,12 @@ def run(seed: str, arm: str, days: int) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--arm", choices=ARMS, required=True)
-    parser.add_argument("--seed", choices=SEEDS + ["all"], default="all")
+    parser.add_argument("--arm", required=True, help="base arm, optionally with +thirst")
+    parser.add_argument("--seed", default="all", help="a seed name, 'all', or 'first4'")
     parser.add_argument("--days", type=int, default=DAYS)
     parser.add_argument("--out")
     args = parser.parse_args()
-    seeds = SEEDS if args.seed == "all" else [args.seed]
+    seeds = SEEDS if args.seed == "all" else (SEEDS[:4] if args.seed == "first4" else [args.seed])
     results = []
     for seed in seeds:
         result = run(seed, args.arm, args.days)

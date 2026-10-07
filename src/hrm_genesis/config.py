@@ -30,6 +30,8 @@ class GenesisConfig:
     # manipulation or capture) and "no_recall" (no travel toward remembered
     # food).
     agentus_capacity_ablation: str = ""
+    # Thirst as an interoceptive planning drive (G10.4). Off by default.
+    agentus_thirst_enabled: bool = False
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -70,6 +72,8 @@ class GenesisConfig:
             raise ValueError("unknown agentus_capacity_ablation")
         if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
             raise ValueError("agentus_capacity_ablation requires agentus_capacities_enabled")
+        if self.agentus_thirst_enabled and not self.human_cognition_enabled:
+            raise ValueError("agentus_thirst_enabled requires human_cognition_enabled")
         if self.multi_population_enabled and not self.human_actions_enabled:
             raise ValueError("multi_population_enabled requires human_actions_enabled")
 
@@ -101,9 +105,11 @@ class GenesisConfig:
         if self.agentus_capacities_enabled:
             # Present only when enabled so earlier fingerprints do not change.
             canonical["agentus_capacities_enabled"] = True
-            canonical["agentus_capacity_model"] = "capacity-v1"
+            canonical["agentus_capacity_model"] = "capacity-v2"
         if self.agentus_capacity_ablation:
             canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
+        if self.agentus_thirst_enabled:
+            canonical["agentus_thirst_enabled"] = True
         return canonical
 
     def fingerprint(self) -> str:

@@ -160,6 +160,9 @@ class GenesisSimulation:
                 producer_state,
                 matter_state,
             )
+            if config.agentus_thirst_enabled:
+                human_state = dict(human_state)
+                human_state["thirst_planning"] = True
             if config.agentus_capacities_enabled:
                 # Loose weathered stone is part of initial conditions; its total
                 # is the fixed lithic ledger quantity. Fresh carcass tissue is
