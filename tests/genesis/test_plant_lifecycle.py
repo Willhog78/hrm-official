@@ -1,5 +1,10 @@
 from hrm_coordination.seeds import SeedBank
-from hrm_genesis.ecology.plants import build_producer_state, evolve_producers
+from hrm_genesis.ecology.plants import (
+    GERMINATION_SEED_MASS_KG,
+    SEED_GERMINATION_FRACTION,
+    build_producer_state,
+    evolve_producers,
+)
 from hrm_genesis.matter.pools import build_matter_state
 
 
@@ -28,3 +33,22 @@ def test_seedlings_in_empty_cell_start_at_age_zero():
     producers, matter = _single_cell(plant_kg=0.0, seed_kg=1.0, age=0)
     producers, _ = evolve_producers(producers, matter, VIABLE, 0)
     assert producers["cells"][0]["age_ticks"] == 1
+
+
+
+def _seed_drop(seed_kg: float) -> float:
+    producers, matter = _single_cell(plant_kg=0.0, seed_kg=seed_kg, age=0)
+    producers, _ = evolve_producers(producers, matter, VIABLE, 0)
+    return seed_kg - producers["cells"][0]["seed_elements_kg"]["C"]
+
+
+def test_small_seed_pool_keeps_fixed_germinating_mass():
+    # Seedlings below the 0.02 kg reproduction threshold shed no seed this tick.
+    assert abs(_seed_drop(0.05) - GERMINATION_SEED_MASS_KG) < 1e-9
+
+
+def test_germination_scales_with_large_seed_pool():
+    large = 200.0
+    # New seedlings (3.3 kg) shed 1.2% back into this single cell's pool.
+    assert abs(_seed_drop(large) - 3.3) < 0.1
+    assert SEED_GERMINATION_FRACTION == 0.0165
