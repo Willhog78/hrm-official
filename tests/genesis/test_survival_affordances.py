@@ -234,3 +234,40 @@ def test_terrain_cover_moderates_cold_extremes_too():
 
     assert float(protected["energy"]) > float(exposed["energy"])
     assert float(protected["injury"]) <= float(exposed["injury"])
+
+
+def test_cover_preference_is_context_sensitive_not_permanent():
+    expectations = {}
+    expectations = update_expectations(
+        expectations,
+        {"origin": [1, 0], "cells": [], "context": "hot"},
+        100.0,
+    )
+    expectations = update_expectations(
+        expectations,
+        {"origin": [0, 0], "cells": [], "context": "mild"},
+        20.0,
+    )
+
+    hot_perception = {
+        "origin": [0, 0],
+        "context": "hot",
+        "recognized": [],
+        "cells": [
+            {"x": 0, "y": 0, "food_kg": 1.2, "water_kg": 1.0},
+            {"x": 1, "y": 0, "food_kg": 1.0, "water_kg": 1.0},
+        ],
+    }
+    mild_perception = {
+        "origin": [0, 0],
+        "context": "mild",
+        "recognized": [],
+        "cells": [
+            {"x": 0, "y": 0, "food_kg": 1.2, "water_kg": 1.0},
+            {"x": 1, "y": 0, "food_kg": 1.0, "water_kg": 1.0},
+        ],
+    }
+
+    cognition = {"expectations": expectations, "uncertainty": 0.05}
+    assert choose_destination({"x": 0, "y": 0}, hot_perception, cognition) == (1, 0)
+    assert choose_destination({"x": 0, "y": 0}, mild_perception, cognition) == (0, 0)
