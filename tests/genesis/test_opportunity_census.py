@@ -42,12 +42,12 @@ def test_classify_hunger_and_peers():
 
 
 def test_census_uninstalls_cleanly():
-    originals = (biology.choose_destination, cap.remember_witnessed)
+    originals = (biology.choose_destination, cap.remember_witnessed, cap.observe_outcome)
     census = Census()
     census.install()
     assert biology.choose_destination is not originals[0]
     census.uninstall()
-    assert (biology.choose_destination, cap.remember_witnessed) == originals
+    assert (biology.choose_destination, cap.remember_witnessed, cap.observe_outcome) == originals
 
 
 def test_census_is_non_causal():

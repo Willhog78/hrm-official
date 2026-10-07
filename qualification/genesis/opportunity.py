@@ -18,9 +18,18 @@ Per independent agent-day (the planner is consulted; dependents are carried):
      none              nothing known
   P  peer in view      another individual within perception range (own cell + 4)
   C  peer in own cell  the only place acts can be witnessed
+  P_nonkin, C_nonkin   the same, counting only individuals outside the agent's
+                       caregiving lineage (caregiver, dependent, same caregiver)
   W  witnessed useful  saw, today, an act with at least one visible consequence
                        (witnessed_salience > 0); `W_nonmeal` excludes acts that
                        are themselves eating
+  reserve              energy / satiety reference, the quantity the planner's
+                       hunger test thresholds at 0.75; reported in bins, and for
+                       agents caring for a dependent that day ("caring")
+
+Useful non-meal acts performed are also counted at the actor, with whether
+anyone (or any non-kin) shared the cell: this separates "useful acts are rare"
+from "useful acts happen unseen".
 
 Opportunities are counted apart from use:
   follow opportunity   H and not T and food none and P (the branch where
@@ -96,6 +105,8 @@ def classify(perception: dict, cognition: dict) -> dict:
     peers = perception.get("visible_peers") or []
     ox, oy = map(int, perception["origin"])
     return {
+        "reserve": reserve,
+        "peer_ids": [(str(pid), (int(x), int(y)) == (ox, oy)) for pid, x, y in peers],
         "H": hungry,
         "T": thirst,
         "food": food,
@@ -110,6 +121,8 @@ class Census:
         self.epoch = 0
         self.day_records: dict[str, dict] = {}
         self.witnessed: dict[str, Counter] = defaultdict(Counter)
+        self.caregiver: dict[str, str | None] = {}
+        self.acts: Counter = Counter()
         self._originals: list[tuple[object, str, object]] = []
 
     def install(self) -> None:
@@ -138,10 +151,35 @@ class Census:
                         c["useful_nonmeal"] += 1
             return original_remember(ctx, peer, event, consequence)
 
+        original_observe = cap.observe_outcome
+
+        def observe_outcome(ctx, key, reward=None, visible=None):
+            # Every act a capable agent performs passes here (visible-v1), with
+            # or without anyone present: count useful acts and their audience.
+            if visible is not None:
+                salience = cap.witnessed_salience({
+                    "act": key, "eaten_kg": visible["eaten_kg"], "hurt": visible["injury"] > 0.0,
+                    "appeared": visible.get("appeared", []), "transformed": visible.get("transformed", False),
+                    "killed": visible.get("killed", False), "exposed_kg": visible.get("exposed_kg", 0.0)})
+                if salience > 0 and not str(key).startswith("eat:"):
+                    present = [p for p in ctx.humans["humans"]
+                               if p is not ctx.human and "cognition" in p and (int(p["x"]), int(p["y"])) == ctx.xy]
+                    kin = [p for p in present if census.related(ctx.agent_id, str(p["id"]))]
+                    census.acts["useful_nonmeal_acts"] += 1
+                    census.acts["with_audience"] += bool(present)
+                    census.acts["with_nonkin_audience"] += len(present) > len(kin)
+            return original_observe(ctx, key, reward, visible)
+
         for module, name, fn in ((biology, "choose_destination", choose_destination),
-                                 (cap, "remember_witnessed", remember_witnessed)):
+                                 (cap, "remember_witnessed", remember_witnessed),
+                                 (cap, "observe_outcome", observe_outcome)):
             self._originals.append((module, name, getattr(module, name)))
             setattr(module, name, fn)
+
+    def related(self, a: str, b: str) -> bool:
+        """Kin by caregiving lineage: caregiver/dependent, or the same caregiver."""
+        ca, cb = self.caregiver.get(a), self.caregiver.get(b)
+        return ca == b or cb == a or (ca is not None and ca == cb)
 
     def uninstall(self) -> None:
         for module, name, fn in reversed(self._originals):
@@ -167,6 +205,16 @@ def _add(bucket: dict, rec: dict) -> None:
     c[f"food:{food}"] += 1
     c["P"] += P
     c["C"] += C
+    c["P_nonkin"] += rec["P_nonkin"]
+    c["C_nonkin"] += rec["C_nonkin"]
+    r = rec["reserve"]
+    c["reserve<0.25"] += r < 0.25
+    c["reserve<0.50"] += r < 0.50
+    c["reserve<0.75"] += r < 0.75
+    c["caring"] += rec["caring"]
+    c["H_caring"] += H and rec["caring"]
+    c["reserve<0.25_caring"] += r < 0.25 and rec["caring"]
+    bucket["reserve_sum"] = bucket.get("reserve_sum", 0.0) + r
     c["W"] += W
     c["W_nonmeal"] += Wn
     c["H_and_not_known_full"] += H and not known_full
@@ -200,6 +248,7 @@ def run_census(seed: str, arm: str, days: int) -> dict:
             census.day_records = {}
             census.witnessed = defaultdict(Counter)
             census.epoch = day
+            census.caregiver = {str(p["id"]): p.get("caregiver_id") for p in sim.human_state()["humans"]}
             sim.run(1)
             state = sim.human_state()
             cells = sim.ecology_state()["cells"]
@@ -216,6 +265,8 @@ def run_census(seed: str, arm: str, days: int) -> dict:
                 b["plant_kg_min"] = sum(plant) if b["plant_kg_min"] is None else min(b["plant_kg_min"], sum(plant))
                 b["adult_day_cells_min"] = adult_day_cells if b["adult_day_cells_min"] is None else min(b["adult_day_cells_min"], adult_day_cells)
                 b["zero_adult_day_cell_days"] += adult_day_cells == 0
+            caring = {str(p.get("caregiver_id")) for p in state["humans"]
+                      if int(p["age_ticks"]) < independent and p.get("caregiver_id")}
             for person in state["humans"]:
                 pid = str(person["id"])
                 rec = census.day_records.get(pid)
@@ -227,7 +278,10 @@ def run_census(seed: str, arm: str, days: int) -> dict:
                             buckets[key]["dependent_witness_useful"] += w["useful"] > 0
                     continue
                 peers_tracked = peers_tracked and rec["peers_tracked"]
-                rec = {**rec, "W": w["useful"], "W_nonmeal": w["useful_nonmeal"]}
+                nonkin = [(q, same) for q, same in rec["peer_ids"] if not census.related(pid, q)]
+                rec = {**rec, "W": w["useful"], "W_nonmeal": w["useful_nonmeal"],
+                       "caring": pid in caring,
+                       "P_nonkin": bool(nonkin), "C_nonkin": any(same for _, same in nonkin)}
                 for key in keys:
                     _add(buckets[key], rec)
         final = sim.human_state()
@@ -247,6 +301,7 @@ def run_census(seed: str, arm: str, days: int) -> dict:
                 "imitation_tries": sum(stats.get("imitation_tries", {}).values()),
                 "imitation_paid": sum(stats.get("imitation_paid", {}).values()),
             },
+            "acts": dict(census.acts),
             "buckets": {k: {**v, "counts": dict(v["counts"]), "combos": dict(v["combos"])} for k, v in buckets.items()},
         }
     except Exception as exc:  # a crash is a result
@@ -274,6 +329,7 @@ def merge(results: list[dict]) -> dict[str, dict]:
             for f in ("plant_kg_min", "adult_day_cells_min"):
                 if b[f] is not None:
                     m[f] = b[f] if m[f] is None else min(m[f], b[f])
+            m["reserve_sum"] = m.get("reserve_sum", 0.0) + b.get("reserve_sum", 0.0)
             m["counts"].update(b["counts"])
             m["combos"].update(b["combos"])
     return merged
@@ -301,12 +357,19 @@ def print_report(results: list[dict]) -> None:
         (k for k in merged if k.startswith("year")), key=lambda k: (int(k[4:].split(":")[0]), k))
     print(f"\n== OPPORTUNITY CENSUS: {len(ok)} runs; independent agent-days; percentages of agent-days in the row ==")
     cols = ["H", "T", "food:full_in_view", "food:full_remembered", "food:partial_in_view", "food:none",
-            "P", "C", "W", "W_nonmeal"]
+            "P", "C", "P_nonkin", "C_nonkin", "W", "W_nonmeal"]
     print(f"{'bucket':16s}{'agent-days':>11s} " + " ".join(f"{c.replace('food:', ''):>17s}" for c in cols))
     for key in order:
         b = merged[key]
         n = b["agent_days"]
         print(f"{key:16s}{n:11d} " + " ".join(f"{_pct(b['counts'].get(c, 0), n):>17s}" for c in cols))
+    print("\n-- reserves behind the hunger label (energy / satiety reference; planner calls < 0.75 hungry) --")
+    print(f"{'bucket':16s}{'mean':>8s}" + "".join(f"{c:>20s}" for c in ("reserve<0.25", "reserve<0.50", "reserve<0.75", "caring", "H_caring", "reserve<0.25_caring")))
+    for key in order:
+        b = merged[key]
+        n = b["agent_days"]
+        print(f"{key:16s}{b.get('reserve_sum', 0.0) / max(1, n):8.2f}" + "".join(
+            f"{_pct(b['counts'].get(c, 0), n):>20s}" for c in ("reserve<0.25", "reserve<0.50", "reserve<0.75", "caring", "H_caring", "reserve<0.25_caring")))
     print("\n-- conjunctions --")
     conj = ["H_and_not_known_full", "H_food_partial", "H_food_none", "H_and_P", "follow_if_partial",
             "follow_opportunity", "follow_branch_reached", "followed", "H_not_known_full_and_W"]
@@ -323,6 +386,13 @@ def print_report(results: list[dict]) -> None:
         print(f"{key:16s}{b['alive_sum'] / d:11.1f}{b['plant_kg_sum'] / d:15.0f}{(b['plant_kg_min'] or 0):14.0f}"
               f"{b['seed_kg_sum'] / d:14.0f}{(b['adult_day_cells_min'] or 0):26d}{b['zero_adult_day_cell_days']:24d}"
               f"{b['dependent_days']:16d}{b['dependent_witness_useful']:16d}")
+    acts = Counter()
+    for r in ok:
+        acts.update(r.get("acts", {}))
+    n = acts.get("useful_nonmeal_acts", 0)
+    print(f"\n-- useful non-meal acts performed (any visible consequence): {n}; "
+          f"with anyone in the cell {_pct(acts.get('with_audience', 0), n)}; "
+          f"with a non-kin in the cell {_pct(acts.get('with_nonkin_audience', 0), n)}")
     print("\n-- overlap, all agent-days: bits = H, no known full food, peer in view, witnessed useful --")
     combos = merged["all"]["combos"]
     total = merged["all"]["agent_days"]
