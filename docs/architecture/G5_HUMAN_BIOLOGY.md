@@ -70,3 +70,12 @@ The first G5 qualification should prove that a deterministic human organism can:
 8. preserve element and water accounting.
 
 This is a biology gate, not an intelligence gate.
+
+
+## Qualification-scale anatomy
+
+The current Genesis G5 body quantities are intentionally compressed to fit the small G0-G4 ecology. They qualify causal biological pathways and conservation; they are **not** a claim of realistic adult human mass, caloric demand, hydration volume, or physiology.
+
+Before HRM is used for experiments that depend on real human energetics, body size, carrying capacity, starvation time, reproduction timing, or thermal tolerance, G10 must replace these compressed quantities with a calibrated human-scale model and requalify the full stack.
+
+This simplification is explicit so later cognition and social experiments cannot accidentally treat the qualification body as physiologically realistic.
