@@ -25,9 +25,10 @@ class GenesisConfig:
     # G10.3 capacity model v1. Off by default; earlier configs, fingerprints
     # and results are unchanged.
     agentus_capacities_enabled: bool = False
-    # Experimental ablation of capacity v1: "", "plant_diet" (no sampling of
-    # unknown food kinds), "no_interactions" (no manipulation or capture), or
-    # "no_recall" (no travel toward remembered food).
+    # Experimental ablation of capacity v1: "" or a "+"-joined set of
+    # "plant_diet" (no sampling of unknown food kinds), "no_interactions" (no
+    # manipulation or capture) and "no_recall" (no travel toward remembered
+    # food).
     agentus_capacity_ablation: str = ""
     world_width: int = 8
     world_height: int = 8
@@ -64,7 +65,8 @@ class GenesisConfig:
             raise ValueError("human_actions_enabled requires human_cognition_enabled")
         if self.agentus_capacities_enabled and not (self.human_actions_enabled and self.human_calibration_enabled):
             raise ValueError("agentus_capacities_enabled requires human_actions_enabled and human_calibration_enabled")
-        if self.agentus_capacity_ablation not in {"", "plant_diet", "no_interactions", "no_recall"}:
+        parts = [p for p in self.agentus_capacity_ablation.split("+") if p]
+        if not set(parts) <= {"plant_diet", "no_interactions", "no_recall"} or len(parts) != len(set(parts)):
             raise ValueError("unknown agentus_capacity_ablation")
         if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
             raise ValueError("agentus_capacity_ablation requires agentus_capacities_enabled")

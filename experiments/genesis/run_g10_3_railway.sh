@@ -5,7 +5,7 @@ cd "$(dirname "$0")/../.."
 export PYTHONPATH=src:.
 PARALLEL="${HRM_PARALLEL:-3}"
 echo "CAPACITY_START: parallel=$PARALLEL"
-for arm in v0 v1 plant_diet no_interactions no_recall; do
+for arm in ${HRM_ARMS:-v0 v1 plant_diet no_interactions no_recall}; do
   for seed in a b c d; do
     echo "$arm agentus-demography-$seed"
   done

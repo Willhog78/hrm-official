@@ -601,7 +601,7 @@ def evolve_agentus_step(
     lets Agentus kill animals and eat carcass tissue inside the same atomic
     transaction. Without capacities the Consumer state is returned unchanged."""
     capacities = human_state.get("capacity_model") == cap.CAPACITY_MODEL
-    ablation = str(human_state.get("capacity_ablation", ""))
+    ablation = set(str(human_state.get("capacity_ablation", "")).split("+"))
     if capacities and consumer_state is not None:
         consumer_state = deepcopy(consumer_state)
     humans = deepcopy(human_state)
@@ -663,7 +663,7 @@ def evolve_agentus_step(
                     human["cognition"].get("food_values", {}),
                     innate_food_prior(effective_profile)["plant_tissue"],
                     {kind: float(spec["hand_access_kg"]) * scale for kind, spec in FOOD_KINDS.items()},
-                    None if ablation == "no_recall" else human["cognition"].get("memory", {}).get("locations", {}),
+                    None if "no_recall" in ablation else human["cognition"].get("memory", {}).get("locations", {}),
                 )
             target = choose_destination(human, perception, human["cognition"])
         else:
@@ -699,12 +699,12 @@ def evolve_agentus_step(
             ctx = None
             samples: tuple[str, ...] = ()
             if dependence <= 0.0:
-                if ablation != "no_interactions":
+                if "no_interactions" not in ablation:
                     ctx = cap.run_interactions(
                         humans, human, effective_profile, pcells[xy], ccells[xy],
                         lithic_cells, wcells[xy], consumer_state, epoch, hungry,
                     )
-                if ablation != "plant_diet":
+                if "plant_diet" not in ablation:
                     samples = cap.choose_food_samples(human, pcells[xy], ccells[xy], epoch, hungry)
             intake = forage_at_cell(
                 human, pcells[xy], ccells[xy], effective_profile,

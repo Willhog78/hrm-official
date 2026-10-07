@@ -6,6 +6,8 @@ Arms (same seeds, same world, same resource quantities):
   plant_diet       v1 without sampling unknown food kinds
   no_interactions  v1 without manipulation or capture
   no_recall        v1 without travel toward remembered food
+  null             v1 with all three ablated: isolates effects of the
+                   capacity model that no single ablation removes
 
 Every measurement below is read after a tick; nothing here feeds back into the
 simulation. Results print as JSON lines (usable from a log) and optionally
@@ -32,7 +34,8 @@ SEEDS = [
     "agentus-demography-d",
 ]
 DAYS = 730
-ARMS = ("v0", "v1", "plant_diet", "no_interactions", "no_recall")
+ARMS = ("v0", "v1", "plant_diet", "no_interactions", "no_recall", "null")
+NULL_ABLATION = "plant_diet+no_interactions+no_recall"
 
 
 def config_for(seed: str, arm: str) -> GenesisConfig:
@@ -50,7 +53,7 @@ def config_for(seed: str, arm: str) -> GenesisConfig:
         material_scale_factor=1000.0,
         human_calibration_enabled=True,
         agentus_capacities_enabled=arm != "v0",
-        agentus_capacity_ablation="" if arm in {"v0", "v1"} else arm,
+        agentus_capacity_ablation="" if arm in {"v0", "v1"} else (NULL_ABLATION if arm == "null" else arm),
     )
 
 
