@@ -54,6 +54,8 @@ def build_producer_state(*, width: int, height: int) -> dict:
                 "y": y,
                 "plant_elements_kg": _blank_elements(),
                 "woody_elements_kg": _blank_elements(),
+                "loose_material_elements_kg": _blank_elements(),
+                "arranged_material_elements_kg": _blank_elements(),
                 "seed_elements_kg": _blank_elements(),
                 "detritus_elements_kg": _blank_elements(),
                 "age_ticks": 0,
@@ -151,6 +153,8 @@ def evolve_producers(
     wcells = _cell_lookup(world_state["cells"])
     for pcell in pcells.values():
         pcell.setdefault("woody_elements_kg", _blank_elements())
+        pcell.setdefault("loose_material_elements_kg", _blank_elements())
+        pcell.setdefault("arranged_material_elements_kg", _blank_elements())
 
     # 1. Decomposition returns previously dead material to Matter.
     for xy, pcell in pcells.items():
@@ -250,7 +254,14 @@ def evolve_producers(
     matter["epoch_applied"] = epoch
 
     for pcell in ecology["cells"]:
-        for bucket in ("plant_elements_kg", "woody_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
+        for bucket in (
+            "plant_elements_kg",
+            "woody_elements_kg",
+            "loose_material_elements_kg",
+            "arranged_material_elements_kg",
+            "seed_elements_kg",
+            "detritus_elements_kg",
+        ):
             pcell[bucket] = {
                 symbol: round(max(0.0, float(amount)), 10)
                 for symbol, amount in sorted(pcell[bucket].items())
@@ -289,7 +300,14 @@ def producer_detritus_mass_kg(state: dict) -> float:
 def ecology_element_totals(state: dict) -> dict[str, float]:
     totals = _blank_elements()
     for cell in state["cells"]:
-        for bucket in ("plant_elements_kg", "woody_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
+        for bucket in (
+            "plant_elements_kg",
+            "woody_elements_kg",
+            "loose_material_elements_kg",
+            "arranged_material_elements_kg",
+            "seed_elements_kg",
+            "detritus_elements_kg",
+        ):
             for symbol, amount in cell.get(bucket, {}).items():
                 totals[symbol] += float(amount)
     return {symbol: round(value, 10) for symbol, value in sorted(totals.items())}
