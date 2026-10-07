@@ -61,8 +61,11 @@ def build_grid(width: int, height: int, seed_bank: SeedBank) -> list[dict[str, f
         # Terrain cover is terrain-derived, not independently scattered.
         # Strong relief plus exposed rock can create cave/overhang-like shelter.
         shelter = 0.0
-        if rock_exposure >= 0.58 and relief >= 12.0:
-            shelter = min(0.85, (rock_exposure - 0.50) * 1.4 + (relief - 12.0) / 80.0)
+        if rock_exposure >= 0.88 and relief >= 30.0:
+            shelter = min(
+                0.85,
+                0.35 + (rock_exposure - 0.88) * 2.5 + (relief - 30.0) / 60.0,
+            )
 
         cell["terrain_relief"] = round(relief, 6)
         cell["rock_exposure"] = round(rock_exposure, 6)
