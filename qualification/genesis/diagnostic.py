@@ -10,6 +10,7 @@ question. Arms use the multiseed names plus an optional `@physiology`:
                                                    transmission and food adoption)
   infant        v1           vs v1@reference-v2   (caregiving and energy budget)
   capacities    v0           vs v1
+  integrity     v1-preg106   vs v1                (G10.6 behavioural/locomotion integrity)
 
   python -m qualification.genesis.tiers diagnostic infant
   python -m qualification.genesis.tiers diagnostic custom --arms v1 v1@reference-v2 --days 365
@@ -34,6 +35,7 @@ SETS: dict[str, tuple[str, ...]] = {
     "learning": ("no_recall", "v1"),
     "infant": ("v1", "v1@reference-v2"),
     "capacities": ("v0", "v1"),
+    "integrity": ("v1-preg106", "v1"),
 }
 DIAGNOSTIC_SEEDS = ("agentus-demography-a", "agentus-demography-b", "agentus-demography-c", "agentus-demography-d")
 DIAGNOSTIC_DAYS = 180

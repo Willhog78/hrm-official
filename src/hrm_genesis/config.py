@@ -34,6 +34,10 @@ class GenesisConfig:
     # On by default wherever Agentus cognition is enabled; set False only to
     # reproduce pre-G10.4 results, whose fingerprints omit this key.
     agentus_thirst_enabled: bool = True
+    # G10.6 behavioural/locomotion integrity (baseline correction): partial food
+    # anchors a hungry agent, dependents move physically, sleep recovers fatigue.
+    # False reproduces pre-G10.6 runs exactly.
+    agentus_behavior_integrity_enabled: bool = True
     # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
     # catabolism, realistic lactation and size^0.75 child metabolism.
     agentus_physiology_version: str = "reference-v1"
@@ -90,6 +94,10 @@ class GenesisConfig:
         return self.agentus_thirst_enabled and self.human_cognition_enabled
 
     @property
+    def behavior_integrity_active(self) -> bool:
+        return self.agentus_behavior_integrity_enabled and self.human_biology_enabled
+
+    @property
     def contract_dt(self) -> Fraction:
         return Fraction(self.contract_dt_numerator, self.contract_dt_denominator)
 
@@ -122,6 +130,8 @@ class GenesisConfig:
             canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
         if self.thirst_planning_active:
             canonical["agentus_thirst_enabled"] = True
+        if self.behavior_integrity_active:
+            canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":
             canonical["agentus_physiology_version"] = self.agentus_physiology_version
         return canonical

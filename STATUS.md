@@ -89,3 +89,37 @@ Merged implementation and qualification assets now exist through:
 - travel toward remembered food.
 
 Specification, audit and limits: `docs/architecture/G10_3_AGENTUS_CAPACITIES.md`. Experimental evidence: `experiments/genesis/summaries/AGENTUS_CAPACITY_V1_2026-10-07.md`. Sustainable survival is not qualified.
+
+**G10.4 survival bottlenecks: COMPLETE** (merged in PR #26; capacity model `capacity-v2`). Specification: `docs/architecture/G10_4_SURVIVAL_BOTTLENECKS.md`.
+- Thirst is a baseline planning drive. It uses local or remembered water only and competes with hunger.
+- Hunting requires approach and physical contact.
+- Delayed credit flows through object history, and warmth counts as a reward.
+- Repeated beneficial use is measured, and learning by observation applies to successes only.
+- The animal population is diagnosed as limited by its life history (owner decision pending).
+
+**G10.5 energy-budget realism: COMPLETE as an opt-in** (`agentus_physiology_version="reference-v2"`).
+- It adds a fat reserve, lean catabolism, corrected nursing and Kleiber scaling.
+- The default remains `reference-v1`. Whether v2 becomes the default is decided when long-run claims are made.
+
+**Testing tiers: ACTIVE** (`docs/architecture/TESTING_TIERS.md`).
+- The tiers are micro (about 2 s), smoke (about 25 s), diagnostic (about 2–4 min) and full (hours).
+- The development loop is `python -m qualification.genesis.tiers fast`.
+- The full 20-seed × 730-day batch is validation, not the default.
+- **Advancement rule:** a mechanism advances when its physical and integrity contract holds. Long-horizon survival is reported, not used as a gate.
+
+**G10.6 behavioural/locomotion integrity: IMPLEMENTED** (`docs/architecture/G10_6_BEHAVIORAL_INTEGRITY.md`; flag `agentus_behavior_integrity_enabled`, default on).
+- Partial food is no longer abandoned.
+- Dependents are carried, or walk one cell a day.
+- Fatigue recovers with sleep.
+- Blocked agent-days fell from 27% to 0% in the targeted diagnostic.
+
+**Next: G10.7 communication and teaching** (see ROADMAP).
+
+**Infrastructure ticket.** GitHub Actions `verify` fails before any step runs, on `main` as well as on PRs (runs 99–104). This is an Actions environment problem (billing or runner) and is tracked separately. Until it is fixed, the local fast tier and gates are the verification record.
+
+**Pre-existing gate failure, hidden by the dead CI.** `run_g5_human_biology_gate.py` fails `reproduction_occurred` and `birth_added_human` on `main` before G10.6, with identical results with G10.6 on or off.
+- Its birth probe places the founding pair in one cell.
+- Since the reproduction-contact correction (PR #23), reproduction requires co-location *after* the day's movement.
+- Without cognition, the two adults move to different food cells first.
+
+The probe needs updating, for example by holding the pair on a cell whose food satisfies both. The model itself has no defect here. The other 18 gate scripts pass with G10.6.

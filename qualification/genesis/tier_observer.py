@@ -9,8 +9,8 @@ physical access from the state it sees, so a regression in those guards shows
 up here.
 
 Arms are the multiseed arms (`v0`, `v1`, `plant_diet`, `no_interactions`,
-`no_recall`, `null`, each optionally `-nothirst`), plus an optional
-`@<physiology>` suffix, e.g. `v1@reference-v2`.
+`no_recall`, `null`, each optionally `-nothirst`), then optionally
+`-preg106` (G10.6 integrity off) and `@<physiology>`, e.g. `v1-preg106@reference-v2`.
 
 Checks are split into:
   FAIL: broken invariants (crash, NaN, negative mass, ledger, conservation,
@@ -43,16 +43,28 @@ from hrm_genesis.human import human_element_totals, human_water_total_kg  # noqa
 from hrm_genesis.matter.pools import total_elements, total_water  # noqa: E402
 from run_agentus_capacity_multiseed import config_for  # noqa: E402
 
+# A habit that keeps failing must extinguish: one agent repeating the same
+# no-op as a learned habit this many times is a superstition loop.
+NOOP_HABIT_LIMIT = 10
 # Relative tolerance for whole-world element and water balance.
 CONSERVATION_REL_TOL = 1e-6
 FATIGUE_BLOCK = 0.8  # interactions stop above this (interactions.run_interactions)
 
 
+PRE_G10_6 = "-preg106"  # arm suffix: behavioural/locomotion integrity off
+
+
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
-    config = config_for(seed, base)
+    integrity = not base.endswith(PRE_G10_6)
+    config = config_for(seed, base.removesuffix(PRE_G10_6))
+    overrides = {}
     if physiology:
-        config = GenesisConfig(**{**config.__dict__, "agentus_physiology_version": physiology})
+        overrides["agentus_physiology_version"] = physiology
+    if not integrity:
+        overrides["agentus_behavior_integrity_enabled"] = False
+    if overrides:
+        config = GenesisConfig(**{**config.__dict__, **overrides})
     return config
 
 
@@ -122,6 +134,7 @@ class Observer:
         self.killed: set[str] = set()
         self.per_agent_day: Counter = Counter()
         self.noop_keys: Counter = Counter()
+        self.exploited_noops_by_agent_key: Counter = Counter()
         self._exploit_pick: dict[str, str] = {}
         self._originals: list[tuple[object, str, object]] = []
 
@@ -202,6 +215,7 @@ class Observer:
                 obs.noop_keys[key] += 1
                 if obs._exploit_pick.get(ctx.agent_id) == key:
                     obs.c["exploited_noops"] += 1
+                    obs.exploited_noops_by_agent_key[(ctx.agent_id, key)] += 1
             obs._exploit_pick.pop(ctx.agent_id, None)
             return out
 
@@ -258,6 +272,23 @@ def _death_context(cause: str, person: dict, wet: dict, food: dict, profile: dic
     return "no_water_known"
 
 
+def _check_dependents(before: dict, after: dict, independent_age: int, observer: Observer) -> None:
+    """A dependent may move with its caregiver (carried) or one cell on its own."""
+    start = {p["id"]: p for p in before["humans"]}
+    for child in after["humans"]:
+        prev = start.get(child["id"])
+        if prev is None or not prev.get("caregiver_id") or int(prev["age_ticks"]) >= independent_age:
+            continue
+        observer.c["dependent_days"] += 1
+        carer_before = start.get(prev["caregiver_id"])
+        carried = carer_before is not None and (prev["x"], prev["y"]) == (carer_before["x"], carer_before["y"])
+        step = abs(int(child["x"]) - int(prev["x"])) + abs(int(child["y"]) - int(prev["y"]))
+        if not carried and step > 1:
+            observer._note("FAIL_dependent_teleport", f"{child['id']} moved {step} cells alone")
+        if not child.get("caregiver_present", True):
+            observer.c["dependent_days_apart"] += 1
+
+
 def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
     started = time.perf_counter()
     observer = Observer()
@@ -284,6 +315,7 @@ def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
             sim.run(1)
             after = sim.human_state()
             alive_min = min(alive_min, len(after["humans"]))
+            _check_dependents(before, after, independent, observer)
             for person in after["humans"]:
                 f = float(person.get("fatigue", 0.0))
                 fatigue["agent_days"] += 1
@@ -338,6 +370,8 @@ def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
             "observer": dict(observer.c),
             "max_interactions_per_agent_day": max(observer.per_agent_day.values(), default=0),
             "top_noop_keys": dict(observer.noop_keys.most_common(4)),
+            "max_noop_habit_repeats": max(observer.exploited_noops_by_agent_key.values(), default=0),
+            "noop_habits": {f"{a}|{k}": n for (a, k), n in observer.exploited_noops_by_agent_key.most_common(3)},
             "fatigue_blocked_share": round(fatigue["blocked_days"] / max(1, fatigue["agent_days"]), 3),
             "numeric": dict(numeric),
             "examples": numeric_examples + observer.examples,
@@ -375,8 +409,10 @@ def evaluate(r: dict) -> dict[str, list[str]]:
             fails.append(f"{key[5:]}: {n}")
     if r["max_interactions_per_agent_day"] > cap.MAX_INTERACTIONS_PER_TICK:
         fails.append(f"interaction budget exceeded: {r['max_interactions_per_agent_day']} in one agent-day")
-    if r["observer"].get("exploited_noops", 0) > 0:
-        fails.append(f"no-op repeated as a learned habit: {r['observer']['exploited_noops']} times")
+    if r.get("max_noop_habit_repeats", 0) >= NOOP_HABIT_LIMIT:
+        fails.append(f"superstition loop: one agent repeated a no-op habit {r['max_noop_habit_repeats']} times {r['noop_habits']}")
+    elif r["observer"].get("exploited_noops", 0) > 0:
+        warns.append(f"no-op chosen as a learned habit {r['observer']['exploited_noops']} times before extinguishing {r['noop_habits']}")
     if r["observer"].get("kills", 0) != r["hunting"]["captures"]:
         fails.append(f"kill count mismatch: observed {r['observer'].get('kills', 0)} vs stats {r['hunting']['captures']}")
     ctx = r["death_context"]
@@ -391,6 +427,9 @@ def evaluate(r: dict) -> dict[str, list[str]]:
         warns.append(f"{beside_food} adults starved with >=5 kg plant/seed in their cell")
     if r["founders"] and r["alive_min"] < 0.5 * r["founders"]:
         warns.append(f"population fell to {r['alive_min']} of {r['founders']} founders")
+    apart = r["observer"].get("dependent_days_apart", 0)
+    if apart and apart > 0.05 * max(1, r["observer"].get("dependent_days", 0)):
+        warns.append(f"dependents apart from caregiver on {apart} of {r['observer']['dependent_days']} dependent-days")
     if r["fatigue_blocked_share"] > 0.25:
         warns.append(f"fatigue above {FATIGUE_BLOCK} on {r['fatigue_blocked_share']:.0%} of agent-days (interactions blocked)")
     n = r["observer"].get("interactions", 0)

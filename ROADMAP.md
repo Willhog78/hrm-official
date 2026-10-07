@@ -340,11 +340,56 @@ The new abilities:
 
 First evidence: `experiments/genesis/summaries/AGENTUS_CAPACITY_V1_2026-10-07.md`. The capacities work and conserve material. Over two years on four seeds, they did not change survival reliably. Dehydration dominates every arm.
 
-### Next step
+### Outcome (superseded plan)
 
-Sustainable-survival qualification stays blocked on the binding constraint, not on more capacities. In order:
+The plan that stood here has been carried out or replaced:
+- thirst was decided and implemented (G10.4);
+- animal abundance was diagnosed (life history is the limit; owner decision pending);
+- learning was extended (G10.4);
+- the 20-seed batches were run.
 
-1. **Decide whether the planner gets a thirst signal** (owner decision). The undeclared confound found in G10.3 suggests water-awareness alone roughly tripled survivors.
-2. **Decide animal abundance and body size** relative to `material_scale_factor` (owner decision). Until then, animal food cannot matter.
-3. **Re-run v0, v1 and the null arm with about 20 seeds per arm** on the Railway runner, so capacity effects can be separated from trajectory variation.
-4. **Only then extend learning.** Social transmission of food and interaction knowledge, and longer credit assignment, are the levers that could turn one-off material events into repeated practice.
+Long batches are no longer the advancement gate (see G10.6 and `docs/architecture/TESTING_TIERS.md`).
+
+## G10.4 — Survival bottlenecks (complete)
+
+Thirst became a baseline drive. Hunting requires physical approach and contact. Delayed credit flows through object history. Repeated use is measured, and successes are transmitted by observation. Details: `docs/architecture/G10_4_SURVIVAL_BOTTLENECKS.md`.
+
+## G10.5 — Energy-budget realism (complete, opt-in)
+
+`reference-v2` physiology adds a fat reserve, lean catabolism, corrected nursing and Kleiber scaling. It is opt-in, and the default stays `reference-v1`.
+
+## Testing tiers and advancement rule
+
+There are four tiers: micro, smoke, diagnostic and full. Work iterates on `fast` (micro + smoke, about 30 s). A targeted diagnostic confirms outcome-level effects. The full 730-day batch supports long-run claims only.
+
+A mechanism advances when its physical and integrity contract holds:
+- thirst is physical;
+- hunting needs contact;
+- omnivory is capability, not knowledge;
+- stone and fibres obey material constraints;
+- ledgers, balance and determinism hold.
+
+This applies even while the ecology still has unsolved mortality.
+
+## G10.6 — Behavioural and locomotion integrity (implemented)
+
+Three causal-model defects exposed by the micro tier are corrected as a versioned baseline (`agentus_behavior_integrity_enabled`, default on; off reproduces pre-G10.6):
+1. **Partial-food abandonment.** A hungry agent no longer walks away from reachable food just because it cannot cover a full day. A declared giving-up level of 25% of daily need applies.
+2. **Dependent teleportation.** A co-located dependent is carried; a separated one walks one cell a day. Dependents act after caregivers.
+3. **Fatigue saturation.** Sleep recovers a fraction of fatigue every night, so daily walking settles at about 0.24 instead of 1.0, and interaction is no longer suppressed for large parts of life.
+
+Each passed micro, then smoke, then the targeted diagnostic (`diagnostic integrity`). Details: `docs/architecture/G10_6_BEHAVIORAL_INTEGRITY.md`.
+
+## G10.7 — Communication and teaching (next)
+
+G7 promises signal, communicate and teach/imitate. G10.4 supplies observation of successes and delayed credit. The next layer bridges isolated useful acts and persistent transmitted practice, without hard-coding technology:
+- signals produced by bodies and perceived locally, with no shared vocabulary preloaded;
+- demonstration and imitation of interaction sequences, not only single outcomes;
+- teacher-learner asymmetry (caregivers and dependents) under the same physical-access rules;
+- measures of practices that persist across individuals and generations.
+
+Later G10 candidates: richer cognition, tool complexity, disease, larger populations, generational depth.
+
+## Infrastructure
+
+The GitHub Actions `verify` job fails before any step runs, on `main` too. It is tracked as an infrastructure ticket and does not block Genesis development. The local tiers and gate scripts are the verification record until it is fixed.

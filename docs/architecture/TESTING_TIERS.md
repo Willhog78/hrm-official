@@ -4,7 +4,7 @@ Long multiseed runs are validation, not the debugging loop. Questions are answer
 
 | Tier | What | Size | Wall time (4 vCPU) | Command |
 |---|---|---|---|---|
-| 1. Micro | One mechanism in a hand-built world of a few cells | 49 tests (46 pass + 3 strict xfail) | ~2 s | `python -m qualification.genesis.tiers micro [topic]` |
+| 1. Micro | One mechanism in a hand-built world of a few cells | 56 tests | ~2 s | `python -m qualification.genesis.tiers micro [topic]` |
 | 2. Smoke | Production runs, every mechanism on, integrity and pathology checks | 3 seeds × 75 days (+1 unobserved rerun) | ~25 s | `python -m qualification.genesis.tiers smoke` |
 | 3. Diagnostic | One question, 2+ arms, outcome comparison plus the smoke checks | 4 seeds × 180 days per arm (365 optional) | ~1.5–2 min for 2 arms at 180 days; ~4 min at 365 | `python -m qualification.genesis.tiers diagnostic <set>` |
 | 4. Full | The existing 20 seeds × 730 days × 5 arms validation | 100 runs | ~1.5–2 h on Railway (8 vCPU, 3 parallel) | `python -m qualification.genesis.tiers full` |
@@ -20,18 +20,15 @@ All commands run from the repository root with `PYTHONPATH=src:.`. On Railway, o
 | Topic | File | Questions |
 |---|---|---|
 | thirst | `test_micro_thirst.py` (8) | Drinks local water. Reaches water one cell away. Walks to remembered water. Does not know unseen distant water. The more urgent need (water or food) wins. A cell meeting both needs beats either alone. No repeated water seeking when hydrated. |
-| food | `test_micro_food.py` (8) | Only plant tissue known at start, newborns included. Nearby known food is eaten. Unknown seed is tasted, survived and learned. Meat is learned only by tasting, or by observation in the same cell. Rotten meat stays hazardous and is then avoided. Wood never becomes food. |
+| food | `test_micro_food.py` (11) | Only plant tissue known at start, newborns included. Nearby known food is eaten. Unknown seed is tasted, survived and learned. Meat is learned only by tasting, or by observation in the same cell. Rotten meat stays hazardous and is then avoided. Wood never becomes food. Partial food is not abandoned, a richer visible patch is chosen, and a trickle below the giving-up level is left. |
 | hunting | `test_micro_hunting.py` (5) | An animal in another cell is not offered. Capture needs approach, with real costs and both outcomes. A kill yields tissue exactly once. Tissue spoils faster warm and conserves mass. A held stick extends reach; one lying nearby does not. |
 | stone | `test_micro_stone.py` (6) | A stone must be encountered before pickup. Carried stone is conserved. Over-heavy stones are not offered. Striking conserves lithic mass. Sharp edges only where fracture rules allow. Blunt stone never cuts, and edges wear. |
 | fibers | `test_micro_fibers.py` (5) | Extraction needs the source in this cell. Split, twist, weave and bind conserve material. Strength and wet sensitivity differ by source. A binding can hold, slip or break. Meaningless repeats cost and are not reinforced. |
-| learning | `test_micro_learning.py` (6) | Value from experienced benefit. Delayed credit through the tool's history. Observed success transmits; observed failure does not. Failed capture is learned as negative. A no-payoff world forms no habit. |
-| infant_care | `test_micro_infant_care.py` (7) | A provisioned caregiver feeds the infant. Nursing transfers energy, water and mass. No caregiver or a caregiver elsewhere means no provisioning. Infant starvation reproduces in isolation under reference-v1 and not under reference-v2. |
+| learning | `test_micro_learning.py` (8) | Value from experienced benefit. Delayed credit through the tool's history. Observed success transmits; observed failure does not. Failed capture is learned as negative. A no-payoff world forms no habit. A sated agent stays rested enough to explore, and daily walking reaches a steady fatigue. |
+| infant_care | `test_micro_infant_care.py` (9) | A provisioned caregiver feeds the infant. Nursing transfers energy, water and mass. No caregiver or a caregiver elsewhere means no provisioning. Infant starvation reproduces in isolation under reference-v1 and not under reference-v2. A separated dependent walks one cell a day, and a carried one stays with its caregiver. |
 | cannibalism | `test_micro_cannibalism.py` (4) | Diagnostic only: where Agentus remains go, whether they are a food kind, perceived or tasted, whether Agentus are capture targets. Prints a report. |
 
-**Known defects are strict `xfail`s.** They are listed by `-rx` on every run and turn into failures the moment the behaviour changes, so a fix is noticed:
-- `test_partial_food_is_not_abandoned_for_empty_ground`: a hungry agent leaves the only reachable food when it is below a day's need.
-- `test_dependent_child_moves_at_most_one_cell_per_day`: a dependent child jumps to its caregiver however far away.
-- `test_a_sated_agent_stays_rested_enough_to_explore`: movement fatigue saturates and blocks interactions.
+**Known defects are recorded as strict `xfail`s.** They are listed by `-rx` on every run and turn into failures the moment behaviour changes, so a fix is noticed. The first three (partial-food abandonment, dependent teleportation, fatigue saturation) were fixed in G10.6. They are now ordinary tests, plus tests that reproduce the old behaviour with `agentus_behavior_integrity_enabled=False`.
 
 ## 2. Smoke — `qualification/genesis/smoke.py`
 
@@ -48,7 +45,8 @@ The shared observer (`qualification/genesis/tier_observer.py`) wraps `interactio
 - remote pickup, capture, tool or target, re-derived independently of the production guards;
 - duplicate kill, or a kill-count mismatch;
 - more than 3 interactions in one agent-day;
-- a no-op interaction repeated as a learned habit;
+- a no-op interaction repeated as a learned habit 10+ times by one agent (no extinction: a superstition loop);
+- a dependent moving more than one cell on its own (not carried);
 - a thirst move more than one step, to an unperceived cell, or over hunger that would kill sooner;
 - an adult dehydration death with water in view;
 - the observer changing the run.
@@ -58,7 +56,9 @@ The shared observer (`qualification/genesis/tier_observer.py`) wraps `interactio
 - an adult dehydration death with water remembered;
 - population below half of founders;
 - fatigue above 0.8 on more than 25% of agent-days;
-- no-op share above 50%.
+- no-op share above 50%;
+- a no-op chosen as a habit at all, before it extinguishes (for example, delayed credit from a kill reaching the hammer stone's earlier strikes);
+- dependents apart from their caregiver on more than 5% of dependent-days.
 
 ## 3. Diagnostic — `qualification/genesis/diagnostic.py`
 
@@ -70,9 +70,10 @@ The shared observer (`qualification/genesis/tier_observer.py`) wraps `interactio
 | `learning` | `no_recall`, `v1` | Place memory; reports repeated use, transmission and food adoption. |
 | `infant` | `v1`, `v1@reference-v2` | Caregiving and energy budget. |
 | `capacities` | `v0`, `v1` | All capacities. |
+| `integrity` | `v1-preg106`, `v1` | G10.6 behavioural/locomotion integrity. |
 | `custom` | `--arms ...` | Any comparison. |
 
-There is no arm that disables value learning alone. `learning` compares place memory and reports the learning measures for both arms.
+Arm suffixes: `-nothirst` (thirst off), `-preg106` (G10.6 off), `@reference-v2` (physiology). There is no arm that disables value learning alone. `learning` compares place memory and reports the learning measures for both arms.
 
 Reported per arm:
 - survivors and adults;
