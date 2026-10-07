@@ -54,6 +54,7 @@ PROFILE = {
 
 def _body_outcome(sequence: tuple[str, ...]) -> tuple[float, dict, dict, dict]:
     human, cell, trace = execute_live_sequence(sequence, _human("candidate"), _cell())
+    human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
     _apply_physiology(
         human,
         {"temperature": 60.0, "terrain_cover": 0.0},
@@ -100,6 +101,9 @@ def main() -> int:
         imitated,
         learner,
         _cell(),
+    )
+    learner_after["energy"] = float(learner_after["energy"]) - float(
+        learner_trace.get("effort_energy_kcal", 0.0)
     )
     _apply_physiology(
         learner_after,
