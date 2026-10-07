@@ -7,7 +7,41 @@ from hrm_coordination.seeds import SeedBank
 from hrm_genesis.world.grid import neighbors
 
 from .plants import PLANT_ELEMENT_FRACTIONS
-from .traits import SPECIES, scaled_life_history_ticks, trait_for
+from .traits import (
+    CONSUMER_TIMEBASE_ELAPSED,
+    CONSUMER_TIMEBASE_LEGACY,
+    SPECIES,
+    TRAIT_REFERENCE_TICKS_PER_YEAR,
+    per_tick_amount,
+    per_tick_fraction,
+    scaled_life_history_ticks,
+    scaled_ticks,
+    trait_for,
+)
+
+
+# TIMEBASE note. Under "elapsed-time-v1", flows stated per month (basal energy,
+# water loss, bite fraction and cap, carcass decomposition) are converted to the
+# run's tick length, as life-history durations are. Not converted: costs per
+# event (movement energy per cell moved, a failed hunt, an escape), per-event
+# learning steps (forage_bias), hunt success per attempt, and movement speed,
+# which stays one cell per tick at any timebase. Speed and per-tick attempt
+# frequency therefore still differ between timebases; changing them would need
+# fractional movement and is a behaviour change, not a unit conversion.
+#
+# Per-month (reference tick) rates that are not traits: the bite cap and
+# carcass decomposition. Converted to the run's tick length like trait rates.
+BITE_CAP_KG_PER_REFERENCE_TICK = 0.004
+CARCASS_RETURN_FRACTION_PER_REFERENCE_TICK = 0.05
+CARCASS_WATER_RETURN_FRACTION_PER_REFERENCE_TICK = 0.10
+# Minimum consecutive supported reference ticks before reproduction.
+MIN_SUPPORT_STREAK_REFERENCE_TICKS = 5
+
+
+def consumer_timebase(consumers: dict) -> str:
+    """States without the key predate the timebase correction and replay as
+    legacy, so old checkpoints reproduce exactly."""
+    return str(consumers.get("rate_timebase", CONSUMER_TIMEBASE_LEGACY))
 
 
 ANIMAL_TRACKED_ELEMENTS = tuple(sorted(PLANT_ELEMENT_FRACTIONS))
@@ -37,6 +71,7 @@ def build_consumer_state(
     seed_bank: SeedBank,
     ticks_per_year: int = 12,
     initial_per_species: int = 2,
+    timebase: str = CONSUMER_TIMEBASE_ELAPSED,
 ) -> dict:
     animals: list[dict] = []
     ordinal = 0
@@ -68,7 +103,7 @@ def build_consumer_state(
                 }
             )
             ordinal += 1
-    return {
+    state = {
         "width": width,
         "height": height,
         "ticks_per_year": int(ticks_per_year),
@@ -83,6 +118,14 @@ def build_consumer_state(
             for x in range(width)
         ],
     }
+    if timebase not in (CONSUMER_TIMEBASE_ELAPSED, CONSUMER_TIMEBASE_LEGACY):
+        raise ValueError(f"unknown consumer timebase: {timebase}")
+    # Recorded only where it changes behaviour; absent means legacy, and at
+    # the reference timebase the two are identical. Earlier states and their
+    # ledger digests are therefore unchanged.
+    if timebase == CONSUMER_TIMEBASE_ELAPSED and int(ticks_per_year) != TRAIT_REFERENCE_TICKS_PER_YEAR:
+        state["rate_timebase"] = timebase
+    return state
 
 
 def seed_initial_consumers(
@@ -224,7 +267,8 @@ def _local_forage_per_consumer(animal: dict, consumers: dict, producers: dict) -
     return forage / max(1, competitors)
 
 
-def _consume_plants(animal: dict, pcell: dict) -> float:
+def _consume_plants(animal: dict, pcell: dict, bite_fraction: float, bite_cap_kg: float) -> float:
+    """`bite_fraction` and `bite_cap_kg` are already per tick."""
     traits = trait_for(str(animal["species"]))
     if traits.trophic_role != "herbivore":
         animal["last_forage_success"] = 0.0
@@ -235,7 +279,7 @@ def _consume_plants(animal: dict, pcell: dict) -> float:
         animal["forage_bias"] = max(-0.25, float(animal["forage_bias"]) - 0.01)
         return 0.0
 
-    bite = min(available * traits.bite_fraction, 0.004)
+    bite = min(available * bite_fraction, bite_cap_kg)
     fraction = min(1.0, bite / available)
     consumed = 0.0
     assimilated = 0.0
@@ -400,6 +444,7 @@ def evolve_consumers(
     mcells = _cell_lookup(matter["cells"])
     carcasses = _cell_lookup(consumers["carcass_cells"])
 
+    timebase = consumer_timebase(consumers)
     births: list[dict] = []
     survivors: list[dict] = []
     deaths_by_cause = {"old_age": 0, "starvation": 0, "dehydration": 0, "predation": 0}
@@ -414,6 +459,8 @@ def evolve_consumers(
             traits.reproduction_cooldown_ticks,
             ticks_per_year,
         )
+        basal_cost = per_tick_amount(traits.basal_cost, ticks_per_year, timebase)
+        water_loss_per_tick = per_tick_amount(traits.water_loss_per_tick_kg, ticks_per_year, timebase)
         origin = (int(animal["x"]), int(animal["y"]))
         if str(animal["id"]) in killed_ids:
             continue
@@ -461,11 +508,15 @@ def evolve_consumers(
             else:
                 animal["last_forage_success"] = 0.0
         else:
-            _consume_plants(animal, pcell)
+            _consume_plants(
+                animal, pcell,
+                per_tick_fraction(traits.bite_fraction, ticks_per_year, timebase),
+                per_tick_amount(BITE_CAP_KG_PER_REFERENCE_TICK, ticks_per_year, timebase),
+            )
 
-        animal["energy"] = float(animal["energy"]) - traits.basal_cost
+        animal["energy"] = float(animal["energy"]) - basal_cost
         water_before_loss = max(0.0, float(animal["body_water_kg"]))
-        water_loss = min(water_before_loss, traits.water_loss_per_tick_kg)
+        water_loss = min(water_before_loss, water_loss_per_tick)
         animal["body_water_kg"] = water_before_loss - water_loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + water_loss
         animal["age_ticks"] = int(animal["age_ticks"]) + 1
@@ -491,7 +542,10 @@ def evolve_consumers(
 
         if traits.trophic_role == "herbivore":
             local_forage_per_consumer = _local_forage_per_consumer(animal, consumers, producers)
-            expected_tick_cost = traits.basal_cost + 0.25 * traits.movement_cost
+            # Basal cost per tick times cooldown ticks is the energy needed over
+            # the cooldown, independent of timebase once basal cost is per tick.
+            # Movement is one cell per tick at any timebase (see TIMEBASE note).
+            expected_tick_cost = basal_cost + 0.25 * traits.movement_cost
             required_forage_support = (
                 expected_tick_cost
                 * reproduction_cooldown_ticks
@@ -514,7 +568,10 @@ def evolve_consumers(
             int(animal["age_ticks"]) >= maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
             and body_mass >= traits.adult_body_mass_kg * 0.45
-            and int(animal["support_streak"]) >= max(5, reproduction_cooldown_ticks // 3)
+            and int(animal["support_streak"]) >= max(
+                scaled_ticks(MIN_SUPPORT_STREAK_REFERENCE_TICKS, ticks_per_year, timebase),
+                reproduction_cooldown_ticks // 3,
+            )
             and since_reproduction >= reproduction_cooldown_ticks
         )
         if reproduction_ready:
@@ -542,10 +599,13 @@ def evolve_consumers(
 
     # Carcass decomposition returns consumer material to environmental Matter.
     wcells = _cell_lookup(world_state["cells"]) if world_state.get("cells") else {}
+    year_ticks = int(consumers.get("ticks_per_year", 12))
+    carcass_return = per_tick_fraction(CARCASS_RETURN_FRACTION_PER_REFERENCE_TICK, year_ticks, timebase)
+    carcass_water_return = per_tick_fraction(CARCASS_WATER_RETURN_FRACTION_PER_REFERENCE_TICK, year_ticks, timebase)
     for xy, ccell in carcasses.items():
         mcell = mcells[xy]
         for symbol in ANIMAL_TRACKED_ELEMENTS:
-            returned = float(ccell["elements_kg"][symbol]) * 0.05
+            returned = float(ccell["elements_kg"][symbol]) * carcass_return
             ccell["elements_kg"][symbol] -= returned
             mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
         if "fresh_elements_kg" in ccell:
@@ -557,12 +617,12 @@ def evolve_consumers(
                 fresh = float(ccell["fresh_elements_kg"][symbol])
                 # Fresh tissue decomposes at the same rate as other carcass
                 # matter, so total carcass decay is unchanged by the split.
-                returned = fresh * 0.05
+                returned = fresh * carcass_return
                 spoiled = (fresh - returned) * spoil
                 ccell["fresh_elements_kg"][symbol] = fresh - returned - spoiled
                 ccell["elements_kg"][symbol] += spoiled
                 mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
-        water_return = float(ccell["water_kg"]) * 0.10
+        water_return = float(ccell["water_kg"]) * carcass_water_return
         ccell["water_kg"] -= water_return
         mcell["soil_water_kg"] += water_return
 

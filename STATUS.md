@@ -140,6 +140,26 @@ In the targeted diagnostics, step 3 produced 7 imitated tries, none of which pai
 
 Opening, census and controlled-experiment proposal: `docs/architecture/ECOLOGY_OPPORTUNITY_OPENING.md`. The next milestone is an explanation of the missing opportunities. That explanation may be that these mechanisms have little value in this world.
 
+**D2 consumer timebase correction: IMPLEMENTED (owner-authorized 2026-10-07).** Specification and validation: `docs/architecture/D2_CONSUMER_TIMEBASE.md`. Flag `consumer_timebase`: default `elapsed-time-v1`; `per-tick-legacy` reproduces earlier runs exactly.
+- **What it fixes.** Animal rates stated per month (metabolism, water loss, bite, carcass decay) are now converted to the tick length, as durations already were. Before, daily-tick worlds charged a month's rate every day.
+- **Unchanged.** 12 ticks/year runs, including G4, are bit-identical.
+- **At daily ticks:**
+  - the predator survives for years instead of weeks;
+  - herbivore births are unchanged, so the life-history bottleneck stands as a calibration issue;
+  - Agentus injury deaths rose from 2 to 7 in the two-year census.
+- **Verification.** 9 equivalence tests pass, all 19 gates pass, micro passes, and smoke shows 0 fail and 0 warn. One test horizon was restated in simulated years.
+- **Not done.** Life-history recalibration is not done and needs separate authorization.
+
+**Open owner decisions:**
+- **D1:** predation on Agentus is an unresolved rule. It is now active, because predators survive and bite.
+- **D3:** default physiology stays `reference-v1` until the caregiver energy budget closes.
+
+**Queued investigations (no model changes):**
+- the caregiver energy budget: food consumed and credited, intake limits, nursing expenditure, other costs and reserve changes;
+- inspection of the unsuccessful imitation attempts.
+
+Ecology experiments E1–E3 stay unimplemented.
+
 ## Verification infrastructure
 
 **CI has never run.** All 119 runs of the GitHub Actions `Stage-1 verification` workflow have failed in about 3 s, before a runner was assigned. That covers runs 1–119, from the first run on 2026-09-23 to the merge of PR #33. No log exists. GitHub's annotation on the job (checked for runs 1, 11 and 119) says:

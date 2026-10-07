@@ -335,6 +335,17 @@ Do not advance a phase if:
 
 **Milestone.** An explanation of the missing opportunities, even if it is that following and imitation have little value in this world.
 
+**Progress (2026-10-07).**
+- Step 1 (measurement) is done. Following has no opportunity because food is abundant and in view. Useful acts are rare at the source, so imitation has little to draw on. Co-presence is low only in the founding months.
+- D2 units fix: done (`docs/architecture/D2_CONSUMER_TIMEBASE.md`).
+
+Next, in order:
+1. Caregiver energy budget (closes D3).
+2. Inspect the unsuccessful imitation attempts.
+3. D2 life-history recalibration, if authorized.
+
+E1–E3 remain proposals and are not the next step. Higher density is not supported by the census.
+
 ## G10.2A — Survival affordance substrate (complete)
 
 Merged in PR #19:

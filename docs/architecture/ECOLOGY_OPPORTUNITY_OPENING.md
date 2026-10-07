@@ -1,5 +1,7 @@
 # Ecology opening — why social learning has no opportunity
 
+**Timebase note (D2).** The census results in sections 4–5 ran before the consumer timebase correction (`docs/architecture/D2_CONSUMER_TIMEBASE.md`). That correction lets predators survive at daily ticks. Re-running the `v1` census under the corrected default leaves every opportunity conclusion unchanged. It raises injury deaths from 2 to 7, inferred to be mostly predator bites (D2 note, section 6).
+
 **Status:** design opening. Step 1 (measurement) is done. Step 2 (controlled experiments) is proposed here and **not implemented**. Owner decisions are listed in section 7.
 
 **Owner decision (2026-10-07).** Cognition work is paused until this question is answered: which condition keeps social learning from having an opportunity? The candidates are measured separately and together:
@@ -177,7 +179,7 @@ What the code does now:
 - Agentus remains go to `human.remains_cells`, a pool that no animal reads.
 - So a predator can injure an agent but cannot gain from it.
 - `tests/genesis/micro/test_micro_cannibalism.py` records this as *current behaviour, not a decision*.
-- The only predator starves in year 1 on the seeds examined (G10.4), so the question is presently moot in practice.
+- Under the old per-tick timebase the only predator starved in year 1 (G10.4), so the question was moot. **After the D2 units fix the predator survives, and the limitation is active.** Injury deaths of Agentus rose from 2 to 7 in the two-year census. That rise is attributed to predator bites on one smoke seed and is inferred for the rest. The predator cannot eat what it kills.
 
 The options:
 - **(a) Declare it a rule:** Agentus is not prey. The consequence is an injury source with no ecological cause, which would need its own justification. It would also be a biological claim with no basis in the model.
@@ -197,7 +199,12 @@ There are two decisions (section 6.1): the units fix, which is a defect, and the
 - predator survival;
 - D1.
 
-**Recommendation:** authorize the units fix first. It should change nothing at 12 ticks/year, and its effect at 365 ticks/year should be reported before any recalibration.
+**Decision (2026-10-07):** the units fix is authorized and **implemented** (`docs/architecture/D2_CONSUMER_TIMEBASE.md`).
+- Results at 12 ticks/year are bit-identical; `per-tick-legacy` reproduces earlier runs.
+- At daily ticks the predator survives for years instead of weeks.
+- Herbivore births are unchanged, so the life-history bottleneck stands.
+
+The allometric recalibration remains open and needs its own authorization.
 
 ### D3. Default physiology (`reference-v1` vs `reference-v2`)
 

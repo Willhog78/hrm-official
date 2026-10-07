@@ -1,0 +1,860 @@
+[
+ {
+  "seed": "agentus-demography-a",
+  "arm": "monthly",
+  "ticks_per_year": 12,
+  "timebase": "elapsed-time-v1",
+  "years": 5,
+  "fingerprint": "a7028dba5b63",
+  "ledger_valid": true,
+  "element_rel_error": 6.329446290816872e-16,
+  "water_rel_error": 2.750617534409627e-16,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 34.304,
+    "mean_water_fraction": 0.971
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.42,
+     "grazer": 2.25,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 3,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 42.269,
+    "mean_water_fraction": 0.942
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.58,
+     "grazer": 3.75,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 43.288,
+    "mean_water_fraction": 0.951
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 4.0,
+     "stalker": 0.17
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 0,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 54.538,
+    "mean_water_fraction": 0.97
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.58,
+     "grazer": 6.33
+    },
+    "end_alive": {
+     "browser": 5,
+     "grazer": 8
+    },
+    "births": 5,
+    "deaths": {},
+    "mean_energy": 47.659,
+    "mean_water_fraction": 0.933
+   }
+  ],
+  "seconds": 8.6
+ },
+ {
+  "seed": "agentus-demography-b",
+  "arm": "monthly",
+  "ticks_per_year": 12,
+  "timebase": "elapsed-time-v1",
+  "years": 5,
+  "fingerprint": "44df49db5999",
+  "ledger_valid": true,
+  "element_rel_error": 5.483068403794121e-16,
+  "water_rel_error": 0.0,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 33.913,
+    "mean_water_fraction": 0.971
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.83,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 41.533,
+    "mean_water_fraction": 0.943
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 3.83,
+     "stalker": 0.33
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 2,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 48.078,
+    "mean_water_fraction": 0.951
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 4.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 55.81,
+    "mean_water_fraction": 0.97
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 5.17,
+     "grazer": 6.0
+    },
+    "end_alive": {
+     "browser": 6,
+     "grazer": 8
+    },
+    "births": 6,
+    "deaths": {},
+    "mean_energy": 46.279,
+    "mean_water_fraction": 0.927
+   }
+  ],
+  "seconds": 8.9
+ },
+ {
+  "seed": "agentus-demography-c",
+  "arm": "monthly",
+  "ticks_per_year": 12,
+  "timebase": "elapsed-time-v1",
+  "years": 5,
+  "fingerprint": "415b8ba1b1d7",
+  "ledger_valid": true,
+  "element_rel_error": 4.220147888317007e-16,
+  "water_rel_error": 2.7520620575346455e-16,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 1.17,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 1,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {
+     "predation": 1
+    },
+    "mean_energy": 38.397,
+    "mean_water_fraction": 0.971
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.08,
+     "grazer": 1.08,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 48.951,
+    "mean_water_fraction": 0.932
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.83,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 1,
+    "deaths": {},
+    "mean_energy": 45.384,
+    "mean_water_fraction": 0.959
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 52.564,
+    "mean_water_fraction": 0.971
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.25,
+     "grazer": 3.33,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 5,
+     "grazer": 4,
+     "stalker": 1
+    },
+    "births": 3,
+    "deaths": {},
+    "mean_energy": 46.659,
+    "mean_water_fraction": 0.942
+   }
+  ],
+  "seconds": 9.0
+ },
+ {
+  "seed": "agentus-demography-a",
+  "arm": "daily-legacy",
+  "ticks_per_year": 365,
+  "timebase": "per-tick-legacy",
+  "years": 5,
+  "fingerprint": "dacd6cffda16",
+  "ledger_valid": true,
+  "element_rel_error": 1.8350119704793248e-14,
+  "water_rel_error": 8.515135709025023e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 0.1
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2
+    },
+    "births": 0,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 54.048,
+    "mean_water_fraction": 0.97
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.41,
+     "grazer": 2.26
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 3
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 55.66,
+    "mean_water_fraction": 0.956
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.55,
+     "grazer": 3.71
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 55.546,
+    "mean_water_fraction": 0.967
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 4.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 55.68,
+    "mean_water_fraction": 0.97
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.58,
+     "grazer": 5.53
+    },
+    "end_alive": {
+     "browser": 5,
+     "grazer": 8
+    },
+    "births": 5,
+    "deaths": {},
+    "mean_energy": 54.787,
+    "mean_water_fraction": 0.969
+   }
+  ],
+  "seconds": 302.2
+ },
+ {
+  "seed": "agentus-demography-b",
+  "arm": "daily-legacy",
+  "ticks_per_year": 365,
+  "timebase": "per-tick-legacy",
+  "years": 5,
+  "fingerprint": "3ee9331b3f66",
+  "ledger_valid": true,
+  "element_rel_error": 1.818111672161926e-14,
+  "water_rel_error": 7.580933800216771e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 0.08
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2
+    },
+    "births": 0,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 53.591,
+    "mean_water_fraction": 0.97
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.36,
+     "grazer": 2.0
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 2
+    },
+    "births": 1,
+    "deaths": {},
+    "mean_energy": 55.828,
+    "mean_water_fraction": 0.966
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.63,
+     "grazer": 3.76
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 3,
+    "deaths": {},
+    "mean_energy": 55.481,
+    "mean_water_fraction": 0.968
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 4.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 55.81,
+    "mean_water_fraction": 0.969
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.53,
+     "grazer": 5.86
+    },
+    "end_alive": {
+     "browser": 5,
+     "grazer": 8
+    },
+    "births": 5,
+    "deaths": {},
+    "mean_energy": 54.997,
+    "mean_water_fraction": 0.969
+   }
+  ],
+  "seconds": 300.8
+ },
+ {
+  "seed": "agentus-demography-c",
+  "arm": "daily-legacy",
+  "ticks_per_year": 365,
+  "timebase": "per-tick-legacy",
+  "years": 5,
+  "fingerprint": "c60ae6668104",
+  "ledger_valid": true,
+  "element_rel_error": 3.217203366734168e-14,
+  "water_rel_error": 2.867080304267675e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 0.43,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {
+     "predation": 2
+    },
+    "mean_energy": 54.466,
+    "mean_water_fraction": 0.971
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.07,
+     "stalker": 0.18
+    },
+    "end_alive": {
+     "browser": 3
+    },
+    "births": 1,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 55.6,
+    "mean_water_fraction": 0.965
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.85
+    },
+    "end_alive": {
+     "browser": 4
+    },
+    "births": 1,
+    "deaths": {},
+    "mean_energy": 59.634,
+    "mean_water_fraction": 0.969
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0
+    },
+    "end_alive": {
+     "browser": 4
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 59.82,
+    "mean_water_fraction": 0.968
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.26
+    },
+    "end_alive": {
+     "browser": 6
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 59.493,
+    "mean_water_fraction": 0.969
+   }
+  ],
+  "seconds": 300.1
+ },
+ {
+  "seed": "agentus-demography-a",
+  "arm": "daily-elapsed",
+  "ticks_per_year": 365,
+  "timebase": "elapsed-time-v1",
+  "years": 5,
+  "fingerprint": "b2e310aca031",
+  "ledger_valid": true,
+  "element_rel_error": 1.3307660826442473e-14,
+  "water_rel_error": 7.26292917174343e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 1.65,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 1,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {
+     "predation": 1
+    },
+    "mean_energy": 34.663,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.41,
+     "grazer": 1.26,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {},
+    "mean_energy": 47.719,
+    "mean_water_fraction": 0.998
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.55,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 1,
+    "deaths": {},
+    "mean_energy": 47.77,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 50.606,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.58,
+     "grazer": 3.69,
+     "stalker": 0.43
+    },
+    "end_alive": {
+     "browser": 5,
+     "grazer": 4
+    },
+    "births": 3,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 47.429,
+    "mean_water_fraction": 0.998
+   }
+  ],
+  "seconds": 263.3
+ },
+ {
+  "seed": "agentus-demography-b",
+  "arm": "daily-elapsed",
+  "ticks_per_year": 365,
+  "timebase": "elapsed-time-v1",
+  "years": 5,
+  "fingerprint": "55483be08dca",
+  "ledger_valid": true,
+  "element_rel_error": 1.5012535845965156e-14,
+  "water_rel_error": 7.317038434221869e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 29.396,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.36,
+     "grazer": 2.0,
+     "stalker": 0.1
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 2
+    },
+    "births": 1,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 51.583,
+    "mean_water_fraction": 0.998
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.66,
+     "grazer": 3.76
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 3,
+    "deaths": {},
+    "mean_energy": 47.732,
+    "mean_water_fraction": 0.998
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 4.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 4
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 55.88,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.53,
+     "grazer": 5.86
+    },
+    "end_alive": {
+     "browser": 5,
+     "grazer": 8
+    },
+    "births": 5,
+    "deaths": {},
+    "mean_energy": 48.434,
+    "mean_water_fraction": 0.998
+   }
+  ],
+  "seconds": 264.3
+ },
+ {
+  "seed": "agentus-demography-c",
+  "arm": "daily-elapsed",
+  "ticks_per_year": 365,
+  "timebase": "elapsed-time-v1",
+  "years": 5,
+  "fingerprint": "9ef8e8d2f7bf",
+  "ledger_valid": true,
+  "element_rel_error": 1.8413032755213142e-14,
+  "water_rel_error": 6.189747531643306e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 1.02,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 1,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {
+     "predation": 1
+    },
+    "mean_energy": 35.501,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.07,
+     "grazer": 1.1,
+     "stalker": 0.69
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 2
+    },
+    "births": 2,
+    "deaths": {
+     "starvation": 1
+    },
+    "mean_energy": 46.777,
+    "mean_water_fraction": 0.997
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.85,
+     "grazer": 2.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2
+    },
+    "births": 1,
+    "deaths": {},
+    "mean_energy": 48.421,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 2.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2
+    },
+    "births": 0,
+    "deaths": {},
+    "mean_energy": 57.324,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.26,
+     "grazer": 3.37
+    },
+    "end_alive": {
+     "browser": 6,
+     "grazer": 4
+    },
+    "births": 4,
+    "deaths": {},
+    "mean_energy": 50.694,
+    "mean_water_fraction": 0.998
+   }
+  ],
+  "seconds": 261.5
+ }
+]

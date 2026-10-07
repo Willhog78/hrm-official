@@ -59,6 +59,10 @@ class GenesisConfig:
     # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
     # catabolism, realistic lactation and size^0.75 child metabolism.
     agentus_physiology_version: str = "reference-v1"
+    # Consumer (animal) rate timebase. "elapsed-time-v1" (default) converts
+    # per-month trait rates to the run's tick length, as durations already
+    # are; "per-tick-legacy" reproduces earlier runs. Identical at 12 ticks/year.
+    consumer_timebase: str = "elapsed-time-v1"
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -76,6 +80,8 @@ class GenesisConfig:
             raise ValueError("ticks_per_year must be >= 4")
         if self.material_scale_factor < 1.0:
             raise ValueError("material_scale_factor must be >= 1.0")
+        if self.consumer_timebase not in ("elapsed-time-v1", "per-tick-legacy"):
+            raise ValueError("consumer_timebase must be 'elapsed-time-v1' or 'per-tick-legacy'")
         if self.human_calibration_enabled and self.ticks_per_year != 365:
             raise ValueError("human_calibration_enabled requires ticks_per_year == 365")
         if self.human_calibration_enabled and self.material_scale_factor < 100.0:
@@ -178,6 +184,11 @@ class GenesisConfig:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":
             canonical["agentus_physiology_version"] = self.agentus_physiology_version
+        if (self.consumer_ecology_enabled and self.ticks_per_year != 12
+                and self.consumer_timebase == "elapsed-time-v1"):
+            # Present only where it changes behaviour, so monthly-tick and
+            # legacy fingerprints do not change.
+            canonical["consumer_timebase"] = self.consumer_timebase
         return canonical
 
     def fingerprint(self) -> str:

@@ -12,6 +12,45 @@ def scaled_life_history_ticks(value: int, ticks_per_year: int) -> int:
     return max(1, int(round(int(value) * ticks_per_year / TRAIT_REFERENCE_TICKS_PER_YEAR)))
 
 
+# Consumer rate timebase. Trait rates (energy, water and food per tick, and
+# decay fractions per tick) are stated per reference tick, i.e. per month.
+# "elapsed-time-v1" converts them to the run's tick length, as durations
+# already are; "per-tick-legacy" applies them unchanged at any timebase and
+# reproduces earlier runs. At the reference timebase both are identical.
+CONSUMER_TIMEBASE_ELAPSED = "elapsed-time-v1"
+CONSUMER_TIMEBASE_LEGACY = "per-tick-legacy"
+CONSUMER_TIMEBASES = (CONSUMER_TIMEBASE_ELAPSED, CONSUMER_TIMEBASE_LEGACY)
+
+
+def _converts(ticks_per_year: int, timebase: str) -> bool:
+    if timebase not in CONSUMER_TIMEBASES:
+        raise ValueError(f"unknown consumer timebase: {timebase}")
+    return timebase == CONSUMER_TIMEBASE_ELAPSED and int(ticks_per_year) != TRAIT_REFERENCE_TICKS_PER_YEAR
+
+
+def per_tick_amount(per_reference_tick: float, ticks_per_year: int, timebase: str) -> float:
+    """A flow stated per month (energy, water, food mass) as an amount per tick."""
+    if not _converts(ticks_per_year, timebase):
+        return per_reference_tick
+    return per_reference_tick * TRAIT_REFERENCE_TICKS_PER_YEAR / int(ticks_per_year)
+
+
+def per_tick_fraction(per_reference_tick: float, ticks_per_year: int, timebase: str) -> float:
+    """A fraction removed per month, compounded to the fraction per tick, so
+    that the fraction remaining after a month is the same at any timebase."""
+    if not _converts(ticks_per_year, timebase):
+        return per_reference_tick
+    return 1.0 - (1.0 - per_reference_tick) ** (TRAIT_REFERENCE_TICKS_PER_YEAR / int(ticks_per_year))
+
+
+def scaled_ticks(value: int, ticks_per_year: int, timebase: str) -> int:
+    """A count of reference ticks (months) as a count of ticks, under the
+    given timebase; the legacy timebase leaves it unchanged."""
+    if not _converts(ticks_per_year, timebase):
+        return int(value)
+    return scaled_life_history_ticks(value, ticks_per_year)
+
+
 @dataclass(frozen=True)
 class ConsumerTraits:
     species: str

@@ -146,16 +146,28 @@ def test_g3_no_food_causes_consumer_collapse():
 
     # Herbivores starve first. A predator can outlive them on the energy of its
     # last kill (fallible predation postdates this test), so collapse of the
-    # whole community is checked over a longer horizon.
-    for epoch in range(300):
+    # whole community is checked over a longer horizon. Horizons are in
+    # simulated years: consumer rates follow elapsed time (elapsed-time-v1), so
+    # starvation takes the same time at any tick length. With the current
+    # monthly trait values a starving grazer lasts about 4 years and a predator
+    # with a full store about 13; those values await life-history recalibration.
+    year = int(consumers["ticks_per_year"])
+    predator_energy = None
+    for epoch in range(15 * year):
         consumers, producers, matter = evolve_consumers(
             consumers, producers, matter, world, epoch
         )
-        if epoch == 99:
+        if epoch == 5 * year - 1:
             assert not any(
                 trait_for(str(a["species"])).trophic_role == "herbivore"
                 for a in consumers["animals"]
             )
+        if epoch >= 5 * year:
+            # With no plants and no prey, nothing can raise a predator's energy.
+            energies = [float(a["energy"]) for a in consumers["animals"]]
+            if predator_energy is not None and energies:
+                assert max(energies) <= predator_energy + 1e-12
+            predator_energy = max(energies, default=None)
 
     assert living_population(consumers) == 0
 

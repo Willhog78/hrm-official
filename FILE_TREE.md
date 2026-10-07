@@ -34,6 +34,7 @@ hrm-official/
 │   │   ├── G10_6_BEHAVIORAL_INTEGRITY.md
 │   │   ├── G10_7_COMMUNICATION_TEACHING.md
 │   │   ├── ECOLOGY_OPPORTUNITY_OPENING.md   # current focus
+│   │   ├── D2_CONSUMER_TIMEBASE.md         # animal units correction
 │   │   └── ADR/                    # planned; no ADR written yet
 │   └── stage0/
 │       └── HRM_STAGE0_SALVAGE_LEDGER_v1.1.md
@@ -106,6 +107,8 @@ hrm-official/
 │       ├── test_g10_5_physiology.py
 │       ├── test_g10_7_memory_non_causal.py
 │       ├── test_{food_intake_diagnosis,plant_lifecycle,reproduction_contact,survival_affordances,tier_observer}.py
+│       ├── test_opportunity_census.py
+│       ├── test_consumer_timebase.py
 │       └── micro/                 # micro tier: test_micro_<topic>.py + _scenario.py
 │
 ├── qualification/
@@ -129,7 +132,7 @@ hrm-official/
 │
 ├── experiments/
 │   └── genesis/
-│       ├── run_*.py, run_*.sh     # multiseed, diagnosis and long-run scripts
+│       ├── run_*.py, run_*.sh     # multiseed, diagnosis, long-run and timebase-comparison scripts
 │       └── summaries/             # dated experiment summaries and JSON
 │
 ├── evidence/                      # dated verification records (flat; per-phase folders not created)
