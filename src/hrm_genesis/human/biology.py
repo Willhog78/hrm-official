@@ -206,6 +206,18 @@ def _age_profile(human: dict, profile: dict) -> dict:
     adjusted["move_energy_kcal_per_tick"] = float(profile["move_energy_kcal_per_tick"]) * max(0.10, scale)
     adjusted["water_loss_per_tick_kg"] = float(profile["water_loss_per_tick_kg"]) * max(0.10, scale)
     adjusted["min_dry_mass_kg"] = float(profile["min_dry_mass_kg"]) * scale
+    adjusted["thermal_scale"] = max(0.08, scale)
+    dependent_age = int(profile.get("dependent_age_ticks", 0))
+    independent_age = max(dependent_age, int(profile.get("independent_feeding_age_ticks", dependent_age)))
+    age = int(human.get("age_ticks", 0))
+    if dependent_age <= 0 or age >= independent_age:
+        dependence = 0.0
+    elif age <= dependent_age:
+        dependence = 1.0
+    else:
+        span = max(1, independent_age - dependent_age)
+        dependence = max(0.0, 1.0 - (age - dependent_age) / span)
+    adjusted["caregiver_dependence"] = dependence
     return adjusted
 
 
@@ -284,6 +296,7 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
         "body_elements_kg": body,
         "body_water_kg": water,
         "generation": int(mother["generation"]) + 1,
+        "caregiver_id": str(mother["id"]),
         "last_reproduction_epoch": -1000000,
         "fatigue": 0.0,
         "injury": 0.0,
@@ -316,6 +329,55 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
             else {}
         ),
     }
+
+
+
+def _provision_dependent(
+    child: dict,
+    caregiver: dict | None,
+    profile: dict,
+) -> float:
+    dependence = max(0.0, min(1.0, float(profile.get("caregiver_dependence", 0.0))))
+    if caregiver is None or dependence <= 0.0:
+        return 0.0
+
+    if (int(child["x"]), int(child["y"])) != (int(caregiver["x"]), int(caregiver["y"])):
+        return 0.0
+
+    transferred = 0.0
+    dry_cap = float(profile.get("nursing_dry_mass_kg_per_tick", 0.0)) * dependence
+    target_dry_mass = float(profile.get("target_dry_mass_kg", 0.0))
+    child_dry_mass = _mass(child["body_elements_kg"])
+    dry_need = max(0.0, target_dry_mass - child_dry_mass)
+    dry_transfer = min(dry_cap, dry_need)
+
+    if dry_transfer > 0.0:
+        caregiver_mass = max(1e-9, _mass(caregiver["body_elements_kg"]))
+        transferable_fraction = min(1.0, dry_transfer / caregiver_mass)
+        for symbol in HUMAN_TRACKED_ELEMENTS:
+            amount = float(caregiver["body_elements_kg"][symbol]) * transferable_fraction
+            caregiver["body_elements_kg"][symbol] -= amount
+            child["body_elements_kg"][symbol] += amount
+            transferred += amount
+
+    water_need = max(0.0, float(profile["water_capacity_kg"]) - float(child["body_water_kg"]))
+    water_cap = float(profile.get("nursing_water_kg_per_tick", 0.0)) * dependence
+    caregiver_water_floor = max(0.0, float(caregiver["body_water_kg"]) * 0.55)
+    water_available = max(0.0, float(caregiver["body_water_kg"]) - caregiver_water_floor)
+    water = min(water_need, water_cap, water_available)
+    caregiver["body_water_kg"] -= water
+    child["body_water_kg"] += water
+
+    energy_cap = float(profile.get("nursing_energy_kcal_per_tick", 0.0)) * dependence
+    caregiver_energy_floor = max(0.0, float(profile.get("basal_energy_kcal_per_tick", 0.0)))
+    energy_available = max(0.0, float(caregiver["energy"]) - caregiver_energy_floor)
+    energy = min(energy_cap, energy_available)
+    caregiver["energy"] -= energy
+    child["energy"] = min(
+        float(profile.get("energy_capacity_kcal", float("inf"))) * max(0.10, float(profile.get("development_scale", 1.0))),
+        float(child["energy"]) + energy,
+    )
+    return transferred + water
 
 
 def _structural_protection(world_cell: dict, producer_cell: dict | None = None) -> tuple[float, float]:
@@ -393,22 +455,24 @@ def _apply_physiology(
         fatigue = max(0.0, fatigue - HUMAN_FATIGUE_REST_RECOVERY)
 
     if excess > 0.0:
-        thermal_cost_cap = 300.0 if bool(profile.get("calibrated")) else 0.30
-        thermal_cost_rate = 10.0 if bool(profile.get("calibrated")) else 0.01
+        thermal_scale = max(0.08, float(profile.get("thermal_scale", 1.0)))
+        thermal_cost_cap = (300.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.30
+        thermal_cost_rate = (10.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.01
         human["energy"] = float(human["energy"]) - min(thermal_cost_cap, excess * thermal_cost_rate)
         if ambient > HUMAN_COMFORT_TEMPERATURE_C:
             human["body_water_kg"] = max(
                 0.0,
                 float(human["body_water_kg"]) - min(
-                    0.75 if bool(profile.get("calibrated")) else 0.02,
-                    excess * (0.03 if bool(profile.get("calibrated")) else 0.001),
+                    (0.75 * thermal_scale) if bool(profile.get("calibrated")) else 0.02,
+                    excess * ((0.03 * thermal_scale) if bool(profile.get("calibrated")) else 0.001),
                 ),
             )
 
     injury = float(human.get("injury", 0.0))
     severe_exposure = max(0.0, thermal_delta - 28.0)
     if severe_exposure > 0.0:
-        injury = min(1.5, injury + min(0.08, severe_exposure * 0.002))
+        injury_scale = max(0.15, float(profile.get("thermal_scale", 1.0)))
+        injury = min(1.5, injury + min(0.08 * injury_scale, severe_exposure * 0.002 * injury_scale))
     if fire_intensity > 0.45:
         injury = min(1.5, injury + min(0.25, (fire_intensity - 0.45) * 0.30))
 
@@ -480,13 +544,19 @@ def evolve_humans(
 
     survivors = []
     births = []
+    people_by_id = {str(person["id"]): person for person in humans["humans"]}
     for human in sorted(humans["humans"], key=lambda h: h["id"]):
         origin = (int(human["x"]), int(human["y"]))
         effective_profile = _age_profile(human, profile)
         start_energy = float(human["energy"])
         start_water = float(human["body_water_kg"])
         start_injury = float(human.get("injury", 0.0))
-        if cognition_enabled:
+        caregiver = people_by_id.get(str(human.get("caregiver_id", "")))
+        dependence = float(effective_profile.get("caregiver_dependence", 0.0))
+        if dependence > 0.0 and caregiver is not None:
+            target = (int(caregiver["x"]), int(caregiver["y"]))
+            perception = None
+        elif cognition_enabled:
             perception = perceive_local(
                 human,
                 producers,
@@ -500,7 +570,8 @@ def evolve_humans(
             target = _move_toward_food(human, producers)
         moved = target != origin
         if moved:
-            human["energy"] = float(human["energy"]) - float(effective_profile["move_energy_kcal_per_tick"])
+            movement_cost = float(effective_profile["move_energy_kcal_per_tick"]) * (0.25 if dependence > 0.0 else 1.0)
+            human["energy"] = float(human["energy"]) - movement_cost
             human["x"], human["y"] = target
 
         xy = (int(human["x"]), int(human["y"]))
@@ -515,8 +586,12 @@ def evolve_humans(
             pcells[xy].update(updated_cell)
             human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
             human["last_action_trace"] = trace
-        _drink(human, mcells[xy], effective_profile)
-        ate = _eat(human, pcells[xy], effective_profile)
+        provisioned = _provision_dependent(human, caregiver, effective_profile)
+        if dependence < 1.0:
+            _drink(human, mcells[xy], effective_profile)
+            ate = _eat(human, pcells[xy], effective_profile)
+        else:
+            ate = 0.0
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
         _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
         attacks = _apply_predator_threat(human, consumer_state)
@@ -525,6 +600,7 @@ def evolve_humans(
         loss = min(float(human["body_water_kg"]), float(effective_profile["water_loss_per_tick_kg"]))
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
+        human["caregiver_present"] = bool(caregiver is not None and (int(caregiver["x"]), int(caregiver["y"])) == xy) if "caregiver_id" in human else False
         human["age_ticks"] = int(human["age_ticks"]) + 1
 
         if cognition_enabled and perception is not None:
