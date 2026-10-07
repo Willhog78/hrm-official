@@ -154,6 +154,7 @@ class GenesisSimulation:
                 multi_population_enabled=config.multi_population_enabled,
                 calibrated=config.human_calibration_enabled,
                 ticks_per_year=config.ticks_per_year,
+                physiology_version=config.agentus_physiology_version,
             )
             human_state, producer_state, matter_state = seed_initial_humans(
                 human_state,
