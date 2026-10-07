@@ -758,6 +758,15 @@ def evolve_agentus_step(
                 _add_interoception(perception, human, effective_profile, profile)
             if integrity:
                 perception["partial_food_anchor"] = True
+            if humans.get("following"):
+                # Who is in view, and where: visible facts only.
+                perception["visible_peers"] = [
+                    (str(p["id"]), int(p["x"]), int(p["y"])) for p in humans["humans"]
+                    if p["id"] != human["id"]
+                    and abs(int(p["x"]) - origin[0]) + abs(int(p["y"]) - origin[1]) <= 1
+                ]
+                perception["follow_draw"] = cap.mo.unit_draw(human["id"], epoch, "follow")
+                perception["follow_pick"] = cap.mo.unit_draw(human["id"], epoch, "follow-pick")
             if capacities:
                 scale = max(0.10, float(effective_profile.get("development_scale", 1.0)))
                 extend_perception_with_materials(
@@ -826,6 +835,8 @@ def evolve_agentus_step(
                 ctx = cap.Context(humans, human, effective_profile, pcells[xy], ccells[xy], lithic_cells, wcells[xy], consumer_state, epoch)
             cap.learn_from_tick(ctx, intake)
             ate = sum(float(r["kg"]) for r in intake if float(r["kcal"]) > 0.0)
+            if perception is not None and "chosen_by" in perception:
+                cap.learn_following(humans, human, perception, ate)
         elif dependence < 1.0:
             _drink(human, mcells[xy], effective_profile)
             ate = _eat(human, pcells[xy], effective_profile)

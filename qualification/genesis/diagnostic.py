@@ -15,6 +15,7 @@ question. Arms use the multiseed names plus an optional `@physiology`:
   memory        v1-nomem     vs v1                (G10.7a step 2: witnessed memory; outcomes must not differ)
   retention     v1-fifo      vs v1                (G10.7a step 2.5: what is kept; outcomes must not differ)
   imitation     v1-noimit    vs v1                (G10.7a step 3: remembered acts raise the chance of trying them)
+  following     v1-nofollow  vs v1                (G10.7a step 4: going where a visible individual is, learned)
 
   python -m qualification.genesis.tiers diagnostic infant
   python -m qualification.genesis.tiers diagnostic custom --arms v1 v1@reference-v2 --days 365
@@ -44,6 +45,7 @@ SETS: dict[str, tuple[str, ...]] = {
     "memory": ("v1-nomem", "v1"),
     "retention": ("v1-fifo", "v1"),
     "imitation": ("v1-noimit", "v1"),
+    "following": ("v1-nofollow", "v1"),
 }
 DIAGNOSTIC_SEEDS = ("agentus-demography-a", "agentus-demography-b", "agentus-demography-c", "agentus-demography-d")
 DIAGNOSTIC_DAYS = 180
@@ -84,6 +86,12 @@ def arm_summary(arm: str, results: list[dict]) -> dict:
         "observed_ingestions": dict(_sum(ok, lambda r: r.get("observed_ingestions", {}))),
         "food_learned_after_observation": dict(_sum(ok, lambda r: r.get("food_learned_after_observation", {}))),
         "memory": [r.get("memory", {}) for r in ok],
+        "follow_days": sum(r.get("following", {}).get("follow_days", 0) for r in ok),
+        "explore_days": sum(r.get("following", {}).get("explore_days", 0) for r in ok),
+        "explore_days_with_someone_in_view": sum(r.get("following", {}).get("explore_days_with_someone_in_view", 0) for r in ok),
+        "follow_outcomes": dict(_sum(ok, lambda r: r.get("following", {}).get("outcomes", {}))),
+        "follow_basis": dict(_sum(ok, lambda r: r.get("following", {}).get("basis", {}))),
+        "agents_valuing_someone": sum(r.get("following", {}).get("agents_valuing_someone", 0) for r in ok),
         "imitation_tries": dict(_sum(ok, lambda r: r.get("imitation", {}).get("tries", {}))),
         "imitation_paid": dict(_sum(ok, lambda r: r.get("imitation", {}).get("paid", {}))),
         "imitation_unpaid": dict(_sum(ok, lambda r: r.get("imitation", {}).get("unpaid", {}))),
@@ -111,6 +119,9 @@ def print_comparison(summaries: list[dict], seeds: int, days: int) -> None:
         print(f"  observed transmissions {s['observed_transmissions']}")
         print(f"  food: legacy adoptions {s['observed_food_adoptions']}  ingestions seen {s['observed_ingestions']}  "
               f"learned by eating after seeing {s['food_learned_after_observation']}")
+        if s["follow_days"] or s["explore_days"]:
+            print(f"  following: follow days {s['follow_days']}  explore-alone days {s['explore_days']}  "
+                  f"(someone in view on {s['explore_days_with_someone_in_view']})  outcomes {s['follow_outcomes']}  basis {s['follow_basis']}  agents valuing someone {s['agents_valuing_someone']}")
         if s["imitation_tries"]:
             print(f"  imitation tries {s['imitation_tries']}")
             print(f"  imitation paid {s['imitation_paid']}  unpaid {s['imitation_unpaid']}  "

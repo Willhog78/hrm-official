@@ -61,6 +61,9 @@ RETENTION_DAYS_PER_CONSEQUENCE = 30
 # capped at 0.5 (declared). Imitation chooses what to try; it never sets value.
 IMITATION_PER_CONSEQUENCE = 0.15
 IMITATION_CAP = 0.5
+# G10.7a step 4: learning rate for the worth of following an individual and
+# for the agent's own baseline from exploring alone.
+FOLLOW_LEARNING_RATE = 0.3
 EXPLORE_HUNGRY = 0.25
 EXPLORE_SATED = 0.08
 RETRY_KNOWN = 0.03
@@ -1132,6 +1135,34 @@ def _own_appraisal(peer: dict, profile_basal: float, visible: dict) -> float | N
     if visible["injury"] > 0.0:
         parts.append(-visible["injury"] * 2.0)
     return sum(parts) if parts else None
+
+
+def learn_following(humans: dict, human: dict, perception: dict, ate_kg: float) -> None:
+    """G10.7a step 4. After a hungry day with nowhere known to go, the agent
+    compares what it got (intake as a share of need) with its own running
+    baseline from exploring alone. A day spent going where an individual was
+    updates the worth of following that individual by the difference. Nothing
+    is written to the individual followed."""
+    kind, peer_id = perception["chosen_by"]
+    outcome = min(1.0, ate_kg / max(1e-9, float(perception.get("forage_need_kg", 1.0))))
+    cognition = dict(human["cognition"])
+    stats = humans.setdefault("capacity_stats", {})
+    if kind == "explore":
+        prior = cognition.get("explore_baseline")
+        cognition["explore_baseline"] = round(outcome if prior is None else float(prior) + FOLLOW_LEARNING_RATE * (outcome - float(prior)), 10)
+        _bump(stats, "explore_days")
+        if perception.get("visible_peers"):
+            _bump(stats, "explore_days_with_someone_in_view")
+    else:
+        reward = outcome - float(cognition.get("explore_baseline", 0.0))
+        values = dict(cognition.get("follow_values", {}))
+        prior = values.get(peer_id)
+        values[peer_id] = round(reward if prior is None else float(prior) + FOLLOW_LEARNING_RATE * (reward - float(prior)), 10)
+        cognition["follow_values"] = values
+        _bump(stats, "follow_days")
+        _bump_map(stats, "follow_outcomes", "better_than_exploring" if reward > 0.0 else "not_better", 1)
+        _bump_map(stats, "follow_by_basis", "trial" if prior is None else ("valued" if float(prior) > 0.0 else "other"), 1)
+    human["cognition"] = cognition
 
 
 def imitation_candidate(ctx: Context, untried: list[tuple[str, dict]]) -> tuple[tuple[str, dict], int, list[str]] | None:

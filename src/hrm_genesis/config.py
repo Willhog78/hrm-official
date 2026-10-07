@@ -53,6 +53,9 @@ class GenesisConfig:
     # G10.7a step 3: remembered conspicuous acts raise the chance of trying the
     # same act when physically possible. No value or recipe is transferred.
     agentus_imitation_enabled: bool = True
+    # G10.7a step 4: when hungry with nowhere known to go, an agent may go where
+    # a visible individual is, valued only by its own experience of doing so.
+    agentus_following_enabled: bool = True
     # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
     # catabolism, realistic lactation and size^0.75 child metabolism.
     agentus_physiology_version: str = "reference-v1"
@@ -126,6 +129,11 @@ class GenesisConfig:
         return self.agentus_imitation_enabled and self.event_memory_active
 
     @property
+    def following_active(self) -> bool:
+        return (self.agentus_following_enabled and self.agentus_capacities_enabled
+                and self.human_cognition_enabled and self.agentus_observation_model != "g10.4-legacy")
+
+    @property
     def contract_dt(self) -> Fraction:
         return Fraction(self.contract_dt_numerator, self.contract_dt_denominator)
 
@@ -164,6 +172,8 @@ class GenesisConfig:
             canonical["agentus_event_memory"] = "witnessed-v2" if self.agentus_event_memory_retention == "consequence" else "witnessed-v1"
         if self.imitation_active:
             canonical["agentus_imitation"] = "witnessed-act-v1"
+        if self.following_active:
+            canonical["agentus_following"] = "visible-peer-v1"
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":
