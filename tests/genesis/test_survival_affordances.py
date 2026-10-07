@@ -11,7 +11,7 @@ from hrm_genesis.ecology.plants import (
     seed_initial_producers,
 )
 from hrm_genesis.human.biology import _apply_physiology, _eat, _experienced_reward
-from hrm_genesis.human.learning import update_expectations
+from hrm_genesis.human.learning import update_contextual_expectations, update_expectations
 from hrm_genesis.human.planning import choose_destination
 from hrm_genesis.matter.pools import build_matter_state
 
@@ -237,14 +237,14 @@ def test_terrain_cover_moderates_cold_extremes_too():
 
 
 def test_cover_preference_is_context_sensitive_not_permanent():
-    expectations = {}
-    expectations = update_expectations(
-        expectations,
+    contextual = {}
+    contextual = update_contextual_expectations(
+        contextual,
         {"origin": [1, 0], "cells": [], "context": "hot"},
         100.0,
     )
-    expectations = update_expectations(
-        expectations,
+    contextual = update_contextual_expectations(
+        contextual,
         {"origin": [0, 0], "cells": [], "context": "mild"},
         20.0,
     )
@@ -268,6 +268,10 @@ def test_cover_preference_is_context_sensitive_not_permanent():
         ],
     }
 
-    cognition = {"expectations": expectations, "uncertainty": 0.05}
+    cognition = {
+        "expectations": {},
+        "contextual_expectations": contextual,
+        "uncertainty": 0.05,
+    }
     assert choose_destination({"x": 0, "y": 0}, hot_perception, cognition) == (1, 0)
     assert choose_destination({"x": 0, "y": 0}, mild_perception, cognition) == (0, 0)
