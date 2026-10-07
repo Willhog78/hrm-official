@@ -1,0 +1,2837 @@
+{
+  "baseline": {
+    "events": [
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 49,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.0038813566,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1608.1535235814,
+          "pre_tick_xy": [
+            12,
+            3
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 57,
+          "generation": 0,
+          "id": "human-g00000007",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.0,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1292.1586259065,
+          "pre_tick_xy": [
+            3,
+            12
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 265,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 3.1150978819999997,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 936.3450368672,
+          "pre_tick_xy": [
+            6,
+            12
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000000",
+          "cause": "dehydration",
+          "epoch": 271,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.016742796,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 1.704960903,
+          "pre_tick_body_water_kg": 1.711369863,
+          "pre_tick_energy": 1798.625,
+          "pre_tick_xy": [
+            5,
+            12
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 364,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019306254000000002,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 1.9319441901999999,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1833.8870812102,
+          "pre_tick_xy": [
+            14,
+            4
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000006",
+          "cause": "dehydration",
+          "epoch": 371,
+          "generation": 1,
+          "id": "human-b00000009",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0060815468,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.2979383064,
+          "pre_tick_body_water_kg": 1.831826484,
+          "pre_tick_energy": 1581.0506417609,
+          "pre_tick_xy": [
+            14,
+            3
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 400,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019754892,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 24.668156936,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1639.672791241,
+          "pre_tick_xy": [
+            7,
+            6
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000004",
+          "cause": "dehydration",
+          "epoch": 406,
+          "generation": 1,
+          "id": "human-b00000010",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0759688384,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 8.9195960274,
+          "pre_tick_body_water_kg": 1.7538812785,
+          "pre_tick_energy": 1795.875,
+          "pre_tick_xy": [
+            7,
+            3
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 426,
+          "generation": 0,
+          "id": "human-g00000003",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020094648999999997,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.12931273669999999,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1186.070368192,
+          "pre_tick_xy": [
+            6,
+            8
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 432,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020030979,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 0.0982386832,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1111.3348168864,
+          "pre_tick_xy": [
+            14,
+            5
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 454,
+          "generation": 0,
+          "id": "human-g00000005",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.002007524,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.0623977369,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 923.345741904,
+          "pre_tick_xy": [
+            5,
+            2
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 1078,
+          "adult_female_days_with_colocated_male": 65,
+          "adult_female_days_with_reproduction_energy": 1012,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 0,
+          "births": 3,
+          "by_population_and_sex": {},
+          "days": 730,
+          "deaths": 11,
+          "extinct": true,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 75,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.0076905878,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1583.7230825125,
+          "pre_tick_xy": [
+            2,
+            13
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 84,
+          "generation": 0,
+          "id": "human-g00000007",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.002026281,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.06914606549999999,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1237.673654517,
+          "pre_tick_xy": [
+            14,
+            6
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 131,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020266255,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.4482301115,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 688.1534157868,
+          "pre_tick_xy": [
+            3,
+            8
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000000",
+          "cause": "dehydration",
+          "epoch": 135,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.3238376697,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.4853465945,
+          "pre_tick_body_water_kg": 1.403652968,
+          "pre_tick_energy": 2197.25,
+          "pre_tick_xy": [
+            3,
+            6
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 209,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [
+            "human-g00000006"
+          ],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 39.752351084000004,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1256.73574044,
+          "pre_tick_xy": [
+            11,
+            11
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000002",
+          "cause": "dehydration",
+          "epoch": 214,
+          "generation": 1,
+          "id": "human-b00000009",
+          "nearby_adults_before": [
+            "human-g00000006"
+          ],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 36.150943872899994,
+          "post_tick_nearest_viable_food_steps": 0,
+          "post_tick_visible_max_edible_kg": 36.150943872899994,
+          "pre_tick_body_water_kg": 1.3115525114,
+          "pre_tick_energy": 1998.625,
+          "pre_tick_xy": [
+            12,
+            11
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 376,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 2.037346815,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 649.714401969,
+          "pre_tick_xy": [
+            9,
+            3
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 430,
+          "generation": 0,
+          "id": "human-g00000005",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019787633000000002,
+          "post_tick_nearest_viable_food_steps": 6,
+          "post_tick_visible_max_edible_kg": 0.0823522823,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1740.457159109,
+          "pre_tick_xy": [
+            12,
+            10
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 432,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020175118,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.20977249509999998,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 829.786741872,
+          "pre_tick_xy": [
+            4,
+            7
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 791,
+          "adult_female_days_with_colocated_male": 75,
+          "adult_female_days_with_reproduction_energy": 755,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 1,
+          "births": 2,
+          "by_population_and_sex": {
+            "population-1": {
+              "female": 0,
+              "male": 1,
+              "total": 1
+            }
+          },
+          "days": 730,
+          "deaths": 9,
+          "extinct": false,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 50,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [
+            "human-g00000003"
+          ],
+          "nearby_same_population_adults_before": [
+            "human-g00000003"
+          ],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.0,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 753.2089580527,
+          "pre_tick_xy": [
+            14,
+            2
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 57,
+          "generation": 0,
+          "id": "human-g00000003",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.0,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 38.9827489601,
+          "pre_tick_xy": [
+            10,
+            0
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 179,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.002071111,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 0.013580101899999999,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1038.375303824,
+          "pre_tick_xy": [
+            1,
+            1
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 201,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 16.319418088,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 478.942332816,
+          "pre_tick_xy": [
+            2,
+            12
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000004",
+          "cause": "dehydration",
+          "epoch": 206,
+          "generation": 1,
+          "id": "human-b00000009",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0241928431,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 6.3591270762,
+          "pre_tick_body_water_kg": 1.4147945205,
+          "pre_tick_energy": 1876.192332816,
+          "pre_tick_xy": [
+            2,
+            13
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 422,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [
+            "human-g00000005"
+          ],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 15.6028197615,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1152.0570398146,
+          "pre_tick_xy": [
+            7,
+            6
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000000",
+          "cause": "dehydration",
+          "epoch": 429,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.017787801599999997,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 24.8477766634,
+          "pre_tick_body_water_kg": 2.2569406393,
+          "pre_tick_energy": 1595.875,
+          "pre_tick_xy": [
+            8,
+            6
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 448,
+          "generation": 0,
+          "id": "human-g00000005",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.002032607,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 0.1689152766,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1618.11695016,
+          "pre_tick_xy": [
+            1,
+            9
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 536,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020660596,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.1694958729,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 720.081753216,
+          "pre_tick_xy": [
+            14,
+            4
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000006",
+          "cause": "dehydration",
+          "epoch": 543,
+          "generation": 1,
+          "id": "human-b00000010",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0165530656,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.7616500679,
+          "pre_tick_body_water_kg": 2.2508675799,
+          "pre_tick_energy": 1598.625,
+          "pre_tick_xy": [
+            14,
+            3
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 1209,
+          "adult_female_days_with_colocated_male": 76,
+          "adult_female_days_with_reproduction_energy": 1186,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 1,
+          "births": 3,
+          "by_population_and_sex": {
+            "population-3": {
+              "female": 0,
+              "male": 1,
+              "total": 1
+            }
+          },
+          "days": 730,
+          "deaths": 10,
+          "extinct": false,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 35,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [
+            "human-g00000007"
+          ],
+          "nearby_same_population_adults_before": [
+            "human-g00000007"
+          ],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 9.8895015434,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1920.7460720548,
+          "pre_tick_xy": [
+            12,
+            13
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 46,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 3.6521539506,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 556.063972801,
+          "pre_tick_xy": [
+            8,
+            1
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 74,
+          "generation": 0,
+          "id": "human-g00000007",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 1,
+          "post_tick_visible_max_edible_kg": 9.4865097436,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1782.0617189037,
+          "pre_tick_xy": [
+            10,
+            11
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000007",
+          "cause": "dehydration",
+          "epoch": 79,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 5.1317416068999995,
+          "post_tick_nearest_viable_food_steps": 0,
+          "post_tick_visible_max_edible_kg": 14.370808659,
+          "pre_tick_body_water_kg": 1.2811872146,
+          "pre_tick_energy": 1998.625,
+          "pre_tick_xy": [
+            9,
+            11
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 387,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019669412,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.0819526089,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 236.5559324062,
+          "pre_tick_xy": [
+            3,
+            9
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 426,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019956881000000003,
+          "post_tick_nearest_viable_food_steps": 8,
+          "post_tick_visible_max_edible_kg": 0.060867585099999996,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 92.853619008,
+          "pre_tick_xy": [
+            5,
+            10
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 429,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [
+            "human-g00000003"
+          ],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.0477450077,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1361.562917504,
+          "pre_tick_xy": [
+            3,
+            7
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 441,
+          "generation": 0,
+          "id": "human-g00000003",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020303276,
+          "post_tick_nearest_viable_food_steps": 6,
+          "post_tick_visible_max_edible_kg": 0.1292483214,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 967.258194528,
+          "pre_tick_xy": [
+            6,
+            7
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 936,
+          "adult_female_days_with_colocated_male": 35,
+          "adult_female_days_with_reproduction_energy": 916,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 1,
+          "births": 1,
+          "by_population_and_sex": {
+            "population-2": {
+              "female": 0,
+              "male": 1,
+              "total": 1
+            }
+          },
+          "days": 730,
+          "deaths": 8,
+          "extinct": false,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "all_ledgers_valid": true,
+          "extinct_by_two_years": 1,
+          "mean_agentus": 0.75,
+          "seeds": 4,
+          "total_births": 9,
+          "zero_reproductive_populations": 4
+        },
+        "event": "DEMOGRAPHY_SUMMARY"
+      }
+    ],
+    "seed_results": [
+      {
+        "agentus": 0,
+        "births": 3,
+        "by_population_and_sex": {},
+        "days": 730,
+        "deaths": 11,
+        "extinct": true,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-a"
+      },
+      {
+        "agentus": 1,
+        "births": 2,
+        "by_population_and_sex": {
+          "population-1": {
+            "female": 0,
+            "male": 1,
+            "total": 1
+          }
+        },
+        "days": 730,
+        "deaths": 9,
+        "extinct": false,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-b"
+      },
+      {
+        "agentus": 1,
+        "births": 3,
+        "by_population_and_sex": {
+          "population-3": {
+            "female": 0,
+            "male": 1,
+            "total": 1
+          }
+        },
+        "days": 730,
+        "deaths": 10,
+        "extinct": false,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-c"
+      },
+      {
+        "agentus": 1,
+        "births": 1,
+        "by_population_and_sex": {
+          "population-2": {
+            "female": 0,
+            "male": 1,
+            "total": 1
+          }
+        },
+        "days": 730,
+        "deaths": 8,
+        "extinct": false,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-d"
+      }
+    ],
+    "summary": {
+      "all_ledgers_valid": true,
+      "extinct_by_two_years": 1,
+      "mean_agentus": 0.75,
+      "seeds": 4,
+      "total_births": 9,
+      "zero_reproductive_populations": 4
+    }
+  },
+  "baseline_commit": "923173522a10d94b50375cb71a1606a1de3c8a68",
+  "configuration": {
+    "calibrated": true,
+    "days": 730,
+    "height": 16,
+    "material_scale_factor": 1000.0,
+    "resource_quantities_changed": false,
+    "ticks_per_year": 365,
+    "width": 16
+  },
+  "corrected": {
+    "events": [
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 111,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [
+            "human-g00000001"
+          ],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.033994923,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 521.0,
+          "pre_tick_xy": [
+            3,
+            8
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 130,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [
+            "human-g00000001"
+          ],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020873061999999998,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.07474288829999982,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 955.8190289684,
+          "pre_tick_xy": [
+            5,
+            10
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 132,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020793951,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.3557554149,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 473.602392416,
+          "pre_tick_xy": [
+            7,
+            9
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000001",
+          "cause": "dehydration",
+          "epoch": 136,
+          "generation": 1,
+          "id": "human-b00000009",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.413614951,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.413614951,
+          "pre_tick_body_water_kg": 1.4826027397,
+          "pre_tick_energy": 2198.625,
+          "pre_tick_xy": [
+            7,
+            10
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 148,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [
+            "human-g00000005"
+          ],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.4692497438,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 758.0,
+          "pre_tick_xy": [
+            9,
+            5
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 155,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020859815,
+          "post_tick_nearest_viable_food_steps": 6,
+          "post_tick_visible_max_edible_kg": 0.0883353887,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 223.175953728,
+          "pre_tick_xy": [
+            3,
+            10
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 421,
+          "generation": 0,
+          "id": "human-g00000007",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.001996491,
+          "post_tick_nearest_viable_food_steps": 4,
+          "post_tick_visible_max_edible_kg": 0.036815383800000004,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1030.109991265,
+          "pre_tick_xy": [
+            11,
+            9
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 422,
+          "generation": 0,
+          "id": "human-g00000005",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 1.1095156123,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 1.1095156123,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 764.7123287671,
+          "pre_tick_xy": [
+            10,
+            8
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 439,
+          "generation": 0,
+          "id": "human-g00000003",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020274146999999998,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.5659671423,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1410.319633023,
+          "pre_tick_xy": [
+            8,
+            7
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000003",
+          "cause": "dehydration",
+          "epoch": 447,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.6045243564,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.6045243564,
+          "pre_tick_body_water_kg": 2.3432420092,
+          "pre_tick_energy": 1488.0248763317,
+          "pre_tick_xy": [
+            9,
+            7
+          ],
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 544,
+          "adult_female_days_with_colocated_male": 23,
+          "adult_female_days_with_reproduction_energy": 482,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 0,
+          "births": 2,
+          "by_population_and_sex": {},
+          "days": 730,
+          "deaths": 10,
+          "extinct": true,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-a"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 120,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 0.06981084180000001,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1365.2156163325,
+          "pre_tick_xy": [
+            5,
+            1
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000004",
+          "cause": "dehydration",
+          "epoch": 124,
+          "generation": 1,
+          "id": "human-b00000009",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.1185679144,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 0.1185679144,
+          "pre_tick_body_water_kg": 1.2032420091,
+          "pre_tick_energy": 2197.25,
+          "pre_tick_xy": [
+            6,
+            0
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 124,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 11,
+          "post_tick_visible_max_edible_kg": 0.0020252983,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1673.104308768,
+          "pre_tick_xy": [
+            0,
+            0
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 149,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 9.221e-05,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1470.278011296,
+          "pre_tick_xy": [
+            15,
+            15
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000006",
+          "cause": "dehydration",
+          "epoch": 153,
+          "generation": 1,
+          "id": "human-b00000011",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0908320172,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.0908320172,
+          "pre_tick_body_water_kg": 1.2214611872,
+          "pre_tick_energy": 2195.875,
+          "pre_tick_xy": [
+            15,
+            12
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 355,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019528762000000002,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 0.0983321425,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 499.177996048,
+          "pre_tick_xy": [
+            11,
+            5
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000002",
+          "cause": "dehydration",
+          "epoch": 362,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.14916087579999998,
+          "post_tick_nearest_viable_food_steps": 7,
+          "post_tick_visible_max_edible_kg": 0.14916087579999998,
+          "pre_tick_body_water_kg": 1.9593607306,
+          "pre_tick_energy": 1596.009656052,
+          "pre_tick_xy": [
+            12,
+            4
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 428,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019533208,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0286704094,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1979.681304041,
+          "pre_tick_xy": [
+            1,
+            12
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 430,
+          "generation": 0,
+          "id": "human-g00000005",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019524584,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0389169157,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 664.5920045178,
+          "pre_tick_xy": [
+            4,
+            11
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 432,
+          "generation": 0,
+          "id": "human-g00000007",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020102988,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0785217916,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1233.261881952,
+          "pre_tick_xy": [
+            9,
+            9
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 435,
+          "generation": 0,
+          "id": "human-g00000003",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020216952,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0568750825,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1640.778209824,
+          "pre_tick_xy": [
+            4,
+            7
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000000",
+          "cause": "dehydration",
+          "epoch": 436,
+          "generation": 1,
+          "id": "human-b00000010",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0336237898,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0523290581,
+          "pre_tick_body_water_kg": 2.0676712329,
+          "pre_tick_energy": 1370.1446256425,
+          "pre_tick_xy": [
+            3,
+            13
+          ],
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 1052,
+          "adult_female_days_with_colocated_male": 67,
+          "adult_female_days_with_reproduction_energy": 887,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 0,
+          "births": 4,
+          "by_population_and_sex": {},
+          "days": 730,
+          "deaths": 12,
+          "extinct": true,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-b"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 102,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020053894,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.040635627300000005,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 267.7433572536,
+          "pre_tick_xy": [
+            5,
+            1
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000004",
+          "cause": "dehydration",
+          "epoch": 106,
+          "generation": 1,
+          "id": "human-b00000009",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 3.8996917469,
+          "post_tick_nearest_viable_food_steps": 0,
+          "post_tick_visible_max_edible_kg": 8.4383559763,
+          "pre_tick_body_water_kg": 1.4340182648,
+          "pre_tick_energy": 2062.2433572536,
+          "pre_tick_xy": [
+            6,
+            3
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": true,
+          "caregiver_alive_before": true,
+          "caregiver_id": "human-g00000002",
+          "cause": "injury",
+          "epoch": 122,
+          "generation": 1,
+          "id": "human-b00000010",
+          "nearby_adults_before": [
+            "human-g00000002"
+          ],
+          "nearby_same_population_adults_before": [
+            "human-g00000002"
+          ],
+          "post_tick_edible_at_previous_cell_kg": 5.2190861197,
+          "post_tick_nearest_viable_food_steps": 0,
+          "post_tick_visible_max_edible_kg": 5.3845543731,
+          "pre_tick_body_water_kg": 2.0807762557,
+          "pre_tick_energy": 2800.0,
+          "pre_tick_xy": [
+            6,
+            5
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 148,
+          "generation": 0,
+          "id": "human-g00000005",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020473761999999997,
+          "post_tick_nearest_viable_food_steps": 9,
+          "post_tick_visible_max_edible_kg": 0.0514134843,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1736.640974384,
+          "pre_tick_xy": [
+            13,
+            15
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 406,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019718687,
+          "post_tick_nearest_viable_food_steps": 8,
+          "post_tick_visible_max_edible_kg": 0.2618230693,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 858.97421633,
+          "pre_tick_xy": [
+            12,
+            10
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 409,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.001971309,
+          "post_tick_nearest_viable_food_steps": 9,
+          "post_tick_visible_max_edible_kg": 0.0401789114,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1041.5475770768,
+          "pre_tick_xy": [
+            12,
+            11
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000006",
+          "cause": "dehydration",
+          "epoch": 417,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0273546126,
+          "post_tick_nearest_viable_food_steps": 16,
+          "post_tick_visible_max_edible_kg": 0.0297649338,
+          "pre_tick_body_water_kg": 2.2478082192,
+          "pre_tick_energy": 1402.3738965309,
+          "pre_tick_xy": [
+            14,
+            10
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 425,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019703015,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0156315136,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 703.72827816,
+          "pre_tick_xy": [
+            7,
+            10
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 427,
+          "generation": 0,
+          "id": "human-g00000003",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019523386,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0177650733,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1474.969981776,
+          "pre_tick_xy": [
+            1,
+            3
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 428,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020050979000000003,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.0491542898,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 288.630540209,
+          "pre_tick_xy": [
+            14,
+            6
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 428,
+          "generation": 0,
+          "id": "human-g00000007",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019412452,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.050449067400000006,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1715.238955249,
+          "pre_tick_xy": [
+            5,
+            4
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000000",
+          "cause": "dehydration",
+          "epoch": 431,
+          "generation": 1,
+          "id": "human-b00000011",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.1574114279,
+          "post_tick_nearest_viable_food_steps": null,
+          "post_tick_visible_max_edible_kg": 0.1574114279,
+          "pre_tick_body_water_kg": 1.9117808219,
+          "pre_tick_energy": 1795.875,
+          "pre_tick_xy": [
+            10,
+            10
+          ],
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 1342,
+          "adult_female_days_with_colocated_male": 143,
+          "adult_female_days_with_reproduction_energy": 1330,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 0,
+          "births": 4,
+          "by_population_and_sex": {},
+          "days": 730,
+          "deaths": 12,
+          "extinct": true,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-c"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "day": 90,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 118,
+          "generation": 0,
+          "id": "human-g00000006",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020697247,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.3396628451,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1641.5583165903,
+          "pre_tick_xy": [
+            12,
+            8
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 129,
+          "generation": 0,
+          "id": "human-g00000002",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020917313,
+          "post_tick_nearest_viable_food_steps": 4,
+          "post_tick_visible_max_edible_kg": 0.1421880118,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1273.5975864523,
+          "pre_tick_xy": [
+            11,
+            6
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000002",
+          "cause": "dehydration",
+          "epoch": 133,
+          "generation": 1,
+          "id": "human-b00000010",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.5852379906999999,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.8588669186,
+          "pre_tick_body_water_kg": 1.4522374429,
+          "pre_tick_energy": 2195.875,
+          "pre_tick_xy": [
+            9,
+            7
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 170,
+          "generation": 0,
+          "id": "human-g00000005",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020432984,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.008663910700000001,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 364.116525776,
+          "pre_tick_xy": [
+            6,
+            15
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 175,
+          "generation": 0,
+          "id": "human-g00000003",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0020705809999999997,
+          "post_tick_nearest_viable_food_steps": 3,
+          "post_tick_visible_max_edible_kg": 0.1008591522,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 32.068413952,
+          "pre_tick_xy": [
+            9,
+            14
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 180,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000003",
+          "cause": "dehydration",
+          "epoch": 181,
+          "generation": 1,
+          "id": "human-b00000008",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.5098246555,
+          "post_tick_nearest_viable_food_steps": 7,
+          "post_tick_visible_max_edible_kg": 0.5098246555,
+          "pre_tick_body_water_kg": 1.6567123288,
+          "pre_tick_energy": 1593.125,
+          "pre_tick_xy": [
+            12,
+            15
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 270,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 360,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 388,
+          "generation": 0,
+          "id": "human-g00000001",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019674634999999998,
+          "post_tick_nearest_viable_food_steps": 2,
+          "post_tick_visible_max_edible_kg": 0.17883086729999997,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1258.551554892,
+          "pre_tick_xy": [
+            6,
+            9
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 402,
+          "generation": 0,
+          "id": "human-g00000007",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019484003,
+          "post_tick_nearest_viable_food_steps": 7,
+          "post_tick_visible_max_edible_kg": 0.0817713234,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1748.911436288,
+          "pre_tick_xy": [
+            15,
+            3
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 417,
+          "generation": 0,
+          "id": "human-g00000000",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019983482,
+          "post_tick_nearest_viable_food_steps": 9,
+          "post_tick_visible_max_edible_kg": 0.021389793700000003,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 1922.9052579513,
+          "pre_tick_xy": [
+            0,
+            8
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": null,
+          "cause": "energy",
+          "epoch": 419,
+          "generation": 0,
+          "id": "human-g00000004",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.0019876239,
+          "post_tick_nearest_viable_food_steps": 8,
+          "post_tick_visible_max_edible_kg": 0.0465967828,
+          "pre_tick_body_water_kg": 39.5,
+          "pre_tick_energy": 779.719308528,
+          "pre_tick_xy": [
+            7,
+            10
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "caregiver_alive_after": false,
+          "caregiver_alive_before": false,
+          "caregiver_id": "human-g00000000",
+          "cause": "dehydration",
+          "epoch": 425,
+          "generation": 1,
+          "id": "human-b00000009",
+          "nearby_adults_before": [],
+          "nearby_same_population_adults_before": [],
+          "post_tick_edible_at_previous_cell_kg": 0.7685873938,
+          "post_tick_nearest_viable_food_steps": 5,
+          "post_tick_visible_max_edible_kg": 0.7685873938,
+          "pre_tick_body_water_kg": 2.3432420092,
+          "pre_tick_energy": 1483.5944254185,
+          "pre_tick_xy": [
+            2,
+            6
+          ],
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_DEATH_TRACE"
+      },
+      {
+        "data": {
+          "day": 450,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 540,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 630,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "day": 720,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_PROGRESS"
+      },
+      {
+        "data": {
+          "adult_female_days": 1083,
+          "adult_female_days_with_colocated_male": 20,
+          "adult_female_days_with_reproduction_energy": 1056,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_CONTACT"
+      },
+      {
+        "data": {
+          "agentus": 0,
+          "births": 3,
+          "by_population_and_sex": {},
+          "days": 730,
+          "deaths": 11,
+          "extinct": true,
+          "ledger_valid": true,
+          "reproductive_populations": 0,
+          "seed": "agentus-demography-d"
+        },
+        "event": "DEMOGRAPHY_SEED"
+      },
+      {
+        "data": {
+          "all_ledgers_valid": true,
+          "extinct_by_two_years": 4,
+          "mean_agentus": 0.0,
+          "seeds": 4,
+          "total_births": 13,
+          "zero_reproductive_populations": 4
+        },
+        "event": "DEMOGRAPHY_SUMMARY"
+      }
+    ],
+    "seed_results": [
+      {
+        "agentus": 0,
+        "births": 2,
+        "by_population_and_sex": {},
+        "days": 730,
+        "deaths": 10,
+        "extinct": true,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-a"
+      },
+      {
+        "agentus": 0,
+        "births": 4,
+        "by_population_and_sex": {},
+        "days": 730,
+        "deaths": 12,
+        "extinct": true,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-b"
+      },
+      {
+        "agentus": 0,
+        "births": 4,
+        "by_population_and_sex": {},
+        "days": 730,
+        "deaths": 12,
+        "extinct": true,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-c"
+      },
+      {
+        "agentus": 0,
+        "births": 3,
+        "by_population_and_sex": {},
+        "days": 730,
+        "deaths": 11,
+        "extinct": true,
+        "ledger_valid": true,
+        "reproductive_populations": 0,
+        "seed": "agentus-demography-d"
+      }
+    ],
+    "summary": {
+      "all_ledgers_valid": true,
+      "extinct_by_two_years": 4,
+      "mean_agentus": 0.0,
+      "seeds": 4,
+      "total_births": 13,
+      "zero_reproductive_populations": 4
+    }
+  },
+  "corrected_code_commit": "1e4419f"
+}

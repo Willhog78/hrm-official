@@ -30,6 +30,36 @@ def main() -> int:
     left_choice = choose_destination(agent, identical_perception, history_left)
     right_choice = choose_destination(agent, identical_perception, history_right)
 
+
+    hungry_perception = {
+        "origin": [1, 1],
+        "recognized": [],
+        "forage_need_kg": 1.0,
+        "energy_reserve_fraction": 0.20,
+        "cells": [
+            {"x": 1, "y": 1, "food_kg": 0.08, "water_kg": 1.0},
+            {"x": 0, "y": 1, "food_kg": 0.0, "water_kg": 1.0},
+            {"x": 2, "y": 1, "food_kg": 0.0, "water_kg": 1.0},
+            {"x": 1, "y": 0, "food_kg": 0.0, "water_kg": 1.0},
+            {"x": 1, "y": 2, "food_kg": 0.0, "water_kg": 1.0},
+        ],
+    }
+    hungry_history = {
+        "expectations": {},
+        "contextual_expectations": {},
+        "uncertainty": 0.2,
+        "memory": {
+            "episodes": [
+                {"epoch": 1, "origin": [0, 1], "reward": -1.0},
+                {"epoch": 2, "origin": [1, 0], "reward": -1.0},
+                {"epoch": 3, "origin": [1, 2], "reward": -1.0},
+            ],
+            "locations": {},
+            "recognized": [],
+        },
+    }
+    hungry_choice = choose_destination(agent, hungry_perception, hungry_history)
+
     memory = empty_memory()
     for epoch in range(MAX_EPISODES + 12):
         perception = {
@@ -64,6 +94,7 @@ def main() -> int:
         cognition_states = [h.get("cognition") for h in final_humans]
         checks = {
             "different_history_different_choice": left_choice != right_choice,
+            "hunger_drives_exploration_through_poor_neighbor": hungry_choice == (2, 1),
             "left_history_selects_left": left_choice == (0, 1),
             "right_history_selects_right": right_choice == (2, 1),
             "episodic_memory_bounded": len(memory["episodes"]) <= MAX_EPISODES,
@@ -91,7 +122,7 @@ def main() -> int:
         print("G6_GATE_FAIL:", ", ".join(failed))
         return 1
 
-    print("G6_HISTORY_CHOICES:", {"left_history": left_choice, "right_history": right_choice})
+    print("G6_HISTORY_CHOICES:", {"left_history": left_choice, "right_history": right_choice, "hungry_exploration": hungry_choice})
     print("G6_GATE_PASS")
     return 0
 
