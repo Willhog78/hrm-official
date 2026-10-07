@@ -388,7 +388,11 @@ def evolve_consumers(
         if str(animal["id"]) in killed_ids:
             continue
 
-        if traits.trophic_role == "predator":
+        predator_hungry = (
+            traits.trophic_role == "predator"
+            and float(animal["energy"]) < traits.reproduction_energy * 0.60
+        )
+        if predator_hungry:
             prey = _choose_prey(animal, consumers)
             if prey is not None:
                 target = (int(prey["x"]), int(prey["y"]))
@@ -407,7 +411,7 @@ def evolve_consumers(
         mcell = mcells[xy]
 
         _drink(animal, mcell)
-        if traits.trophic_role == "predator":
+        if traits.trophic_role == "predator" and predator_hungry:
             prey_here = [
                 other for other in consumers["animals"]
                 if str(other["id"]) not in killed_ids
