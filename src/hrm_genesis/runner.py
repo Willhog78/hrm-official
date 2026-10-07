@@ -130,6 +130,7 @@ class GenesisSimulation:
                 width=config.world_width,
                 height=config.world_height,
                 seed_bank=self.seed_bank,
+                ticks_per_year=config.ticks_per_year,
             )
             consumer_state, producer_state, matter_state = seed_initial_consumers(
                 consumer_state,
