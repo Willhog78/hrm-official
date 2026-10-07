@@ -1,6 +1,6 @@
 # G10.7 — Communication and teaching (design opening)
 
-**Status:** design opening. G10.7a step 1 (leak closure) is implemented; see section 5.
+**Status:** design opening. G10.7a step 1 (leak closure) is merged (PR #29); step 2 (witnessed-event memory) is implemented. See sections 5 and 6.
 
 The first question: what primitive information can one Agentus physically signal or demonstrate to another, without handing over language, concepts or named techniques?
 
@@ -154,3 +154,48 @@ No food value is set. The value comes only from the observer's own ingestion (`f
 - **Gates and suite:** all 19 gate scripts pass, including G7 on its legacy path. The full pytest suite passes.
 
 **Note on G7's exit condition.** G7's "transmitted to another agent which reproduces the effect by imitation" was satisfied only through the non-physical recipe path. That claim is reopened: G10.7a steps 2–3 (perceptual event memory, imitation) must earn it physically.
+
+## 6. G10.7a step 2 — witnessed-event memory (implemented; perception → memory only)
+
+**Flag.** `agentus_event_memory_enabled` is default on. It is active only with capacities and a visible observation model, and is recorded as `agentus_event_memory: "witnessed-v1"`. The diagnostic arm suffix `-nomem` turns it off.
+
+**What is stored.** Every agent in the same cell as an act or a meal, dependents included, appends one event to `cognition["witnessed"]`:
+- `epoch`;
+- `actor`: the recognised individual, which is the id used by `perceive_local`;
+- `act`: the verb and object classes, for example `strike:stone_small|stone_heavy` or `eat:seed`;
+- `created`: classes of objects that appeared;
+- `eaten_kg`: the food kind and amount visibly eaten as a result;
+- `hurt`: visible injury or distress.
+
+The memory keeps the newest `WITNESSED_MEMORY = 32` events (a declared bound). The actor's reward, effort, values and history are never stored. Agents do not witness their own acts; those are in `trace`.
+
+**Write-only.** No decision reads the memory. Two checks enforce this:
+- **Code-level guard:** a micro test fails if any source line other than the single writer references `"witnessed"`.
+- **Run-level check:** `test_g10_7_memory_non_causal.py` runs a production seed for 40 days with memory on and off. Every authority's state is identical once the memory field and its counters are removed.
+
+**Evidence.**
+- **Micro:** 8 new memory tests; all 74 micro tests pass.
+- **Smoke:** 0 fail, 0 warn. Results are identical to before step 2.
+- **Diagnostic `memory`** (`v1-nomem` vs `v1`, 4 seeds × 180 days): every outcome measure is identical. That covers survival, deaths, interactions, intake, hunting, learned values and transmissions.
+- **Gates and suite:** all 19 gate scripts and the full pytest suite pass.
+
+**What the memory holds** (findings that bear on imitation):
+
+| Measure (per seed, day 180) | Range |
+|---|---|
+| Events witnessed | 563–814 |
+| Share that are eating (plant, seed) | about 95% |
+| Agents holding memories | 7–11 |
+| Events held per agent | 22–25 of 32 |
+| Distinct acts per agent | 2.6–3.2 |
+| Distinct actors per agent | 1.0–1.5 |
+| Non-eating events still held | 4–13 |
+| Dependents with memories | 1–3 |
+
+- **Observation is socially sparse.** Most agents only ever see one other individual act. Co-location is rare outside caregiver and child pairs.
+- **Eating crowds out manipulation.** With a plain newest-32 bound, witnessed manipulative acts are flushed within days by the steady stream of witnessed meals. Imitation built on this memory would rarely have a manipulative act to draw on.
+
+  This is a design question for step 3, not a defect to tune here. The options are:
+  - a separate bound per event class;
+  - retention by visible consequence (an act that produced an object or a meal stays longer);
+  - leaving it as is and reporting it.

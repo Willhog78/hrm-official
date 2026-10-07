@@ -43,6 +43,9 @@ class GenesisConfig:
     # observer's own values; "g10.4-legacy" reproduces the G10.4 path that
     # copied the actor's reward and the eater's energy yield.
     agentus_observation_model: str = "visible-v1"
+    # G10.7a step 2: bounded memory of witnessed events (write-only until
+    # imitation exists). Active only with capacities and a visible model.
+    agentus_event_memory_enabled: bool = True
     # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
     # catabolism, realistic lactation and size^0.75 child metabolism.
     agentus_physiology_version: str = "reference-v1"
@@ -105,6 +108,11 @@ class GenesisConfig:
         return self.agentus_behavior_integrity_enabled and self.human_biology_enabled
 
     @property
+    def event_memory_active(self) -> bool:
+        return (self.agentus_event_memory_enabled and self.agentus_capacities_enabled
+                and self.agentus_observation_model != "g10.4-legacy")
+
+    @property
     def contract_dt(self) -> Fraction:
         return Fraction(self.contract_dt_numerator, self.contract_dt_denominator)
 
@@ -139,6 +147,8 @@ class GenesisConfig:
             canonical["agentus_thirst_enabled"] = True
         if self.agentus_capacities_enabled and self.agentus_observation_model != "g10.4-legacy":
             canonical["agentus_observation_model"] = self.agentus_observation_model
+        if self.event_memory_active:
+            canonical["agentus_event_memory"] = "witnessed-v1"
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":
