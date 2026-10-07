@@ -701,6 +701,15 @@ def evolve_humans(
             death_counts = dict(humans.get("cumulative_deaths_by_cause", {}))
             death_counts[death_cause] = int(death_counts.get(death_cause, 0)) + 1
             humans["cumulative_deaths_by_cause"] = death_counts
+            records = list(humans.get("death_records", []))
+            records.append({
+                "id": str(human["id"]),
+                "generation": int(human.get("generation", 0)),
+                "cause": death_cause,
+                "caregiver_id": human.get("caregiver_id"),
+                "epoch": int(epoch),
+            })
+            humans["death_records"] = records[-256:]
             cell = remains[xy]
             for symbol in HUMAN_TRACKED_ELEMENTS:
                 cell["elements_kg"][symbol] += float(human["body_elements_kg"][symbol])
