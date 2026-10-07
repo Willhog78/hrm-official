@@ -291,9 +291,17 @@ def _structural_protection(world_cell: dict, producer_cell: dict | None = None) 
     arranged_mass = sum(
         float(v) for v in producer_cell.get("arranged_material_elements_kg", {}).values()
     )
+    geometry = producer_cell.get("arrangement_geometry", {})
+    span = max(0.0, float(geometry.get("span_m", 0.0)))
+    height = max(0.0, float(geometry.get("height_m", 0.0)))
+    density = max(0.0, min(1.0, float(geometry.get("density", 0.0))))
+    area = max(0.0, float(geometry.get("surface_area_m2", 0.0)))
     canopy = min(0.80, max(0.0, woody_mass / 8.0))
     terrain_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
-    arranged_cover = min(0.45, max(0.0, arranged_mass / 2.0 * 0.45))
+    geometry_factor = min(1.0, (span / 1.5) * (height / 1.2) * density)
+    arranged_cover = min(0.45, max(0.0, geometry_factor * min(1.0, area / 2.0) * 0.45))
+    if arranged_mass <= 0.0:
+        arranged_cover = 0.0
     return canopy, min(0.95, terrain_cover + arranged_cover)
 
 def _experienced_reward(
@@ -328,6 +336,9 @@ def _apply_physiology(
     """Apply bounded fatigue, thermoregulation cost, injury, and healing."""
     profile = profile or physiology_profile(calibrated=False, ticks_per_year=120)
     ambient = float(world_cell["temperature"])
+    producer_cell = producer_cell or {}
+    fire_intensity = max(0.0, min(1.0, float(producer_cell.get("fire_intensity", 0.0))))
+    ambient += fire_intensity * 28.0
     canopy, terrain_cover = _structural_protection(world_cell, producer_cell)
 
     # Canopy primarily reduces hot exposure; cave/overhang terrain moderates
@@ -364,6 +375,8 @@ def _apply_physiology(
     severe_exposure = max(0.0, thermal_delta - 28.0)
     if severe_exposure > 0.0:
         injury = min(1.5, injury + min(0.08, severe_exposure * 0.002))
+    if fire_intensity > 0.45:
+        injury = min(1.5, injury + min(0.25, (fire_intensity - 0.45) * 0.30))
 
     can_heal = (
         injury > 0.0
