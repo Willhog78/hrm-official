@@ -89,6 +89,7 @@ def summarize(sim: GenesisSimulation, year: int) -> dict:
         "births_cumulative": int(humans.get("cumulative_births", 0)),
         "deaths_cumulative": int(humans.get("cumulative_deaths", 0)),
         "agentus_deaths_by_cause": dict(humans.get("cumulative_deaths_by_cause", {})),
+        "agentus_death_records": list(humans.get("death_records", [])),
         "dependent_agentus": sum(
             1 for person in people
             if int(person.get("age_ticks", 0)) < int(humans["physiology_profile"].get("dependent_age_ticks", 0))
