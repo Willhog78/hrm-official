@@ -55,13 +55,14 @@ PROFILE = {
 def _body_outcome(sequence: tuple[str, ...]) -> tuple[float, dict, dict, dict]:
     human, cell, trace = execute_live_sequence(sequence, _human("candidate"), _cell())
     human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
-    _apply_physiology(
-        human,
-        {"temperature": 60.0, "terrain_cover": 0.0},
-        moved=False,
-        profile=PROFILE,
-        producer_cell=cell,
-    )
+    for _ in range(7):
+        _apply_physiology(
+            human,
+            {"temperature": 60.0, "terrain_cover": 0.0},
+            moved=False,
+            profile=PROFILE,
+            producer_cell=cell,
+        )
     score = float(human["energy"]) - float(human["injury"]) * 4000.0
     return score, human, cell, trace
 
@@ -112,13 +113,14 @@ def main() -> int:
     learner_after["energy"] = float(learner_after["energy"]) - float(
         learner_trace.get("effort_energy_kcal", 0.0)
     )
-    _apply_physiology(
-        learner_after,
-        {"temperature": 60.0, "terrain_cover": 0.0},
-        moved=False,
-        profile=PROFILE,
-        producer_cell=learner_cell,
-    )
+    for _ in range(7):
+        _apply_physiology(
+            learner_after,
+            {"temperature": 60.0, "terrain_cover": 0.0},
+            moved=False,
+            profile=PROFILE,
+            producer_cell=learner_cell,
+        )
     learner_score = float(learner_after["energy"]) - float(learner_after["injury"]) * 4000.0
 
     initial_material = sum(_scaled_elements(1.0).values())
