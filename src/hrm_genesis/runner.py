@@ -144,6 +144,7 @@ class GenesisSimulation:
                 seed_bank=self.seed_bank,
                 cognition_enabled=config.human_cognition_enabled,
                 actions_enabled=config.human_actions_enabled,
+                multi_population_enabled=config.multi_population_enabled,
             )
             human_state, producer_state, matter_state = seed_initial_humans(
                 human_state,
