@@ -18,6 +18,8 @@ class ConsumerTraits:
     water_capacity_kg: float
     water_loss_per_tick_kg: float
     reproduction_cooldown_ticks: int
+    adult_body_mass_kg: float
+    trophic_role: str = "herbivore"
 
     def __post_init__(self) -> None:
         if self.perception_radius < 1:
@@ -28,6 +30,10 @@ class ConsumerTraits:
             raise ValueError("invalid age thresholds")
         if not 0.0 < self.offspring_mass_fraction < 1.0:
             raise ValueError("offspring_mass_fraction must be in (0,1)")
+        if self.adult_body_mass_kg <= 0.0:
+            raise ValueError("adult_body_mass_kg must be positive")
+        if self.trophic_role not in {"herbivore", "predator"}:
+            raise ValueError("unsupported trophic_role")
 
 
 SPECIES: dict[str, ConsumerTraits] = {
@@ -45,6 +51,7 @@ SPECIES: dict[str, ConsumerTraits] = {
         water_capacity_kg=0.30,
         water_loss_per_tick_kg=0.009,
         reproduction_cooldown_ticks=30,
+        adult_body_mass_kg=0.050,
     ),
     "browser": ConsumerTraits(
         species="browser",
@@ -59,7 +66,25 @@ SPECIES: dict[str, ConsumerTraits] = {
         offspring_mass_fraction=0.15,
         water_capacity_kg=0.34,
         water_loss_per_tick_kg=0.010,
-        reproduction_cooldown_ticks=30,
+        reproduction_cooldown_ticks=45,
+        adult_body_mass_kg=0.060,
+    ),
+    "stalker": ConsumerTraits(
+        species="stalker",
+        perception_radius=3,
+        movement_cost=0.34,
+        basal_cost=0.30,
+        bite_fraction=0.0,
+        assimilation_efficiency=0.72,
+        reproduction_energy=24.0,
+        maturity_ticks=60,
+        max_age_ticks=420,
+        offspring_mass_fraction=0.12,
+        water_capacity_kg=0.42,
+        water_loss_per_tick_kg=0.012,
+        reproduction_cooldown_ticks=90,
+        adult_body_mass_kg=0.085,
+        trophic_role="predator",
     ),
 }
 
