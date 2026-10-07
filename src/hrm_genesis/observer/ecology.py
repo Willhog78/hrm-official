@@ -14,11 +14,19 @@ def ecology_metrics(producer_state: dict, consumer_state: dict) -> dict:
     arranged_mass = 0.0
     active_fire_cells = 0
     max_fire_intensity = 0.0
+    protective_arrangement_cells = 0
     for cell in producer_state["cells"]:
         local_arranged = sum(float(v) for v in cell.get("arranged_material_elements_kg", {}).values())
         arranged_mass += local_arranged
         if local_arranged > 0.0:
             arranged_cells += 1
+            geometry = cell.get("arrangement_geometry", {})
+            span = float(geometry.get("span_m", 0.0))
+            height = float(geometry.get("height_m", 0.0))
+            density = float(geometry.get("density", 0.0))
+            area = float(geometry.get("surface_area_m2", 0.0))
+            if span >= 1.0 and height >= 0.8 and density >= 0.15 and area >= 1.0:
+                protective_arrangement_cells += 1
         fire = max(0.0, float(cell.get("fire_intensity", 0.0)))
         if fire > 0.0:
             active_fire_cells += 1
@@ -40,4 +48,5 @@ def ecology_metrics(producer_state: dict, consumer_state: dict) -> dict:
         "arranged_material_cells": arranged_cells,
         "active_fire_cells": active_fire_cells,
         "max_fire_intensity": round(max_fire_intensity, 10),
+        "protective_arrangement_cells": protective_arrangement_cells,
     }
