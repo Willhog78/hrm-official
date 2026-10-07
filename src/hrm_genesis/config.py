@@ -19,6 +19,7 @@ class GenesisConfig:
     human_biology_enabled: bool = False
     human_cognition_enabled: bool = False
     human_actions_enabled: bool = False
+    multi_population_enabled: bool = False
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -46,6 +47,8 @@ class GenesisConfig:
             raise ValueError("human_cognition_enabled requires human_biology_enabled")
         if self.human_actions_enabled and not self.human_cognition_enabled:
             raise ValueError("human_actions_enabled requires human_cognition_enabled")
+        if self.multi_population_enabled and not self.human_actions_enabled:
+            raise ValueError("multi_population_enabled requires human_actions_enabled")
 
     @property
     def contract_dt(self) -> Fraction:
@@ -64,10 +67,11 @@ class GenesisConfig:
             "human_biology_enabled": self.human_biology_enabled,
             "human_cognition_enabled": self.human_cognition_enabled,
             "human_actions_enabled": self.human_actions_enabled,
+            "multi_population_enabled": self.multi_population_enabled,
             "world_width": self.world_width,
             "world_height": self.world_height,
             "ticks_per_year": self.ticks_per_year,
-            "genesis_phase": "G7" if self.human_actions_enabled else ("G6" if self.human_cognition_enabled else ("G5" if self.human_biology_enabled else ("G3" if self.consumer_ecology_enabled else "G2"))),
+            "genesis_phase": "G8" if self.multi_population_enabled else ("G7" if self.human_actions_enabled else ("G6" if self.human_cognition_enabled else ("G5" if self.human_biology_enabled else ("G3" if self.consumer_ecology_enabled else "G2")))),
         }
 
     def fingerprint(self) -> str:
