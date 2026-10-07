@@ -10,7 +10,9 @@ from hrm_genesis.ecology.plants import (
     producer_woody_biomass_kg,
     seed_initial_producers,
 )
-from hrm_genesis.human.biology import _apply_physiology
+from hrm_genesis.human.biology import _apply_physiology, _experienced_reward
+from hrm_genesis.human.learning import update_expectations
+from hrm_genesis.human.planning import choose_destination
 from hrm_genesis.matter.pools import build_matter_state
 
 
@@ -103,3 +105,76 @@ def test_physical_cover_reduces_heat_exposure_without_named_shelter_action():
     assert float(protected["energy"]) > float(exposed["energy"])
     assert float(protected["body_water_kg"]) >= float(exposed["body_water_kg"])
     assert float(protected["injury"]) <= float(exposed["injury"])
+
+
+def test_experienced_protection_can_be_learned_without_a_shelter_rule():
+    profile = {
+        "calibrated": True,
+        "water_capacity_kg": 42.0,
+        "basal_energy_kcal_per_tick": 2000.0,
+    }
+    base = {
+        "energy": 8000.0,
+        "body_water_kg": 42.0,
+        "fatigue": 0.0,
+        "injury": 0.0,
+        "core_temperature_c": 37.0,
+    }
+
+    exposed = deepcopy(base)
+    protected = deepcopy(base)
+    _apply_physiology(
+        exposed,
+        {"temperature": 60.0, "natural_shelter": 0.0},
+        moved=False,
+        profile=profile,
+    )
+    _apply_physiology(
+        protected,
+        {"temperature": 60.0, "natural_shelter": 0.8},
+        moved=False,
+        profile=profile,
+        producer_cell={"woody_elements_kg": {"C": 8.0}},
+    )
+
+    exposed_reward = _experienced_reward(
+        start_energy=8000.0,
+        start_water=42.0,
+        start_injury=0.0,
+        human=exposed,
+        profile=profile,
+    )
+    protected_reward = _experienced_reward(
+        start_energy=8000.0,
+        start_water=42.0,
+        start_injury=0.0,
+        human=protected,
+        profile=profile,
+    )
+    assert protected_reward > exposed_reward
+
+    expectations = {}
+    expectations = update_expectations(
+        expectations,
+        {"origin": [0, 0], "cells": []},
+        exposed_reward,
+    )
+    expectations = update_expectations(
+        expectations,
+        {"origin": [1, 0], "cells": []},
+        protected_reward,
+    )
+    perception = {
+        "origin": [0, 0],
+        "recognized": [],
+        "cells": [
+            {"x": 0, "y": 0, "food_kg": 1.0, "water_kg": 1.0},
+            {"x": 1, "y": 0, "food_kg": 1.0, "water_kg": 1.0},
+        ],
+    }
+    choice = choose_destination(
+        {"x": 0, "y": 0},
+        perception,
+        {"expectations": expectations, "uncertainty": 0.05},
+    )
+    assert choice == (1, 0)
