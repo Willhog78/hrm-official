@@ -507,6 +507,27 @@ def _find(humans: dict, object_id: str | None) -> dict | None:
     return None
 
 
+def _held(ctx: Context, object_id: str | None) -> dict | None:
+    """An object the acting agent is actually holding, or None.
+
+    Physical-access guard: interactions may only use what is in hand. Live
+    choice only ever offers held tools, so this never changes a live run; it
+    makes a remote or stale reference fail closed instead of acting at a distance.
+    """
+    obj = _find(ctx.humans, object_id)
+    if obj is None or obj.get("holder") != ctx.agent_id or obj.get("worn"):
+        return None
+    return obj
+
+
+def _on_ground_here(ctx: Context, object_id: str | None) -> dict | None:
+    """An unheld object lying in the acting agent's own cell, or None."""
+    obj = _find(ctx.humans, object_id)
+    if obj is None or obj.get("holder") is not None or (int(obj["x"]), int(obj["y"])) != ctx.xy:
+        return None
+    return obj
+
+
 def _injure(ctx: Context, amount: float) -> float:
     ctx.human["injury"] = float(ctx.human.get("injury", 0.0)) + amount
     _bump(ctx.stats, "interaction_injury", amount)
@@ -598,25 +619,25 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
             out["effort_kcal"] = 3.0 + 4.0 * float(frag["m"])
 
     elif verb == "grasp_object":
-        obj = _find(humans, spec["id"])
-        if obj is not None and obj.get("holder") is None:
+        obj = _on_ground_here(ctx, spec["id"])
+        if obj is not None:
             obj["holder"] = ctx.agent_id
             out["effort_kcal"] = 3.0 + 4.0 * mo.object_mass(obj)
 
     elif verb == "release":
-        obj = _find(humans, spec["id"])
+        obj = _held(ctx, spec["id"])
         if obj is not None:
             obj["holder"] = None
             out["effort_kcal"] = 1.0
 
     elif verb == "strike_stone":
-        tool = _find(humans, spec["tool"])
+        tool = _held(ctx, spec["tool"])
         if spec.get("natural"):
             cell = ctx.mcell_lithics()
             target_frag = next((f for f in cell if f["id"] == spec["natural"]), None)
             target_obj = None
         else:
-            target_obj = _find(humans, spec.get("object"))
+            target_obj = _on_ground_here(ctx, spec.get("object"))
             target_frag = None if target_obj is None else target_obj["fragment"]
         if tool is not None and target_frag is not None:
             energy, hardness, edge, head_mass, head_frag = _swing(ctx, tool)
@@ -655,8 +676,12 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
             _strike_load_test(ctx, tool, energy, out)
 
     elif verb == "capture":
-        animal = next((a for a in ctx.consumers["animals"] if a["id"] == spec["animal"]), None)
-        tool = _find(humans, spec.get("tool"))
+        animal = next(
+            (a for a in ctx.consumers["animals"]
+             if a["id"] == spec["animal"] and (int(a["x"]), int(a["y"])) == ctx.xy),
+            None,
+        )
+        tool = _held(ctx, spec.get("tool"))
         if animal is not None:
             traits = trait_for(str(animal["species"]))
             energy, _, edge, _, _ = _swing(ctx, tool)
@@ -690,7 +715,7 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
                 _strike_load_test(ctx, tool, energy, out)
 
     elif verb == "cut_tissue":
-        tool = _find(humans, spec.get("tool"))
+        tool = _held(ctx, spec.get("tool"))
         cap = _capability(ctx.human, ctx.profile)
         if tool is None:
             capacity = 0.0
@@ -705,7 +730,7 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
         out["access_bonus_kg"] = bonus
 
     elif verb in {"extract_tendon", "extract_bark", "extract_plant_fiber"}:
-        tool = _find(humans, spec.get("tool"))
+        tool = _held(ctx, spec.get("tool"))
         cap = _capability(ctx.human, ctx.profile)
         capacity = 0.0
         if tool is not None:
@@ -747,7 +772,7 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
             _bump(ctx.stats, "fibers_extracted")
 
     elif verb == "wood_piece":
-        tool = _find(humans, spec.get("tool"))
+        tool = _held(ctx, spec.get("tool"))
         cap = _capability(ctx.human, ctx.profile)
         pool = ctx.pcell["woody_elements_kg"]
         if tool is None:
@@ -773,7 +798,7 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
             _bump(ctx.stats, "wood_pieces")
 
     elif verb == "pull_apart":
-        obj = _find(humans, spec["id"])
+        obj = _held(ctx, spec["id"])
         if obj is not None and len(ctx.soft_held()) < MAX_SOFT_IN_HAND:
             first, second = mo.break_fiber(obj, ctx.draw("pull", key), _new_id(humans, "fiber"))
             obj.clear()
@@ -849,7 +874,7 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
                     humans["objects"].append(_place(second, ctx.xy[0], ctx.xy[1], None))
 
     elif verb == "wear":
-        obj = _find(humans, spec["id"])
+        obj = _held(ctx, spec["id"])
         if obj is not None:
             obj["worn"] = True
             out["effort_kcal"] = 4.0
