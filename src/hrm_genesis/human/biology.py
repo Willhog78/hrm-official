@@ -353,14 +353,11 @@ def _resolve_caregiver(
         return current
 
     cx, cy = int(child["x"]), int(child["y"])
-    same_population = child.get("population_id")
     candidates = []
     for other in people_by_id.values():
         if str(other["id"]) == str(child["id"]):
             continue
         if int(other.get("age_ticks", 0)) < int(profile.get("maturity_ticks", 0)):
-            continue
-        if same_population is not None and other.get("population_id") != same_population:
             continue
         distance = abs(int(other["x"]) - cx) + abs(int(other["y"]) - cy)
         if distance <= 1:
@@ -579,13 +576,9 @@ def evolve_humans(
     wcells = _cell_lookup(world_state["cells"])
     profile = humans.get("physiology_profile", physiology_profile(calibrated=False, ticks_per_year=120))
 
-    adults_by_cell: dict[tuple[int, int], set[str]] = {}
-    for person in humans["humans"]:
-        if int(person["age_ticks"]) >= int(profile["maturity_ticks"]):
-            adults_by_cell.setdefault((int(person["x"]), int(person["y"])), set()).add(str(person["sex"]))
-
     survivors = []
     births = []
+    fed_ids = set()
     people_by_id = {str(person["id"]): person for person in humans["humans"]}
     for human in sorted(humans["humans"], key=lambda h: h["id"]):
         origin = (int(human["x"]), int(human["y"]))
@@ -733,13 +726,26 @@ def evolve_humans(
             humans["cumulative_deaths"] = int(humans.get("cumulative_deaths", 0)) + 1
             continue
 
+        survivors.append(human)
+        if ate > 0.0:
+            fed_ids.add(str(human["id"]))
+
+    # Reproduction sees the living adults' positions after today's movement.
+    adults_by_cell: dict[tuple[int, int], set[str]] = {}
+    for person in survivors:
+        if int(person["age_ticks"]) >= int(profile["maturity_ticks"]):
+            adults_by_cell.setdefault((int(person["x"]), int(person["y"])), set()).add(str(person["sex"]))
+    for human in survivors:
+        xy = (int(human["x"]), int(human["y"]))
+        body_mass = _mass(human["body_elements_kg"])
         since_birth = epoch - int(human.get("last_reproduction_epoch", -1000000))
         can_reproduce = (
             human["sex"] == "female"
+            and int(human["age_ticks"]) >= int(profile["maturity_ticks"])
             and {"female", "male"}.issubset(adults_by_cell.get(xy, set()))
             and float(human["energy"]) >= float(profile["reproduction_energy_kcal"])
             and body_mass >= float(profile["seed_dry_mass_kg"]) * 0.9
-            and ate > 0.0
+            and str(human["id"]) in fed_ids
             and since_birth >= int(profile["reproduction_cooldown_ticks"])
         )
         if can_reproduce:
@@ -750,8 +756,6 @@ def evolve_humans(
             human["last_reproduction_epoch"] = epoch
             births.append(child)
             humans["cumulative_births"] = int(humans.get("cumulative_births", 0)) + 1
-
-        survivors.append(human)
 
     humans["humans"] = survivors + births
 
