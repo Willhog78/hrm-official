@@ -112,8 +112,8 @@ def summarize(sim: GenesisSimulation, year: int) -> dict:
 def main() -> int:
     config = GenesisConfig(
         master_seed="genesis-first-calibrated-human-long-run",
-        world_width=8,
-        world_height=8,
+        world_width=16,
+        world_height=16,
         ticks_per_year=TICKS_PER_YEAR,
         producer_ecology_enabled=True,
         consumer_ecology_enabled=True,
