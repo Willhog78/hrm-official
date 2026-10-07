@@ -34,7 +34,7 @@ The first major milestone is **Autonomous Computational Ecology v1**: a non-huma
 - **Stage 0 — Canon / Salvage Audit:** frozen/closed by the current governing record.
 - **Stage 1 — Coordination Architecture:** active corrected implementation. Round-2 defects DAR-S1-004 through DAR-S1-006 have been corrected in code and regression-tested here. This repository does **not** claim the required independent freeze review has been supplied in the review chain currently stored here.
 - **Stage 2 — Matter / Materials:** a self-tested Slice-A candidate is preserved under `drafts/stage2/`. It is quarantined from the active baseline until Stage-1 governance is formally satisfied.
-- **Genesis execution roadmap:** proposed as the active build-order overlay. It preserves the Master Development Plan's scientific rules while prioritizing a causally complete vertical slice.
+- **Genesis execution roadmap:** actively implemented through G10.2, with qualification assets for G0–G10.2. The current correction is G10.2A survival affordances before long-run calibrated-human survival.
 
 ## Stage-1 architecture
 
