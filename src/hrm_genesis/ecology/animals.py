@@ -106,9 +106,18 @@ def seed_initial_consumers(
         return consumers, producers, matter
 
     survivors: list[dict] = []
+    herbivore_seed_cells: list[tuple[int, int]] = []
     for index, animal in enumerate(consumers["animals"]):
-        xy = vegetated[index % len(vegetated)]
+        traits = trait_for(str(animal["species"]))
+        if traits.trophic_role == "predator" and herbivore_seed_cells:
+            # Predators enter the same habitat as available prey, not a random
+            # remote cell. This changes initial ecology, not later outcomes.
+            xy = herbivore_seed_cells[index % len(herbivore_seed_cells)]
+        else:
+            xy = vegetated[index % len(vegetated)]
         animal["x"], animal["y"] = xy
+        if traits.trophic_role == "herbivore":
+            herbivore_seed_cells.append(xy)
         pcell = pcells[xy]
         mcell = mcells[xy]
 
