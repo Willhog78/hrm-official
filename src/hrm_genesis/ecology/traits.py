@@ -3,6 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
+TRAIT_REFERENCE_TICKS_PER_YEAR = 12
+
+
+def scaled_life_history_ticks(value: int, ticks_per_year: int) -> int:
+    if ticks_per_year < 1:
+        raise ValueError("ticks_per_year must be >= 1")
+    return max(1, int(round(int(value) * ticks_per_year / TRAIT_REFERENCE_TICKS_PER_YEAR)))
+
+
 @dataclass(frozen=True)
 class ConsumerTraits:
     species: str
