@@ -311,7 +311,14 @@ Do not advance a phase if:
 
 # Immediate next work
 
-1. Freeze the current Stage-1 source against incidental modification.
-2. Implement the G0 integration contract.
-3. Create the Genesis package skeleton from `FILE_TREE.md`.
-4. Build the empty physical world before adding any organism.
+G0 through G10.2 now have implementation and qualification assets in the repository.
+
+Before the first serious long-run calibrated-human experiment, complete **G10.2A — Survival Affordance Substrate**:
+
+1. terrain-conditioned exposed rock and cave/overhang cover;
+2. woody biomass that develops only under viable plant conditions and is not automatically edible;
+3. local perception of those physical affordances;
+4. measurable exposure moderation from occupying real cover;
+5. regression checks preserving conservation, determinism, replay, and the prior qualification stack.
+
+After that substrate is qualified, the next experiment is long-run calibrated human survival without scripted rescue.
