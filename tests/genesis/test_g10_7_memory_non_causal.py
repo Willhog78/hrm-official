@@ -21,6 +21,7 @@ MEMORY_STATS = {"witnessed_events", "witnessed_by_act"}
 def _strip(human_state: dict) -> dict:
     state = dict(human_state)
     state.pop("event_memory", None)
+    state.pop("event_memory_retention", None)
     state["capacity_stats"] = {k: v for k, v in state.get("capacity_stats", {}).items() if k not in MEMORY_STATS}
     people = []
     for person in state["humans"]:
@@ -33,8 +34,9 @@ def _strip(human_state: dict) -> dict:
     return state
 
 
-def _run(memory: bool) -> GenesisSimulation:
-    config = GenesisConfig(**{**config_for("agentus-demography-a", "v1").__dict__, "agentus_event_memory_enabled": memory})
+def _run(memory: bool, retention: str = "consequence") -> GenesisSimulation:
+    config = GenesisConfig(**{**config_for("agentus-demography-a", "v1").__dict__,
+                              "agentus_event_memory_enabled": memory, "agentus_event_memory_retention": retention})
     sim = GenesisSimulation(config)
     sim.run(DAYS)
     return sim
@@ -48,3 +50,14 @@ def test_witnessed_memory_is_recorded_but_changes_no_behaviour():
     assert on.ecology_state() == off.ecology_state()
     assert on.matter_state() == off.matter_state()
     assert on.consumer_state() == off.consumer_state()
+
+
+def test_retention_policy_changes_only_what_is_remembered():
+    """Step 2.5: consequence-based retention vs step-2 FIFO retention. (At 40
+    days memories are not yet full; eviction itself is covered by the micro
+    tests and a 180-day full-state check recorded in the G10.7 doc.)"""
+    consequence, fifo = _run(True, "consequence"), _run(True, "fifo")
+    assert _strip(consequence.human_state()) == _strip(fifo.human_state())
+    assert consequence.ecology_state() == fifo.ecology_state()
+    assert consequence.matter_state() == fifo.matter_state()
+    assert consequence.consumer_state() == fifo.consumer_state()

@@ -13,6 +13,7 @@ question. Arms use the multiseed names plus an optional `@physiology`:
   integrity     v1-preg106   vs v1                (G10.6 behavioural/locomotion integrity)
   observation   v1-g104obs   vs v1                (G10.7a: only visible acts and consequences travel)
   memory        v1-nomem     vs v1                (G10.7a step 2: witnessed memory; outcomes must not differ)
+  retention     v1-fifo      vs v1                (G10.7a step 2.5: what is kept; outcomes must not differ)
 
   python -m qualification.genesis.tiers diagnostic infant
   python -m qualification.genesis.tiers diagnostic custom --arms v1 v1@reference-v2 --days 365
@@ -40,6 +41,7 @@ SETS: dict[str, tuple[str, ...]] = {
     "integrity": ("v1-preg106", "v1"),
     "observation": ("v1-g104obs", "v1"),
     "memory": ("v1-nomem", "v1"),
+    "retention": ("v1-fifo", "v1"),
 }
 DIAGNOSTIC_SEEDS = ("agentus-demography-a", "agentus-demography-b", "agentus-demography-c", "agentus-demography-d")
 DIAGNOSTIC_DAYS = 180

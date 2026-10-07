@@ -7,14 +7,16 @@ later, separate step).
 
 from __future__ import annotations
 
-import re
+import ast
 from pathlib import Path
 
 from _scenario import Scenario
 from hrm_genesis.human import interactions as cap
 from hrm_genesis.human.diet import innate_food_prior
 
-ALLOWED_FIELDS = {"epoch", "actor", "act", "created", "eaten_kg", "hurt"}
+STEP2_FIELDS = {"epoch", "actor", "act", "created", "eaten_kg", "hurt"}
+CONSEQUENCE_FIELDS = {"appeared", "transformed", "killed", "exposed_kg"}
+ALLOWED_FIELDS = STEP2_FIELDS | CONSEQUENCE_FIELDS
 KEY = "cut:fresh_tissue|stone_edged"
 SEED_MEAL = {"kind": "seed", "kg": 1.0, "kcal": 2850.0, "hazard": 0.0, "handling_kcal": 60.0}
 
@@ -42,8 +44,15 @@ def test_a_witnessed_act_is_remembered_with_visible_fields_only():
     cap.observe_outcome(_ctx(sc), KEY, reward=12.0, visible=_visible(0.5, created=["stone_edged"], injury=0.02))
     (event,) = w["cognition"]["witnessed"]
     assert set(event) == ALLOWED_FIELDS
-    assert event == {"epoch": 7, "actor": sc.agent["id"], "act": KEY, "created": ["stone_edged"],
-                     "eaten_kg": {"fresh_tissue": 0.5}, "hurt": True}
+    assert {k: event[k] for k in STEP2_FIELDS} == {"epoch": 7, "actor": sc.agent["id"], "act": KEY, "created": ["stone_edged"],
+                                                   "eaten_kg": {"fresh_tissue": 0.5}, "hurt": True}
+
+
+def test_fifo_retention_stores_exactly_the_step_2_fields():
+    sc = Scenario(capacities=True, retention="fifo")
+    w = _witness(sc)
+    cap.observe_outcome(_ctx(sc), KEY, visible=_visible(0.5))
+    assert set(w["cognition"]["witnessed"][0]) == STEP2_FIELDS
 
 
 def test_it_is_remembered_even_when_it_means_nothing_to_the_witness():
@@ -80,7 +89,7 @@ def test_dependents_witness_too():
 
 
 def test_memory_is_bounded_and_keeps_the_newest():
-    sc = Scenario(capacities=True)
+    sc = Scenario(capacities=True, retention="fifo")
     w = _witness(sc)
     for epoch in range(cap.WITNESSED_MEMORY + 10):
         cap.observe_food(_ctx(sc, epoch), [SEED_MEAL])
@@ -99,15 +108,75 @@ def test_memory_off_and_legacy_observation_store_nothing():
 
 
 def test_no_decision_code_reads_witnessed_memory():
-    """Step 2 is perception -> memory only. The only code that may touch the
-    memory is the function that writes it."""
+    """Perception -> memory only: every reference to the memory anywhere in the
+    model sits inside the function that writes it."""
     src = Path(__file__).resolve().parents[3] / "src" / "hrm_genesis"
-    touches: set[str] = set()
+    outside = []
+
+    def visit(node, enclosing):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            enclosing = node.name
+        if isinstance(node, ast.Constant) and node.value == "witnessed" and enclosing != "remember_witnessed":
+            outside.append(f"{path.name}:{node.lineno} in {enclosing}")
+        for child in ast.iter_child_nodes(node):
+            visit(child, enclosing)
+
     for path in src.rglob("*.py"):
-        text = path.read_text()
-        for m in re.finditer(r"\"witnessed\"", text):
-            line_start = text.rfind("\n", 0, m.start()) + 1
-            line = text[line_start:text.find("\n", m.start())].strip()
-            touches.add(f"{path.name}: {line}")
-    allowed = 'cognition["witnessed"] = (list(cognition.get("witnessed", [])) + [entry])[-WITNESSED_MEMORY:]'
-    assert touches == {f"interactions.py: {allowed}"}, touches
+        visit(ast.parse(path.read_text()), "<module>")
+    assert outside == [], outside
+
+
+# --- Step 2.5: conspicuous things stick better --------------------------------
+
+
+def _fill_with_meals(sc, w, n, start=0):
+    for epoch in range(start, start + n):
+        cap.observe_food(_ctx(sc, epoch), [SEED_MEAL])
+
+
+def test_a_conspicuous_act_outlasts_routine_meals():
+    sc = Scenario(capacities=True)
+    w = _witness(sc)
+    flake = dict(_visible(0.0, created=["stone_edged"]), appeared=["stone_edged"], transformed=True)
+    cap.observe_outcome(_ctx(sc, 0), "strike:stone_small|stone_heavy", visible=flake)
+    _fill_with_meals(sc, w, cap.WITNESSED_MEMORY + 20, start=1)
+    acts = [e["act"] for e in w["cognition"]["witnessed"]]
+    assert "strike:stone_small|stone_heavy" in acts and len(acts) == cap.WITNESSED_MEMORY
+
+
+def test_under_fifo_the_same_act_is_flushed():
+    sc = Scenario(capacities=True, retention="fifo")
+    w = _witness(sc)
+    cap.observe_outcome(_ctx(sc, 0), "strike:stone_small|stone_heavy", visible=_visible(0.0, created=["stone_edged"]))
+    _fill_with_meals(sc, w, cap.WITNESSED_MEMORY + 20, start=1)
+    assert "strike:stone_small|stone_heavy" not in [e["act"] for e in w["cognition"]["witnessed"]]
+
+
+def test_salience_comes_from_visible_consequences_not_from_the_act_name():
+    base = {"epoch": 0, "actor": "a", "created": [], "eaten_kg": {}, "hurt": False,
+            "appeared": [], "transformed": False, "killed": False, "exposed_kg": 0.0}
+    assert cap.witnessed_salience(dict(base, act="strike:stone_small|stone_heavy")) == 0  # nothing happened
+    assert cap.witnessed_salience(dict(base, act="eat:seed", eaten_kg={"seed": 1.0})) == 0  # a meal is the act itself
+    assert cap.witnessed_salience(dict(base, act="eat:decayed_tissue", eaten_kg={"decayed_tissue": 0.1}, hurt=True)) == 1
+    assert cap.witnessed_salience(dict(base, act="cut:fresh_tissue|stone_edged", eaten_kg={"fresh_tissue": 0.3}, exposed_kg=0.4)) == 2
+    assert cap.witnessed_salience(dict(base, act="strike:animal_grazer|stick", killed=True, exposed_kg=0.05)) == 2
+    assert cap.witnessed_salience(dict(base, act="strike:stone_small|stone_heavy", appeared=["stone_edged"], transformed=True)) == 2
+
+
+def test_conspicuous_events_still_age_out_eventually():
+    sc = Scenario(capacities=True)
+    w = _witness(sc)
+    flake = dict(_visible(0.0, created=["stone_edged"]), appeared=["stone_edged"], transformed=True)
+    cap.observe_outcome(_ctx(sc, 0), "strike:stone_small|stone_heavy", visible=flake)
+    # A salience-2 event is kept as if 60 days newer; routine events from later
+    # than that push it out.
+    _fill_with_meals(sc, w, cap.WITNESSED_MEMORY + 5, start=2 * cap.RETENTION_DAYS_PER_CONSEQUENCE + 1)
+    assert "strike:stone_small|stone_heavy" not in [e["act"] for e in w["cognition"]["witnessed"]]
+
+
+def test_picking_up_a_stone_is_not_new_matter_or_a_change_of_form():
+    sc = Scenario(capacities=True)
+    sc.add_stone(0, 0, "pebble")
+    out = cap.execute(_ctx(sc), "grasp:stone_heavy|none", {"verb": "grasp_natural", "id": "pebble"})
+    assert out["created_classes"]  # the object list gained it (unchanged step-1 field)
+    assert out["appeared_classes"] == [] and out["transformed"] is False

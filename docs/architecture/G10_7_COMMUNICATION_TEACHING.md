@@ -1,6 +1,6 @@
 # G10.7 — Communication and teaching (design opening)
 
-**Status:** design opening. G10.7a step 1 (leak closure) is merged (PR #29); step 2 (witnessed-event memory) is implemented. See sections 5 and 6.
+**Status:** design opening. G10.7a step 1 (leak closure) is merged (PR #29); step 2 (witnessed-event memory) is merged (PR #30); step 2.5 (retention by visible consequence) is implemented. See sections 5–7.
 
 The first question: what primitive information can one Agentus physically signal or demonstrate to another, without handing over language, concepts or named techniques?
 
@@ -199,3 +199,50 @@ The memory keeps the newest `WITNESSED_MEMORY = 32` events (a declared bound). T
   - a separate bound per event class;
   - retention by visible consequence (an act that produced an object or a meal stays longer);
   - leaving it as is and reporting it.
+
+## 7. G10.7a step 2.5 — retention by visible consequence (implemented; retention only)
+
+This step changes only *which* witnessed events are kept when memory is full. No decision reads memory, and there is still no imitation.
+
+**Rule.** "Conspicuous things stick better", from visible consequence alone. There are no per-category quotas and no rules keyed on act names.
+
+An event's salience is the number of distinct visible consequences that followed it:
+1. new matter appeared (ids that did not exist before; a stone merely picked up is not new);
+2. matter changed form (fragment properties or producer pools changed; position, holder and being worn are not form);
+3. an animal was killed;
+4. food was exposed (killed body mass, or tissue made accessible by cutting);
+5. food was eaten as a result of a *different* act (a meal's own consumption is the act, not a consequence of it);
+6. the actor was visibly hurt or in distress.
+
+When the 32-event memory is full, the event forgotten is the one with the lowest `epoch + RETENTION_DAYS_PER_CONSEQUENCE × salience`, oldest first among equals. `RETENTION_DAYS_PER_CONSEQUENCE = 30` is declared. Conspicuous events still age out eventually.
+
+Some examples:
+- A routine `eat:seed`, or a strike that changed nothing, has salience 0 and goes first.
+- A strike that knocks off a sharp flake has salience 2 (new matter, change of form) and is kept as if 60 days newer.
+- A meal followed by distress has salience 1.
+
+**Flag.** `agentus_event_memory_retention`:
+- `consequence` is the default, recorded as `agentus_event_memory: "witnessed-v2"`;
+- `fifo` reproduces step 2 exactly (`witnessed-v1`, the same stored fields);
+- the diagnostic arm suffix for FIFO is `-fifo`.
+
+**Evidence.**
+- **Micro:** 80 pass. New tests show that:
+  - a flake-producing strike outlasts 52 routine meals under consequence retention and is flushed under FIFO;
+  - salience comes from visible consequences, not act names;
+  - conspicuous events still age out;
+  - picking up a stone is neither new matter nor a change of form;
+  - an AST guard holds: every reference to the memory in the model is inside `remember_witnessed`.
+- **Full-state identity at 180 days** (seeds a and d, with memories full):
+  - with memory off, FIFO and consequence retention, every authority's state is identical once the memory is removed;
+  - the stored contents differ between FIFO and consequence.
+- **Diagnostic `retention`** (`v1-fifo` vs `v1`, 4 seeds × 180 days): all outcomes are identical. Memory contents change:
+
+  | Measure | FIFO | Consequence |
+  |---|---|---|
+  | Non-meal events held (sum over seeds) | 39 | 75 |
+  | Distinct witnessed acts per agent | 2.6–3.2 | 3.4–4.6 |
+
+- **Smoke:** 0 fail, 0 warn, ledger identical. All 19 gate scripts and the full suite pass.
+
+The conspicuous events themselves remain rare, because few manipulations are witnessed at all (observation is socially sparse). Retention makes the most of what is seen. It cannot create more witnessing.

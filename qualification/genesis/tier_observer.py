@@ -54,10 +54,13 @@ FATIGUE_BLOCK = 0.8  # interactions stop above this (interactions.run_interactio
 PRE_G10_6 = "-preg106"  # arm suffix: behavioural/locomotion integrity off
 LEGACY_OBSERVATION = "-g104obs"  # arm suffix: G10.4 observation (copies reward and energy yield)
 NO_MEMORY = "-nomem"  # arm suffix: no witnessed-event memory (G10.7a step 2 off)
+FIFO_MEMORY = "-fifo"  # arm suffix: step-2 newest-first retention (G10.7a step 2.5 off)
 
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    fifo = base.endswith(FIFO_MEMORY)
+    base = base.removesuffix(FIFO_MEMORY)
     no_memory = base.endswith(NO_MEMORY)
     base = base.removesuffix(NO_MEMORY)
     legacy_observation = base.endswith(LEGACY_OBSERVATION)
@@ -69,6 +72,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
         overrides["agentus_observation_model"] = "g10.4-legacy"
     if no_memory:
         overrides["agentus_event_memory_enabled"] = False
+    if fifo:
+        overrides["agentus_event_memory_retention"] = "fifo"
     if physiology:
         overrides["agentus_physiology_version"] = physiology
     if not integrity:
@@ -296,6 +301,7 @@ def _memory_summary(people: list[dict], stats: dict, independent_age: int) -> di
         "mean_distinct_acts": round(sum(len({e["act"] for e in m}) for m in with_memory) / n, 1),
         "mean_distinct_actors": round(sum(len({e["actor"] for e in m}) for m in with_memory) / n, 1),
         "non_eating_events_held": sum(1 for m in with_memory for e in m if not e["act"].startswith("eat:")),
+        "full_memories": sum(1 for m in with_memory if len(m) >= 32),
         "dependents_with_memory": sum(1 for m in dependents if m),
     }
 
