@@ -662,7 +662,11 @@ def evolve_agentus_step(
                     humans.get("objects", []),
                     human["cognition"].get("food_values", {}),
                     innate_food_prior(effective_profile)["plant_tissue"],
-                    {kind: float(spec["hand_access_kg"]) * scale for kind, spec in FOOD_KINDS.items()},
+                    {
+                        kind: float(spec["hand_access_kg"]) * scale
+                        for kind, spec in FOOD_KINDS.items()
+                        if spec["hand_access_kg"] is not None
+                    },
                     None if "no_recall" in ablation else human["cognition"].get("memory", {}).get("locations", {}),
                 )
             target = choose_destination(human, perception, human["cognition"])

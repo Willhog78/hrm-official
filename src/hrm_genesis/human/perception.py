@@ -83,9 +83,11 @@ def extend_perception_with_materials(
     *own* expectation of food in each visible cell.
 
     `expected_food_kg` is plant-tissue-equivalent mass: what is visible, limited
-    by what can be gathered in a day, weighted by the agent's learned value of
-    each kind relative to its innate plant-tissue reference. Unknown kinds count
-    for nothing. No hidden nutritional label is exposed.
+    by what can be gathered in a day where a gathering limit exists (none for
+    plant tissue, which keeps pre-G10.3 planning identical), weighted by the
+    agent's learned value of each kind relative to its innate plant-tissue
+    reference. Unknown kinds count for nothing. No hidden nutritional label is
+    exposed.
     """
     pcells = {(int(c["x"]), int(c["y"])): c for c in producer_state["cells"]}
     ccells = {(int(c["x"]), int(c["y"])): c for c in consumer_state["carcass_cells"]}
@@ -122,7 +124,8 @@ def extend_perception_with_materials(
             value = float(food_values.get(kind, 0.0))
             if value <= 0.0 or kg <= 0.0:
                 continue
-            expected += min(kg, float(access_kg.get(kind, kg))) * value / reference
+            reachable = kg if kind not in access_kg else min(kg, float(access_kg[kind]))
+            expected += reachable * value / reference
         cell["expected_food_kg"] = round(expected, 10)
 
     if remembered is not None:

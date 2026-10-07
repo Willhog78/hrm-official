@@ -437,3 +437,24 @@ def test_flag_off_keeps_earlier_fingerprints():
     assert base["agentus_capacity_model"] == "capacity-v1"
     sim = GenesisSimulation(GenesisConfig(master_seed="x", producer_ecology_enabled=True, consumer_ecology_enabled=True))
     assert all("fresh_elements_kg" not in c for c in sim.consumer_state()["carcass_cells"])
+
+
+def test_plant_only_expectation_leaves_pre_capacity_planning_unchanged():
+    """Regression: a per-day gathering cap on plant tissue once saturated
+    perceived food in rich cells and silently changed planning (water became
+    the tie-breaker). With only plant tissue valued, the planner must see the
+    same food numbers as before G10.3."""
+    sim = GenesisSimulation(GenesisConfig(master_seed="g10-3-plan", producer_ecology_enabled=True, consumer_ecology_enabled=True))
+    producers = sim.ecology_state()
+    for cell in producers["cells"]:
+        cell["plant_elements_kg"] = _el(500.0 + cell["x"])
+    consumers = enable_fresh_tissue(sim.consumer_state())
+    profile = _profile()
+    agent = _agent()
+    agent["x"], agent["y"] = 3, 3
+    perception = perceive_local(agent, producers, sim.matter_state())
+    from hrm_genesis.human.diet import FOOD_KINDS
+    access = {k: float(v["hand_access_kg"]) for k, v in FOOD_KINDS.items() if v["hand_access_kg"] is not None}
+    extend_perception_with_materials(perception, producers, consumers, {}, [], innate_food_prior(profile), innate_food_prior(profile)["plant_tissue"], access)
+    for cell in perception["cells"]:
+        assert abs(cell["expected_food_kg"] - cell["food_kg"]) < 1e-6

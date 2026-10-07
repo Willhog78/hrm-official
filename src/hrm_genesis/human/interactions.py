@@ -825,7 +825,7 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
     for rec in intake:
         kcal_by_kind[rec["kind"]] = kcal_by_kind.get(rec["kind"], 0.0) + rec["kcal"] - rec["handling_kcal"]
         kg_by_kind[rec["kind"]] = kg_by_kind.get(rec["kind"], 0.0) + rec["kg"]
-    hand_access = FOOD_KINDS["fresh_tissue"]["hand_access_kg"] * max(0.1, float(ctx.profile.get("development_scale", 1.0)))
+    hand_access = float(FOOD_KINDS["fresh_tissue"]["hand_access_kg"]) * max(0.1, float(ctx.profile.get("development_scale", 1.0)))
     trace = list(cognition.get("trace", []))
     for key, out in ctx.performed:
         gain = 0.0

@@ -33,8 +33,8 @@ from __future__ import annotations
 from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
 
 
-FOOD_KINDS: dict[str, dict[str, float | str]] = {
-    "plant_tissue": {"pool": "plant_elements_kg", "owner": "producer", "kcal_per_kg": -1.0, "digestibility": -1.0, "hand_access_kg": 99.0, "handling_kcal_per_kg": 0.0, "hazard_per_kg": 0.0},
+FOOD_KINDS: dict[str, dict[str, float | str | None]] = {
+    "plant_tissue": {"pool": "plant_elements_kg", "owner": "producer", "kcal_per_kg": -1.0, "digestibility": -1.0, "hand_access_kg": None, "handling_kcal_per_kg": 0.0, "hazard_per_kg": 0.0},
     "seed": {"pool": "seed_elements_kg", "owner": "producer", "kcal_per_kg": 3800.0, "digestibility": 0.75, "hand_access_kg": 0.45, "handling_kcal_per_kg": 60.0, "hazard_per_kg": 0.0},
     "fresh_tissue": {"pool": "fresh_elements_kg", "owner": "carcass", "kcal_per_kg": 4800.0, "digestibility": 0.90, "hand_access_kg": 0.25, "handling_kcal_per_kg": 40.0, "hazard_per_kg": 0.0},
     "decayed_tissue": {"pool": "elements_kg", "owner": "carcass", "kcal_per_kg": 0.0, "digestibility": 0.0, "hand_access_kg": 0.25, "handling_kcal_per_kg": 20.0, "hazard_per_kg": 0.6},
@@ -105,7 +105,8 @@ def ingest(
         return record
     available = _mass(pool)
     scale = max(0.10, float(profile.get("development_scale", 1.0)))
-    access = float(spec["hand_access_kg"]) * scale + max(0.0, access_bonus_kg)
+    # Plant tissue keeps the pre-G10.3 behavior: no handling limit beyond gut capacity.
+    access = float("inf") if spec["hand_access_kg"] is None else float(spec["hand_access_kg"]) * scale + max(0.0, access_bonus_kg)
     take = min(max(0.0, request_kg), available, access)
     if take <= 0.0 or available <= 0.0:
         return record
