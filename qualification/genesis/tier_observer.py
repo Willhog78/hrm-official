@@ -56,10 +56,13 @@ LEGACY_OBSERVATION = "-g104obs"  # arm suffix: G10.4 observation (copies reward 
 NO_MEMORY = "-nomem"  # arm suffix: no witnessed-event memory (G10.7a step 2 off)
 FIFO_MEMORY = "-fifo"  # arm suffix: step-2 newest-first retention (G10.7a step 2.5 off)
 NO_IMITATION = "-noimit"  # arm suffix: no imitation (G10.7a step 3 off)
+NO_FOLLOWING = "-nofollow"  # arm suffix: no following (G10.7a step 4 off)
 
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    no_following = base.endswith(NO_FOLLOWING)
+    base = base.removesuffix(NO_FOLLOWING)
     no_imitation = base.endswith(NO_IMITATION)
     base = base.removesuffix(NO_IMITATION)
     fifo = base.endswith(FIFO_MEMORY)
@@ -79,6 +82,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
         overrides["agentus_event_memory_retention"] = "fifo"
     if no_imitation:
         overrides["agentus_imitation_enabled"] = False
+    if no_following:
+        overrides["agentus_following_enabled"] = False
     if physiology:
         overrides["agentus_physiology_version"] = physiology
     if not integrity:
@@ -406,6 +411,15 @@ def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
             "observed_ingestions": dict(stats.get("observed_ingestions", {})),
             "food_learned_after_observation": dict(stats.get("food_learned_after_observation", {})),
             "memory": _memory_summary(people, stats, independent),
+            "following": {
+                "follow_days": int(stats.get("follow_days", 0)),
+                "explore_days": int(stats.get("explore_days", 0)),
+                "explore_days_with_someone_in_view": int(stats.get("explore_days_with_someone_in_view", 0)),
+                "outcomes": dict(stats.get("follow_outcomes", {})),
+                "basis": dict(stats.get("follow_by_basis", {})),
+                "agents_valuing_someone": sum(1 for p in people if any(
+                    float(v) > 0.0 for v in p.get("cognition", {}).get("follow_values", {}).values())),
+            },
             "imitation": {
                 "tries": dict(stats.get("imitation_tries", {})),
                 "paid": dict(stats.get("imitation_paid", {})),

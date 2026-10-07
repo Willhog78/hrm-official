@@ -8,6 +8,26 @@ from .learning import contextual_expectation_for, expectation_for
 PARTIAL_FOOD_GIVING_UP = 0.25
 
 
+# G10.7a step 4: chance of trying to follow a visible individual one has no
+# experience of following (declared).
+FOLLOW_TRIAL = 0.5
+
+
+def _follow_target(perception: dict, cognition: dict) -> tuple[str, tuple[int, int]] | None:
+    """A visible individual worth going to, by this agent's own experience of
+    having followed it; otherwise, sometimes, an untried one."""
+    values = cognition.get("follow_values", {})
+    peers = sorted(perception["visible_peers"])
+    valued = [(float(values[pid]), pid, (x, y)) for pid, x, y in peers if float(values.get(pid, 0.0)) > 0.0]
+    if valued:
+        _, pid, cell = max(valued)
+        return pid, cell
+    untried = [(pid, (x, y)) for pid, x, y in peers if pid not in values]
+    if untried and float(perception.get("follow_draw", 1.0)) < FOLLOW_TRIAL:
+        return untried[int(float(perception.get("follow_pick", 0.0)) * len(untried)) % len(untried)]
+    return None
+
+
 def _food(cell: dict) -> float:
     """The agent's own estimate of edible food in a cell.
 
@@ -157,6 +177,17 @@ def choose_destination(
                 -int(cell["y"]), -int(cell["x"]),
             ))
             return int(best["x"]), int(best["y"])
+
+    if hungry_local_failure and perception.get("visible_peers") is not None:
+        # G10.7a step 4: with nowhere known to go, an agent may go to where a
+        # visible individual is now. Only learned worth (or a trial) decides;
+        # nothing about the other's knowledge or destination is available.
+        followed = _follow_target(perception, cognition)
+        if followed is not None:
+            peer_id, cell = followed
+            perception["chosen_by"] = ("follow", peer_id)
+            return cell
+        perception["chosen_by"] = ("explore", None)
 
     if hungry_local_failure:
         episodes = cognition.get("memory", {}).get("episodes", [])

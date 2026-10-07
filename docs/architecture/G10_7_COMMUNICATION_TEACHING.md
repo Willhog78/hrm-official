@@ -1,6 +1,6 @@
 # G10.7 — Communication and teaching (design opening)
 
-**Status:** design opening. G10.7a step 1 (leak closure) is merged (PR #29); step 2 (witnessed-event memory) is merged (PR #30); step 2.5 (retention by visible consequence) is merged (PR #31); step 3 (imitation) is implemented. See sections 5–8.
+**Status:** design opening. G10.7a step 1 (leak closure) is merged (PR #29); step 2 (witnessed-event memory) is merged (PR #30); step 2.5 (retention by visible consequence) is merged (PR #31); step 3 (imitation) is merged (PR #32); step 4 (following) is implemented. See sections 5–9.
 
 The first question: what primitive information can one Agentus physically signal or demonstrate to another, without handing over language, concepts or named techniques?
 
@@ -299,3 +299,51 @@ The world scores the try like any other exploration. A micro test shows the lear
 2. **What gets imitated is preparation** (bark, wood, strands), whose benefit is delayed. A first try costs effort and pays nothing immediately, so it starts with a negative value. Delayed credit through object history can still rescue it later, if the prepared object is ever used to good effect. Whether that happens is a question for the measurement step and longer runs.
 
 Neither finding is tuned here.
+
+## 9. G10.7a step 4 — following (implemented; learned from experience only)
+
+**Where it applies.** Only in the planner's hungry branch where the agent has nowhere known to go. All drives with somewhere known to go still come first:
+- thirst;
+- visible food covering need;
+- remembered food;
+- partial food above the giving-up level.
+
+There, a hungry agent may move to the cell where a **visible** individual is now. "Visible" means within perception range: the individual's id and current cell, which the agent can see.
+
+**Constraints.**
+- No coordinates beyond what is in view.
+- No inferred destination: you go to where they *are*, not to where they are going.
+- No leader label.
+- Nothing is written to the individual followed.
+
+**Choice** (`planning._follow_target`):
+- an individual with a positive learned worth is followed;
+- otherwise an individual never followed before is tried with probability `FOLLOW_TRIAL = 0.5` (declared);
+- negatively valued individuals are ignored;
+- if no one is followed, the agent explores alone as before.
+
+**Learning** (`interactions.learn_following`). After such a day, the agent compares its intake as a share of need with its **own** running baseline from exploring alone:
+- `reward = outcome − explore_baseline`, which updates `follow_values[that individual]` at rate 0.3;
+- exploring alone updates the baseline itself.
+
+So an individual becomes worth following only if going where they were has beaten going alone.
+
+**Flag.** `agentus_following_enabled` is default on, with capacities, cognition and a visible observation model. It is recorded as `agentus_following: "visible-peer-v1"`. The diagnostic arm suffix `-nofollow` turns it off.
+
+**Evidence.**
+- **Micro:** 9 new following tests; all 99 micro tests pass. They show that:
+  - a valued individual in view is followed;
+  - a negatively valued one is not;
+  - individuals out of view are not even perceived;
+  - untried individuals are tried at exactly the declared rate;
+  - following to an empty place is learned as no better than exploring;
+  - value is relative to the agent's own exploring;
+  - nothing is written to the individual followed;
+  - drives with somewhere known to go are not overridden;
+  - following off reproduces step 3.
+- **Smoke:** 0 fail, 0 warn.
+- **Diagnostic `following`** (`v1-nofollow` vs `v1`, 4 seeds × 180 days): all outcomes are identical.
+  - **Following never occurred.** The hungry-and-nowhere-to-go branch was reached on only 14 agent-days in total.
+  - **Nobody was in view on any of those 14 days.** A 365-day v1 run confirms this: still 14 such days, all in the first 180 days, all alone.
+
+**Finding (not tuned).** The mechanism works but has no opportunity in this ecology. Plants are plentiful and the G10.6 partial-food anchor keeps agents near food, so agents are almost never hungry with nowhere to go. When they are, they are alone. Following can only matter where food is patchy and agents share space. That is an ecology and demography question, not a cognition one, and it is reported here rather than engineered.
