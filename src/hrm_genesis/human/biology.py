@@ -121,7 +121,11 @@ def seed_initial_humans(human_state: dict, producer_state: dict, matter_state: d
             local_ranked = sorted(local, key=lambda xy: (-_mass(pcells[xy]["plant_elements_kg"]), xy[1], xy[0]))
             if not local_ranked:
                 continue
-            xy = local_ranked[index % len(local_ranked)]
+            member_index = sum(
+                1 for seeded in survivors
+                if seeded.get("population_id") == human.get("population_id")
+            )
+            xy = local_ranked[member_index % len(local_ranked)]
         else:
             xy = ranked[index % len(ranked)]
         human["x"], human["y"] = xy
