@@ -201,9 +201,9 @@ def _age_profile(human: dict, profile: dict) -> dict:
     adjusted["target_dry_mass_kg"] = float(profile["seed_dry_mass_kg"]) * scale
     adjusted["water_capacity_kg"] = float(profile["water_capacity_kg"]) * scale
     adjusted["bite_cap_kg"] = float(profile["bite_cap_kg"]) * max(0.10, scale)
-    adjusted["basal_energy_kcal_per_tick"] = float(effective_profile["basal_energy_kcal_per_tick"]) * max(0.10, scale)
-    adjusted["move_energy_kcal_per_tick"] = float(effective_profile["move_energy_kcal_per_tick"]) * max(0.10, scale)
-    adjusted["water_loss_per_tick_kg"] = float(effective_profile["water_loss_per_tick_kg"]) * max(0.10, scale)
+    adjusted["basal_energy_kcal_per_tick"] = float(profile["basal_energy_kcal_per_tick"]) * max(0.10, scale)
+    adjusted["move_energy_kcal_per_tick"] = float(profile["move_energy_kcal_per_tick"]) * max(0.10, scale)
+    adjusted["water_loss_per_tick_kg"] = float(profile["water_loss_per_tick_kg"]) * max(0.10, scale)
     adjusted["min_dry_mass_kg"] = float(profile["min_dry_mass_kg"]) * scale
     return adjusted
 
@@ -468,7 +468,7 @@ def evolve_humans(
             target = _move_toward_food(human, producers)
         moved = target != origin
         if moved:
-            human["energy"] = float(human["energy"]) - float(profile["move_energy_kcal_per_tick"])
+            human["energy"] = float(human["energy"]) - float(effective_profile["move_energy_kcal_per_tick"])
             human["x"], human["y"] = target
 
         xy = (int(human["x"]), int(human["y"]))
@@ -485,9 +485,9 @@ def evolve_humans(
             human["last_action_trace"] = trace
         _drink(human, mcells[xy], effective_profile)
         ate = _eat(human, pcells[xy], effective_profile)
-        human["energy"] = float(human["energy"]) - float(profile["basal_energy_kcal_per_tick"])
+        human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
         _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
-        loss = min(float(human["body_water_kg"]), float(profile["water_loss_per_tick_kg"]))
+        loss = min(float(human["body_water_kg"]), float(effective_profile["water_loss_per_tick_kg"]))
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
         human["age_ticks"] = int(human["age_ticks"]) + 1
