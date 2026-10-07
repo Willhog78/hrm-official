@@ -117,9 +117,9 @@ Specification, audit and limits: `docs/architecture/G10_3_AGENTUS_CAPACITIES.md`
 
 **Infrastructure ticket.** GitHub Actions `verify` fails before any step runs, on `main` as well as on PRs (runs 99–104). This is an Actions environment problem (billing or runner) and is tracked separately. Until it is fixed, the local fast tier and gates are the verification record.
 
-**Pre-existing gate failure, hidden by the dead CI.** `run_g5_human_biology_gate.py` fails `reproduction_occurred` and `birth_added_human` on `main` before G10.6, with identical results with G10.6 on or off.
-- Its birth probe places the founding pair in one cell.
-- Since the reproduction-contact correction (PR #23), reproduction requires co-location *after* the day's movement.
-- Without cognition, the two adults move to different food cells first.
+**G5 gate fixture repaired (housekeeping, after G10.6).** `run_g5_human_biology_gate.py` had been failing `reproduction_occurred` and `birth_added_human` on `main` since the reproduction-contact correction (PR #23), hidden by the dead CI.
+- Its birth probe placed the pair on the richest cell.
+- The first adult's bite made a neighbour richer, so the second adult walked away before reproduction.
+- The probe now uses a cell that stays the movement rule's choice after the earlier adults' bites. It tests reproduction, not whether the pair happens to stay together.
 
-The probe needs updating, for example by holding the pair on a cell whose food satisfies both. The model itself has no defect here. The other 18 gate scripts pass with G10.6.
+No model code changed. All 19 gate scripts pass.
