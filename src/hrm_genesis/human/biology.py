@@ -279,10 +279,35 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
     }
 
 
-def _apply_physiology(human: dict, world_cell: dict, moved: bool, profile: dict | None = None) -> None:
+def _structural_protection(world_cell: dict, producer_cell: dict | None = None) -> tuple[float, float]:
+    """Return canopy and terrain protection from physical state, not named techniques."""
+    producer_cell = producer_cell or {}
+    woody_mass = sum(float(v) for v in producer_cell.get("woody_elements_kg", {}).values())
+    canopy = min(0.80, max(0.0, woody_mass / 8.0))
+    terrain_cover = min(0.90, max(0.0, float(world_cell.get("natural_shelter", 0.0))))
+    return canopy, terrain_cover
+
+
+def _apply_physiology(
+    human: dict,
+    world_cell: dict,
+    moved: bool,
+    profile: dict | None = None,
+    producer_cell: dict | None = None,
+) -> None:
     """Apply bounded fatigue, thermoregulation cost, injury, and healing."""
     profile = profile or physiology_profile(calibrated=False, ticks_per_year=120)
     ambient = float(world_cell["temperature"])
+    canopy, terrain_cover = _structural_protection(world_cell, producer_cell)
+
+    # Canopy primarily reduces hot exposure; cave/overhang terrain moderates
+    # both hot and cold extremes toward a stable subsurface-like temperature.
+    if ambient > HUMAN_COMFORT_TEMPERATURE_C:
+        ambient -= min(9.0, canopy * 9.0)
+    if terrain_cover > 0.0:
+        moderation = min(0.55, terrain_cover * 0.55)
+        ambient = ambient * (1.0 - moderation) + 15.0 * moderation
+
     thermal_delta = abs(ambient - HUMAN_COMFORT_TEMPERATURE_C)
     excess = max(0.0, thermal_delta - HUMAN_THERMAL_TOLERANCE_C)
 
@@ -352,7 +377,13 @@ def evolve_humans(
     for human in sorted(humans["humans"], key=lambda h: h["id"]):
         origin = (int(human["x"]), int(human["y"]))
         if cognition_enabled:
-            perception = perceive_local(human, producers, matter, humans["humans"])
+            perception = perceive_local(
+                human,
+                producers,
+                matter,
+                humans["humans"],
+                world_state,
+            )
             target = choose_destination(human, perception, human["cognition"])
         else:
             perception = None
@@ -375,7 +406,7 @@ def evolve_humans(
             human["cognition"] = cognition
 
         human["energy"] = float(human["energy"]) - float(profile["basal_energy_kcal_per_tick"])
-        _apply_physiology(human, wcells[xy], moved, profile)
+        _apply_physiology(human, wcells[xy], moved, profile, pcells[xy])
         loss = min(float(human["body_water_kg"]), float(profile["water_loss_per_tick_kg"]))
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
