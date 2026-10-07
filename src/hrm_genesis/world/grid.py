@@ -40,8 +40,34 @@ def build_grid(width: int, height: int, seed_bank: SeedBank) -> list[dict[str, f
                     "temperature": 0.0,
                     "solar": 0.0,
                     "precipitation": 0.0,
+                    "terrain_relief": 0.0,
+                    "rock_exposure": 0.0,
+                    "natural_shelter": 0.0,
                 }
             )
+
+    lookup = {(int(cell["x"]), int(cell["y"])): cell for cell in cells}
+    for cell in cells:
+        x, y = int(cell["x"]), int(cell["y"])
+        adjacent = neighbors(x, y, width, height)
+        relief = max(
+            (abs(float(cell["elevation"]) - float(lookup[xy]["elevation"])) for xy in adjacent),
+            default=0.0,
+        )
+        elevation_factor = min(1.0, max(0.0, (float(cell["elevation"]) - 35.0) / 45.0))
+        relief_factor = min(1.0, relief / 28.0)
+        rock_exposure = min(1.0, 0.35 * elevation_factor + 0.65 * relief_factor)
+
+        # Natural shelter is terrain-derived, not independently scattered.
+        # Strong relief plus exposed rock can create cave/overhang-like shelter.
+        shelter = 0.0
+        if rock_exposure >= 0.58 and relief >= 12.0:
+            shelter = min(0.85, (rock_exposure - 0.50) * 1.4 + (relief - 12.0) / 80.0)
+
+        cell["terrain_relief"] = round(relief, 6)
+        cell["rock_exposure"] = round(rock_exposure, 6)
+        cell["natural_shelter"] = round(max(0.0, shelter), 6)
+
     return cells
 
 
