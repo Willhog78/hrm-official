@@ -55,8 +55,13 @@ def install(recorder: Recorder):
                 recorder.counts["dry_here_decisions"] += 1
             if result is not None:
                 recorder.counts["thirst_moves"] += 1
+                visible_now = {(int(c["x"]), int(c["y"])): c for c in perception["cells"]}
+                target_food = float(visible_now.get(result, {}).get("expected_food_kg", visible_now.get(result, {}).get("food_kg", 0.0)))
                 if hungry and float(perception["energy_days"]) < float(perception["hydration_days"]):
-                    recorder.counts["VIOLATION_thirst_over_more_urgent_hunger"] += 1
+                    if target_food >= forage_need:
+                        recorder.counts["thirst_and_hunger_met_together"] += 1
+                    else:
+                        recorder.counts["VIOLATION_thirst_over_more_urgent_hunger"] += 1
                 dist = abs(result[0] - ox) + abs(result[1] - oy)
                 if dist > 1:
                     recorder.counts["VIOLATION_thirst_move_beyond_one_step"] += 1
@@ -112,9 +117,14 @@ def run(seed: str, arm: str, days: int) -> dict:
         seen = {r["id"] for r in before.get("death_records", [])}
         people = {p["id"]: p for p in before["humans"]}
         for record in after.get("death_records", []):
-            if record["id"] in seen or record["cause"] != "dehydration":
+            if record["id"] in seen:
                 continue
             p = people[record["id"]]
+            if record["cause"] == "energy":
+                dehydration["starvation_age_years_" + str(int(p["age_ticks"]) // 365)] += 1
+                continue
+            if record["cause"] != "dehydration":
+                continue
             x, y = int(p["x"]), int(p["y"])
             if int(p["age_ticks"]) < int(profile["independent_feeding_age_ticks"]):
                 dehydration["dependent_child"] += 1
@@ -133,7 +143,7 @@ def run(seed: str, arm: str, days: int) -> dict:
         "seed": seed, "arm": arm, "days": days,
         "alive": len(final["humans"]), "births": final["cumulative_births"],
         "deaths_by_cause": final["cumulative_deaths_by_cause"],
-        "dehydration_death_context": dict(dehydration),
+        "death_context": dict(dehydration),
         "decisions": dict(recorder.counts),
         "max_agents_in_one_cell": max_crowd,
         "agent_days": agent_days,
