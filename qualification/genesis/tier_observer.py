@@ -55,10 +55,13 @@ PRE_G10_6 = "-preg106"  # arm suffix: behavioural/locomotion integrity off
 LEGACY_OBSERVATION = "-g104obs"  # arm suffix: G10.4 observation (copies reward and energy yield)
 NO_MEMORY = "-nomem"  # arm suffix: no witnessed-event memory (G10.7a step 2 off)
 FIFO_MEMORY = "-fifo"  # arm suffix: step-2 newest-first retention (G10.7a step 2.5 off)
+NO_IMITATION = "-noimit"  # arm suffix: no imitation (G10.7a step 3 off)
 
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    no_imitation = base.endswith(NO_IMITATION)
+    base = base.removesuffix(NO_IMITATION)
     fifo = base.endswith(FIFO_MEMORY)
     base = base.removesuffix(FIFO_MEMORY)
     no_memory = base.endswith(NO_MEMORY)
@@ -74,6 +77,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
         overrides["agentus_event_memory_enabled"] = False
     if fifo:
         overrides["agentus_event_memory_retention"] = "fifo"
+    if no_imitation:
+        overrides["agentus_imitation_enabled"] = False
     if physiology:
         overrides["agentus_physiology_version"] = physiology
     if not integrity:
@@ -401,6 +406,16 @@ def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
             "observed_ingestions": dict(stats.get("observed_ingestions", {})),
             "food_learned_after_observation": dict(stats.get("food_learned_after_observation", {})),
             "memory": _memory_summary(people, stats, independent),
+            "imitation": {
+                "tries": dict(stats.get("imitation_tries", {})),
+                "paid": dict(stats.get("imitation_paid", {})),
+                "unpaid": dict(stats.get("imitation_unpaid", {})),
+                "sources": {k: len(v) for k, v in stats.get("imitated_from", {}).items()},
+                # Practices now valued by living agents that some agent first tried by imitation.
+                "valued_after_imitation": dict(Counter(
+                    k for p in people for k, e in p.get("cognition", {}).get("affordance_values", {}).items()
+                    if float(e["v"]) > 0.0 and k in stats.get("imitated_from", {}))),
+            },
             "learned_positive_living": dict(learned.most_common(8)),
             "ledger_valid": ledger_valid,
             "conservation": conservation,

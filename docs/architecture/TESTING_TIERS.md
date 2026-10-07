@@ -4,7 +4,7 @@ Long multiseed runs are validation, not the debugging loop. Questions are answer
 
 | Tier | What | Size | Wall time (4 vCPU) | Command |
 |---|---|---|---|---|
-| 1. Micro | One mechanism in a hand-built world of a few cells | 80 tests | ~2 s | `python -m qualification.genesis.tiers micro [topic]` |
+| 1. Micro | One mechanism in a hand-built world of a few cells | 90 tests | ~2 s | `python -m qualification.genesis.tiers micro [topic]` |
 | 2. Smoke | Production runs, every mechanism on, integrity and pathology checks | 3 seeds × 75 days (+1 unobserved rerun) | ~25 s | `python -m qualification.genesis.tiers smoke` |
 | 3. Diagnostic | One question, 2+ arms, outcome comparison plus the smoke checks | 4 seeds × 180 days per arm (365 optional) | ~1.5–2 min for 2 arms at 180 days; ~4 min at 365 | `python -m qualification.genesis.tiers diagnostic <set>` |
 | 4. Full | The existing 20 seeds × 730 days × 5 arms validation | 100 runs | ~1.5–2 h on Railway (8 vCPU, 3 parallel) | `python -m qualification.genesis.tiers full` |
@@ -27,7 +27,8 @@ All commands run from the repository root with `PYTHONPATH=src:.`. On Railway, o
 | learning | `test_micro_learning.py` (7) | Value from experienced benefit. Delayed credit through the tool's history. Failed capture is learned as negative. A no-payoff world forms no habit. A sated agent stays rested enough to explore, and daily walking reaches a steady fatigue. |
 | infant_care | `test_micro_infant_care.py` (9) | A provisioned caregiver feeds the infant. Nursing transfers energy, water and mass. No caregiver or a caregiver elsewhere means no provisioning. Infant starvation reproduces in isolation under reference-v1 and not under reference-v2. A separated dependent walks one cell a day, and a carried one stays with its caregiver. |
 | social | `test_micro_social.py` (11) | Only visible acts and consequences travel; observers appraise by their own values; seen eating changes readiness to taste, not value; G7 recipe transfer only with its legacy flag. |
-| memory | `test_micro_memory.py` (14) | Witnessed acts and meals are remembered with visible fields only, by agents in the same cell, dependents included. Conspicuous events (by visible consequence) outlast routine ones and still age out. FIFO reproduces step 2. No decision code reads the memory (AST guard). |
+| memory | `test_micro_memory.py` (14) | Witnessed acts and meals are remembered with visible fields only, by agents in the same cell, dependents included. Conspicuous events (by visible consequence) outlast routine ones and still age out. FIFO reproduces step 2. Only the writer and the imitation reader touch the memory (AST guard). |
+| imitation | `test_micro_imitation.py` (10) | Seen conspicuous acts are tried more often, only when physically possible and untried; no value is written; imitated tries are scored exactly like unprompted ones. |
 | cannibalism | `test_micro_cannibalism.py` (4) | Diagnostic only: where Agentus remains go, whether they are a food kind, perceived or tasted, whether Agentus are capture targets. Prints a report. |
 
 **Known defects are recorded as strict `xfail`s.** They are listed by `-rx` on every run and turn into failures the moment behaviour changes, so a fix is noticed. The first three (partial-food abandonment, dependent teleportation, fatigue saturation) were fixed in G10.6. They are now ordinary tests, plus tests that reproduce the old behaviour with `agentus_behavior_integrity_enabled=False`.
@@ -76,9 +77,10 @@ The shared observer (`qualification/genesis/tier_observer.py`) wraps `interactio
 | `observation` | `v1-g104obs`, `v1` | G10.7a: only visible acts and consequences travel. |
 | `memory` | `v1-nomem`, `v1` | G10.7a step 2: witnessed memory; outcomes must be identical. |
 | `retention` | `v1-fifo`, `v1` | G10.7a step 2.5: what memory keeps; outcomes must be identical. |
+| `imitation` | `v1-noimit`, `v1` | G10.7a step 3: remembered conspicuous acts raise the chance of trying them. |
 | `custom` | `--arms ...` | Any comparison. |
 
-Arm suffixes: `-nothirst` (thirst off), `-preg106` (G10.6 off), `-g104obs` (G10.4 observation), `-nomem` (no witnessed memory), `-fifo` (step-2 retention), `@reference-v2` (physiology). There is no arm that disables value learning alone. `learning` compares place memory and reports the learning measures for both arms.
+Arm suffixes: `-nothirst` (thirst off), `-preg106` (G10.6 off), `-g104obs` (G10.4 observation), `-nomem` (no witnessed memory), `-fifo` (step-2 retention), `-noimit` (no imitation), `@reference-v2` (physiology). There is no arm that disables value learning alone. `learning` compares place memory and reports the learning measures for both arms.
 
 Reported per arm:
 - survivors and adults;

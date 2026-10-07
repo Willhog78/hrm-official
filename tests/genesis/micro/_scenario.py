@@ -48,6 +48,7 @@ class Scenario:
         observation: str = "visible-v1",
         memory: bool = True,
         retention: str = "consequence",
+        imitation: bool = True,
     ) -> None:
         config = GenesisConfig(
             master_seed=seed, world_width=max(2, width), world_height=max(2, height), ticks_per_year=365,
@@ -57,7 +58,7 @@ class Scenario:
             agentus_capacities_enabled=capacities, agentus_thirst_enabled=thirst,
             agentus_physiology_version=physiology, agentus_behavior_integrity_enabled=integrity,
             agentus_observation_model=observation, agentus_event_memory_enabled=memory,
-            agentus_event_memory_retention=retention,
+            agentus_event_memory_retention=retention, agentus_imitation_enabled=imitation,
         )
         sim = GenesisSimulation(config)
         self.config = config

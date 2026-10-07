@@ -1,6 +1,6 @@
 # G10.7 — Communication and teaching (design opening)
 
-**Status:** design opening. G10.7a step 1 (leak closure) is merged (PR #29); step 2 (witnessed-event memory) is merged (PR #30); step 2.5 (retention by visible consequence) is implemented. See sections 5–7.
+**Status:** design opening. G10.7a step 1 (leak closure) is merged (PR #29); step 2 (witnessed-event memory) is merged (PR #30); step 2.5 (retention by visible consequence) is merged (PR #31); step 3 (imitation) is implemented. See sections 5–8.
 
 The first question: what primitive information can one Agentus physically signal or demonstrate to another, without handing over language, concepts or named techniques?
 
@@ -246,3 +246,56 @@ Some examples:
 - **Smoke:** 0 fail, 0 warn, ledger identical. All 19 gate scripts and the full suite pass.
 
 The conspicuous events themselves remain rare, because few manipulations are witnessed at all (observation is socially sparse). Retention makes the most of what is seen. It cannot create more witnessing.
+
+## 8. G10.7a step 3 — imitation (implemented; memory → trying)
+
+**Rule** (`interactions.imitation_candidate`, used by `choose`):
+- Among the acts an agent has **never tried** and can **physically do here and now** (the options `enumerate_affordances` already offers), it looks for those it remembers seeing.
+- Matching is by the visible act alone: verb and object classes.
+- Only witnessed events followed by visible consequences count, weighted by salience.
+- The agent tries the most conspicuous match with probability `min(0.5, 0.15 × total salience)` (declared). Otherwise it chooses as before.
+
+**What imitation never does:**
+- write a value;
+- inherit reward;
+- transfer a sequence or recipe;
+- override an act the agent has already tried.
+
+The world scores the try like any other exploration. A micro test shows the learned value after an imitated try equals that of an unprompted try with the same draws.
+
+**Flag.** `agentus_imitation_enabled` is default on, recorded as `agentus_imitation: "witnessed-act-v1"`. It requires event memory. The diagnostic arm suffix `-noimit` turns it off.
+- The step 2/2.5 non-causation tests run with imitation off.
+- The AST guard now admits exactly one reader of the memory, `imitation_candidate`.
+
+**Measures.**
+- `imitation_tries`: tries by key;
+- `imitation_paid` and `imitation_unpaid`: the first-try outcome, as scored by the world;
+- `imitated_from`: who the act was seen from;
+- `valued_after_imitation`: practices living agents value positively that were first tried by imitation.
+
+**Evidence.**
+- **Micro:** 10 new imitation tests; all micro tests pass. They show that:
+  - seeing a conspicuous act raises tries from near zero to about 30% of opportunities;
+  - an act seen with no visible consequence gives no boost;
+  - nothing physically unavailable is tried;
+  - no value is written;
+  - imitated and unprompted tries are scored identically;
+  - tried acts are left to own experience;
+  - imitation off reproduces step 2.5;
+  - options sharing a key are handled (a bug the full suite caught, now fixed).
+- **Smoke:** 0 fail, 0 warn.
+- **Diagnostic `imitation`** (`v1-noimit` vs `v1`, 4 seeds × 180 days):
+  - **7 imitated tries in total:**
+    - separating bark: 3;
+    - arranging loose wood: 2;
+    - twisting strands: 1;
+    - separating arranged wood: 1.
+  - **0 paid on the first try.** The world scored all 7 negative.
+  - **0 practices valued after imitation.**
+  - Interactions shift slightly. Survival, deaths and hunting are unchanged.
+
+**Findings.**
+1. **Imitation is rare** because witnessing is rare: observation is socially sparse, and most conspicuous acts are seen by agents that have already tried them.
+2. **What gets imitated is preparation** (bark, wood, strands), whose benefit is delayed. A first try costs effort and pays nothing immediately, so it starts with a negative value. Delayed credit through object history can still rescue it later, if the prepared object is ever used to good effect. Whether that happens is a question for the measurement step and longer runs.
+
+Neither finding is tuned here.
