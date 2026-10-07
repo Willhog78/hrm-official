@@ -125,3 +125,22 @@ def test_repeated_use_because_it_paid_is_counted():
     assert picked[0] == "separate:plant_tissue|none"
     assert ctx.stats["exploit_by_key"]["separate:plant_tissue|none"] == 1
     assert ctx.stats["exploit_agents"]["separate:plant_tissue|none"] == ["a"]
+
+
+def test_impossible_or_costless_repeats_cannot_sustain_a_habit():
+    """Regression: a no-op interaction once earned reward exactly 0, so a tiny
+    positive value never decayed below zero and was repeated hundreds of times."""
+    humans = _humans(_agent())
+    agent = humans["humans"][0]
+    for i in range(cap.MAX_SOFT_IN_HAND):
+        humans["objects"].append(cap._place(mo.make_fiber("bark", _el(0.001), 0.5, 0.5, f"f{i}"), 0, 0, "a"))
+    ctx = _ctx(humans, agent)
+    keys = [k for k, _ in cap.enumerate_affordances(ctx)]
+    assert not any(k.startswith("separate:strand_") for k in keys)  # hands are full
+
+    values = {"release:strand_bark|none": {"n": 1, "v": 0.003}}
+    for _ in range(40):
+        out = cap.execute(ctx, "release:strand_bark|none", {"verb": "release", "id": "nonexistent"})
+        assert out["effort_kcal"] > 0.0
+        cap._update_value(values, "release:strand_bark|none", -out["effort_kcal"] / 2000.0, cap.VALUE_LEARNING_RATE)
+    assert values["release:strand_bark|none"]["v"] < 0.0

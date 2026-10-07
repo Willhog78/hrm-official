@@ -56,6 +56,7 @@ RETRY_KNOWN = 0.03
 FOOD_SAMPLE_HUNGRY = 0.5
 FOOD_SAMPLE_SATED = 0.1
 FATIGUE_PER_INTERACTION = 0.02
+MIN_INTERACTION_KCAL = 2.0
 INSULATION_MAX_C = 8.0
 BODY_SURFACE_M2 = 1.8
 ORGANIC_DECAY_GROUND = 0.005
@@ -397,8 +398,9 @@ def enumerate_affordances(ctx: Context) -> list[tuple[str, dict]]:
 
     # Strand manipulations.
     strands = [o for o in soft if o["material"] == "fiber"]
-    for strand in strands[:2]:
-        options.append((f"separate:{object_class(strand)}|held", {"verb": "pull_apart", "id": strand["id"]}))
+    if hands_free_soft:  # pulling apart yields a second strand that must be held
+        for strand in strands[:2]:
+            options.append((f"separate:{object_class(strand)}|held", {"verb": "pull_apart", "id": strand["id"]}))
     if len(strands) >= 2:
         options.append(("twist:strands|held", {"verb": "twist"}))
     if len(strands) >= 4:
@@ -859,6 +861,10 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
         ctx.pcell.update(cell)
         out["effort_kcal"] = float(trace.get("effort_energy_kcal", 0.0))
 
+    # Every attempt takes time and some effort, even one that changes nothing.
+    # Without this floor a positive expectation for a costless repeat decays
+    # toward zero without ever crossing it, and the repeat never stops.
+    out["effort_kcal"] = max(float(out["effort_kcal"]), MIN_INTERACTION_KCAL * scale)
     ctx.human["energy"] = float(ctx.human["energy"]) - out["effort_kcal"]
     ctx.human["fatigue"] = min(1.0, float(ctx.human.get("fatigue", 0.0)) + FATIGUE_PER_INTERACTION)
     _bump(ctx.stats, "interaction_effort_kcal", out["effort_kcal"])
