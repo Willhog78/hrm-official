@@ -106,6 +106,7 @@ class GenesisSimulation:
                 width=config.world_width,
                 height=config.world_height,
                 seed_bank=self.seed_bank,
+                scale_factor=config.material_scale_factor,
             )
 
         if config.producer_ecology_enabled:
@@ -119,6 +120,7 @@ class GenesisSimulation:
                 matter_state,
                 producer_state,
                 self.seed_bank,
+                biomass_scale_factor=config.material_scale_factor,
             )
 
         if config.consumer_ecology_enabled:
