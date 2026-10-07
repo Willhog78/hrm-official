@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from hrm_coordination.seeds import SeedBank
 
-from .climate import persistent_weather_anomaly, precipitation_amount, temperature_c
+from .climate import lightning_activity, persistent_weather_anomaly, precipitation_amount, temperature_c
 from .energy import solar_input
 from .grid import build_grid
 from .terrain import latitude_factor
@@ -65,6 +65,13 @@ def evolve_world(state: dict, epoch: int) -> dict:
             y=y,
             channel="moisture",
         )
+        cell["lightning"] = lightning_activity(
+            seed=seed,
+            epoch=epoch,
+            ticks_per_year=ticks_per_year,
+            x=x,
+            y=y,
+        )
         cell["precipitation"] = precipitation_amount(
             seed=seed,
             epoch=epoch,
@@ -83,6 +90,7 @@ def evolve_world(state: dict, epoch: int) -> dict:
             "precipitation",
             "weather_temperature_anomaly",
             "weather_moisture_anomaly",
+            "lightning",
         ):
             cell[field] = round(float(cell[field]), 10)
     return world

@@ -43,6 +43,33 @@ def persistent_weather_anomaly(
     return a * (1.0 - blend) + b * blend
 
 
+
+
+def lightning_activity(
+    *,
+    seed: str,
+    epoch: int,
+    ticks_per_year: int,
+    x: int,
+    y: int,
+) -> float:
+    """Rare deterministic natural ignition source tied to storm moisture."""
+    moisture = persistent_weather_anomaly(
+        seed=seed,
+        epoch=epoch,
+        ticks_per_year=ticks_per_year,
+        x=x,
+        y=y,
+        channel="moisture",
+    )
+    storminess = max(0.0, moisture)
+    strike = _unit_noise(seed + ":lightning", epoch, x, y)
+    threshold = 0.992 - min(0.010, storminess * 0.008)
+    if strike < threshold:
+        return 0.0
+    return min(1.0, 0.35 + (strike - threshold) / max(1e-9, 1.0 - threshold) * 0.65)
+
+
 def temperature_c(
     *,
     seed: str,

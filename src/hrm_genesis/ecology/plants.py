@@ -39,6 +39,25 @@ def _live_mass(cell: dict) -> float:
     return _mass(cell["plant_elements_kg"]) + _mass(cell.get("woody_elements_kg", {}))
 
 
+
+
+def _burnable_mass(cell: dict) -> float:
+    return (
+        _mass(cell.get("woody_elements_kg", {}))
+        + _mass(cell.get("loose_material_elements_kg", {}))
+        + _mass(cell.get("arranged_material_elements_kg", {}))
+    )
+
+
+def _burn_fraction(source: dict[str, float], fraction: float) -> dict[str, float]:
+    burned = {}
+    for symbol, raw in source.items():
+        amount = max(0.0, float(raw) * fraction)
+        source[symbol] = float(raw) - amount
+        burned[symbol] = amount
+    return burned
+
+
 def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
@@ -54,6 +73,15 @@ def build_producer_state(*, width: int, height: int) -> dict:
                 "y": y,
                 "plant_elements_kg": _blank_elements(),
                 "woody_elements_kg": _blank_elements(),
+                "loose_material_elements_kg": _blank_elements(),
+                "arranged_material_elements_kg": _blank_elements(),
+                "arrangement_geometry": {
+                    "span_m": 0.0,
+                    "height_m": 0.0,
+                    "density": 0.0,
+                    "surface_area_m2": 0.0,
+                },
+                "fire_intensity": 0.0,
                 "seed_elements_kg": _blank_elements(),
                 "detritus_elements_kg": _blank_elements(),
                 "age_ticks": 0,
@@ -151,6 +179,13 @@ def evolve_producers(
     wcells = _cell_lookup(world_state["cells"])
     for pcell in pcells.values():
         pcell.setdefault("woody_elements_kg", _blank_elements())
+        pcell.setdefault("loose_material_elements_kg", _blank_elements())
+        pcell.setdefault("arranged_material_elements_kg", _blank_elements())
+        pcell.setdefault(
+            "arrangement_geometry",
+            {"span_m": 0.0, "height_m": 0.0, "density": 0.0, "surface_area_m2": 0.0},
+        )
+        pcell.setdefault("fire_intensity", 0.0)
 
     # 1. Decomposition returns previously dead material to Matter.
     for xy, pcell in pcells.items():
@@ -205,6 +240,41 @@ def evolve_producers(
 
         pcell["age_ticks"] = int(pcell["age_ticks"]) + 1
 
+
+    # 3b. Natural combustion: ignition comes from the physical world, not humans.
+    # Existing fire can persist/spread locally while dry combustible material exists.
+    ignition_additions: dict[tuple[int, int], float] = {xy: 0.0 for xy in pcells}
+    for xy, pcell in pcells.items():
+        wcell = wcells[xy]
+        fuel = _burnable_mass(pcell)
+        moisture = max(0.0, min(1.0, float(wcell.get("precipitation", 0.0)) / 5.0))
+        lightning = max(0.0, float(wcell.get("lightning", 0.0)))
+        current = max(0.0, float(pcell.get("fire_intensity", 0.0)))
+        if fuel > 0.05 and lightning > 0.0 and moisture < 0.6:
+            current = max(current, min(1.0, 0.25 + 0.75 * lightning))
+        if current > 0.0 and fuel > 0.0:
+            burn_fraction = min(0.22, current * 0.08 + 0.01)
+            for bucket in ("woody_elements_kg", "loose_material_elements_kg", "arranged_material_elements_kg"):
+                burned = _burn_fraction(pcell[bucket], burn_fraction)
+                for symbol, amount in burned.items():
+                    pcell["detritus_elements_kg"][symbol] += amount
+            fuel_after = _burnable_mass(pcell)
+            rain_quench = min(0.85, float(wcell.get("precipitation", 0.0)) / 6.0)
+            current = max(0.0, current * (0.82 - 0.55 * rain_quench))
+            if fuel_after < 0.02:
+                current = 0.0
+            if current > 0.18:
+                for other in neighbors(xy[0], xy[1], width, height):
+                    if _burnable_mass(pcells[other]) > 0.05:
+                        ignition_additions[other] = max(
+                            ignition_additions[other], min(0.35, current * 0.18)
+                        )
+        pcell["fire_intensity"] = current
+
+    for xy, addition in ignition_additions.items():
+        if addition > 0.0:
+            pcells[xy]["fire_intensity"] = max(float(pcells[xy]["fire_intensity"]), addition)
+
     # 4. Mortality is condition- and age-sensitive. Dead matter stays in the
     # ecology authority as detritus until decomposition returns it.
     for xy, pcell in pcells.items():
@@ -247,10 +317,19 @@ def evolve_producers(
             pcells[xy]["seed_elements_kg"][symbol] += amount
 
     ecology["epoch_applied"] = epoch
+    for pcell in ecology["cells"]:
+        pcell["fire_intensity"] = round(max(0.0, min(1.0, float(pcell.get("fire_intensity", 0.0)))), 10)
     matter["epoch_applied"] = epoch
 
     for pcell in ecology["cells"]:
-        for bucket in ("plant_elements_kg", "woody_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
+        for bucket in (
+            "plant_elements_kg",
+            "woody_elements_kg",
+            "loose_material_elements_kg",
+            "arranged_material_elements_kg",
+            "seed_elements_kg",
+            "detritus_elements_kg",
+        ):
             pcell[bucket] = {
                 symbol: round(max(0.0, float(amount)), 10)
                 for symbol, amount in sorted(pcell[bucket].items())
@@ -289,7 +368,14 @@ def producer_detritus_mass_kg(state: dict) -> float:
 def ecology_element_totals(state: dict) -> dict[str, float]:
     totals = _blank_elements()
     for cell in state["cells"]:
-        for bucket in ("plant_elements_kg", "woody_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
+        for bucket in (
+            "plant_elements_kg",
+            "woody_elements_kg",
+            "loose_material_elements_kg",
+            "arranged_material_elements_kg",
+            "seed_elements_kg",
+            "detritus_elements_kg",
+        ):
             for symbol, amount in cell.get(bucket, {}).items():
                 totals[symbol] += float(amount)
     return {symbol: round(value, 10) for symbol, value in sorted(totals.items())}
