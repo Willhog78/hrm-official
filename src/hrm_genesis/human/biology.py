@@ -60,14 +60,6 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
                 "body_water_kg": 0.0,
                 "generation": 0,
                 "last_reproduction_epoch": -1000000,
-        **(
-            {
-                "population_id": mother["population_id"],
-                "home_region": mother.get("home_region", mother["population_id"]),
-            }
-            if "population_id" in mother
-            else {}
-        ),
             }
         if population_id is not None:
             region_cells = cells_for_population(population_id, width, height)
@@ -237,6 +229,14 @@ def _offspring(mother: dict, ordinal: int) -> dict:
         "body_water_kg": water,
         "generation": int(mother["generation"]) + 1,
         "last_reproduction_epoch": -1000000,
+        **(
+            {
+                "population_id": mother["population_id"],
+                "home_region": mother.get("home_region", mother["population_id"]),
+            }
+            if "population_id" in mother
+            else {}
+        ),
         **(
             {
                 "cognition": {
