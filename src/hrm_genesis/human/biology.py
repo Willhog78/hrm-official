@@ -287,6 +287,27 @@ def _structural_protection(world_cell: dict, producer_cell: dict | None = None) 
     terrain_cover = min(0.90, max(0.0, float(world_cell.get("natural_shelter", 0.0))))
     return canopy, terrain_cover
 
+def _experienced_reward(
+    *,
+    start_energy: float,
+    start_water: float,
+    start_injury: float,
+    human: dict,
+    profile: dict,
+) -> float:
+    """Reward the body's experienced result, not a named environmental feature."""
+    basal = max(1e-9, float(profile["basal_energy_kcal_per_tick"]))
+    water_capacity = max(1e-9, float(profile["water_capacity_kg"]))
+    energy_delta = float(human["energy"]) - float(start_energy)
+    water_fraction_delta = (float(human["body_water_kg"]) - float(start_water)) / water_capacity
+    injury_delta = float(human.get("injury", 0.0)) - float(start_injury)
+    return (
+        energy_delta
+        + water_fraction_delta * basal
+        - injury_delta * basal * 2.0
+    )
+
+
 
 def _apply_physiology(
     human: dict,
@@ -376,6 +397,9 @@ def evolve_humans(
     births = []
     for human in sorted(humans["humans"], key=lambda h: h["id"]):
         origin = (int(human["x"]), int(human["y"]))
+        start_energy = float(human["energy"])
+        start_water = float(human["body_water_kg"])
+        start_injury = float(human.get("injury", 0.0))
         if cognition_enabled:
             perception = perceive_local(
                 human,
@@ -396,21 +420,41 @@ def evolve_humans(
         xy = (int(human["x"]), int(human["y"]))
         _drink(human, mcells[xy], profile)
         ate = _eat(human, pcells[xy], profile)
-        if cognition_enabled and perception is not None:
-            reward = ate * float(profile["food_energy_kcal_per_kg"]) * float(profile["assimilation"])
-            cognition = dict(human["cognition"])
-            cognition["memory"] = remember(cognition.get("memory", empty_memory()), perception, epoch, reward)
-            cognition["expectations"] = update_expectations(cognition.get("expectations", {}), perception, reward)
-            cognition["last_reward"] = round(float(reward), 10)
-            cognition["uncertainty"] = round(max(0.05, float(cognition.get("uncertainty", 1.0)) * 0.97), 10)
-            human["cognition"] = cognition
-
         human["energy"] = float(human["energy"]) - float(profile["basal_energy_kcal_per_tick"])
         _apply_physiology(human, wcells[xy], moved, profile, pcells[xy])
         loss = min(float(human["body_water_kg"]), float(profile["water_loss_per_tick_kg"]))
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
         human["age_ticks"] = int(human["age_ticks"]) + 1
+
+        if cognition_enabled and perception is not None:
+            reward = _experienced_reward(
+                start_energy=start_energy,
+                start_water=start_water,
+                start_injury=start_injury,
+                human=human,
+                profile=profile,
+            )
+            experienced = deepcopy(perception)
+            experienced["origin"] = [xy[0], xy[1]]
+            cognition = dict(human["cognition"])
+            cognition["memory"] = remember(
+                cognition.get("memory", empty_memory()),
+                experienced,
+                epoch,
+                reward,
+            )
+            cognition["expectations"] = update_expectations(
+                cognition.get("expectations", {}),
+                experienced,
+                reward,
+            )
+            cognition["last_reward"] = round(float(reward), 10)
+            cognition["uncertainty"] = round(
+                max(0.05, float(cognition.get("uncertainty", 1.0)) * 0.97),
+                10,
+            )
+            human["cognition"] = cognition
 
         body_mass = _mass(human["body_elements_kg"])
         dead = (
