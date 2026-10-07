@@ -30,7 +30,7 @@ def remember(memory: dict, perception: dict, epoch: int, reward: float) -> dict:
             "water_kg": float(cell["water_kg"]),
             "woody_kg": float(cell.get("woody_kg", 0.0)),
             "rock_exposure": float(cell.get("rock_exposure", 0.0)),
-            "natural_shelter": float(cell.get("natural_shelter", 0.0)),
+            "terrain_cover": float(cell.get("terrain_cover", 0.0)),
         }
     locations = {
         k: v for k, v in locations.items()
