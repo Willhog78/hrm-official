@@ -35,6 +35,10 @@ def _mass(elements: dict[str, float]) -> float:
     return sum(float(v) for v in elements.values())
 
 
+def _live_mass(cell: dict) -> float:
+    return _mass(cell["plant_elements_kg"]) + _mass(cell.get("woody_elements_kg", {}))
+
+
 def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
@@ -49,6 +53,7 @@ def build_producer_state(*, width: int, height: int) -> dict:
                 "x": x,
                 "y": y,
                 "plant_elements_kg": _blank_elements(),
+                "woody_elements_kg": _blank_elements(),
                 "seed_elements_kg": _blank_elements(),
                 "detritus_elements_kg": _blank_elements(),
                 "age_ticks": 0,
@@ -169,7 +174,7 @@ def evolve_producers(
 
     # 3. Existing biomass grows by consuming Matter pools and water.
     for xy, pcell in pcells.items():
-        live_mass = _mass(pcell["plant_elements_kg"])
+        live_mass = _live_mass(pcell)
         if live_mass <= 0.0:
             continue
 
@@ -179,10 +184,16 @@ def evolve_producers(
         growth = _growth_limit(mcells[xy], desired)
 
         if growth > 0.0:
+            woody_share = 0.0
+            if int(pcell["age_ticks"]) >= 30 and condition >= 0.60:
+                # Woody structure emerges only under sustained viable growth
+                # conditions; it is not randomly assigned to cells.
+                woody_share = min(0.55, 0.15 + (condition - 0.60) * 0.80)
             for symbol, frac in PLANT_ELEMENT_FRACTIONS.items():
                 amount = growth * frac
                 mcells[xy]["elements_kg"][symbol] -= amount
-                pcell["plant_elements_kg"][symbol] += amount
+                pcell["plant_elements_kg"][symbol] += amount * (1.0 - woody_share)
+                pcell["woody_elements_kg"][symbol] += amount * woody_share
 
             water_used = growth * WATER_KG_PER_KG_GROWTH
             mcells[xy]["soil_water_kg"] -= water_used
@@ -195,7 +206,7 @@ def evolve_producers(
     # 4. Mortality is condition- and age-sensitive. Dead matter stays in the
     # ecology authority as detritus until decomposition returns it.
     for xy, pcell in pcells.items():
-        live_mass = _mass(pcell["plant_elements_kg"])
+        live_mass = _live_mass(pcell)
         if live_mass <= 0.0:
             continue
         light, temp, water = _environment_factors(wcells[xy], mcells[xy])
@@ -203,9 +214,12 @@ def evolve_producers(
         old_age = max(0.0, (int(pcell["age_ticks"]) - MAX_AGE_TICKS) / MAX_AGE_TICKS)
         mortality = min(0.85, BASE_MORTALITY_FRACTION + 0.08 * stress + 0.12 * old_age)
         dead = _transfer_fraction(pcell["plant_elements_kg"], mortality)
+        woody_dead = _transfer_fraction(pcell["woody_elements_kg"], mortality * 0.35)
         for symbol, amount in dead.items():
             pcell["detritus_elements_kg"][symbol] += amount
-        if _mass(pcell["plant_elements_kg"]) <= 1e-12:
+        for symbol, amount in woody_dead.items():
+            pcell["detritus_elements_kg"][symbol] += amount
+        if _live_mass(pcell) <= 1e-12:
             pcell["age_ticks"] = 0
 
     # 5. Reproduction transfers a small fraction of living biomass into seeds
@@ -234,7 +248,7 @@ def evolve_producers(
     matter["epoch_applied"] = epoch
 
     for pcell in ecology["cells"]:
-        for bucket in ("plant_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
+        for bucket in ("plant_elements_kg", "woody_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
             pcell[bucket] = {
                 symbol: round(max(0.0, float(amount)), 10)
                 for symbol, amount in sorted(pcell[bucket].items())
@@ -251,7 +265,15 @@ def evolve_producers(
 
 
 def producer_biomass_kg(state: dict) -> float:
+    return sum(_live_mass(c) for c in state["cells"])
+
+
+def producer_edible_biomass_kg(state: dict) -> float:
     return sum(_mass(c["plant_elements_kg"]) for c in state["cells"])
+
+
+def producer_woody_biomass_kg(state: dict) -> float:
+    return sum(_mass(c.get("woody_elements_kg", {})) for c in state["cells"])
 
 
 def producer_seed_mass_kg(state: dict) -> float:
@@ -265,7 +287,7 @@ def producer_detritus_mass_kg(state: dict) -> float:
 def ecology_element_totals(state: dict) -> dict[str, float]:
     totals = _blank_elements()
     for cell in state["cells"]:
-        for bucket in ("plant_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
+        for bucket in ("plant_elements_kg", "woody_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
             for symbol, amount in cell[bucket].items():
                 totals[symbol] += float(amount)
     return {symbol: round(value, 10) for symbol, value in sorted(totals.items())}
