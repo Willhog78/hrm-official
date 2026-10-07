@@ -69,11 +69,13 @@ def execute_live_sequence(
         "released": False,
         "arranged": False,
         "material_moved_kg": 0.0,
+        "effort_energy_kcal": 0.0,
     }
 
     for action in seq:
         if action == "inspect":
             trace["inspected"] = True
+            trace["effort_energy_kcal"] += 1.0
 
         elif action == "grasp" and _mass(held) <= 1e-12:
             available = _mass(wood)
@@ -82,9 +84,11 @@ def execute_live_sequence(
                 moved = _move_fraction(wood, fraction)
                 _add_elements(held, moved)
                 trace["material_moved_kg"] += _mass(moved)
+                trace["effort_energy_kcal"] += 6.0 + 8.0 * _mass(moved)
 
         elif action == "carry" and _mass(held) > 0.0:
             trace["carried"] = True
+            trace["effort_energy_kcal"] += 4.0 + 6.0 * _mass(held)
 
         elif action == "release" and _mass(held) > 0.0:
             moved = dict(held)
@@ -92,6 +96,7 @@ def execute_live_sequence(
                 held[symbol] = 0.0
             _add_elements(loose, moved)
             trace["released"] = True
+            trace["effort_energy_kcal"] += 2.0
 
         elif action == "arrange" and _mass(loose) > 0.0:
             moved = dict(loose)
@@ -99,11 +104,13 @@ def execute_live_sequence(
                 loose[symbol] = 0.0
             _add_elements(arranged, moved)
             trace["arranged"] = True
+            trace["effort_energy_kcal"] += 8.0 + 5.0 * _mass(moved)
 
         elif action == "separate" and _mass(arranged) > 0.0:
             fraction = min(1.0, MANIPULATION_MASS_KG / _mass(arranged))
             moved = _move_fraction(arranged, fraction)
             _add_elements(loose, moved)
+            trace["effort_energy_kcal"] += 5.0 + 5.0 * _mass(moved)
 
         elif action == "combine" and _mass(loose) > 0.0:
             moved = dict(loose)
@@ -111,6 +118,7 @@ def execute_live_sequence(
                 loose[symbol] = 0.0
             _add_elements(arranged, moved)
             trace["arranged"] = True
+            trace["effort_energy_kcal"] += 7.0 + 5.0 * _mass(moved)
 
         elif action == "apply_force" and _mass(wood) > 0.0:
             available = _mass(wood)
@@ -118,6 +126,7 @@ def execute_live_sequence(
             moved = _move_fraction(wood, fraction)
             _add_elements(loose, moved)
             trace["material_moved_kg"] += _mass(moved)
+            trace["effort_energy_kcal"] += 10.0 + 10.0 * _mass(moved)
 
     h["held_material_elements_kg"] = held
     cell["woody_elements_kg"] = wood
