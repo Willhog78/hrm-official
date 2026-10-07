@@ -64,17 +64,30 @@ def _plant_mass(cell: dict) -> float:
 
 
 def focused_biology_checks(sim: GenesisSimulation) -> dict[str, bool]:
-    # Birth: put the existing materially seeded adults together on the richest
-    # cell. They still eat from real producer mass before reproduction.
+    # Birth: put the existing materially seeded adults together on one cell.
+    # They still move and eat from real producer mass before reproduction, and
+    # since PR #23 reproduction needs the pair together *after* movement. So
+    # the probe uses a cell that stays the movement rule's choice for every
+    # adult even after the earlier adults' bites; otherwise it would test
+    # whether two uncognitive adults happen to stay together, not reproduction.
     humans = deepcopy(sim.human_state())
     producers = deepcopy(sim.ecology_state())
     matter = deepcopy(sim.matter_state())
     world = deepcopy(sim.world_state())
 
-    richest = max(
-        producers["cells"],
-        key=lambda cell: (_plant_mass(cell), -int(cell["y"]), -int(cell["x"])),
-    )
+    bite = float(humans["physiology_profile"]["bite_cap_kg"])
+    earlier_bites = bite * max(0, len(humans["humans"]) - 1)
+    by_xy = {(int(c["x"]), int(c["y"])): c for c in producers["cells"]}
+
+    def holds_the_pair(cell: dict) -> bool:
+        x, y = int(cell["x"]), int(cell["y"])
+        neighbours = [by_xy[n] for n in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)) if n in by_xy]
+        return _plant_mass(cell) - earlier_bites > max((_plant_mass(n) for n in neighbours), default=0.0)
+
+    stable = [cell for cell in producers["cells"] if holds_the_pair(cell)]
+    if not stable:
+        raise RuntimeError("G5 birth probe: no cell keeps the pair together under the movement rule")
+    richest = max(stable, key=lambda cell: (_plant_mass(cell), -int(cell["y"]), -int(cell["x"])))
     xy = (int(richest["x"]), int(richest["y"]))
     for person in humans["humans"]:
         person["x"], person["y"] = xy
