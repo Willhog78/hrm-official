@@ -606,6 +606,19 @@ def evolve_humans(
                 humans["humans"],
                 world_state,
             )
+            forage_need = (
+                float(effective_profile["basal_energy_kcal_per_tick"])
+                / max(
+                    1e-9,
+                    float(effective_profile["food_energy_kcal_per_kg"])
+                    * float(effective_profile["assimilation"]),
+                )
+            )
+            perception["forage_need_kg"] = forage_need
+            perception["energy_reserve_fraction"] = (
+                float(human["energy"])
+                / max(1e-9, float(effective_profile.get("energy_capacity_kcal", 1.0)))
+            )
             target = choose_destination(human, perception, human["cognition"])
         else:
             perception = None
