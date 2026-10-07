@@ -5,7 +5,7 @@ from copy import deepcopy
 from hrm_coordination.seeds import SeedBank
 from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
 
-from .learning import update_expectations
+from .learning import update_contextual_expectations, update_expectations
 from .memory import empty_memory, remember
 from .perception import perceive_local
 from .planning import choose_destination
@@ -82,6 +82,7 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
             person["cognition"] = {
                 "memory": empty_memory(),
                 "expectations": {},
+                "contextual_expectations": {},
                 "uncertainty": 1.0,
                 "last_reward": 0.0,
             }
@@ -264,6 +265,7 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
                 "cognition": {
                     "memory": empty_memory(),
                     "expectations": {},
+                    "contextual_expectations": {},
                     "uncertainty": 1.0,
                     "last_reward": 0.0,
                 }
@@ -446,6 +448,11 @@ def evolve_humans(
             )
             cognition["expectations"] = update_expectations(
                 cognition.get("expectations", {}),
+                experienced,
+                reward,
+            )
+            cognition["contextual_expectations"] = update_contextual_expectations(
+                cognition.get("contextual_expectations", {}),
                 experienced,
                 reward,
             )
