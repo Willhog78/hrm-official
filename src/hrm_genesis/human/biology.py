@@ -9,6 +9,7 @@ from .learning import update_expectations
 from .memory import empty_memory, remember
 from .perception import perceive_local
 from .planning import choose_destination
+from .regions import POPULATION_IDS, cells_for_population
 
 
 HUMAN_TRACKED_ELEMENTS = tuple(sorted(PLANT_ELEMENT_FRACTIONS))
@@ -37,9 +38,16 @@ def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
 
-def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False, actions_enabled: bool = False) -> dict:
+def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition_enabled: bool = False, actions_enabled: bool = False, multi_population_enabled: bool = False) -> dict:
     humans = []
-    for index, sex in enumerate(("female", "male")):
+    founders = []
+    if multi_population_enabled:
+        for population_id in POPULATION_IDS:
+            founders.extend(((population_id, "female"), (population_id, "male")))
+    else:
+        founders = [(None, "female"), (None, "male")]
+
+    for index, (population_id, sex) in enumerate(founders):
         rng = seed_bank.stream(f"human.genesis.{index}")
         person = {
                 "id": f"human-g{index:08d}",
@@ -52,7 +60,21 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
                 "body_water_kg": 0.0,
                 "generation": 0,
                 "last_reproduction_epoch": -1000000,
+        **(
+            {
+                "population_id": mother["population_id"],
+                "home_region": mother.get("home_region", mother["population_id"]),
             }
+            if "population_id" in mother
+            else {}
+        ),
+            }
+        if population_id is not None:
+            region_cells = cells_for_population(population_id, width, height)
+            start_xy = region_cells[index % len(region_cells)]
+            person["x"], person["y"] = start_xy
+            person["population_id"] = population_id
+            person["home_region"] = population_id
         if cognition_enabled:
             person["cognition"] = {
                 "memory": empty_memory(),
@@ -68,7 +90,7 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
         "width": width,
         "height": height,
         "epoch_applied": -1,
-        "next_birth_ordinal": 2,
+        "next_birth_ordinal": len(humans),
         "humans": humans,
         "remains_cells": [
             {"x": x, "y": y, "elements_kg": _blank_elements(), "water_kg": 0.0}
@@ -95,7 +117,21 @@ def seed_initial_humans(human_state: dict, producer_state: dict, matter_state: d
     for index, human in enumerate(humans["humans"]):
         if not ranked:
             break
-        xy = ranked[index % len(ranked)]
+        if "population_id" in human:
+            local = [
+                xy for xy in cells_for_population(
+                    str(human["population_id"]),
+                    int(producers["width"]),
+                    int(producers["height"]),
+                )
+                if _mass(pcells[xy]["plant_elements_kg"]) > 0.0
+            ]
+            local_ranked = sorted(local, key=lambda xy: (-_mass(pcells[xy]["plant_elements_kg"]), xy[1], xy[0]))
+            if not local_ranked:
+                continue
+            xy = local_ranked[index % len(local_ranked)]
+        else:
+            xy = ranked[index % len(ranked)]
         human["x"], human["y"] = xy
         pcell, mcell = pcells[xy], mcells[xy]
 
