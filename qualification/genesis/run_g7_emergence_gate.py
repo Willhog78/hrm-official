@@ -82,7 +82,14 @@ def main() -> int:
     best = None
     for candidate in candidate_sequences(max_length=4):
         score, human, cell, trace = _body_outcome(candidate)
-        if best is None or score > best[0]:
+        arranged_mass = sum(cell["arranged_material_elements_kg"].values())
+        geometry = cell.get("arrangement_geometry", {})
+        physically_changed = (
+            trace["material_moved_kg"] > 0.0
+            and arranged_mass > 0.0
+            and float(geometry.get("surface_area_m2", 0.0)) > 0.0
+        )
+        if physically_changed and (best is None or score > best[0]):
             best = (score, candidate, human, cell, trace)
 
     assert best is not None
