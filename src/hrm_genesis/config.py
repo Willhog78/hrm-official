@@ -22,6 +22,13 @@ class GenesisConfig:
     multi_population_enabled: bool = False
     material_scale_factor: float = 1.0
     human_calibration_enabled: bool = False
+    # G10.3 capacity model v1. Off by default; earlier configs, fingerprints
+    # and results are unchanged.
+    agentus_capacities_enabled: bool = False
+    # Experimental ablation of capacity v1: "", "plant_diet" (no sampling of
+    # unknown food kinds), "no_interactions" (no manipulation or capture), or
+    # "no_recall" (no travel toward remembered food).
+    agentus_capacity_ablation: str = ""
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -55,6 +62,12 @@ class GenesisConfig:
             raise ValueError("human_cognition_enabled requires human_biology_enabled")
         if self.human_actions_enabled and not self.human_cognition_enabled:
             raise ValueError("human_actions_enabled requires human_cognition_enabled")
+        if self.agentus_capacities_enabled and not (self.human_actions_enabled and self.human_calibration_enabled):
+            raise ValueError("agentus_capacities_enabled requires human_actions_enabled and human_calibration_enabled")
+        if self.agentus_capacity_ablation not in {"", "plant_diet", "no_interactions", "no_recall"}:
+            raise ValueError("unknown agentus_capacity_ablation")
+        if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
+            raise ValueError("agentus_capacity_ablation requires agentus_capacities_enabled")
         if self.multi_population_enabled and not self.human_actions_enabled:
             raise ValueError("multi_population_enabled requires human_actions_enabled")
 
@@ -63,7 +76,7 @@ class GenesisConfig:
         return Fraction(self.contract_dt_numerator, self.contract_dt_denominator)
 
     def canonical(self) -> dict[str, object]:
-        return {
+        canonical = {
             "master_seed": self.master_seed,
             "contract_dt_numerator": self.contract_dt_numerator,
             "contract_dt_denominator": self.contract_dt_denominator,
@@ -83,6 +96,13 @@ class GenesisConfig:
             "ticks_per_year": self.ticks_per_year,
             "genesis_phase": "G8" if self.multi_population_enabled else ("G7" if self.human_actions_enabled else ("G6" if self.human_cognition_enabled else ("G5" if self.human_biology_enabled else ("G3" if self.consumer_ecology_enabled else "G2")))),
         }
+        if self.agentus_capacities_enabled:
+            # Present only when enabled so earlier fingerprints do not change.
+            canonical["agentus_capacities_enabled"] = True
+            canonical["agentus_capacity_model"] = "capacity-v1"
+        if self.agentus_capacity_ablation:
+            canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
+        return canonical
 
     def fingerprint(self) -> str:
         return digest_obj(self.canonical())

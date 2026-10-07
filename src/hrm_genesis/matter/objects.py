@@ -107,7 +107,9 @@ def stone_props(fragment: dict) -> dict[str, float]:
         "fracture_energy_j": lith["fracture_j_per_kg23"] * mass ** (2.0 / 3.0),
         "edge_sharpness": float(fragment.get("s", 0.0)),
         "roughness": lith["roughness"],
-        "edge_potential": lith["edge_potential"],
+        # Moderate heating makes fine-grained siliceous rock fracture more
+        # cleanly (declared simplification of heat treatment).
+        "edge_potential": min(1.0, lith["edge_potential"] * (1.15 if fragment.get("ht") else 1.0)),
         "elongation": float(fragment.get("e", 1.0)),
     }
 
@@ -138,6 +140,23 @@ def fracture(fragment: dict, delivered_j: float, draw: float, draw2: float, new_
         "e": round(1.0 + 2.5 * (1.0 - split), 10),
     }
     return core, flake
+
+
+def heat_stone(fragment: dict, intensity: float, draw: float, new_id: str) -> tuple[dict, dict | None]:
+    """Fire acting on a stone. Strong heat can crack it (thermal shock, mass
+    conserved); moderate heat on fine siliceous rock marks it heat-treated."""
+    if intensity >= 0.6 and draw < 0.15:
+        props = stone_props(fragment)
+        pieces = fracture(fragment, props["fracture_energy_j"] * 1.01, draw * 6.0, 0.2, new_id)
+        if pieces is not None:
+            core, flake = pieces
+            # Thermal cracking does not produce worked edges.
+            core["s"] = fragment.get("s", 0.0)
+            flake["s"] = round(min(float(flake["s"]), 0.15), 10)
+            return core, flake
+    if 0.2 <= intensity < 0.6 and fragment["lith"] == "siliceous_fine":
+        fragment = dict(fragment, ht=True)
+    return fragment, None
 
 
 def edge_wear(fragment: dict, target_hardness: float) -> None:

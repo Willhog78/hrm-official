@@ -20,6 +20,7 @@ hrm-official/
 │   │   ├── G10_1_SCALE_SUBSTRATE.md
 │   │   ├── G10_2_HUMAN_CALIBRATION.md
 │   │   ├── G10_2A_SURVIVAL_AFFORDANCES.md
+│   │   ├── G10_3_AGENTUS_CAPACITIES.md
 │   │   └── ADR/
 │   └── stage0/
 │
@@ -52,6 +53,7 @@ hrm-official/
 │       │   ├── elements.py
 │       │   ├── pools.py
 │       │   ├── transfers.py
+│       │   ├── objects.py         # G10.3 material physics (stone, fiber, binding)
 │       │   └── accounting.py
 │       │
 │       ├── ecology/
@@ -68,6 +70,8 @@ hrm-official/
 │       │   ├── learning.py
 │       │   ├── planning.py
 │       │   ├── actions.py
+│       │   ├── diet.py            # G10.3 ingestion by food kind
+│       │   ├── interactions.py    # G10.3 live interactions and their learning
 │       │   └── communication.py
 │       │
 │       ├── observer/

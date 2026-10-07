@@ -25,14 +25,18 @@ from .ecology.plants import (
 )
 from .ecology.animals import (
     build_consumer_state,
+    enable_fresh_tissue,
     evolve_consumers,
     seed_initial_consumers,
 )
 from .human.biology import (
     build_human_state,
+    evolve_agentus_step,
     evolve_humans,
     seed_initial_humans,
 )
+from .human.interactions import enable_capacities
+from .matter.objects import seed_natural_fragments
 from .interfaces.authorities import (
     AuthorityRegistration,
     GENESIS_SYSTEM_AUTHORITY,
@@ -156,6 +160,20 @@ class GenesisSimulation:
                 producer_state,
                 matter_state,
             )
+            if config.agentus_capacities_enabled:
+                # Loose weathered stone is part of initial conditions; its total
+                # is the fixed lithic ledger quantity. Fresh carcass tissue is
+                # split from decayed tissue so spoilage can matter.
+                lithic_cells, lithic_total = seed_natural_fragments(
+                    world_state["cells"], config.master_seed
+                )
+                matter_state = dict(matter_state)
+                matter_state["lithic_cells"] = lithic_cells
+                matter_state["initial_lithic_kg"] = lithic_total
+                consumer_state = enable_fresh_tissue(consumer_state)
+                human_state = enable_capacities(human_state)
+                if config.agentus_capacity_ablation:
+                    human_state["capacity_ablation"] = config.agentus_capacity_ablation
 
         if matter_state is not None:
             authorities.append(
@@ -512,16 +530,31 @@ class GenesisSimulation:
             dict(world.value),
             ctx.epoch,
         )
-        next_humans, final_producers, final_matter = evolve_humans(
-            dict(humans.value),
-            producers_after_consumers,
-            matter_after_consumers,
-            dict(world.value),
-            ctx.epoch,
-            cognition_enabled=self.config.human_cognition_enabled,
-            actions_enabled=self.config.human_actions_enabled,
-            consumer_state=next_consumers,
-        )
+        if self.config.agentus_capacities_enabled:
+            # Capacity v1 may kill animals and eat carcass tissue, so the
+            # Agentus step also returns the Consumer state it changed.
+            next_humans, final_producers, final_matter, consumers_after_humans = evolve_agentus_step(
+                dict(humans.value),
+                producers_after_consumers,
+                matter_after_consumers,
+                dict(world.value),
+                ctx.epoch,
+                cognition_enabled=self.config.human_cognition_enabled,
+                actions_enabled=self.config.human_actions_enabled,
+                consumer_state=next_consumers,
+            )
+        else:
+            next_humans, final_producers, final_matter = evolve_humans(
+                dict(humans.value),
+                producers_after_consumers,
+                matter_after_consumers,
+                dict(world.value),
+                ctx.epoch,
+                cognition_enabled=self.config.human_cognition_enabled,
+                actions_enabled=self.config.human_actions_enabled,
+                consumer_state=next_consumers,
+            )
+            consumers_after_humans = next_consumers
 
         return [
             TransactionProposal(
@@ -543,7 +576,7 @@ class GenesisSimulation:
                     Mutation(
                         ref=ResourceRef(CONSUMER_AUTHORITY, CONSUMER_STATE_RESOURCE),
                         expected_version=consumers.version,
-                        new_value=next_consumers,
+                        new_value=consumers_after_humans,
                     ),
                     Mutation(
                         ref=ResourceRef(HUMAN_AUTHORITY, HUMAN_STATE_RESOURCE),

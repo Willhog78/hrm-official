@@ -7,9 +7,11 @@ from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
 from hrm_genesis.ecology.traits import trait_for
 
 from .actions import execute_live_sequence
+from .diet import FOOD_KINDS, forage_at_cell, innate_food_prior
+from . import interactions as cap
 from .learning import update_contextual_expectations, update_expectations
 from .memory import empty_memory, remember
-from .perception import perceive_local
+from .perception import extend_perception_with_materials, perceive_local
 from .planning import choose_destination
 from .regions import POPULATION_IDS, cells_for_population
 from .calibration import physiology_profile
@@ -467,6 +469,7 @@ def _apply_physiology(
     moved: bool,
     profile: dict | None = None,
     producer_cell: dict | None = None,
+    insulation_c: float = 0.0,
 ) -> None:
     """Apply bounded fatigue, thermoregulation cost, injury, and healing."""
     profile = profile or physiology_profile(calibrated=False, ticks_per_year=120)
@@ -483,6 +486,9 @@ def _apply_physiology(
     if terrain_cover > 0.0:
         moderation = min(0.55, terrain_cover * 0.55)
         ambient = ambient * (1.0 - moderation) + 15.0 * moderation
+    if insulation_c > 0.0 and ambient < HUMAN_COMFORT_TEMPERATURE_C:
+        # Worn interlaced material slows heat loss in the cold (capacity v1).
+        ambient = min(HUMAN_COMFORT_TEMPERATURE_C, ambient + insulation_c)
 
     thermal_delta = abs(ambient - HUMAN_COMFORT_TEMPERATURE_C)
     excess = max(0.0, thermal_delta - HUMAN_THERMAL_TOLERANCE_C)
@@ -567,6 +573,37 @@ def evolve_humans(
     actions_enabled: bool = False,
     consumer_state: dict | None = None,
 ) -> tuple[dict, dict, dict]:
+    humans, producers, matter, _ = evolve_agentus_step(
+        human_state,
+        producer_state,
+        matter_state,
+        world_state,
+        epoch,
+        cognition_enabled=cognition_enabled,
+        actions_enabled=actions_enabled,
+        consumer_state=consumer_state,
+    )
+    return humans, producers, matter
+
+
+def evolve_agentus_step(
+    human_state: dict,
+    producer_state: dict,
+    matter_state: dict,
+    world_state: dict,
+    epoch: int,
+    *,
+    cognition_enabled: bool = False,
+    actions_enabled: bool = False,
+    consumer_state: dict | None = None,
+) -> tuple[dict, dict, dict, dict | None]:
+    """One Agentus tick. Returns Consumer state too, because capacity model v1
+    lets Agentus kill animals and eat carcass tissue inside the same atomic
+    transaction. Without capacities the Consumer state is returned unchanged."""
+    capacities = human_state.get("capacity_model") == cap.CAPACITY_MODEL
+    ablation = str(human_state.get("capacity_ablation", ""))
+    if capacities and consumer_state is not None:
+        consumer_state = deepcopy(consumer_state)
     humans = deepcopy(human_state)
     producers = deepcopy(producer_state)
     matter = deepcopy(matter_state)
@@ -575,6 +612,9 @@ def evolve_humans(
     remains = _cell_lookup(humans["remains_cells"])
     wcells = _cell_lookup(world_state["cells"])
     profile = humans.get("physiology_profile", physiology_profile(calibrated=False, ticks_per_year=120))
+    if capacities:
+        ccells = _cell_lookup(consumer_state["carcass_cells"])
+        lithic_cells = matter.setdefault("lithic_cells", {})
 
     survivors = []
     births = []
@@ -612,6 +652,19 @@ def evolve_humans(
                 float(human["energy"])
                 / max(1e-9, float(effective_profile.get("energy_capacity_kcal", 1.0)))
             )
+            if capacities:
+                scale = max(0.10, float(effective_profile.get("development_scale", 1.0)))
+                extend_perception_with_materials(
+                    perception,
+                    producers,
+                    consumer_state,
+                    lithic_cells,
+                    humans.get("objects", []),
+                    human["cognition"].get("food_values", {}),
+                    innate_food_prior(effective_profile)["plant_tissue"],
+                    {kind: float(spec["hand_access_kg"]) * scale for kind, spec in FOOD_KINDS.items()},
+                    None if ablation == "no_recall" else human["cognition"].get("memory", {}).get("locations", {}),
+                )
             target = choose_destination(human, perception, human["cognition"])
         else:
             perception = None
@@ -623,6 +676,8 @@ def evolve_humans(
             human["x"], human["y"] = target
 
         xy = (int(human["x"]), int(human["y"]))
+        if capacities:
+            cap.carry_objects(humans, str(human["id"]), xy)
         if actions_enabled and human.get("learned_sequences"):
             sequence = human["learned_sequences"][-1]
             updated_human, updated_cell, trace = execute_live_sequence(
@@ -635,13 +690,45 @@ def evolve_humans(
             human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
             human["last_action_trace"] = trace
         provisioned = _provision_dependent(human, caregiver, effective_profile)
-        if dependence < 1.0:
+        if dependence < 1.0 and capacities and "cognition" in human:
+            _drink(human, mcells[xy], effective_profile)
+            hungry = (
+                float(human["energy"])
+                / max(1e-9, float(effective_profile.get("energy_capacity_kcal", 1.0)))
+            ) < 0.75
+            ctx = None
+            samples: tuple[str, ...] = ()
+            if dependence <= 0.0:
+                if ablation != "no_interactions":
+                    ctx = cap.run_interactions(
+                        humans, human, effective_profile, pcells[xy], ccells[xy],
+                        lithic_cells, wcells[xy], consumer_state, epoch, hungry,
+                    )
+                if ablation != "plant_diet":
+                    samples = cap.choose_food_samples(human, pcells[xy], ccells[xy], epoch, hungry)
+            intake = forage_at_cell(
+                human, pcells[xy], ccells[xy], effective_profile,
+                human["cognition"].get("food_values", {}),
+                samples,
+                {} if ctx is None else ctx.access_bonus,
+            )
+            if ctx is None:
+                ctx = cap.Context(humans, human, effective_profile, pcells[xy], ccells[xy], lithic_cells, wcells[xy], consumer_state, epoch)
+            cap.learn_from_tick(ctx, intake)
+            ate = sum(float(r["kg"]) for r in intake if float(r["kcal"]) > 0.0)
+        elif dependence < 1.0:
             _drink(human, mcells[xy], effective_profile)
             ate = _eat(human, pcells[xy], effective_profile)
         else:
             ate = 0.0
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
-        _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
+        if capacities:
+            _apply_physiology(
+                human, wcells[xy], moved, effective_profile, pcells[xy],
+                insulation_c=cap.insulation_c(humans, str(human["id"])),
+            )
+        else:
+            _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
         attacks = _apply_predator_threat(human, consumer_state)
         if attacks:
             humans["predator_attack_events"] = int(humans.get("predator_attack_events", 0)) + attacks
@@ -724,6 +811,8 @@ def evolve_humans(
                 )
             cell["water_kg"] += float(human["body_water_kg"])
             humans["cumulative_deaths"] = int(humans.get("cumulative_deaths", 0)) + 1
+            if capacities:
+                cap.drop_all(humans, str(human["id"]))
             continue
 
         survivors.append(human)
@@ -752,12 +841,16 @@ def evolve_humans(
             ordinal = int(humans["next_birth_ordinal"])
             humans["next_birth_ordinal"] = ordinal + 1
             child = _offspring(human, ordinal, profile)
+            if capacities and "cognition" in child:
+                cap.init_capacity_cognition(child, profile)
             human["energy"] = max(0.0, float(human["energy"]) - float(child["energy"]))
             human["last_reproduction_epoch"] = epoch
             births.append(child)
             humans["cumulative_births"] = int(humans.get("cumulative_births", 0)) + 1
 
     humans["humans"] = survivors + births
+    if capacities:
+        cap.weather_objects(humans, pcells, wcells, epoch)
 
     for xy, cell in remains.items():
         mcell = mcells[xy]
@@ -791,7 +884,7 @@ def evolve_humans(
             for s, v in sorted(cell["elements_kg"].items())
         }
     matter["water_output_kg"] = round(float(matter["water_output_kg"]), 10)
-    return humans, producers, matter
+    return humans, producers, matter, consumer_state
 
 
 def human_element_totals(state: dict) -> dict[str, float]:
@@ -804,6 +897,8 @@ def human_element_totals(state: dict) -> dict[str, float]:
     for cell in state["remains_cells"]:
         for symbol, amount in cell["elements_kg"].items():
             totals[symbol] += float(amount)
+    for symbol, amount in cap.object_element_totals(state).items():
+        totals[symbol] = totals.get(symbol, 0.0) + float(amount)
     return {s: round(v, 10) for s, v in sorted(totals.items())}
 
 

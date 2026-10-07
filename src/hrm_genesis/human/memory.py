@@ -32,6 +32,8 @@ def remember(memory: dict, perception: dict, epoch: int, reward: float) -> dict:
             "rock_exposure": float(cell.get("rock_exposure", 0.0)),
             "terrain_cover": float(cell.get("terrain_cover", 0.0)),
         }
+        if "expected_food_kg" in cell:
+            locations[key]["expected_food_kg"] = float(cell["expected_food_kg"])
     locations = {
         k: v for k, v in locations.items()
         if int(epoch) - int(v["last_seen_epoch"]) <= FORGET_AFTER_TICKS
