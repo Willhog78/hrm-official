@@ -85,7 +85,7 @@ def summarize(sim: GenesisSimulation, year: int) -> dict:
     return {
         "year": year,
         "epoch": sim.orchestrator.epoch,
-        "humans": len(people),
+        "agentus": len(people),
         "births_cumulative": int(humans.get("cumulative_births", 0)),
         "deaths_cumulative": int(humans.get("cumulative_deaths", 0)),
         "by_generation": dict(sorted(by_generation.items())),
@@ -138,7 +138,7 @@ def main() -> int:
         report["day"] = day
         reports.append(report)
         print("LONG_RUN_CHECKPOINT:", json.dumps(report, sort_keys=True), flush=True)
-        if report["humans"] == 0:
+        if report["agentus"] == 0:
             print("LONG_RUN_EXTINCTION_DAY:", day, flush=True)
             break
 
@@ -154,8 +154,8 @@ def main() -> int:
     outcome = {
         "planned_years": YEARS,
         "completed_years": float(final["year"]),
-        "human_outcome": "surviving" if int(final["humans"]) > 0 else "extinct",
-        "final_humans": int(final["humans"]),
+        "agentus_outcome": "surviving" if int(final["agentus"]) > 0 else "extinct",
+        "final_agentus": int(final["agentus"]),
         "births": int(final["births_cumulative"]),
         "deaths": int(final["deaths_cumulative"]),
         "generations_present": final["by_generation"],
