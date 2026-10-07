@@ -113,6 +113,7 @@ hrm-official/
 │       ├── run_g9_observer_gate.py
 │       ├── run_g10_1_scale_gate.py
 │       ├── run_g10_2_human_calibration_gate.py
+│       ├── run_g10_2a_survival_affordance_gate.py
 │       └── scenarios/
 │
 ├── experiments/
