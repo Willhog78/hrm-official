@@ -172,6 +172,27 @@ def run(seed: str, arm: str, days: int) -> dict:
     }
 
 
+def compact_summary(r: dict) -> dict:
+    """One short line per run for log-only runners."""
+    d = r["deaths_by_cause"]
+    lp = r.get("learned_practice", {})
+    return {
+        "arm": r["arm"], "seed": r["seed"], "fp": r["config_fingerprint"][:8],
+        "alive": r["agentus_final"], "adults": r["adults_final"], "births": r["births"], "deaths": r["deaths"],
+        "dehyd": d.get("dehydration", 0), "energy": d.get("energy", 0), "injury": d.get("injury", 0),
+        "pairs": r["breeding_pairs_final"],
+        "intake": {k: round(v, 3) for k, v in r["intake_kg_by_kind"].items()},
+        "enc": r.get("encounters", {}), "kills": r["animal_deaths_by_cause"].get("agentus", 0),
+        "animals_end": r["availability"]["animals"]["final"],
+        "ev": {k: v for k, v in r["material_events"].items() if v},
+        "exploit": lp.get("exploit_by_key", {}), "exploit_agents": lp.get("exploit_agent_counts", {}),
+        "observed": sum(lp.get("observed_transmissions", {}).values()),
+        "food_adopt": lp.get("observed_food_adoptions", {}),
+        "warmth_kcal": round(lp.get("insulation_saving_kcal", 0.0), 1),
+        "effort": round(r["interaction_effort_kcal"]), "ledger": r["ledger_valid"],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--arm", required=True, help="base arm, optionally with +thirst")
@@ -186,6 +207,7 @@ def main() -> int:
         results.append(result)
         compact = {k: v for k, v in result.items() if k != "weekly_series"}
         print("CAPACITY_RESULT:", json.dumps(compact, sort_keys=True), flush=True)
+        print("CAPACITY_COMPACT:", json.dumps(compact_summary(result), sort_keys=True, separators=(",", ":")), flush=True)
     if args.out:
         with open(args.out, "w", encoding="utf-8") as handle:
             json.dump(results, handle, sort_keys=True)
