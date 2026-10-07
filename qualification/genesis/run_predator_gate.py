@@ -9,7 +9,7 @@ from hrm_genesis.ecology.animals import (
     seed_initial_consumers,
     consumer_element_totals,
 )
-from hrm_genesis.ecology.plants import build_producer_state
+from hrm_genesis.ecology.plants import build_producer_state, ecology_element_totals
 from hrm_genesis.human.biology import _apply_predator_threat
 
 
@@ -52,10 +52,18 @@ def main() -> int:
     stalker["energy"] = 1.0
     browser["energy"] = 8.0
 
-    before = consumer_element_totals(consumers)
+    before_consumers = consumer_element_totals(consumers)
+    before_ecology = ecology_element_totals(producers)
+    symbols = sorted(set(before_consumers) | set(before_ecology))
     matter_before = {
         symbol: sum(float(c["elements_kg"].get(symbol, 0.0)) for c in matter["cells"])
-        for symbol in before
+        for symbol in symbols
+    }
+    before_total = {
+        symbol: float(before_consumers.get(symbol, 0.0))
+        + float(before_ecology.get(symbol, 0.0))
+        + float(matter_before.get(symbol, 0.0))
+        for symbol in symbols
     }
     world = {
         "cells": [
@@ -66,10 +74,17 @@ def main() -> int:
     after, _, matter_after = evolve_consumers(
         consumers, producers, matter, world, epoch=1
     )
-    after_totals = consumer_element_totals(after)
+    after_consumers = consumer_element_totals(after)
+    after_ecology = ecology_element_totals(producers_after)
     matter_after_totals = {
         symbol: sum(float(c["elements_kg"].get(symbol, 0.0)) for c in matter_after["cells"])
-        for symbol in before
+        for symbol in symbols
+    }
+    after_total = {
+        symbol: float(after_consumers.get(symbol, 0.0))
+        + float(after_ecology.get(symbol, 0.0))
+        + float(matter_after_totals.get(symbol, 0.0))
+        for symbol in symbols
     }
 
     predation_deaths = int(after.get("last_tick_deaths_by_cause", {}).get("predation", 0))
@@ -90,14 +105,9 @@ def main() -> int:
     checks = {
         "predator_exists": len(stalkers) >= 1,
         "browser_can_be_killed": browser["id"] not in browser_ids_after and predation_deaths >= 1,
-        "predation_preserves_consumer_plus_matter_elements": all(
-            abs(
-                float(after_totals.get(symbol, 0.0))
-                + float(matter_after_totals.get(symbol, 0.0))
-                - float(before.get(symbol, 0.0))
-                - float(matter_before.get(symbol, 0.0))
-            ) < 1e-6
-            for symbol in before
+        "predation_preserves_full_element_system": all(
+            abs(float(after_total[symbol]) - float(before_total[symbol])) < 1e-6
+            for symbol in symbols
         ),
         "agentus_can_be_attacked": attacks >= 1 and float(agentus["injury"]) > 0.0,
         "no_target_population_field": "target_population" not in after,
