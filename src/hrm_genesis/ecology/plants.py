@@ -63,6 +63,7 @@ def seed_initial_producers(
     matter_state: dict,
     producer_state: dict,
     seed_bank: SeedBank,
+    biomass_scale_factor: float = 1.0,
 ) -> tuple[dict, dict]:
     """Move real Matter inventory into sparse initial producer biomass.
 
@@ -79,7 +80,7 @@ def seed_initial_producers(
         # Sparse colonization: no target population is maintained later.
         if rng.random() > 0.55:
             continue
-        requested_mass = rng.uniform(0.03, 0.12)
+        requested_mass = rng.uniform(0.03, 0.12) * biomass_scale_factor
         mcell = matter_lookup[xy]
 
         limit = requested_mass
