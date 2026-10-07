@@ -50,6 +50,8 @@ TRACE_LENGTH = 8
 HISTORY_DECAY = 0.8
 HISTORY_LENGTH = 16
 OBSERVATION_RATE = 0.5
+# G10.7a step 2: witnessed events kept per agent (declared bound, newest kept).
+WITNESSED_MEMORY = 32
 EXPLORE_HUNGRY = 0.25
 EXPLORE_SATED = 0.08
 RETRY_KNOWN = 0.03
@@ -1077,6 +1079,24 @@ def _own_appraisal(peer: dict, profile_basal: float, visible: dict) -> float | N
     return sum(parts) if parts else None
 
 
+def remember_witnessed(ctx: Context, peer: dict, event: dict) -> None:
+    """G10.7a step 2: an observer stores what it witnessed: who acted, the
+    visible act (verb and object classes), and the visible consequence
+    (objects that appeared, food eaten, the actor hurt or in distress).
+    Nothing internal to the actor is stored.
+
+    This memory is write-only in step 2: no decision reads it. Imitation, which
+    would let it cause behaviour, is a separate later step."""
+    if not ctx.humans.get("event_memory"):
+        return
+    entry = {"epoch": int(ctx.epoch), "actor": ctx.agent_id, **event}
+    cognition = dict(peer["cognition"])
+    cognition["witnessed"] = (list(cognition.get("witnessed", [])) + [entry])[-WITNESSED_MEMORY:]
+    peer["cognition"] = cognition
+    _bump(ctx.stats, "witnessed_events")
+    _bump_map(ctx.stats, "witnessed_by_act", event["act"], 1)
+
+
 def observe_outcome(ctx: Context, key: str, reward: float | None = None, visible: dict | None = None) -> None:
     """Agents sharing the cell see an act and what visibly followed.
 
@@ -1093,6 +1113,13 @@ def observe_outcome(ctx: Context, key: str, reward: float | None = None, visible
             continue
         if (int(peer["x"]), int(peer["y"])) != ctx.xy:
             continue
+        if not legacy:
+            remember_witnessed(ctx, peer, {
+                "act": key,
+                "created": sorted(visible["created"]),
+                "eaten_kg": {k: round(v, 6) for k, v in sorted(visible["eaten_kg"].items())},
+                "hurt": visible["injury"] > 0.0,
+            })
         if legacy:
             target = float(reward)
         else:
@@ -1141,6 +1168,12 @@ def observe_food(ctx: Context, intake: list[dict]) -> None:
                 peer["cognition"] = cognition
                 _bump_map(ctx.stats, "observed_food_adoptions", rec["kind"], 1)
                 continue
+            remember_witnessed(ctx, peer, {
+                "act": f"eat:{rec['kind']}",
+                "created": [],
+                "eaten_kg": {rec["kind"]: round(float(rec["kg"]), 6)},
+                "hurt": harmful,
+            })
             cognition = dict(peer["cognition"])
             seen = dict(cognition.get("observed_ingestion", {}))
             entry = dict(seen.get(rec["kind"], {"harmless": 0, "harmful": 0}))

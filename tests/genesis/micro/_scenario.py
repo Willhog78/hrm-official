@@ -46,6 +46,7 @@ class Scenario:
         cognition: bool = True,
         integrity: bool = True,
         observation: str = "visible-v1",
+        memory: bool = True,
     ) -> None:
         config = GenesisConfig(
             master_seed=seed, world_width=max(2, width), world_height=max(2, height), ticks_per_year=365,
@@ -54,7 +55,7 @@ class Scenario:
             material_scale_factor=1000.0, human_calibration_enabled=True,
             agentus_capacities_enabled=capacities, agentus_thirst_enabled=thirst,
             agentus_physiology_version=physiology, agentus_behavior_integrity_enabled=integrity,
-            agentus_observation_model=observation,
+            agentus_observation_model=observation, agentus_event_memory_enabled=memory,
         )
         sim = GenesisSimulation(config)
         self.config = config

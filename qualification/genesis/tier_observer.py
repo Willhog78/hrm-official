@@ -53,10 +53,13 @@ FATIGUE_BLOCK = 0.8  # interactions stop above this (interactions.run_interactio
 
 PRE_G10_6 = "-preg106"  # arm suffix: behavioural/locomotion integrity off
 LEGACY_OBSERVATION = "-g104obs"  # arm suffix: G10.4 observation (copies reward and energy yield)
+NO_MEMORY = "-nomem"  # arm suffix: no witnessed-event memory (G10.7a step 2 off)
 
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    no_memory = base.endswith(NO_MEMORY)
+    base = base.removesuffix(NO_MEMORY)
     legacy_observation = base.endswith(LEGACY_OBSERVATION)
     base = base.removesuffix(LEGACY_OBSERVATION)
     integrity = not base.endswith(PRE_G10_6)
@@ -64,6 +67,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
     overrides = {}
     if legacy_observation:
         overrides["agentus_observation_model"] = "g10.4-legacy"
+    if no_memory:
+        overrides["agentus_event_memory_enabled"] = False
     if physiology:
         overrides["agentus_physiology_version"] = physiology
     if not integrity:
@@ -277,6 +282,24 @@ def _death_context(cause: str, person: dict, wet: dict, food: dict, profile: dic
     return "no_water_known"
 
 
+def _memory_summary(people: list[dict], stats: dict, independent_age: int) -> dict:
+    """What living agents hold in witnessed-event memory at the end of a run."""
+    held = [p["cognition"].get("witnessed", []) for p in people]
+    with_memory = [m for m in held if m]
+    dependents = [p["cognition"].get("witnessed", []) for p in people if int(p["age_ticks"]) < independent_age]
+    n = max(1, len(with_memory))
+    return {
+        "events_witnessed": int(stats.get("witnessed_events", 0)),
+        "top_acts": dict(Counter(stats.get("witnessed_by_act", {})).most_common(5)),
+        "agents_with_memory": len(with_memory),
+        "mean_events_held": round(sum(len(m) for m in with_memory) / n, 1),
+        "mean_distinct_acts": round(sum(len({e["act"] for e in m}) for m in with_memory) / n, 1),
+        "mean_distinct_actors": round(sum(len({e["actor"] for e in m}) for m in with_memory) / n, 1),
+        "non_eating_events_held": sum(1 for m in with_memory for e in m if not e["act"].startswith("eat:")),
+        "dependents_with_memory": sum(1 for m in dependents if m),
+    }
+
+
 def _check_dependents(before: dict, after: dict, independent_age: int, observer: Observer) -> None:
     """A dependent may move with its caregiver (carried) or one cell on its own."""
     start = {p["id"]: p for p in before["humans"]}
@@ -371,6 +394,7 @@ def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
             "observed_food_adoptions": dict(stats.get("observed_food_adoptions", {})),
             "observed_ingestions": dict(stats.get("observed_ingestions", {})),
             "food_learned_after_observation": dict(stats.get("food_learned_after_observation", {})),
+            "memory": _memory_summary(people, stats, independent),
             "learned_positive_living": dict(learned.most_common(8)),
             "ledger_valid": ledger_valid,
             "conservation": conservation,
