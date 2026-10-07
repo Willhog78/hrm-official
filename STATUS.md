@@ -78,3 +78,14 @@ Merged implementation and qualification assets now exist through:
 - G10.2 calibrated reference humans.
 
 **Current active correction:** G10.2A survival affordances, adding terrain-conditioned rock/cave cover and condition-grown woody biomass before any long-run calibrated-human survival claim.
+
+**G10.3 Agentus natural capacities (capacity model v1):** implemented behind `agentus_capacities_enabled` (default off; earlier fingerprints and ledgers unchanged). It adds:
+- omnivorous ingestion (plant tissue, seeds, fresh animal tissue; wood and decayed tissue are not food);
+- capture of live animals;
+- movable stone with fracture and edges;
+- fibers from plant, bark and tendon, with bindings that hold or fail;
+- worn interlaced surfaces;
+- learned food and interaction values;
+- travel toward remembered food.
+
+Specification, audit and limits: `docs/architecture/G10_3_AGENTUS_CAPACITIES.md`. Experimental evidence: `experiments/genesis/summaries/AGENTUS_CAPACITY_V1_2026-10-07.md`. Sustainable survival is not qualified.

@@ -322,3 +322,29 @@ Before the first serious long-run calibrated-human experiment, complete **G10.2A
 5. regression checks preserving conservation, determinism, replay, and the prior qualification stack.
 
 After that substrate is qualified, the next experiment is long-run calibrated human survival without scripted rescue.
+
+## G10.3 — Agentus natural capacities (capacity model v1)
+
+Implemented behind `agentus_capacities_enabled`. The specification and audit are in `docs/architecture/G10_3_AGENTUS_CAPACITIES.md`.
+
+The new abilities:
+- omnivorous ingestion;
+- fresh vs decayed carcass tissue;
+- capture of live animals;
+- movable stone with fracture and edges;
+- plant, bark and tendon fibers;
+- bindings that hold or fail;
+- worn surfaces;
+- learned food and interaction values;
+- travel toward remembered food.
+
+First evidence: `experiments/genesis/summaries/AGENTUS_CAPACITY_V1_2026-10-07.md`. The capacities work and conserve material. Over two years on four seeds, they did not change survival reliably. Dehydration dominates every arm.
+
+### Next step
+
+Sustainable-survival qualification stays blocked on the binding constraint, not on more capacities. In order:
+
+1. **Decide whether the planner gets a thirst signal** (owner decision). The undeclared confound found in G10.3 suggests water-awareness alone roughly tripled survivors.
+2. **Decide animal abundance and body size** relative to `material_scale_factor` (owner decision). Until then, animal food cannot matter.
+3. **Re-run v0, v1 and the null arm with about 20 seeds per arm** on the Railway runner, so capacity effects can be separated from trajectory variation.
+4. **Only then extend learning.** Social transmission of food and interaction knowledge, and longer credit assignment, are the levers that could turn one-off material events into repeated practice.

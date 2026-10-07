@@ -305,6 +305,11 @@ def _hunt_succeeds(predator: dict, prey: dict, epoch: int) -> bool:
     return u < chance
 
 
+def _carcass_target(carcass_cell: dict) -> dict:
+    """Newly dead tissue enters the fresh pool when that pool is modeled."""
+    return carcass_cell["fresh_elements_kg"] if "fresh_elements_kg" in carcass_cell else carcass_cell["elements_kg"]
+
+
 def _consume_prey(predator: dict, prey: dict, carcass_cell: dict) -> float:
     traits = trait_for(str(predator["species"]))
     prey_mass = _element_mass(prey["body_elements_kg"])
@@ -319,7 +324,7 @@ def _consume_prey(predator: dict, prey: dict, carcass_cell: dict) -> float:
         retainable = amount * traits.assimilation_efficiency
         keep = min(retainable, deficit)
         predator["body_elements_kg"][symbol] += keep
-        carcass_cell["elements_kg"][symbol] += amount - keep
+        _carcass_target(carcass_cell)[symbol] += amount - keep
         retained_total += keep
         prey["body_elements_kg"][symbol] = 0.0
 
@@ -478,8 +483,9 @@ def evolve_consumers(
             elif old:
                 deaths_by_cause["old_age"] += 1
             ccell = carcasses[xy]
+            target = _carcass_target(ccell)
             for symbol in ANIMAL_TRACKED_ELEMENTS:
-                ccell["elements_kg"][symbol] += float(animal["body_elements_kg"][symbol])
+                target[symbol] += float(animal["body_elements_kg"][symbol])
             ccell["water_kg"] += float(animal["body_water_kg"])
             continue
 
@@ -535,12 +541,27 @@ def evolve_consumers(
     consumers["cumulative_deaths_by_cause"] = cumulative_deaths
 
     # Carcass decomposition returns consumer material to environmental Matter.
+    wcells = _cell_lookup(world_state["cells"]) if world_state.get("cells") else {}
     for xy, ccell in carcasses.items():
         mcell = mcells[xy]
         for symbol in ANIMAL_TRACKED_ELEMENTS:
             returned = float(ccell["elements_kg"][symbol]) * 0.05
             ccell["elements_kg"][symbol] -= returned
             mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
+        if "fresh_elements_kg" in ccell:
+            spoil = spoilage_fraction(
+                float(wcells.get(xy, {}).get("temperature", 20.0)),
+                int(consumers.get("ticks_per_year", 12)),
+            )
+            for symbol in ANIMAL_TRACKED_ELEMENTS:
+                fresh = float(ccell["fresh_elements_kg"][symbol])
+                # Fresh tissue decomposes at the same rate as other carcass
+                # matter, so total carcass decay is unchanged by the split.
+                returned = fresh * 0.05
+                spoiled = (fresh - returned) * spoil
+                ccell["fresh_elements_kg"][symbol] = fresh - returned - spoiled
+                ccell["elements_kg"][symbol] += spoiled
+                mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
         water_return = float(ccell["water_kg"]) * 0.10
         ccell["water_kg"] -= water_return
         mcell["soil_water_kg"] += water_return
@@ -562,8 +583,77 @@ def evolve_consumers(
             s: round(max(0.0, float(v)), 10)
             for s, v in sorted(ccell["elements_kg"].items())
         }
+        if "fresh_elements_kg" in ccell:
+            ccell["fresh_elements_kg"] = {
+                s: round(max(0.0, float(v)), 10)
+                for s, v in sorted(ccell["fresh_elements_kg"].items())
+            }
 
     return consumers, producers, matter
+
+
+# ---------------------------------------------------------------------------
+# Fresh tissue and interactions initiated by other organisms (G10.3).
+
+FRESH_SPOILAGE_PER_DAY_COLD = 0.10
+FRESH_SPOILAGE_PER_DAY_WARM = 0.55
+
+
+def spoilage_fraction(temperature_c: float, ticks_per_year: int) -> float:
+    """Fraction of fresh tissue that becomes decayed per tick.
+
+    Cold slows spoilage; warmth speeds it. Rates are per day and converted to
+    the run's tick length.
+    """
+    warmth = max(0.0, min(1.0, (float(temperature_c) - 4.0) / 26.0))
+    per_day = FRESH_SPOILAGE_PER_DAY_COLD + (FRESH_SPOILAGE_PER_DAY_WARM - FRESH_SPOILAGE_PER_DAY_COLD) * warmth
+    days_per_tick = 365.0 / max(1, int(ticks_per_year))
+    return 1.0 - (1.0 - per_day) ** days_per_tick
+
+
+def enable_fresh_tissue(consumer_state: dict) -> dict:
+    """Opt-in split of carcass tissue into fresh and decayed pools."""
+    consumers = deepcopy(consumer_state)
+    for ccell in consumers["carcass_cells"]:
+        ccell.setdefault("fresh_elements_kg", _blank_elements())
+    return consumers
+
+
+def kill_animal(consumers: dict, animal_id: str, cause: str) -> dict | None:
+    """Remove a living animal exactly once; its whole body becomes fresh carcass
+    tissue and carcass water at its cell. Returns the removed animal or None."""
+    for index, animal in enumerate(consumers["animals"]):
+        if str(animal["id"]) == str(animal_id):
+            break
+    else:
+        return None
+    animal = consumers["animals"].pop(index)
+    xy = (int(animal["x"]), int(animal["y"]))
+    ccell = _cell_lookup(consumers["carcass_cells"])[xy]
+    target = _carcass_target(ccell)
+    for symbol in ANIMAL_TRACKED_ELEMENTS:
+        target[symbol] = float(target.get(symbol, 0.0)) + float(animal["body_elements_kg"][symbol])
+    ccell["water_kg"] = float(ccell["water_kg"]) + float(animal["body_water_kg"])
+    counts = dict(consumers.get("cumulative_deaths_by_cause", {}))
+    counts[cause] = int(counts.get(cause, 0)) + 1
+    consumers["cumulative_deaths_by_cause"] = counts
+    return animal
+
+
+def displace_animal(consumers: dict, animal_id: str, draw: float) -> tuple[int, int] | None:
+    """An escaping animal flees one cell; it pays its own movement cost."""
+    width, height = int(consumers["width"]), int(consumers["height"])
+    for animal in consumers["animals"]:
+        if str(animal["id"]) != str(animal_id):
+            continue
+        options = neighbors(int(animal["x"]), int(animal["y"]), width, height)
+        if not options:
+            return None
+        target = options[int(draw * len(options)) % len(options)]
+        animal["x"], animal["y"] = target
+        animal["energy"] = float(animal["energy"]) - trait_for(str(animal["species"])).movement_cost
+        return target
+    return None
 
 
 def consumer_element_totals(state: dict) -> dict[str, float]:
@@ -573,6 +663,8 @@ def consumer_element_totals(state: dict) -> dict[str, float]:
             totals[symbol] += float(amount)
     for cell in state["carcass_cells"]:
         for symbol, amount in cell["elements_kg"].items():
+            totals[symbol] += float(amount)
+        for symbol, amount in cell.get("fresh_elements_kg", {}).items():
             totals[symbol] += float(amount)
     return {s: round(v, 10) for s, v in sorted(totals.items())}
 
