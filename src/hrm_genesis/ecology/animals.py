@@ -7,7 +7,7 @@ from hrm_coordination.seeds import SeedBank
 from hrm_genesis.world.grid import neighbors
 
 from .plants import PLANT_ELEMENT_FRACTIONS
-from .traits import SPECIES, trait_for
+from .traits import SPECIES, scaled_life_history_ticks, trait_for
 
 
 ANIMAL_TRACKED_ELEMENTS = tuple(sorted(PLANT_ELEMENT_FRACTIONS))
@@ -35,25 +35,34 @@ def build_consumer_state(
     width: int,
     height: int,
     seed_bank: SeedBank,
+    ticks_per_year: int = 12,
     initial_per_species: int = 2,
 ) -> dict:
     animals: list[dict] = []
     ordinal = 0
     for species in sorted(SPECIES):
-        for local_index in range(initial_per_species):
+        species_initial = initial_per_species
+        if trait_for(species).trophic_role == "predator":
+            species_initial = max(1, initial_per_species // 2)
+        for local_index in range(species_initial):
             rng = seed_bank.stream(f"ecology.consumer.genesis.{species}.{local_index}")
+            maturity_ticks = scaled_life_history_ticks(
+                trait_for(species).maturity_ticks,
+                ticks_per_year,
+            )
             animals.append(
                 {
                     "id": f"{species}-g{ordinal:08d}",
                     "species": species,
                     "x": rng.randrange(width),
                     "y": rng.randrange(height),
-                    "age_ticks": rng.randrange(0, max(1, trait_for(species).maturity_ticks // 2)),
+                    "age_ticks": rng.randrange(0, max(1, maturity_ticks // 2)),
                     "energy": rng.uniform(8.0, 12.0),
                     "body_elements_kg": _blank_elements(),
                     "body_water_kg": rng.uniform(0.08, 0.16),
                     "forage_bias": rng.uniform(-0.05, 0.05),
                     "last_forage_success": 0.0,
+                    "support_streak": 0,
                     "generation": 0,
                     "last_reproduction_epoch": -1000000,
                 }
@@ -62,6 +71,7 @@ def build_consumer_state(
     return {
         "width": width,
         "height": height,
+        "ticks_per_year": int(ticks_per_year),
         "epoch_applied": -1,
         "next_birth_ordinal": ordinal,
         "cumulative_births": 0,
@@ -216,6 +226,9 @@ def _local_forage_per_consumer(animal: dict, consumers: dict, producers: dict) -
 
 def _consume_plants(animal: dict, pcell: dict) -> float:
     traits = trait_for(str(animal["species"]))
+    if traits.trophic_role != "herbivore":
+        animal["last_forage_success"] = 0.0
+        return 0.0
     available = _plant_mass(pcell)
     if available <= 0.0:
         animal["last_forage_success"] = 0.0
@@ -229,17 +242,95 @@ def _consume_plants(animal: dict, pcell: dict) -> float:
     for symbol in ANIMAL_TRACKED_ELEMENTS:
         amount = float(pcell["plant_elements_kg"][symbol]) * fraction
         pcell["plant_elements_kg"][symbol] -= amount
-        keep = amount * traits.assimilation_efficiency
+        retainable = amount * traits.assimilation_efficiency
+        target_symbol = traits.adult_body_mass_kg * PLANT_ELEMENT_FRACTIONS[symbol]
+        deficit = max(0.0, target_symbol - float(animal["body_elements_kg"][symbol]))
+        keep = min(retainable, deficit)
         animal["body_elements_kg"][symbol] += keep
         # Unassimilated food becomes producer detritus in the same cell.
         pcell["detritus_elements_kg"][symbol] += amount - keep
         consumed += amount
         assimilated += keep
 
-    animal["energy"] = float(animal["energy"]) + consumed * 2200.0 * traits.assimilation_efficiency
+    animal["energy"] = min(
+        traits.reproduction_energy * 4.0,
+        float(animal["energy"]) + consumed * 2200.0 * traits.assimilation_efficiency,
+    )
     animal["last_forage_success"] = consumed
     animal["forage_bias"] = min(0.25, float(animal["forage_bias"]) + 0.018)
     return assimilated
+
+
+
+def _prey_candidates(predator: dict, consumers: dict) -> list[dict]:
+    px, py = int(predator["x"]), int(predator["y"])
+    visible = []
+    radius = trait_for(str(predator["species"])).perception_radius
+    for other in consumers["animals"]:
+        if other["id"] == predator["id"]:
+            continue
+        other_traits = trait_for(str(other["species"]))
+        if other_traits.trophic_role == "predator":
+            continue
+        distance = abs(int(other["x"]) - px) + abs(int(other["y"]) - py)
+        if distance <= radius:
+            visible.append(other)
+    return visible
+
+
+def _choose_prey(predator: dict, consumers: dict) -> dict | None:
+    candidates = _prey_candidates(predator, consumers)
+    if not candidates:
+        return None
+
+    def score(prey: dict) -> tuple[float, float, str]:
+        distance = abs(int(prey["x"]) - int(predator["x"])) + abs(int(prey["y"]) - int(predator["y"]))
+        species_bias = 1.0 if prey["species"] == "browser" else 0.75
+        body_mass = _element_mass(prey["body_elements_kg"])
+        vulnerability = 1.0 / max(0.01, float(prey["energy"]))
+        return (species_bias * body_mass - distance * 0.01 + vulnerability * 0.02, -distance, str(prey["id"]))
+
+    return max(candidates, key=score)
+
+
+
+def _hunt_succeeds(predator: dict, prey: dict, epoch: int) -> bool:
+    species_chance = 0.42 if str(prey["species"]) == "browser" else 0.30
+    vulnerability = max(0.0, min(0.20, (8.0 - float(prey["energy"])) * 0.02))
+    chance = min(0.75, species_chance + vulnerability)
+    raw = hashlib.sha256(
+        f"{predator['id']}|{prey['id']}|hunt|{epoch}".encode("utf-8")
+    ).digest()
+    u = int.from_bytes(raw[:8], "big") / float(2**64 - 1)
+    return u < chance
+
+
+def _consume_prey(predator: dict, prey: dict, carcass_cell: dict) -> float:
+    traits = trait_for(str(predator["species"]))
+    prey_mass = _element_mass(prey["body_elements_kg"])
+    if prey_mass <= 0.0:
+        return 0.0
+
+    retained_total = 0.0
+    for symbol in ANIMAL_TRACKED_ELEMENTS:
+        amount = float(prey["body_elements_kg"][symbol])
+        target_symbol = traits.adult_body_mass_kg * PLANT_ELEMENT_FRACTIONS[symbol]
+        deficit = max(0.0, target_symbol - float(predator["body_elements_kg"][symbol]))
+        retainable = amount * traits.assimilation_efficiency
+        keep = min(retainable, deficit)
+        predator["body_elements_kg"][symbol] += keep
+        carcass_cell["elements_kg"][symbol] += amount - keep
+        retained_total += keep
+        prey["body_elements_kg"][symbol] = 0.0
+
+    carcass_cell["water_kg"] += float(prey["body_water_kg"])
+    prey["body_water_kg"] = 0.0
+    predator["energy"] = min(
+        traits.reproduction_energy * 4.0,
+        float(predator["energy"]) + prey_mass * 2200.0 * traits.assimilation_efficiency,
+    )
+    predator["last_forage_success"] = prey_mass
+    return prey_mass
 
 
 def _drink(animal: dict, mcell: dict) -> float:
@@ -283,6 +374,7 @@ def _offspring(parent: dict, ordinal: int) -> dict:
         "body_water_kg": child_water,
         "forage_bias": max(-0.25, min(0.25, float(parent["forage_bias"]) + delta)),
         "last_forage_success": 0.0,
+        "support_streak": 0,
         "generation": int(parent["generation"]) + 1,
         "last_reproduction_epoch": -1000000,
     }
@@ -305,14 +397,36 @@ def evolve_consumers(
 
     births: list[dict] = []
     survivors: list[dict] = []
-    deaths_by_cause = {"old_age": 0, "starvation": 0, "dehydration": 0}
+    deaths_by_cause = {"old_age": 0, "starvation": 0, "dehydration": 0, "predation": 0}
+    killed_ids: set[str] = set()
 
     for animal in sorted(consumers["animals"], key=lambda a: a["id"]):
         traits = trait_for(str(animal["species"]))
+        ticks_per_year = int(consumers.get("ticks_per_year", 12))
+        maturity_ticks = scaled_life_history_ticks(traits.maturity_ticks, ticks_per_year)
+        max_age_ticks = scaled_life_history_ticks(traits.max_age_ticks, ticks_per_year)
+        reproduction_cooldown_ticks = scaled_life_history_ticks(
+            traits.reproduction_cooldown_ticks,
+            ticks_per_year,
+        )
         origin = (int(animal["x"]), int(animal["y"]))
-        target = _choose_destination(animal, producers, matter)
-        step = _move_one_step(origin, target)
+        if str(animal["id"]) in killed_ids:
+            continue
 
+        predator_hungry = (
+            traits.trophic_role == "predator"
+            and float(animal["energy"]) < traits.reproduction_energy * 0.60
+        )
+        if predator_hungry:
+            prey = _choose_prey(animal, consumers)
+            if prey is not None:
+                target = (int(prey["x"]), int(prey["y"]))
+            else:
+                target = _choose_destination(animal, producers, matter)
+        else:
+            target = _choose_destination(animal, producers, matter)
+
+        step = _move_one_step(origin, target)
         if step != origin:
             animal["energy"] = float(animal["energy"]) - traits.movement_cost
             animal["x"], animal["y"] = step
@@ -322,7 +436,27 @@ def evolve_consumers(
         mcell = mcells[xy]
 
         _drink(animal, mcell)
-        _consume_plants(animal, pcell)
+        if traits.trophic_role == "predator" and predator_hungry:
+            prey_here = [
+                other for other in consumers["animals"]
+                if str(other["id"]) not in killed_ids
+                and str(other["id"]) != str(animal["id"])
+                and trait_for(str(other["species"])).trophic_role != "predator"
+                and (int(other["x"]), int(other["y"])) == xy
+            ]
+            if prey_here:
+                prey = _choose_prey(animal, {"animals": prey_here}) or prey_here[0]
+                if _hunt_succeeds(animal, prey, epoch):
+                    _consume_prey(animal, prey, carcasses[xy])
+                    killed_ids.add(str(prey["id"]))
+                    deaths_by_cause["predation"] += 1
+                else:
+                    animal["energy"] = float(animal["energy"]) - traits.movement_cost * 0.75
+                    animal["last_forage_success"] = 0.0
+            else:
+                animal["last_forage_success"] = 0.0
+        else:
+            _consume_plants(animal, pcell)
 
         animal["energy"] = float(animal["energy"]) - traits.basal_cost
         water_before_loss = max(0.0, float(animal["body_water_kg"]))
@@ -334,7 +468,7 @@ def evolve_consumers(
         body_mass = _element_mass(animal["body_elements_kg"])
         dehydrated = float(animal["body_water_kg"]) <= 1e-6
         starved = float(animal["energy"]) <= 0.0 or body_mass <= 0.002
-        old = int(animal["age_ticks"]) >= traits.max_age_ticks
+        old = int(animal["age_ticks"]) >= max_age_ticks
 
         if dehydrated or starved or old:
             if dehydrated:
@@ -349,22 +483,33 @@ def evolve_consumers(
             ccell["water_kg"] += float(animal["body_water_kg"])
             continue
 
-        local_forage_per_consumer = _local_forage_per_consumer(animal, consumers, producers)
-        expected_tick_cost = traits.basal_cost + 0.25 * traits.movement_cost
-        required_forage_support = (
-            expected_tick_cost
-            * traits.reproduction_cooldown_ticks
-            * 2.0
-            / (2200.0 * traits.assimilation_efficiency)
+        if traits.trophic_role == "herbivore":
+            local_forage_per_consumer = _local_forage_per_consumer(animal, consumers, producers)
+            expected_tick_cost = traits.basal_cost + 0.25 * traits.movement_cost
+            required_forage_support = (
+                expected_tick_cost
+                * reproduction_cooldown_ticks
+                * 4.0
+                / (2200.0 * traits.assimilation_efficiency)
+            )
+            support_now = (
+                float(animal["last_forage_success"]) > 0.0
+                and local_forage_per_consumer >= required_forage_support
+            )
+        else:
+            local_prey = len(_prey_candidates(animal, consumers))
+            support_now = float(animal["last_forage_success"]) > 0.0 and local_prey >= 1
+
+        animal["support_streak"] = (
+            int(animal.get("support_streak", 0)) + 1 if support_now else 0
         )
         since_reproduction = epoch - int(animal.get("last_reproduction_epoch", -1000000))
         reproduction_ready = (
-            int(animal["age_ticks"]) >= traits.maturity_ticks
+            int(animal["age_ticks"]) >= maturity_ticks
             and float(animal["energy"]) >= traits.reproduction_energy
-            and body_mass >= 0.015
-            and float(animal["last_forage_success"]) > 0.0
-            and local_forage_per_consumer >= required_forage_support
-            and since_reproduction >= traits.reproduction_cooldown_ticks
+            and body_mass >= traits.adult_body_mass_kg * 0.45
+            and int(animal["support_streak"]) >= max(5, reproduction_cooldown_ticks // 3)
+            and since_reproduction >= reproduction_cooldown_ticks
         )
         if reproduction_ready:
             ordinal = int(consumers["next_birth_ordinal"])
@@ -377,7 +522,10 @@ def evolve_consumers(
 
         survivors.append(animal)
 
-    consumers["animals"] = survivors + births
+    consumers["animals"] = [
+        animal for animal in survivors
+        if str(animal["id"]) not in killed_ids
+    ] + births
     consumers["last_tick_births"] = len(births)
     consumers["last_tick_deaths_by_cause"] = deaths_by_cause
     consumers["cumulative_births"] = int(consumers.get("cumulative_births", 0)) + len(births)

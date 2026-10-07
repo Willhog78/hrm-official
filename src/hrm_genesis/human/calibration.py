@@ -18,8 +18,14 @@ def qualification_profile() -> dict[str, float | int | bool]:
         "reproduction_cooldown_ticks": 60,
         "offspring_mass_fraction": 0.12,
         "initial_energy_kcal": 15.0,
+        "energy_capacity_kcal": 60.0,
         "min_dry_mass_kg": 0.01,
         "min_water_fraction": 0.0,
+        "dependent_age_ticks": 0,
+        "independent_feeding_age_ticks": 0,
+        "nursing_energy_kcal_per_tick": 0.0,
+        "nursing_water_kg_per_tick": 0.0,
+        "nursing_dry_mass_kg_per_tick": 0.0,
     }
 
 
@@ -45,8 +51,14 @@ def reference_adult_profile(ticks_per_year: int) -> dict[str, float | int | bool
         "reproduction_cooldown_ticks": ticks_per_year,
         "offspring_mass_fraction": 0.05,
         "initial_energy_kcal": 6000.0,
+        "energy_capacity_kcal": 30000.0,
         "min_dry_mass_kg": 14.0,
         "min_water_fraction": 0.50,
+        "dependent_age_ticks": 2 * ticks_per_year,
+        "independent_feeding_age_ticks": 5 * ticks_per_year,
+        "nursing_energy_kcal_per_tick": 350.0,
+        "nursing_water_kg_per_tick": 0.65,
+        "nursing_dry_mass_kg_per_tick": 0.035,
     }
 
 
