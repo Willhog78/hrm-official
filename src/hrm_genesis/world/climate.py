@@ -69,7 +69,7 @@ def temperature_c(
         base
         + seasonal * (0.65 + 0.35 * lat)
         + lapse_adjustment(elevation)
-        + weather * 8.0
+        + weather * 3.5
     )
 
 
@@ -97,11 +97,11 @@ def precipitation_amount(
     )
     probability = max(
         0.03,
-        min(0.92, 0.23 + 0.18 * wet_season + terrain_lift - 0.08 * lat + 0.22 * moisture),
+        min(0.92, 0.23 + 0.18 * wet_season + terrain_lift - 0.08 * lat + 0.08 * moisture),
     )
     u = _unit_noise(seed + ":rain-event", epoch, x, y)
     if u > probability:
         return 0.0
     intensity = 0.5 + 4.5 * _unit_noise(seed + ":intensity", epoch, x, y)
-    intensity *= max(0.35, 1.0 + 0.65 * moisture)
+    intensity *= max(0.35, 1.0 + 0.25 * moisture)
     return intensity
