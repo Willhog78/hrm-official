@@ -4,7 +4,12 @@ import json
 
 from hrm_genesis import GenesisConfig, GenesisSimulation
 from hrm_genesis.ecology.animals import consumer_element_totals, consumer_water_total_kg
-from hrm_genesis.ecology.plants import ecology_element_totals, producer_biomass_kg
+from hrm_genesis.ecology.plants import (
+    ecology_element_totals,
+    producer_biomass_kg,
+    producer_edible_biomass_kg,
+    producer_woody_biomass_kg,
+)
 from hrm_genesis.human import human_element_totals, human_water_total_kg
 from hrm_genesis.matter.pools import total_elements, total_water
 from hrm_genesis.observer import observe_genesis
@@ -52,6 +57,52 @@ def total_mass(human: dict) -> float:
         + float(human["body_water_kg"])
         + sum(float(v) for v in human.get("held_material_elements_kg", {}).values())
     )
+
+
+
+def agentus_resource_diagnostics(sim: GenesisSimulation) -> dict:
+    ecology = sim.ecology_state()
+    people = list(sim.human_state()["humans"])
+    pcells = {
+        (int(cell["x"]), int(cell["y"])): cell
+        for cell in ecology["cells"]
+    }
+
+    edible = {
+        xy: sum(float(v) for v in cell["plant_elements_kg"].values())
+        for xy, cell in pcells.items()
+    }
+    viable = [xy for xy, mass in edible.items() if mass >= 0.10]
+
+    rows = []
+    for person in people:
+        xy = (int(person["x"]), int(person["y"]))
+        neighborhood = [
+            (xy[0], xy[1]),
+            (xy[0] - 1, xy[1]),
+            (xy[0] + 1, xy[1]),
+            (xy[0], xy[1] - 1),
+            (xy[0], xy[1] + 1),
+        ]
+        neighborhood = [p for p in neighborhood if p in pcells]
+        nearest = (
+            min(abs(v[0] - xy[0]) + abs(v[1] - xy[1]) for v in viable)
+            if viable else None
+        )
+        rows.append({
+            "id": str(person["id"]),
+            "xy": [xy[0], xy[1]],
+            "energy": round(float(person["energy"]), 3),
+            "local_edible_kg": round(float(edible.get(xy, 0.0)), 6),
+            "visible_max_edible_kg": round(max(float(edible[p]) for p in neighborhood), 6),
+            "nearest_viable_food_steps": nearest,
+        })
+    return {
+        "edible_biomass_kg": round(producer_edible_biomass_kg(ecology), 6),
+        "woody_biomass_kg": round(producer_woody_biomass_kg(ecology), 6),
+        "viable_food_cells": len(viable),
+        "agentus_resources": rows,
+    }
 
 
 def summarize(sim: GenesisSimulation, year: int) -> dict:
@@ -102,6 +153,7 @@ def summarize(sim: GenesisSimulation, year: int) -> dict:
         "mean_body_water_kg": round(sum(waters) / len(waters), 6) if waters else None,
         "max_injury": round(max(injuries), 6) if injuries else None,
         "producer_biomass_kg": round(producer_biomass_kg(ecology), 6),
+        "resource_diagnostics": agentus_resource_diagnostics(sim),
         "consumer_counts": observed["ecology"]["consumer_counts"],
         "consumer_deaths_by_cause": dict(consumers.get("cumulative_deaths_by_cause", {})),
         "agentus_predator_attack_events": int(humans.get("predator_attack_events", 0)),
