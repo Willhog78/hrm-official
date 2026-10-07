@@ -48,16 +48,6 @@ def test_delayed_credit_reaches_the_preparation_recorded_in_the_tool():
     assert sc.agent["cognition"]["affordance_values"]["grasp:stone_edged|none"]["v"] > 0.0
 
 
-def test_observed_success_transmits_but_observed_failure_does_not():
-    sc = Scenario(capacities=True)
-    watcher = sc.add_agent("watcher", 0, 0)
-    ctx = _ctx(sc)
-    cap.observe_outcome(ctx, "cut:fresh_tissue|stone_edged", 0.3)
-    cap.observe_outcome(ctx, "strike:animal_grazer|none", -0.2)
-    values = watcher["cognition"]["affordance_values"]
-    assert values["cut:fresh_tissue|stone_edged"]["v"] > 0.0 and "strike:animal_grazer|none" not in values
-
-
 def test_failed_capture_is_learned_as_negative():
     sc = Scenario(capacities=True)
     sc.add_animal("browser-1", "browser", 0, 0, energy=80.0)  # well fed, alert: hard to catch

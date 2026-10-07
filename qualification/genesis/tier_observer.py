@@ -10,7 +10,7 @@ up here.
 
 Arms are the multiseed arms (`v0`, `v1`, `plant_diet`, `no_interactions`,
 `no_recall`, `null`, each optionally `-nothirst`), then optionally
-`-preg106` (G10.6 integrity off) and `@<physiology>`, e.g. `v1-preg106@reference-v2`.
+`-preg106` (G10.6 integrity off), `-g104obs` (G10.4 observation) and `@<physiology>`, e.g. `v1-preg106@reference-v2`.
 
 Checks are split into:
   FAIL: broken invariants (crash, NaN, negative mass, ledger, conservation,
@@ -52,13 +52,18 @@ FATIGUE_BLOCK = 0.8  # interactions stop above this (interactions.run_interactio
 
 
 PRE_G10_6 = "-preg106"  # arm suffix: behavioural/locomotion integrity off
+LEGACY_OBSERVATION = "-g104obs"  # arm suffix: G10.4 observation (copies reward and energy yield)
 
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    legacy_observation = base.endswith(LEGACY_OBSERVATION)
+    base = base.removesuffix(LEGACY_OBSERVATION)
     integrity = not base.endswith(PRE_G10_6)
     config = config_for(seed, base.removesuffix(PRE_G10_6))
     overrides = {}
+    if legacy_observation:
+        overrides["agentus_observation_model"] = "g10.4-legacy"
     if physiology:
         overrides["agentus_physiology_version"] = physiology
     if not integrity:
@@ -364,6 +369,8 @@ def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
             "repeated_use_agents": {k: len(v) for k, v in stats.get("exploit_agents", {}).items()},
             "observed_transmissions": dict(stats.get("observed_transmissions", {})),
             "observed_food_adoptions": dict(stats.get("observed_food_adoptions", {})),
+            "observed_ingestions": dict(stats.get("observed_ingestions", {})),
+            "food_learned_after_observation": dict(stats.get("food_learned_after_observation", {})),
             "learned_positive_living": dict(learned.most_common(8)),
             "ledger_valid": ledger_valid,
             "conservation": conservation,

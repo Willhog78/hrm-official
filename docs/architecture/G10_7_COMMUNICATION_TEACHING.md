@@ -1,6 +1,6 @@
 # G10.7 — Communication and teaching (design opening)
 
-**Status: design question, not implemented.**
+**Status:** design opening. G10.7a step 1 (leak closure) is implemented; see section 5.
 
 The first question: what primitive information can one Agentus physically signal or demonstrate to another, without handing over language, concepts or named techniques?
 
@@ -70,7 +70,12 @@ Teaching is defined by behaviour (Caro & Hauser, 1992):
 
 Under that definition, teaching cannot be granted. It has to be *measured* and must emerge, for example a caregiver that performs a valued action more often while its dependent is co-located. That needs a learnable reason, such as the caregiver's own fitness interest through the child, which takes generational depth. The first slice therefore provides channels and measures. Teaching is a later question, not a feature.
 
-## 4. Proposed first slice (G10.7a)
+## 4. G10.7a plan (owner decision, 2026-10-07)
+
+The order is leak closure → perceptual event memory → imitation → following → measurement.
+
+**No call yet.** A call would open a new channel whose meaning could quietly become hard-coded. G10.7a must first show that visible action, visible consequence and imitation work without any symbolic signal. The costly call (section 2, item 7) is G10.7b.
+
 
 1. **Close the leaks** (versioned; old behaviour reproducible behind a flag):
    - `observe_outcome` transmits the visible event (verb, object classes, visible result), and the observer appraises the result with its own values;
@@ -78,12 +83,10 @@ Under that definition, teaching cannot be granted. It has to be *measured* and m
    - G7 `signal_sequence` is quarantined as non-physical: kept for the G7 gate record, unusable in live runs.
 2. **Observation record.** Each agent keeps a bounded memory of perceived events, `(epoch, actor id, verb, object classes, visible result)`. This becomes the substrate for imitation: the learner may try the observed verb on the observed object classes and is rewarded only by the world.
 3. **Following.** Proximity to a conspecific can be valued from experience (the agent arrived somewhere good after following). There is no innate "follow" rule beyond what dependents already do.
-4. **One costly call** with no content: emitted on strong arousal, with physical range, energy cost and detectability by animals. Receivers learn what follows it.
-5. **Measures** for the existing tiers:
+4. **Measures** for the existing tiers:
    - how each value was acquired (own trial, observation, or provisioned taste);
    - transmission chains (who acquired a practice from whom, across generations);
    - persistence of practices across individuals;
-   - call–event contingency, and receiver responses.
 
 **Gate for G10.7a**, under the advancement rule (no survival requirement):
 - micro tests show that nothing non-physical travels;
@@ -92,3 +95,62 @@ Under that definition, teaching cannot be granted. It has to be *measured* and m
 - the diagnostic reports the measures above.
 
 Whether transmitted practice actually persists is the experiment that comes after.
+
+## 5. G10.7a step 1 — leak closure (implemented)
+
+**Flag.** `agentus_observation_model`:
+- `visible-v1` is the default and is recorded in the canonical config when capacities are on.
+- `g10.4-legacy` reproduces G10.4 exactly: same fingerprints and ledger digests as pre-G10.7 `main`, checked on seeds a and c over 60 days.
+- The diagnostic arm suffix for legacy is `-g104obs`.
+
+**1. G7 recipe transfer.**
+- `signal_sequence` and `imitate_signal` refuse to run unless called with `compatibility="g7-legacy"`.
+- Only the G7 gate and the G7 test pass that flag.
+- A micro test fails if any live module references the recipe channel.
+
+**2. `observe_outcome`.** An observer in the same cell sees the act and its visible consequence:
+- food the actor then ate because of it (kind and kg, not energy);
+- the classes of objects that appeared;
+- the actor being hurt.
+
+The observer appraises this with **its own** history:
+- its own value per kg of that food, if it has eaten that food;
+- its own best value from acts using the appeared class as a tool;
+- minus twice the visible injury.
+
+With no relevant history, nothing is learned. The actor's reward and effort never travel.
+
+**3. `observe_food`.** An observer records only `{kind: {harmless, harmful}}` sightings, where "harmful" means visible distress (ingestion hazard).
+- **Seen eaten harmlessly:** the agent tastes that kind at probability 0.5 when it is present and the agent feeds itself.
+- **Seen harmful more often than harmless:** the agent never tastes it.
+
+No food value is set. The value comes only from the observer's own ingestion (`food_learned_after_observation` counts this path).
+
+**Evidence (fast loop).**
+- **Micro:** 11 new social tests; all micro tests pass. Among them:
+  - an observer never receives reward;
+  - two observers appraise the same event by their own food values, whatever the actor's reward;
+  - visible injury teaches caution;
+  - an appearing object matters only to an observer that has used such objects;
+  - nothing travels across cells;
+  - seeing food eaten transfers no value;
+  - tasting likelihood rises when food is seen eaten safely and falls to zero when distress is seen;
+  - value comes only from eating;
+  - the G7 path is unavailable without its flag;
+  - the legacy behaviour reproduces with its flag.
+- **Smoke:** 0 fail, 0 warn.
+- **Diagnostic `observation`** (`v1-g104obs` vs `v1`, 4 seeds × 180 days):
+
+  | Measure | Legacy | visible-v1 |
+  |---|---|---|
+  | Legacy food adoptions | 11 | 0 |
+  | Living agents valuing seed | 42 | 32 |
+  | Observed ingestions recorded | — | 2,657 |
+  | Foods learned by eating after observing | — | 0 |
+  | Affordance transmissions (own appraisal) | — | 3 (`break:woody|none`) |
+
+  - The 10 who do not value seed are dependents. They saw seed eaten up to 115 times and will be ready to taste it once they feed themselves. Under legacy, the same infants had been handed an energy value for seed.
+  - Survival, interactions and intake are unchanged.
+- **Gates and suite:** all 19 gate scripts pass, including G7 on its legacy path. The full pytest suite passes.
+
+**Note on G7's exit condition.** G7's "transmitted to another agent which reproduces the effect by imitation" was satisfied only through the non-physical recipe path. That claim is reopened: G10.7a steps 2–3 (perceptual event memory, imitation) must earn it physically.

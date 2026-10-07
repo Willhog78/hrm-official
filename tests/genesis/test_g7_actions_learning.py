@@ -1,5 +1,5 @@
 from hrm_genesis.human.actions import execute_abstract_sequence
-from hrm_genesis.human.communication import imitate_signal, signal_sequence
+from hrm_genesis.human.communication import G7_LEGACY, imitate_signal, signal_sequence
 
 
 def test_useful_primitive_sequence_can_be_transmitted_and_imitated():
@@ -12,7 +12,7 @@ def test_useful_primitive_sequence_can_be_transmitted_and_imitated():
     teacher = {"id": "a", "learned_sequences": [sequence], "last_teacher_id": None}
     learner = {"id": "b", "learned_sequences": [], "last_teacher_id": None}
 
-    learner = imitate_signal(learner, signal_sequence(teacher, sequence))
+    learner = imitate_signal(learner, signal_sequence(teacher, sequence, compatibility=G7_LEGACY), compatibility=G7_LEGACY)
     _, learner_reward = execute_abstract_sequence(learner["learned_sequences"][-1], start)
 
     assert learner_reward > 0

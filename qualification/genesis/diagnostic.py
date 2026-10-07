@@ -11,6 +11,7 @@ question. Arms use the multiseed names plus an optional `@physiology`:
   infant        v1           vs v1@reference-v2   (caregiving and energy budget)
   capacities    v0           vs v1
   integrity     v1-preg106   vs v1                (G10.6 behavioural/locomotion integrity)
+  observation   v1-g104obs   vs v1                (G10.7a: only visible acts and consequences travel)
 
   python -m qualification.genesis.tiers diagnostic infant
   python -m qualification.genesis.tiers diagnostic custom --arms v1 v1@reference-v2 --days 365
@@ -36,6 +37,7 @@ SETS: dict[str, tuple[str, ...]] = {
     "infant": ("v1", "v1@reference-v2"),
     "capacities": ("v0", "v1"),
     "integrity": ("v1-preg106", "v1"),
+    "observation": ("v1-g104obs", "v1"),
 }
 DIAGNOSTIC_SEEDS = ("agentus-demography-a", "agentus-demography-b", "agentus-demography-c", "agentus-demography-d")
 DIAGNOSTIC_DAYS = 180
@@ -73,6 +75,8 @@ def arm_summary(arm: str, results: list[dict]) -> dict:
         "repeated_use": dict(_sum(ok, lambda r: r["repeated_use"])),
         "observed_transmissions": dict(_sum(ok, lambda r: r["observed_transmissions"])),
         "observed_food_adoptions": dict(_sum(ok, lambda r: r["observed_food_adoptions"])),
+        "observed_ingestions": dict(_sum(ok, lambda r: r.get("observed_ingestions", {}))),
+        "food_learned_after_observation": dict(_sum(ok, lambda r: r.get("food_learned_after_observation", {}))),
         "fatigue_blocked_share": round(sum(r["fatigue_blocked_share"] for r in ok) / n, 3),
         "ledgers_valid": all(r["ledger_valid"] for r in ok),
         "max_element_balance_error": max((r["conservation"]["element_rel_error"] for r in ok), default=0.0),
@@ -93,7 +97,9 @@ def print_comparison(summaries: list[dict], seeds: int, days: int) -> None:
         print(f"  food kinds valued (living agents) {s['food_kinds_valued']}")
         print(f"  interactions {s['interactions']}")
         print(f"  repeated beneficial use {s['repeated_use']}")
-        print(f"  observed transmissions {s['observed_transmissions']}  food adoptions {s['observed_food_adoptions']}")
+        print(f"  observed transmissions {s['observed_transmissions']}")
+        print(f"  food: legacy adoptions {s['observed_food_adoptions']}  ingestions seen {s['observed_ingestions']}  "
+              f"learned by eating after seeing {s['food_learned_after_observation']}")
         print(f"  fatigue-blocked agent-days {s['fatigue_blocked_share']:.0%}  ledgers valid {s['ledgers_valid']}  balance error {s['max_element_balance_error']:.1e}")
     ref = summaries[0]
     for s in summaries[1:]:
