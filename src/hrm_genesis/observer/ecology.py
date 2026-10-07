@@ -12,7 +12,7 @@ def ecology_metrics(producer_state: dict, consumer_state: dict) -> dict:
 
     by_species: dict[str, int] = {}
     occupied = set()
-    for animal in consumer_state["consumers"]:
+    for animal in consumer_state["animals"]:
         species = str(animal["species"])
         by_species[species] = by_species.get(species, 0) + 1
         occupied.add((int(animal["x"]), int(animal["y"])))
