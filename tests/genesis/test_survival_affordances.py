@@ -203,3 +203,34 @@ def test_woody_biomass_is_not_implicitly_edible():
     )
     assert consumed == 0.0
     assert cell["woody_elements_kg"] == before
+
+
+def test_terrain_cover_moderates_cold_extremes_too():
+    profile = {
+        "calibrated": True,
+        "water_capacity_kg": 42.0,
+    }
+    exposed = {
+        "energy": 8000.0,
+        "body_water_kg": 42.0,
+        "fatigue": 0.0,
+        "injury": 0.0,
+        "core_temperature_c": 37.0,
+    }
+    protected = deepcopy(exposed)
+
+    _apply_physiology(
+        exposed,
+        {"temperature": -30.0, "terrain_cover": 0.0},
+        moved=False,
+        profile=profile,
+    )
+    _apply_physiology(
+        protected,
+        {"temperature": -30.0, "terrain_cover": 0.8},
+        moved=False,
+        profile=profile,
+    )
+
+    assert float(protected["energy"]) > float(exposed["energy"])
+    assert float(protected["injury"]) <= float(exposed["injury"])
