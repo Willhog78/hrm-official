@@ -71,7 +71,7 @@ def main() -> int:
             for y in range(3) for x in range(3)
         ]
     }
-    after, _, matter_after = evolve_consumers(
+    after, producers_after, matter_after = evolve_consumers(
         consumers, producers, matter, world, epoch=1
     )
     after_consumers = consumer_element_totals(after)
