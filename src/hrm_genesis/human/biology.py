@@ -284,7 +284,7 @@ def _structural_protection(world_cell: dict, producer_cell: dict | None = None) 
     producer_cell = producer_cell or {}
     woody_mass = sum(float(v) for v in producer_cell.get("woody_elements_kg", {}).values())
     canopy = min(0.80, max(0.0, woody_mass / 8.0))
-    terrain_cover = min(0.90, max(0.0, float(world_cell.get("natural_shelter", 0.0))))
+    terrain_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
     return canopy, terrain_cover
 
 def _experienced_reward(
