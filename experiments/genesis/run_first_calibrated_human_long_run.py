@@ -10,7 +10,7 @@ from hrm_genesis.matter.pools import total_elements, total_water
 from hrm_genesis.observer import observe_genesis
 
 
-YEARS = 1
+YEARS = 5
 TICKS_PER_YEAR = 365
 REPORT_INTERVAL_DAYS = 30
 
