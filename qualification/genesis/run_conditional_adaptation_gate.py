@@ -1,23 +1,27 @@
 from __future__ import annotations
 
-from hrm_genesis.human.learning import update_expectations
+from hrm_genesis.human.learning import update_contextual_expectations
 from hrm_genesis.human.planning import choose_destination
 
 
 def main() -> int:
-    expectations = {}
-    expectations = update_expectations(
-        expectations,
+    contextual = {}
+    contextual = update_contextual_expectations(
+        contextual,
         {"origin": [1, 0], "cells": [], "context": "hot"},
         100.0,
     )
-    expectations = update_expectations(
-        expectations,
+    contextual = update_contextual_expectations(
+        contextual,
         {"origin": [0, 0], "cells": [], "context": "mild"},
         20.0,
     )
 
-    cognition = {"expectations": expectations, "uncertainty": 0.05}
+    cognition = {
+        "expectations": {},
+        "contextual_expectations": contextual,
+        "uncertainty": 0.05,
+    }
     hot = {
         "origin": [0, 0],
         "context": "hot",
