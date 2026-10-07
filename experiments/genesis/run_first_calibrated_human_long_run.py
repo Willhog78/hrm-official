@@ -97,6 +97,8 @@ def summarize(sim: GenesisSimulation, year: int) -> dict:
         "max_injury": round(max(injuries), 6) if injuries else None,
         "producer_biomass_kg": round(producer_biomass_kg(ecology), 6),
         "consumer_counts": observed["ecology"]["consumer_counts"],
+        "consumer_deaths_by_cause": dict(consumers.get("cumulative_deaths_by_cause", {})),
+        "agentus_predator_attack_events": int(humans.get("predator_attack_events", 0)),
         "active_fire_cells": observed["ecology"].get("active_fire_cells", 0),
         "max_fire_intensity": observed["ecology"].get("max_fire_intensity", 0.0),
         "arranged_material_kg": observed["ecology"].get("arranged_material_kg", 0.0),
