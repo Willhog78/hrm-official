@@ -24,6 +24,12 @@ HUMAN_MAX_AGE_TICKS = 900
 HUMAN_REPRODUCTION_ENERGY = 18.0
 HUMAN_REPRODUCTION_COOLDOWN = 60
 HUMAN_OFFSPRING_MASS_FRACTION = 0.12
+HUMAN_COMFORT_TEMPERATURE_C = 22.0
+HUMAN_THERMAL_TOLERANCE_C = 14.0
+HUMAN_FATIGUE_MOVE_GAIN = 0.08
+HUMAN_FATIGUE_REST_RECOVERY = 0.04
+HUMAN_HEALING_PER_TICK = 0.03
+HUMAN_INJURY_DEATH_THRESHOLD = 1.0
 
 
 def _blank_elements() -> dict[str, float]:
@@ -60,6 +66,9 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
                 "body_water_kg": 0.0,
                 "generation": 0,
                 "last_reproduction_epoch": -1000000,
+                "fatigue": 0.0,
+                "injury": 0.0,
+                "core_temperature_c": 37.0,
             }
         if population_id is not None:
             region_cells = cells_for_population(population_id, width, height)
@@ -83,6 +92,8 @@ def build_human_state(*, width: int, height: int, seed_bank: SeedBank, cognition
         "height": height,
         "epoch_applied": -1,
         "next_birth_ordinal": len(humans),
+        "cumulative_births": 0,
+        "cumulative_deaths": 0,
         "humans": humans,
         "remains_cells": [
             {"x": x, "y": y, "elements_kg": _blank_elements(), "water_kg": 0.0}
@@ -233,6 +244,9 @@ def _offspring(mother: dict, ordinal: int) -> dict:
         "body_water_kg": water,
         "generation": int(mother["generation"]) + 1,
         "last_reproduction_epoch": -1000000,
+        "fatigue": 0.0,
+        "injury": 0.0,
+        "core_temperature_c": 37.0,
         **(
             {
                 "population_id": mother["population_id"],
@@ -261,6 +275,45 @@ def _offspring(mother: dict, ordinal: int) -> dict:
     }
 
 
+def _apply_physiology(human: dict, world_cell: dict, moved: bool) -> None:
+    """Apply bounded fatigue, thermoregulation cost, injury, and healing."""
+    ambient = float(world_cell["temperature"])
+    thermal_delta = abs(ambient - HUMAN_COMFORT_TEMPERATURE_C)
+    excess = max(0.0, thermal_delta - HUMAN_THERMAL_TOLERANCE_C)
+
+    fatigue = float(human.get("fatigue", 0.0))
+    if moved:
+        fatigue = min(1.0, fatigue + HUMAN_FATIGUE_MOVE_GAIN)
+    else:
+        fatigue = max(0.0, fatigue - HUMAN_FATIGUE_REST_RECOVERY)
+
+    if excess > 0.0:
+        human["energy"] = float(human["energy"]) - min(0.30, excess * 0.01)
+        if ambient > HUMAN_COMFORT_TEMPERATURE_C:
+            human["body_water_kg"] = max(
+                0.0,
+                float(human["body_water_kg"]) - min(0.02, excess * 0.001),
+            )
+
+    injury = float(human.get("injury", 0.0))
+    severe_exposure = max(0.0, thermal_delta - 28.0)
+    if severe_exposure > 0.0:
+        injury = min(1.5, injury + min(0.08, severe_exposure * 0.002))
+
+    can_heal = (
+        injury > 0.0
+        and float(human["energy"]) > 6.0
+        and float(human["body_water_kg"]) > HUMAN_WATER_CAPACITY_KG * 0.35
+        and excess <= 8.0
+    )
+    if can_heal:
+        injury = max(0.0, injury - HUMAN_HEALING_PER_TICK)
+
+    human["fatigue"] = fatigue
+    human["injury"] = injury
+    human["core_temperature_c"] = 37.0 + max(-2.5, min(2.5, (ambient - 22.0) * 0.03))
+
+
 def evolve_humans(
     human_state: dict,
     producer_state: dict,
@@ -276,6 +329,7 @@ def evolve_humans(
     pcells = _cell_lookup(producers["cells"])
     mcells = _cell_lookup(matter["cells"])
     remains = _cell_lookup(humans["remains_cells"])
+    wcells = _cell_lookup(world_state["cells"])
 
     adults_by_cell: dict[tuple[int, int], set[str]] = {}
     for person in humans["humans"]:
@@ -292,7 +346,8 @@ def evolve_humans(
         else:
             perception = None
             target = _move_toward_food(human, producers)
-        if target != origin:
+        moved = target != origin
+        if moved:
             human["energy"] = float(human["energy"]) - HUMAN_MOVE_COST
             human["x"], human["y"] = target
 
@@ -309,6 +364,7 @@ def evolve_humans(
             human["cognition"] = cognition
 
         human["energy"] = float(human["energy"]) - HUMAN_BASAL_COST
+        _apply_physiology(human, wcells[xy], moved)
         loss = min(float(human["body_water_kg"]), HUMAN_WATER_LOSS_PER_TICK_KG)
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
@@ -319,6 +375,7 @@ def evolve_humans(
             float(human["energy"]) <= 0.0
             or float(human["body_water_kg"]) <= 1e-6
             or body_mass <= 0.01
+            or float(human.get("injury", 0.0)) >= HUMAN_INJURY_DEATH_THRESHOLD
             or int(human["age_ticks"]) >= HUMAN_MAX_AGE_TICKS
         )
         if dead:
@@ -326,6 +383,7 @@ def evolve_humans(
             for symbol in HUMAN_TRACKED_ELEMENTS:
                 cell["elements_kg"][symbol] += float(human["body_elements_kg"][symbol])
             cell["water_kg"] += float(human["body_water_kg"])
+            humans["cumulative_deaths"] = int(humans.get("cumulative_deaths", 0)) + 1
             continue
 
         since_birth = epoch - int(human.get("last_reproduction_epoch", -1000000))
@@ -344,6 +402,7 @@ def evolve_humans(
             human["energy"] = max(0.0, float(human["energy"]) - float(child["energy"]))
             human["last_reproduction_epoch"] = epoch
             births.append(child)
+            humans["cumulative_births"] = int(humans.get("cumulative_births", 0)) + 1
 
         survivors.append(human)
 
@@ -363,6 +422,9 @@ def evolve_humans(
     for human in humans["humans"]:
         human["energy"] = round(float(human["energy"]), 10)
         human["body_water_kg"] = round(max(0.0, float(human["body_water_kg"])), 10)
+        human["fatigue"] = round(max(0.0, min(1.0, float(human.get("fatigue", 0.0)))), 10)
+        human["injury"] = round(max(0.0, float(human.get("injury", 0.0))), 10)
+        human["core_temperature_c"] = round(float(human.get("core_temperature_c", 37.0)), 10)
         human["body_elements_kg"] = {
             s: round(max(0.0, float(v)), 10)
             for s, v in sorted(human["body_elements_kg"].items())

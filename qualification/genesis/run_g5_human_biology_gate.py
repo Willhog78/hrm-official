@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -7,6 +8,12 @@ from hrm_genesis import GenesisConfig, GenesisSimulation
 from hrm_genesis.ecology.animals import consumer_element_totals, consumer_water_total_kg
 from hrm_genesis.ecology.plants import ecology_element_totals
 from hrm_genesis.human import human_element_totals, human_water_total_kg
+from hrm_genesis.human.biology import (
+    HUMAN_MATURITY_TICKS,
+    HUMAN_MAX_AGE_TICKS,
+    _apply_physiology,
+    evolve_humans,
+)
 from hrm_genesis.matter.pools import total_elements, total_water
 
 
@@ -50,6 +57,110 @@ def canonical_state(sim: GenesisSimulation) -> tuple[dict, dict, dict, dict]:
     )
 
 
+
+
+def _plant_mass(cell: dict) -> float:
+    return sum(float(v) for v in cell["plant_elements_kg"].values())
+
+
+def focused_biology_checks(sim: GenesisSimulation) -> dict[str, bool]:
+    # Birth: put the existing materially seeded adults together on the richest
+    # cell. They still eat from real producer mass before reproduction.
+    humans = deepcopy(sim.human_state())
+    producers = deepcopy(sim.ecology_state())
+    matter = deepcopy(sim.matter_state())
+    world = deepcopy(sim.world_state())
+
+    richest = max(
+        producers["cells"],
+        key=lambda cell: (_plant_mass(cell), -int(cell["y"]), -int(cell["x"])),
+    )
+    xy = (int(richest["x"]), int(richest["y"]))
+    for person in humans["humans"]:
+        person["x"], person["y"] = xy
+        person["age_ticks"] = HUMAN_MATURITY_TICKS + 1
+        person["energy"] = 30.0
+        person["last_reproduction_epoch"] = -1000000
+
+    before_human_mass = sum(human_element_totals(humans).values())
+    before_plant_mass = sum(
+        _plant_mass(cell) + sum(float(v) for v in cell["detritus_elements_kg"].values())
+        + sum(float(v) for v in cell["seed_elements_kg"].values())
+        for cell in producers["cells"]
+    )
+    born_humans, born_producers, born_matter = evolve_humans(
+        humans, producers, matter, world, epoch=100
+    )
+    after_human_mass = sum(human_element_totals(born_humans).values())
+    after_plant_mass = sum(
+        _plant_mass(cell) + sum(float(v) for v in cell["detritus_elements_kg"].values())
+        + sum(float(v) for v in cell["seed_elements_kg"].values())
+        for cell in born_producers["cells"]
+    )
+
+    # Death and decomposition: isolate one adult and force old-age death.
+    dying = deepcopy(sim.human_state())
+    dying["humans"] = [deepcopy(dying["humans"][0])]
+    dying["humans"][0]["age_ticks"] = HUMAN_MAX_AGE_TICKS - 1
+    dying["humans"][0]["energy"] = 20.0
+    death_producers = deepcopy(sim.ecology_state())
+    death_matter = deepcopy(sim.matter_state())
+    death_world = deepcopy(sim.world_state())
+
+    after_death, death_producers, death_matter = evolve_humans(
+        dying, death_producers, death_matter, death_world, epoch=200
+    )
+    remains_after_death = sum(
+        sum(float(v) for v in cell["elements_kg"].values()) + float(cell["water_kg"])
+        for cell in after_death["remains_cells"]
+    )
+    matter_before_more_decay = sum(
+        sum(float(v) for v in cell["elements_kg"].values()) + float(cell["soil_water_kg"])
+        for cell in death_matter["cells"]
+    )
+    after_decay, _, matter_after_decay = evolve_humans(
+        after_death, death_producers, death_matter, death_world, epoch=201
+    )
+    remains_after_decay = sum(
+        sum(float(v) for v in cell["elements_kg"].values()) + float(cell["water_kg"])
+        for cell in after_decay["remains_cells"]
+    )
+    matter_after_more_decay = sum(
+        sum(float(v) for v in cell["elements_kg"].values()) + float(cell["soil_water_kg"])
+        for cell in matter_after_decay["cells"]
+    )
+
+    # Physiology: deterministic heat stress followed by comfortable recovery.
+    probe = deepcopy(sim.human_state()["humans"][0])
+    probe["energy"] = 20.0
+    probe["body_water_kg"] = 0.7
+    probe["fatigue"] = 0.0
+    probe["injury"] = 0.0
+    _apply_physiology(probe, {"temperature": 60.0}, moved=True)
+    stressed_fatigue = float(probe["fatigue"])
+    stressed_injury = float(probe["injury"])
+    stressed_core = float(probe["core_temperature_c"])
+    _apply_physiology(probe, {"temperature": 22.0}, moved=False)
+
+    return {
+        "reproduction_occurred": int(born_humans.get("cumulative_births", 0)) >= 1,
+        "birth_added_human": len(born_humans["humans"]) > len(humans["humans"]),
+        "birth_material_accounted": abs(
+            (after_human_mass + after_plant_mass)
+            - (before_human_mass + before_plant_mass)
+        ) < 5e-5,
+        "old_age_death_occurred": int(after_death.get("cumulative_deaths", 0)) >= 1,
+        "remains_created": remains_after_death > 0.0,
+        "decomposition_reduces_remains": remains_after_decay < remains_after_death,
+        "decomposition_returns_to_matter": matter_after_more_decay > matter_before_more_decay,
+        "fatigue_changes_with_movement": stressed_fatigue > 0.0,
+        "thermal_state_responds": stressed_core > 37.0,
+        "thermal_exposure_can_injure": stressed_injury > 0.0,
+        "injury_can_heal": float(probe["injury"]) < stressed_injury,
+        "rest_reduces_fatigue": float(probe["fatigue"]) < stressed_fatigue,
+    }
+
+
 def main() -> int:
     config = GenesisConfig(
         master_seed="genesis-g5-human-biology",
@@ -65,6 +176,8 @@ def main() -> int:
     initial_humans = direct.human_state()
     initial_ids = tuple(sorted(h["id"] for h in initial_humans["humans"]))
     initial_energy = sum(float(h["energy"]) for h in initial_humans["humans"])
+
+    focused = focused_biology_checks(direct)
 
     direct.run(24)
     final_humans = direct.human_state()
@@ -89,6 +202,11 @@ def main() -> int:
             "ledger_valid": direct.ledger.verify_chain(),
             "checkpoint_replay": canonical_state(direct) == canonical_state(resumed),
             "checkpoint_ledger_valid": resumed.ledger.verify_chain(),
+            **focused,
+            "physiology_state_present": all(
+                all(key in h for key in ("fatigue", "injury", "core_temperature_c"))
+                for h in final_humans["humans"]
+            ),
             "no_cognition_state": not any(
                 key in h
                 for h in final_humans["humans"]
