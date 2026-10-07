@@ -31,6 +31,7 @@ def main() -> int:
         producer_ecology_enabled=True,
         consumer_ecology_enabled=True,
         human_biology_enabled=True,
+        material_scale_factor=1000.0,
         human_calibration_enabled=True,
     )
     sim = GenesisSimulation(config)
