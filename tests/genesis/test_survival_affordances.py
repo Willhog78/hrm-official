@@ -23,6 +23,7 @@ def test_terrain_shelter_requires_exposed_rock_and_relief():
 
     sheltered = [c for c in world["cells"] if float(c["terrain_cover"]) > 0.0]
     assert sheltered
+    assert len(sheltered) / len(world["cells"]) < 0.15
     assert all(float(c["rock_exposure"]) >= 0.88 for c in sheltered)
     assert all(float(c["terrain_relief"]) >= 30.0 for c in sheltered)
 
