@@ -182,6 +182,32 @@ def seed_initial_humans(human_state: dict, producer_state: dict, matter_state: d
     return humans, producers, matter
 
 
+def _development_scale(human: dict, profile: dict) -> float:
+    """Age-scaled body capacity from birth fraction to adult reference at maturity."""
+    if not bool(profile.get("calibrated")):
+        return 1.0
+    birth = max(0.01, min(1.0, float(profile["offspring_mass_fraction"])))
+    maturity = max(1, int(profile["maturity_ticks"]))
+    progress = max(0.0, min(1.0, float(human.get("age_ticks", 0)) / maturity))
+    return birth + (1.0 - birth) * progress
+
+
+def _age_profile(human: dict, profile: dict) -> dict:
+    if not bool(profile.get("calibrated")):
+        return profile
+    scale = _development_scale(human, profile)
+    adjusted = dict(profile)
+    adjusted["development_scale"] = scale
+    adjusted["target_dry_mass_kg"] = float(profile["seed_dry_mass_kg"]) * scale
+    adjusted["water_capacity_kg"] = float(profile["water_capacity_kg"]) * scale
+    adjusted["bite_cap_kg"] = float(profile["bite_cap_kg"]) * max(0.10, scale)
+    adjusted["basal_energy_kcal_per_tick"] = float(effective_profile["basal_energy_kcal_per_tick"]) * max(0.10, scale)
+    adjusted["move_energy_kcal_per_tick"] = float(effective_profile["move_energy_kcal_per_tick"]) * max(0.10, scale)
+    adjusted["water_loss_per_tick_kg"] = float(effective_profile["water_loss_per_tick_kg"]) * max(0.10, scale)
+    adjusted["min_dry_mass_kg"] = float(profile["min_dry_mass_kg"]) * scale
+    return adjusted
+
+
 def _food_mass(pcell: dict) -> float:
     return _mass(pcell["plant_elements_kg"])
 
@@ -209,10 +235,14 @@ def _eat(human: dict, pcell: dict, profile: dict) -> float:
     bite = min(float(profile["bite_cap_kg"]), available)
     fraction = bite / available
     consumed = 0.0
+    target_dry_mass = float(profile.get("target_dry_mass_kg", profile["seed_dry_mass_kg"]))
     for symbol in HUMAN_TRACKED_ELEMENTS:
         amount = float(pcell["plant_elements_kg"][symbol]) * fraction
         pcell["plant_elements_kg"][symbol] -= amount
-        keep = amount * float(profile["assimilation"])
+        target_symbol = target_dry_mass * float(PLANT_ELEMENT_FRACTIONS[symbol])
+        deficit = max(0.0, target_symbol - float(human["body_elements_kg"][symbol]))
+        retainable = amount * float(profile["assimilation"])
+        keep = min(retainable, deficit)
         human["body_elements_kg"][symbol] += keep
         pcell["detritus_elements_kg"][symbol] += amount - keep
         consumed += amount
@@ -420,6 +450,7 @@ def evolve_humans(
     births = []
     for human in sorted(humans["humans"], key=lambda h: h["id"]):
         origin = (int(human["x"]), int(human["y"]))
+        effective_profile = _age_profile(human, profile)
         start_energy = float(human["energy"])
         start_water = float(human["body_water_kg"])
         start_injury = float(human.get("injury", 0.0))
@@ -452,10 +483,10 @@ def evolve_humans(
             pcells[xy].update(updated_cell)
             human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
             human["last_action_trace"] = trace
-        _drink(human, mcells[xy], profile)
-        ate = _eat(human, pcells[xy], profile)
+        _drink(human, mcells[xy], effective_profile)
+        ate = _eat(human, pcells[xy], effective_profile)
         human["energy"] = float(human["energy"]) - float(profile["basal_energy_kcal_per_tick"])
-        _apply_physiology(human, wcells[xy], moved, profile, pcells[xy])
+        _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy])
         loss = min(float(human["body_water_kg"]), float(profile["water_loss_per_tick_kg"]))
         human["body_water_kg"] -= loss
         matter["water_output_kg"] = float(matter["water_output_kg"]) + loss
@@ -467,7 +498,7 @@ def evolve_humans(
                 start_water=start_water,
                 start_injury=start_injury,
                 human=human,
-                profile=profile,
+                profile=effective_profile,
             )
             experienced = deepcopy(perception)
             experienced["origin"] = [xy[0], xy[1]]
@@ -498,8 +529,8 @@ def evolve_humans(
         body_mass = _mass(human["body_elements_kg"])
         dead = (
             float(human["energy"]) <= 0.0
-            or float(human["body_water_kg"]) <= max(1e-6, float(profile["water_capacity_kg"]) * float(profile["min_water_fraction"]))
-            or body_mass <= float(profile["min_dry_mass_kg"])
+            or float(human["body_water_kg"]) <= max(1e-6, float(effective_profile["water_capacity_kg"]) * float(profile["min_water_fraction"]))
+            or body_mass <= float(effective_profile["min_dry_mass_kg"])
             or float(human.get("injury", 0.0)) >= HUMAN_INJURY_DEATH_THRESHOLD
             or int(human["age_ticks"]) >= int(profile["max_age_ticks"])
         )
