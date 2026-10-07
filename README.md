@@ -31,10 +31,23 @@ The first major milestone is **Autonomous Computational Ecology v1**: a non-huma
 
 ## Current repository state
 
+`STATUS.md` is the detailed record. This summary must agree with it.
+
 - **Stage 0 — Canon / Salvage Audit:** frozen/closed by the current governing record.
-- **Stage 1 — Coordination Architecture:** active corrected implementation. Round-2 defects DAR-S1-004 through DAR-S1-006 have been corrected in code and regression-tested here. This repository does **not** claim the required independent freeze review has been supplied in the review chain currently stored here.
+- **Stage 1 — Coordination Architecture:** active corrected implementation, **not frozen**.
+  - Round-2 defects, post-replacement defects C1–C6 and self-review defects F1–F5 are corrected and regression-tested. Under Governance Amendment v2, self-review replaces independent review.
+  - A real pytest run passed on 2026-10-07 (43 + 14 tests; `evidence/STAGE1_PYTEST_RUN_2026-10-07.md`).
+  - It is still not frozen: S1.12 lacks the `UPSTREAM/` archive, three reported risks are untested, and CI has never run.
 - **Stage 2 — Matter / Materials:** a self-tested Slice-A candidate is preserved under `drafts/stage2/`. It is quarantined from the active baseline until Stage-1 governance is formally satisfied.
-- **Genesis execution roadmap:** actively implemented through G10.2, with qualification assets for G0–G10.2. The current correction is G10.2A survival affordances before long-run calibrated-human survival.
+- **Genesis execution roadmap:** implemented through G10.7a step 4, with qualification assets for each phase:
+  - G0–G10.2, then G10.2A survival affordances;
+  - G10.3 capacities, G10.4 survival bottlenecks, G10.5 opt-in physiology;
+  - G10.6 behavioural integrity;
+  - G10.7a leak closure, witnessed memory, imitation and following.
+  
+  Long-run calibrated-human survival is not qualified.
+- **Current focus:** cognition work is **paused** until the ecology question has been tested. The question is which condition denies social learning its opportunity: hunger, lack of reachable known food, nearby agents, or witnessed useful acts. See `docs/architecture/ECOLOGY_OPPORTUNITY_OPENING.md`.
+- **Verification:** GitHub Actions has never run; every job is refused because the account is locked over billing. The local tiers and gate scripts are the verification record. See `STATUS.md`, "Verification infrastructure".
 
 ## Stage-1 architecture
 
@@ -66,6 +79,14 @@ Hugh Mann Stage-1 Gate:
 
 ```bash
 PYTHONPATH=src:. python qualification/hmt_stage1_gate.py
+```
+
+Genesis development loop (micro + smoke, about 30 s), a targeted diagnostic, and the social-learning opportunity census:
+
+```bash
+python -m qualification.genesis.tiers fast
+python -m qualification.genesis.tiers diagnostic following
+python -m qualification.genesis.opportunity --check-digest
 ```
 
 The HMT load/crash cards are intentionally heavy. On constrained tool hosts, run individual cards independently if the monolithic process hits a host execution limit; do not convert a host timeout into a model PASS or FAIL.

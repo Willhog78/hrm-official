@@ -311,17 +311,40 @@ Do not advance a phase if:
 
 # Immediate next work
 
-G0 through G10.2 now have implementation and qualification assets in the repository.
+**Ecology opportunity investigation** (owner decision, 2026-10-07). Cognition work is paused until it is done. Opening: `docs/architecture/ECOLOGY_OPPORTUNITY_OPENING.md`.
 
-Before the first serious long-run calibrated-human experiment, complete **G10.2A — Survival Affordance Substrate**:
+1. **Measure.** For every independent agent-day, measure how often an agent:
+   - is hungry;
+   - lacks reachable known food;
+   - has another agent nearby;
+   - witnesses a useful act.
 
-1. terrain-conditioned exposed rock and cave/overhang cover;
-2. woody biomass that develops only under viable plant conditions and is not automatically edible;
-3. local perception of those physical affordances;
-4. measurable exposure moderation from occupying real cover;
-5. regression checks preserving conservation, determinism, replay, and the prior qualification stack.
+   Report each condition separately, and their overlap, by year and season. Tool: `python -m qualification.genesis.opportunity`, read-only, with a ledger-digest check.
+2. **Propose controlled experiments** comparing the existing world with:
+   - physically justified food patchiness;
+   - seasonal variation;
+   - population density.
 
-After that substrate is qualified, the next experiment is long-run calibrated human survival without scripted rescue.
+   Preserve the baseline and the conservation checks. Count opportunities separately from successful following or imitation.
+3. **Decide the pending owner calls** recorded in the opening, with concrete consequences:
+   - predation on Agentus;
+   - animal life history;
+   - default physiology.
+
+**Rule.** Animal reproduction is not raised, and agents are not crowded together, merely to make cognition produce a result. Each world change needs a biological or environmental justification stated before its result is known.
+
+**Milestone.** An explanation of the missing opportunities, even if it is that following and imitation have little value in this world.
+
+## G10.2A — Survival affordance substrate (complete)
+
+Merged in PR #19:
+- terrain-conditioned exposed rock and cave/overhang cover;
+- woody biomass grown only under viable plant conditions and not automatically edible;
+- local perception of these affordances;
+- exposure moderation from occupying real cover;
+- regression checks.
+
+Gate: `qualification/genesis/run_g10_2a_survival_affordance_gate.py`.
 
 ## G10.3 — Agentus natural capacities (capacity model v1)
 
@@ -380,7 +403,7 @@ Three causal-model defects exposed by the micro tier are corrected as a versione
 
 Each passed micro, then smoke, then the targeted diagnostic (`diagnostic integrity`). Details: `docs/architecture/G10_6_BEHAVIORAL_INTEGRITY.md`.
 
-## G10.7 — Communication and teaching (next)
+## G10.7 — Communication and teaching (G10.7a steps 1–4 implemented; paused)
 
 G7 promises signal, communicate and teach/imitate. G10.4 supplies observation of successes and delayed credit. The next layer bridges isolated useful acts and persistent transmitted practice, without hard-coding technology:
 - signals produced by bodies and perceived locally, with no shared vocabulary preloaded;
@@ -388,8 +411,17 @@ G7 promises signal, communicate and teach/imitate. G10.4 supplies observation of
 - teacher-learner asymmetry (caregivers and dependents) under the same physical-access rules;
 - measures of practices that persist across individuals and generations.
 
+Implemented so far (G10.7a, PRs #29–#33):
+- leak closure;
+- witnessed-event memory;
+- retention by visible consequence;
+- imitation as a bias on what to try;
+- following learned from the agent's own experience.
+
+Step 5 (measurement) and G10.7b (the costly call) wait on the ecology opportunity investigation above. In its diagnostic, following never had an opportunity, and the reason must be explained before more is built.
+
 Later G10 candidates: richer cognition, tool complexity, disease, larger populations, generational depth.
 
 ## Infrastructure
 
-The GitHub Actions `verify` job fails before any step runs, on `main` too. It is tracked as an infrastructure ticket and does not block Genesis development. The local tiers and gate scripts are the verification record until it is fixed.
+GitHub Actions has never run. Every job since run 1 has been refused with "account is locked due to a billing issue". Restoring it needs the account owner to resolve billing, then a workflow update (see `STATUS.md`, "Verification infrastructure"). Until then, the local tiers and gate scripts are the verification record.

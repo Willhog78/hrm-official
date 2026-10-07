@@ -43,15 +43,18 @@ Under Governance Amendment v2, independent review is replaced by self-review. Th
 
 Current verification:
 
-- Stage-1 coordination regression suite: **43/43 PASS**, run via a minimal pytest stand-in because pytest was unavailable on that host. Every correction's test was shown to fail with that correction removed. **A real pytest run is still outstanding** (CI cannot obtain a runner; see the Actions job page for the account/repository setting that blocks it).
+- Stage-1 coordination regression suite: **43/43 PASS**, originally run via a minimal pytest stand-in because pytest was unavailable on that host. Every correction's test was shown to fail with that correction removed.
+- **Real pytest run (2026-10-07):** `tests/test_stage1_coordination.py` **43 passed**, `tests/test_stage1_hmt_contract.py` **14 passed**. Commit `4fd0224`, Python 3.13.16, pytest 9.1.1; exact commands in `evidence/STAGE1_PYTEST_RUN_2026-10-07.md`. CI pins Python 3.11, and no 3.11 run has happened.
 - HMT Stage-1 Gate: **14/14 PASS as one monolithic run** (≈36 s).
 - `qualification/reproduce_stage1.py`: without the `UPSTREAM/` Agentus archive (not in the repository) it skips the Agentus step, prints `STAGE1_REPRODUCTION_PARTIAL (S1.12 not evidenced)` and exits 2. `--require-upstream` fails immediately if the archive is absent.
 
 **Why Stage 1 is still not frozen:**
 
 - S1.12 is unevidenced until the archive is supplied;
-- no real pytest run has happened;
-- three reported risks are untested: non-atomic checkpoint writes, unbounded publish bookkeeping, and undetectable genesis tampering with an empty ledger.
+- three reported risks are untested: non-atomic checkpoint writes, unbounded publish bookkeeping, and undetectable genesis tampering with an empty ledger;
+- no automated (CI) verification has ever run (see "Verification infrastructure").
+
+The real pytest run cleared the "no real pytest run" blocker. Clearing that one item does not freeze Stage 1.
 
 ## Stage 2
 
@@ -75,9 +78,11 @@ Merged implementation and qualification assets now exist through:
 - G8 multi-population;
 - G9 read-only observer;
 - G10.1 scaled substrate;
-- G10.2 calibrated reference humans.
+- G10.2 calibrated reference humans;
+- G10.2A survival affordances (PR #19): terrain-conditioned rock/cave cover and condition-grown woody biomass;
+- G10.3–G10.6 and G10.7a steps 1–4 (sections below).
 
-**Current active correction:** G10.2A survival affordances, adding terrain-conditioned rock/cave cover and condition-grown woody biomass before any long-run calibrated-human survival claim.
+Long-run calibrated-human survival is **not qualified**. Under the advancement rule (see "Testing tiers"), survival is reported, not used as a gate.
 
 **G10.3 Agentus natural capacities (capacity model v1):** implemented behind `agentus_capacities_enabled` (default off; earlier fingerprints and ledgers unchanged). It adds:
 - omnivorous ingestion (plant tissue, seeds, fresh animal tissue; wood and decayed tissue are not food);
@@ -119,9 +124,39 @@ Specification, audit and limits: `docs/architecture/G10_3_AGENTUS_CAPACITIES.md`
 - Seen eating changes only readiness to taste.
 - Legacy food adoptions fell from 11 to 0, as expected.
 
-Next: perceptual event memory → imitation → following → measurement. The call is deferred to G10.7b.
+**G10.7a steps 2–4: IMPLEMENTED** (PRs #30–#33). Specification and evidence are in `docs/architecture/G10_7_COMMUNICATION_TEACHING.md`, sections 6–9.
+- Step 2: witnessed-event memory.
+- Step 2.5: retention by visible consequence.
+- Step 3: imitation as a bias on what to try.
+- Step 4: following, learned from the agent's own experience.
 
-**Infrastructure ticket.** GitHub Actions `verify` fails before any step runs, on `main` as well as on PRs (runs 99–104). This is an Actions environment problem (billing or runner) and is tracked separately. Until it is fixed, the local fast tier and gates are the verification record.
+In the targeted diagnostics, step 3 produced 7 imitated tries, none of which paid, and following never occurred.
+
+**COGNITION WORK PAUSED (owner decision, 2026-10-07).** G10.7a step 5 (measurement) and G10.7b (the costly call) do not start until the ecology question has been tested. The question: which condition keeps social learning from having an opportunity? The candidates are measured separately:
+- hunger;
+- no reachable known food;
+- another agent nearby;
+- a useful act witnessed.
+
+Opening, census and controlled-experiment proposal: `docs/architecture/ECOLOGY_OPPORTUNITY_OPENING.md`. The next milestone is an explanation of the missing opportunities. That explanation may be that these mechanisms have little value in this world.
+
+## Verification infrastructure
+
+**CI has never run.** All 119 runs of the GitHub Actions `Stage-1 verification` workflow have failed in about 3 s, before a runner was assigned. That covers runs 1–119, from the first run on 2026-09-23 to the merge of PR #33. No log exists. GitHub's annotation on the job (checked for runs 1, 11 and 119) says:
+
+> The job was not started because your account is locked due to a billing issue.
+
+The earlier note that it failed "since runs 99–104" was wrong. No CI result exists for any commit.
+
+**To restore it:**
+1. The account owner resolves the billing lock under GitHub *Settings → Billing and plans*. Nothing in the repository can fix this. For a public repository, standard GitHub-hosted runners are free, but a locked account still blocks them.
+2. Re-run the latest `main` workflow to confirm that a runner is assigned.
+3. Bring `.github/workflows/stage1.yml` up to date before relying on it:
+   - it stops at the G10.2 gate and omits the G10.2A, development, conditional-adaptation, physical-interaction, predator and weather-persistence gates and the micro/smoke tiers;
+   - `tests/genesis` plus 14 gates must fit in its 20-minute timeout (timing below).
+4. Note: `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19 (GitHub notice on the same jobs).
+
+Until CI runs, the local tiers and gate scripts are the only verification record. Because nothing runs automatically, a failure can sit unnoticed on `main`. The G5 gate failure below is the example.
 
 **G5 gate fixture repaired (housekeeping, after G10.6).** `run_g5_human_biology_gate.py` had been failing `reproduction_occurred` and `birth_added_human` on `main` since the reproduction-contact correction (PR #23), hidden by the dead CI.
 - Its birth probe placed the pair on the richest cell.

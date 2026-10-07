@@ -98,6 +98,25 @@ Reported per arm:
 
 Use `--days 365` for slower questions. Each run holds its replay ledger in memory, about 0.4 GB per 180 days.
 
+### Opportunity census — `qualification/genesis/opportunity.py`
+
+This read-only diagnostic belongs to the ecology opening (`docs/architecture/ECOLOGY_OPPORTUNITY_OPENING.md`). For every independent agent-day it records the conditions social learning needs, as the agent perceives them:
+- hunger, by the planner's own test;
+- whether thirst decided the move;
+- food known: a full day in view, a full day remembered, only partial food in view, or nothing;
+- another individual in view, or in the same cell;
+- a useful act witnessed (at least one visible consequence), with and without meals.
+
+It reports each condition, their conjunctions and overlap, and use (follow days, imitation tries) separately from opportunity. Results are broken down by year and by quarter of the year, with map-wide food context.
+
+```bash
+python -m qualification.genesis.opportunity                       # 4 seeds x 730 days, arm v1
+python -m qualification.genesis.opportunity --arm v1@reference-v2 --json out.json
+python -m qualification.genesis.opportunity --days 40 --seeds agentus-demography-a --check-digest
+```
+
+`--check-digest` reruns each seed without the census and requires an identical ledger digest. `tests/genesis/test_opportunity_census.py` checks the same on a short run and checks the classifier against the planner's order.
+
 ## 4. Full validation
 
 This is unchanged: `experiments/genesis/run_g10_3_railway.sh`, with 20 seeds × 730 days × arms `v0 v1 plant_diet no_interactions no_recall`, aggregated by `aggregate_capacity_runs.py`. It is the only tier that can support claims about multi-year survival, generational turnover, births and orphaning across seasons, or learning that takes more than a few months to pay off.

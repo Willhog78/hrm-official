@@ -1,31 +1,45 @@
 # HRM Predetermined File Tree
 
-This tree is the target structure for the Genesis vertical slice.
+This tree is the target structure for the Genesis vertical slice. As of 2026-10-07 it is reconciled with the files that exist; entries marked *planned* do not exist yet.
 
 Existing Stage-1 files remain in place. New implementation should conform to this layout unless a documented architecture decision explicitly changes it.
 
 ```text
 hrm-official/
 ├── README.md
-├── STATUS.md
+├── STATUS.md                      # detailed status; README must agree with it
 ├── ROADMAP.md
 ├── FILE_TREE.md
 ├── pyproject.toml
+├── .github/workflows/stage1.yml   # never run (account billing lock); see STATUS
 │
 ├── docs/
 │   ├── HRM_MASTER_DEVELOPMENT_PLAN_v1.1.md
 │   ├── architecture/
 │   │   ├── GENESIS_CAUSAL_CONTRACT.md
 │   │   ├── WORLD_STATE_OWNERSHIP.md
+│   │   ├── HOMO_AGENTUS_TERMINOLOGY.md
+│   │   ├── TESTING_TIERS.md
+│   │   ├── G4_AUTONOMY_QUALIFICATION.md
+│   │   ├── G5_HUMAN_BIOLOGY.md
+│   │   ├── G6_COGNITION_MEMORY.md
+│   │   ├── G7_GENERAL_ACTION_COMMUNICATION.md
+│   │   ├── G8_MULTI_POPULATION.md
+│   │   ├── G9_OBSERVER.md
 │   │   ├── G10_1_SCALE_SUBSTRATE.md
 │   │   ├── G10_2_HUMAN_CALIBRATION.md
 │   │   ├── G10_2A_SURVIVAL_AFFORDANCES.md
 │   │   ├── G10_3_AGENTUS_CAPACITIES.md
-│   │   └── ADR/
+│   │   ├── G10_4_SURVIVAL_BOTTLENECKS.md
+│   │   ├── G10_6_BEHAVIORAL_INTEGRITY.md
+│   │   ├── G10_7_COMMUNICATION_TEACHING.md
+│   │   ├── ECOLOGY_OPPORTUNITY_OPENING.md   # current focus
+│   │   └── ADR/                    # planned; no ADR written yet
 │   └── stage0/
+│       └── HRM_STAGE0_SALVAGE_LEDGER_v1.1.md
 │
 ├── src/
-│   ├── hrm_coordination/          # existing Stage-1 foundation
+│   ├── hrm_coordination/          # Stage-1 foundation
 │   │   ├── authority.py
 │   │   ├── checkpoint.py
 │   │   ├── fabric.py
@@ -39,47 +53,44 @@ hrm-official/
 │       ├── config.py
 │       ├── runner.py
 │       ├── checkpoint.py
-│       │
 │       ├── world/
 │       │   ├── grid.py
+│       │   ├── state.py
 │       │   ├── terrain.py
 │       │   ├── climate.py
 │       │   ├── water.py
 │       │   ├── soil.py
 │       │   └── energy.py
-│       │
 │       ├── matter/
-│       │   ├── __init__.py
 │       │   ├── elements.py
 │       │   ├── pools.py
 │       │   ├── transfers.py
 │       │   ├── objects.py         # G10.3 material physics (stone, fiber, binding)
 │       │   └── accounting.py
-│       │
 │       ├── ecology/
 │       │   ├── plants.py
 │       │   ├── decomposition.py
 │       │   ├── animals.py
 │       │   ├── populations.py
+│       │   ├── autonomy.py
 │       │   └── traits.py
-│       │
 │       ├── human/
 │       │   ├── biology.py
+│       │   ├── calibration.py     # G10.2 reference physiology
 │       │   ├── perception.py
 │       │   ├── memory.py
 │       │   ├── learning.py
 │       │   ├── planning.py
 │       │   ├── actions.py
 │       │   ├── diet.py            # G10.3 ingestion by food kind
-│       │   ├── interactions.py    # G10.3 live interactions and their learning
+│       │   ├── interactions.py    # G10.3+ live interactions, witnessed memory, imitation, following
+│       │   ├── regions.py
 │       │   └── communication.py
-│       │
 │       ├── observer/
 │       │   ├── metrics.py
 │       │   ├── ecology.py
 │       │   ├── population.py
 │       │   └── emergence.py
-│       │
 │       └── interfaces/
 │           ├── authorities.py
 │           ├── events.py
@@ -88,62 +99,44 @@ hrm-official/
 ├── tests/
 │   ├── test_stage1_coordination.py
 │   ├── test_stage1_hmt_contract.py
-│   │
 │   └── genesis/
-│       ├── test_g0_integration.py
-│       ├── test_g1_physical_world.py
-│       ├── test_g1_5_matter.py
-│       ├── test_g2_plants.py
-│       ├── test_g3_consumers.py
-│       ├── test_g4_ecological_loop.py
-│       ├── test_g5_human_biology.py
-│       ├── test_g6_cognition.py
-│       ├── test_g7_actions_learning.py
-│       ├── test_g8_multi_population.py
-│       └── test_g9_observer_isolation.py
+│       ├── test_g0_integration.py … test_g9_observer_isolation.py
+│       ├── test_g10_3_agentus_capacities.py
+│       ├── test_g10_4_{encounters,learning,thirst}.py
+│       ├── test_g10_5_physiology.py
+│       ├── test_g10_7_memory_non_causal.py
+│       ├── test_{food_intake_diagnosis,plant_lifecycle,reproduction_contact,survival_affordances,tier_observer}.py
+│       └── micro/                 # micro tier: test_micro_<topic>.py + _scenario.py
 │
 ├── qualification/
 │   ├── hmt_stage1_gate.py
 │   ├── reproduce_stage1.py
+│   ├── benchmark_stage1.py
 │   └── genesis/
-│       ├── run_g0_gate.py
-│       ├── run_g1_gate.py
-│       ├── run_g1_5_gate.py
-│       ├── run_g2_gate.py
-│       ├── run_g3_gate.py
-│       ├── run_g4_autonomy_gate.py
-│       ├── run_g7_emergence_gate.py
-│       ├── run_g8_multi_population_gate.py
-│       ├── run_g9_observer_gate.py
-│       ├── run_g10_1_scale_gate.py
-│       ├── run_g10_2_human_calibration_gate.py
-│       ├── run_g10_2a_survival_affordance_gate.py
+│       ├── run_g0_gate.py … run_g10_2a_survival_affordance_gate.py   # phase gates
+│       ├── run_agentus_development_gate.py
+│       ├── run_conditional_adaptation_gate.py
+│       ├── run_physical_interaction_substrate_gate.py
+│       ├── run_predator_gate.py
+│       ├── run_weather_persistence_gate.py
+│       ├── tiers.py               # micro / smoke / diagnostic / full / fast
+│       ├── smoke.py
+│       ├── diagnostic.py
+│       ├── tier_observer.py       # read-only observer for smoke and diagnostic
+│       ├── opportunity.py         # read-only social-learning opportunity census
+│       ├── report_g4_results.py
 │       └── scenarios/
 │
 ├── experiments/
 │   └── genesis/
-│       ├── configs/
-│       ├── runs/
-│       └── summaries/
+│       ├── run_*.py, run_*.sh     # multiseed, diagnosis and long-run scripts
+│       └── summaries/             # dated experiment summaries and JSON
 │
-├── evidence/
-│   ├── stage1/
-│   └── genesis/
-│       ├── G0/
-│       ├── G1/
-│       ├── G2/
-│       ├── G3/
-│       ├── G4/
-│       ├── G5/
-│       ├── G6/
-│       ├── G7/
-│       ├── G8/
-│       └── G9/
-│
+├── evidence/                      # dated verification records (flat; per-phase folders not created)
 ├── governance/
 ├── reviews/
 ├── journals/
-├── drafts/
+├── drafts/                        # stage2 (quarantined)
 └── stage1/
 ```
 
