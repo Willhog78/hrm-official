@@ -149,6 +149,8 @@ def evolve_producers(
     pcells = _cell_lookup(ecology["cells"])
     mcells = _cell_lookup(matter["cells"])
     wcells = _cell_lookup(world_state["cells"])
+    for pcell in pcells.values():
+        pcell.setdefault("woody_elements_kg", _blank_elements())
 
     # 1. Decomposition returns previously dead material to Matter.
     for xy, pcell in pcells.items():
@@ -288,6 +290,6 @@ def ecology_element_totals(state: dict) -> dict[str, float]:
     totals = _blank_elements()
     for cell in state["cells"]:
         for bucket in ("plant_elements_kg", "woody_elements_kg", "seed_elements_kg", "detritus_elements_kg"):
-            for symbol, amount in cell[bucket].items():
+            for symbol, amount in cell.get(bucket, {}).items():
                 totals[symbol] += float(amount)
     return {symbol: round(value, 10) for symbol, value in sorted(totals.items())}
