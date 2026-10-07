@@ -17,6 +17,9 @@ hrm-official/
 │   ├── architecture/
 │   │   ├── GENESIS_CAUSAL_CONTRACT.md
 │   │   ├── WORLD_STATE_OWNERSHIP.md
+│   │   ├── G10_1_SCALE_SUBSTRATE.md
+│   │   ├── G10_2_HUMAN_CALIBRATION.md
+│   │   ├── G10_2A_SURVIVAL_AFFORDANCES.md
 │   │   └── ADR/
 │   └── stage0/
 │
@@ -106,6 +109,10 @@ hrm-official/
 │       ├── run_g3_gate.py
 │       ├── run_g4_autonomy_gate.py
 │       ├── run_g7_emergence_gate.py
+│       ├── run_g8_multi_population_gate.py
+│       ├── run_g9_observer_gate.py
+│       ├── run_g10_1_scale_gate.py
+│       ├── run_g10_2_human_calibration_gate.py
 │       └── scenarios/
 │
 ├── experiments/
