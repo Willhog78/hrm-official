@@ -519,6 +519,7 @@ class GenesisSimulation:
             ctx.epoch,
             cognition_enabled=self.config.human_cognition_enabled,
             actions_enabled=self.config.human_actions_enabled,
+            consumer_state=next_consumers,
         )
 
         return [
