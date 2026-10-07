@@ -50,8 +50,12 @@ TRACE_LENGTH = 8
 HISTORY_DECAY = 0.8
 HISTORY_LENGTH = 16
 OBSERVATION_RATE = 0.5
-# G10.7a step 2: witnessed events kept per agent (declared bound, newest kept).
+# G10.7a step 2: witnessed events kept per agent (declared bound).
 WITNESSED_MEMORY = 32
+# G10.7a step 2.5: "conspicuous things stick better". Each distinct visible
+# consequence makes a witnessed event survive as if it had happened this many
+# days later (declared). Routine events with no visible consequence age out first.
+RETENTION_DAYS_PER_CONSEQUENCE = 30
 EXPLORE_HUNGRY = 0.25
 EXPLORE_SATED = 0.08
 RETRY_KNOWN = 0.03
@@ -588,11 +592,30 @@ def _merge_history(*histories: list[str]) -> list[str]:
     return merged[-HISTORY_LENGTH:]
 
 
+def _material_forms(ctx: Context) -> tuple[dict, tuple]:
+    """The form of every piece of matter an act could touch, by identity:
+    stones by their fragment (wherever they lie or whoever holds them), other
+    objects by their make-up, and the producer pools in this cell. Position,
+    holder and being worn are not form."""
+    forms: dict[str, str] = {}
+    for frag in ctx.lithic_cells.get(f"{ctx.xy[0]},{ctx.xy[1]}", []):
+        forms[frag["id"]] = json.dumps(frag, sort_keys=True, default=str)
+    for obj in ctx.humans["objects"]:
+        if obj.get("material") == "stone" and "fragment" in obj:
+            forms[obj["id"]] = json.dumps(obj["fragment"], sort_keys=True, default=str)
+        else:
+            forms[obj["id"]] = json.dumps({k: v for k, v in obj.items() if k not in {"history", "x", "y", "holder", "worn"}},
+                                          sort_keys=True, default=str)
+    pools = tuple(round(_mass(v), 9) for k, v in sorted(ctx.pcell.items()) if k.endswith("_elements_kg"))
+    return forms, pools
+
+
 def execute(ctx: Context, key: str, spec: dict) -> dict:
     """Run one interaction and record it in the history of every object it
     made, shaped or picked up. Object history is how later benefit reaches the
     preparation that made it possible, however long ago that was."""
     before = {o["id"]: (_signature(o), o.get("history", []), o.get("holder")) for o in ctx.humans["objects"]}
+    forms_before, pools_before = _material_forms(ctx)
     tool = _find(ctx.humans, spec.get("tool"))
     tool_history = list(tool.get("history", [])) if tool is not None else []
     out = _execute_physical(ctx, key, spec)
@@ -600,6 +623,14 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
     after_ids = {o["id"] for o in ctx.humans["objects"]}
     # What anyone present can see appear: the classes of objects this act made.
     out["created_classes"] = sorted(object_class(o) for o in ctx.humans["objects"] if o["id"] not in before)
+    # G10.7a step 2.5, for memory retention only: matter that did not exist
+    # before (a stone merely picked up is not new), and whether any matter
+    # visibly changed form.
+    forms_after, pools_after = _material_forms(ctx)
+    out["appeared_classes"] = sorted(object_class(o) for o in ctx.humans["objects"] if o["id"] not in forms_before)
+    out["transformed"] = pools_after != pools_before or any(
+        forms_before.get(oid) not in (None, form) for oid, form in forms_after.items()
+    ) or any(oid not in forms_after for oid in forms_before)
     consumed = [hist for oid, (_, hist, _) in before.items() if oid not in after_ids]
     for obj in ctx.humans["objects"]:
         prior = before.get(obj["id"])
@@ -714,6 +745,7 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
                     _bump(ctx.stats, "captures")
                     ctx.produced["fresh_tissue"] = ctx.produced.get("fresh_tissue", 0.0) + _mass(killed["body_elements_kg"])
                     out["capture"] = True
+                    out["exposed_kg"] = _mass(killed["body_elements_kg"])
             else:
                 displace_animal(ctx.consumers, animal["id"], ctx.draw("flee", key))
                 _bump(ctx.stats, "capture_escapes")
@@ -734,6 +766,7 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
         ctx.access_bonus["fresh_tissue"] = ctx.access_bonus.get("fresh_tissue", 0.0) + bonus
         out["effort_kcal"] = 10.0 * scale
         out["access_bonus_kg"] = bonus
+        out["exposed_kg"] = bonus
 
     elif verb in {"extract_tendon", "extract_bark", "extract_plant_fiber"}:
         tool = _held(ctx, spec.get("tool"))
@@ -1055,7 +1088,9 @@ def _visible_consequence(out: dict, gain: float, kcal_by_kind: dict, kg_by_kind:
     fresh_kcal = max(0.0, kcal_by_kind.get("fresh_tissue", 0.0))
     if gain > 0.0 and fresh_kcal > 0.0:
         eaten["fresh_tissue"] = kg_by_kind["fresh_tissue"] * min(1.0, gain / fresh_kcal)
-    return {"eaten_kg": eaten, "created": list(out.get("created_classes", [])), "injury": float(out.get("injury", 0.0))}
+    return {"eaten_kg": eaten, "created": list(out.get("created_classes", [])), "injury": float(out.get("injury", 0.0)),
+            "appeared": list(out.get("appeared_classes", [])), "transformed": bool(out.get("transformed", False)),
+            "killed": bool(out.get("capture", False)), "exposed_kg": float(out.get("exposed_kg", 0.0))}
 
 
 def _own_appraisal(peer: dict, profile_basal: float, visible: dict) -> float | None:
@@ -1079,19 +1114,43 @@ def _own_appraisal(peer: dict, profile_basal: float, visible: dict) -> float | N
     return sum(parts) if parts else None
 
 
-def remember_witnessed(ctx: Context, peer: dict, event: dict) -> None:
+def witnessed_salience(event: dict) -> int:
+    """How many distinct visible consequences followed a witnessed act:
+    new matter appeared, matter changed form, an animal was killed, food was
+    exposed, food was eaten as a result of a different act, the actor was hurt
+    or in distress. A meal's own consumption is the act, not a consequence."""
+    followed_by_eating = any(event["act"] != f"eat:{kind}" for kind in event["eaten_kg"])
+    return (bool(event.get("appeared")) + bool(event.get("transformed")) + bool(event.get("killed"))
+            + (float(event.get("exposed_kg", 0.0)) > 0.0) + followed_by_eating + bool(event["hurt"]))
+
+
+def remember_witnessed(ctx: Context, peer: dict, event: dict, consequence: dict | None = None) -> None:
     """G10.7a step 2: an observer stores what it witnessed: who acted, the
     visible act (verb and object classes), and the visible consequence
     (objects that appeared, food eaten, the actor hurt or in distress).
     Nothing internal to the actor is stored.
 
-    This memory is write-only in step 2: no decision reads it. Imitation, which
-    would let it cause behaviour, is a separate later step."""
+    Step 2.5 (retention "consequence"): the event also records the remaining
+    visible consequences, and when memory is full the event to forget is the
+    one with the lowest epoch + RETENTION_DAYS_PER_CONSEQUENCE x salience
+    (oldest first among equals). Retention "fifo" keeps the newest events.
+
+    The memory is write-only: no decision reads it. Imitation, which would let
+    it cause behaviour, is a separate later step."""
     if not ctx.humans.get("event_memory"):
         return
-    entry = {"epoch": int(ctx.epoch), "actor": ctx.agent_id, **event}
+    by_consequence = ctx.humans.get("event_memory_retention") == "consequence"
+    entry = {"epoch": int(ctx.epoch), "actor": ctx.agent_id, **event, **(consequence if by_consequence else {})}
     cognition = dict(peer["cognition"])
-    cognition["witnessed"] = (list(cognition.get("witnessed", [])) + [entry])[-WITNESSED_MEMORY:]
+    events = list(cognition.get("witnessed", [])) + [entry]
+    if len(events) > WITNESSED_MEMORY:
+        if by_consequence:
+            forget = min(range(len(events)), key=lambda i: (
+                events[i]["epoch"] + RETENTION_DAYS_PER_CONSEQUENCE * witnessed_salience(events[i]), events[i]["epoch"], i))
+            del events[forget]
+        else:
+            events = events[-WITNESSED_MEMORY:]
+    cognition["witnessed"] = events
     peer["cognition"] = cognition
     _bump(ctx.stats, "witnessed_events")
     _bump_map(ctx.stats, "witnessed_by_act", event["act"], 1)
@@ -1119,6 +1178,11 @@ def observe_outcome(ctx: Context, key: str, reward: float | None = None, visible
                 "created": sorted(visible["created"]),
                 "eaten_kg": {k: round(v, 6) for k, v in sorted(visible["eaten_kg"].items())},
                 "hurt": visible["injury"] > 0.0,
+            }, {
+                "appeared": sorted(visible.get("appeared", [])),
+                "transformed": bool(visible.get("transformed", False)),
+                "killed": bool(visible.get("killed", False)),
+                "exposed_kg": round(float(visible.get("exposed_kg", 0.0)), 6),
             })
         if legacy:
             target = float(reward)
@@ -1173,7 +1237,7 @@ def observe_food(ctx: Context, intake: list[dict]) -> None:
                 "created": [],
                 "eaten_kg": {rec["kind"]: round(float(rec["kg"]), 6)},
                 "hurt": harmful,
-            })
+            }, {"appeared": [], "transformed": False, "killed": False, "exposed_kg": 0.0})
             cognition = dict(peer["cognition"])
             seen = dict(cognition.get("observed_ingestion", {}))
             entry = dict(seen.get(rec["kind"], {"harmless": 0, "harmful": 0}))

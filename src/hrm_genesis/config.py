@@ -46,6 +46,10 @@ class GenesisConfig:
     # G10.7a step 2: bounded memory of witnessed events (write-only until
     # imitation exists). Active only with capacities and a visible model.
     agentus_event_memory_enabled: bool = True
+    # G10.7a step 2.5: which witnessed events are kept when memory is full.
+    # "consequence" (default): conspicuous events stick better; "fifo"
+    # reproduces step 2 (newest kept).
+    agentus_event_memory_retention: str = "consequence"
     # Reference physiology (G10.5). "reference-v2" adds fat reserves, lean
     # catabolism, realistic lactation and size^0.75 child metabolism.
     agentus_physiology_version: str = "reference-v1"
@@ -93,6 +97,8 @@ class GenesisConfig:
             raise ValueError("unknown agentus_capacity_ablation")
         if self.agentus_observation_model not in {"visible-v1", "g10.4-legacy"}:
             raise ValueError("unknown agentus_observation_model")
+        if self.agentus_event_memory_retention not in {"consequence", "fifo"}:
+            raise ValueError("unknown agentus_event_memory_retention")
         if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
             raise ValueError("agentus_capacity_ablation requires agentus_capacities_enabled")
         if self.multi_population_enabled and not self.human_actions_enabled:
@@ -148,7 +154,7 @@ class GenesisConfig:
         if self.agentus_capacities_enabled and self.agentus_observation_model != "g10.4-legacy":
             canonical["agentus_observation_model"] = self.agentus_observation_model
         if self.event_memory_active:
-            canonical["agentus_event_memory"] = "witnessed-v1"
+            canonical["agentus_event_memory"] = "witnessed-v2" if self.agentus_event_memory_retention == "consequence" else "witnessed-v1"
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":
