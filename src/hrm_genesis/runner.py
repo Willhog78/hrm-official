@@ -518,6 +518,7 @@ class GenesisSimulation:
             dict(world.value),
             ctx.epoch,
             cognition_enabled=self.config.human_cognition_enabled,
+            actions_enabled=self.config.human_actions_enabled,
         )
 
         return [
