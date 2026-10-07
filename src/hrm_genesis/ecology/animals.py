@@ -106,18 +106,9 @@ def seed_initial_consumers(
         return consumers, producers, matter
 
     survivors: list[dict] = []
-    herbivore_seed_cells: list[tuple[int, int]] = []
     for index, animal in enumerate(consumers["animals"]):
-        traits = trait_for(str(animal["species"]))
-        if traits.trophic_role == "predator" and herbivore_seed_cells:
-            # Predators enter the same habitat as available prey, not a random
-            # remote cell. This changes initial ecology, not later outcomes.
-            xy = herbivore_seed_cells[index % len(herbivore_seed_cells)]
-        else:
-            xy = vegetated[index % len(vegetated)]
+        xy = vegetated[index % len(vegetated)]
         animal["x"], animal["y"] = xy
-        if traits.trophic_role == "herbivore":
-            herbivore_seed_cells.append(xy)
         pcell = pcells[xy]
         mcell = mcells[xy]
 
@@ -302,6 +293,18 @@ def _choose_prey(predator: dict, consumers: dict) -> dict | None:
     return max(candidates, key=score)
 
 
+
+def _hunt_succeeds(predator: dict, prey: dict, epoch: int) -> bool:
+    species_chance = 0.42 if str(prey["species"]) == "browser" else 0.30
+    vulnerability = max(0.0, min(0.20, (8.0 - float(prey["energy"])) * 0.02))
+    chance = min(0.75, species_chance + vulnerability)
+    raw = hashlib.sha256(
+        f"{predator['id']}|{prey['id']}|hunt|{epoch}".encode("utf-8")
+    ).digest()
+    u = int.from_bytes(raw[:8], "big") / float(2**64 - 1)
+    return u < chance
+
+
 def _consume_prey(predator: dict, prey: dict, carcass_cell: dict) -> float:
     traits = trait_for(str(predator["species"]))
     prey_mass = _element_mass(prey["body_elements_kg"])
@@ -443,9 +446,13 @@ def evolve_consumers(
             ]
             if prey_here:
                 prey = _choose_prey(animal, {"animals": prey_here}) or prey_here[0]
-                _consume_prey(animal, prey, carcasses[xy])
-                killed_ids.add(str(prey["id"]))
-                deaths_by_cause["predation"] += 1
+                if _hunt_succeeds(animal, prey, epoch):
+                    _consume_prey(animal, prey, carcasses[xy])
+                    killed_ids.add(str(prey["id"]))
+                    deaths_by_cause["predation"] += 1
+                else:
+                    animal["energy"] = float(animal["energy"]) - traits.movement_cost * 0.75
+                    animal["last_forage_success"] = 0.0
             else:
                 animal["last_forage_success"] = 0.0
         else:
