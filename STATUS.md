@@ -151,14 +151,28 @@ Opening, census and controlled-experiment proposal: `docs/architecture/ECOLOGY_O
 - **Not done.** Life-history recalibration is not done and needs separate authorization.
 
 **Open owner decisions:**
-- **D1:** predation on Agentus is an unresolved rule. It is now active, because predators survive and bite.
+- **D1:** predation on Agentus is an unresolved rule, now split into three questions (hunt living Agentus, consume dead Agentus, defensive injury; none authorizes cannibalism). It is active, because predators survive and bite.
 - **D3:** default physiology stays `reference-v1` until the caregiver energy budget closes.
 
-**Queued investigations (no model changes):**
-- the caregiver energy budget: food consumed and credited, intake limits, nursing expenditure, other costs and reserve changes;
-- inspection of the unsuccessful imitation attempts.
+**Caregiver energy budget and imitation audit: DONE (2026-10-08, diagnostics only; no model change).** Report: `experiments/genesis/summaries/BUDGET_AND_IMITATION_AUDIT_2026-10-08.md`; tool `qualification/genesis/budget_audit.py`, read-only and digest-checked.
+- **Caregiver deficit (reference-v2).** The deficit is milk for two overlapping dependents on a full gut. The energy ledger closes to 5e-11 kcal per agent-day.
+  - 100% of the deepest days (reserve below 0.25) have two dependents.
+  - The gut is full and food is in the cell on all of them.
+  - Movement, temperature and effort are negligible.
 
-Ecology experiments E1–E3 stay unimplemented.
+  Under v1, caregivers break even. Their few losses are days the gut was not filled.
+- **Imitation.** All 72 copied tries (18 pre-D2, 11 v1, 43 v2) were scored on effort alone.
+  - 71 were preparation acts, whose same-day reward excludes everything but food from a capture or cut.
+  - The one cut exposed meat that the sated agent did not eat.
+  - The delayed routes deliver nothing in two years: 0 kcal of warmth saved, no worn surfaces, and ≤0.06 kg of meat per seed.
+  - Imitators had always seen matter change, never anyone eat.
+
+  This does not show that imitation generally fails.
+- **Injury deaths.** Cause tracking attributes all of them (v1: 7; v2: 8; pre-D2: 2) to the unprovoked, foodless predator bite.
+
+**Encounter frequency (open).** At daily ticks, animals travel 25–80× farther per year and predators make about 14× more hunt attempts than at monthly ticks (D2 note, section 8). Predator-related mortality is not interpreted as ecologically calibrated until this is decided.
+
+Ecology experiments E1–E3 stay unimplemented. Physiology and life-history values are unchanged.
 
 ## Verification infrastructure
 

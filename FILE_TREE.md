@@ -109,6 +109,7 @@ hrm-official/
 │       ├── test_{food_intake_diagnosis,plant_lifecycle,reproduction_contact,survival_affordances,tier_observer}.py
 │       ├── test_opportunity_census.py
 │       ├── test_consumer_timebase.py
+│       ├── test_budget_audit.py
 │       └── micro/                 # micro tier: test_micro_<topic>.py + _scenario.py
 │
 ├── qualification/
@@ -127,6 +128,7 @@ hrm-official/
 │       ├── diagnostic.py
 │       ├── tier_observer.py       # read-only observer for smoke and diagnostic
 │       ├── opportunity.py         # read-only social-learning opportunity census
+│       ├── budget_audit.py        # read-only energy ledger, injury sources, imitation audit
 │       ├── report_g4_results.py
 │       └── scenarios/
 │

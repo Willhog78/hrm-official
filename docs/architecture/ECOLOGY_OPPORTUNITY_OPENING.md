@@ -229,6 +229,8 @@ Concrete differences measured here (4 seeds × 730 days):
 | imitation tries | 18 | 46 |
 | outcome | births 21, deaths 2 (injury) | births 19, deaths 0 |
 
+**Update (2026-10-08).** The caregiver energy budget now closes (`experiments/genesis/summaries/BUDGET_AND_IMITATION_AUDIT_2026-10-08.md`). Under v2, the deficit is milk for two overlapping dependents (1-year birth interval, dependence to age 5) exceeding a full gut above basal. Under v1 there is no structural deficit. The D3 choice is therefore about those physiology and life-history inputs, not about food.
+
 **Recommendation:** section 5.1 shows that reference-v2's late deep drops occur only in caregivers, with food in view. Its hunger is a physiological signal of caregiving cost, not a scarcity signal. Before choosing it as the default, measure caregiver intake against demand, to confirm that the drops are physical (lactation outrunning a daily intake ceiling) and not an accounting artefact. If they are physical, v2 is the more faithful baseline. Either way, no census or experiment should read the hunger label as scarcity without the reserve bins and the caring split.
 
 ## 8. Proposed controlled experiments (not implemented)

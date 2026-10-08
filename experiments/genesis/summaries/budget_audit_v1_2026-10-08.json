@@ -1,0 +1,1007 @@
+{
+ "results": [
+  {
+   "seed": "agentus-demography-a",
+   "arm": "v1",
+   "consumer_timebase": "elapsed-time-v1",
+   "days": 730,
+   "ledger_digest": "977428fb3e8b6c7c2d4f4c112a41353c0f7463ff8ed80ba3c6843b935e7125b2",
+   "ledger_valid": true,
+   "max_energy_residual_kcal": 4.729372449219227e-11,
+   "profile": {
+    "bite_cap_kg": 1.35,
+    "food_energy_kcal_per_kg": 2200.0,
+    "assimilation": 0.8,
+    "basal_energy_kcal_per_tick": 2000.0,
+    "nursing_energy_kcal_per_tick": 350.0,
+    "lactation_efficiency": null,
+    "energy_capacity_kcal": 30000.0,
+    "satiety_reference_kcal": null,
+    "move_energy_kcal_per_tick": 55.0
+   },
+   "injury_deaths": [
+    {
+     "id": "human-b00000009",
+     "day": 199,
+     "adult": false,
+     "injury_gain_by_source": {
+      "predator": 1.28
+     },
+     "attacks": 4,
+     "attributed_to": "predator",
+     "share": 1.0
+    }
+   ],
+   "predator_attacks_by_year": {
+    "1": 33,
+    "2": 3
+   },
+   "deaths_by_cause": {
+    "injury": 1
+   },
+   "imitation_tries": [],
+   "seconds": 195.3
+  },
+  {
+   "seed": "agentus-demography-b",
+   "arm": "v1",
+   "consumer_timebase": "elapsed-time-v1",
+   "days": 730,
+   "ledger_digest": "5f563f21f07d684fdc0c014250cae1a96a101f8b4d237fb56f6563fc5c68f9a8",
+   "ledger_valid": true,
+   "max_energy_residual_kcal": 4.9112713895738125e-11,
+   "profile": {
+    "bite_cap_kg": 1.35,
+    "food_energy_kcal_per_kg": 2200.0,
+    "assimilation": 0.8,
+    "basal_energy_kcal_per_tick": 2000.0,
+    "nursing_energy_kcal_per_tick": 350.0,
+    "lactation_efficiency": null,
+    "energy_capacity_kcal": 30000.0,
+    "satiety_reference_kcal": null,
+    "move_energy_kcal_per_tick": 55.0
+   },
+   "injury_deaths": [
+    {
+     "id": "human-b00000008",
+     "day": 274,
+     "adult": false,
+     "injury_gain_by_source": {
+      "physiology": 0.02,
+      "predator": 1.28
+     },
+     "attacks": 4,
+     "attributed_to": "predator",
+     "share": 0.98
+    },
+    {
+     "id": "human-g00000006",
+     "day": 293,
+     "adult": true,
+     "injury_gain_by_source": {
+      "predator": 1.68
+     },
+     "attacks": 21,
+     "attributed_to": "predator",
+     "share": 1.0
+    }
+   ],
+   "predator_attacks_by_year": {
+    "1": 28,
+    "2": 5
+   },
+   "deaths_by_cause": {
+    "injury": 2
+   },
+   "imitation_tries": [
+    {
+     "agent": "human-g00000003",
+     "epoch": 125,
+     "key": "separate:bark|none",
+     "step": 0,
+     "seen_from": [
+      "human-g00000002"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000002",
+       "epoch": 125,
+       "salience": 2,
+       "appeared": [
+        "strand_bark"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 28000.0,
+     "fatigue": 0.003,
+     "age_years": 18.3,
+     "options_offered": 11,
+     "animals_here": 0,
+     "held_objects": 3,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 18.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "strand_bark"
+     ],
+     "appeared_classes": [
+      "strand_bark"
+     ],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.009,
+     "reward_effort_term": -0.009,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.009,
+      "uses": 3,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000003",
+     "epoch": 125,
+     "key": "separate:bark|none",
+     "step": 1,
+     "seen_from": [
+      "human-g00000002"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000002",
+       "epoch": 125,
+       "salience": 2,
+       "appeared": [
+        "strand_bark"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 27982.0,
+     "fatigue": 0.023,
+     "age_years": 18.3,
+     "options_offered": 13,
+     "animals_here": 0,
+     "held_objects": 4,
+     "performed": true,
+     "same_day_repeat": true,
+     "effort_kcal": 18.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "strand_bark"
+     ],
+     "appeared_classes": [
+      "strand_bark"
+     ],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.009,
+     "reward_effort_term": -0.009,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.009,
+      "uses": 3,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000005",
+     "epoch": 126,
+     "key": "separate:bark|none",
+     "step": 0,
+     "seen_from": [
+      "human-g00000002",
+      "human-g00000003"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000002",
+       "epoch": 125,
+       "salience": 2,
+       "appeared": [
+        "strand_bark"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      },
+      {
+       "actor": "human-g00000003",
+       "epoch": 125,
+       "salience": 2,
+       "appeared": [
+        "strand_bark"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      },
+      {
+       "actor": "human-g00000003",
+       "epoch": 125,
+       "salience": 2,
+       "appeared": [
+        "strand_bark"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 28000.0,
+     "fatigue": 0.023,
+     "age_years": 18.4,
+     "options_offered": 13,
+     "animals_here": 0,
+     "held_objects": 3,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 18.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "strand_bark"
+     ],
+     "appeared_classes": [
+      "strand_bark"
+     ],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.009,
+     "reward_effort_term": -0.009,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.009,
+      "uses": 1,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000000",
+     "epoch": 343,
+     "key": "separate:strand_bark|held",
+     "step": 1,
+     "seen_from": [
+      "human-g00000001"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000001",
+       "epoch": 267,
+       "salience": 2,
+       "appeared": [
+        "strand_bark"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 27632.0,
+     "fatigue": 0.02,
+     "age_years": 19.0,
+     "options_offered": 8,
+     "animals_here": 0,
+     "held_objects": 1,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 3.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "strand_bark"
+     ],
+     "appeared_classes": [
+      "strand_bark"
+     ],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.0015,
+     "reward_effort_term": -0.0015,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.0015,
+      "uses": 6,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000000",
+     "epoch": 343,
+     "key": "separate:strand_bark|held",
+     "step": 2,
+     "seen_from": [
+      "human-g00000001"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000001",
+       "epoch": 267,
+       "salience": 2,
+       "appeared": [
+        "strand_bark"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 27629.0,
+     "fatigue": 0.04,
+     "age_years": 19.0,
+     "options_offered": 11,
+     "animals_here": 0,
+     "held_objects": 2,
+     "performed": true,
+     "same_day_repeat": true,
+     "effort_kcal": 3.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "strand_bark"
+     ],
+     "appeared_classes": [
+      "strand_bark"
+     ],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.0015,
+     "reward_effort_term": -0.0015,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.0015,
+      "uses": 6,
+      "exploited_by_this_agent": false
+     }
+    }
+   ],
+   "seconds": 192.4
+  },
+  {
+   "seed": "agentus-demography-c",
+   "arm": "v1",
+   "consumer_timebase": "elapsed-time-v1",
+   "days": 730,
+   "ledger_digest": "0bd4548746b58f64a4803031d453bcd0790d1fcac9f6c80a06124a8275081169",
+   "ledger_valid": true,
+   "max_energy_residual_kcal": 5.093170329928398e-11,
+   "profile": {
+    "bite_cap_kg": 1.35,
+    "food_energy_kcal_per_kg": 2200.0,
+    "assimilation": 0.8,
+    "basal_energy_kcal_per_tick": 2000.0,
+    "nursing_energy_kcal_per_tick": 350.0,
+    "lactation_efficiency": null,
+    "energy_capacity_kcal": 30000.0,
+    "satiety_reference_kcal": null,
+    "move_energy_kcal_per_tick": 55.0
+   },
+   "injury_deaths": [
+    {
+     "id": "human-g00000000",
+     "day": 266,
+     "adult": true,
+     "injury_gain_by_source": {
+      "predator": 1.76,
+      "physiology": 0.044
+     },
+     "attacks": 22,
+     "attributed_to": "predator",
+     "share": 0.98
+    }
+   ],
+   "predator_attacks_by_year": {
+    "1": 31,
+    "2": 20
+   },
+   "deaths_by_cause": {
+    "injury": 1
+   },
+   "imitation_tries": [
+    {
+     "agent": "human-g00000007",
+     "epoch": 81,
+     "key": "arrange:loose_wood|none",
+     "step": 0,
+     "seen_from": [
+      "human-g00000006"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000006",
+       "epoch": 52,
+       "salience": 1,
+       "appeared": [],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 28000.0,
+     "fatigue": 0.006,
+     "age_years": 18.3,
+     "options_offered": 8,
+     "animals_here": 0,
+     "held_objects": 1,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 9.25,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [],
+     "appeared_classes": [],
+     "ate_kg_by_kind": {
+      "seed": 0.0143,
+      "plant_tissue": 1.3357
+     },
+     "value_before": null,
+     "value_after_day": -0.004625,
+     "reward_effort_term": -0.00462,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.004625,
+      "uses": 1,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000007",
+     "epoch": 385,
+     "key": "separate:arranged_wood|none",
+     "step": 0,
+     "seen_from": [
+      "human-g00000003"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000003",
+       "epoch": 363,
+       "salience": 1,
+       "appeared": [],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 28000.0,
+     "fatigue": 0.0,
+     "age_years": 19.1,
+     "options_offered": 10,
+     "animals_here": 0,
+     "held_objects": 2,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 5.52,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [],
+     "appeared_classes": [],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.002759222,
+     "reward_effort_term": -0.00276,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.002759222,
+      "uses": 1,
+      "exploited_by_this_agent": false
+     }
+    }
+   ],
+   "seconds": 189.2
+  },
+  {
+   "seed": "agentus-demography-d",
+   "arm": "v1",
+   "consumer_timebase": "elapsed-time-v1",
+   "days": 730,
+   "ledger_digest": "8fbae591b1434749f56ac599120eb7f63fe1ba41e48115215a9dfc80ca0c6bd5",
+   "ledger_valid": true,
+   "max_energy_residual_kcal": 4.729372449219227e-11,
+   "profile": {
+    "bite_cap_kg": 1.35,
+    "food_energy_kcal_per_kg": 2200.0,
+    "assimilation": 0.8,
+    "basal_energy_kcal_per_tick": 2000.0,
+    "nursing_energy_kcal_per_tick": 350.0,
+    "lactation_efficiency": null,
+    "energy_capacity_kcal": 30000.0,
+    "satiety_reference_kcal": null,
+    "move_energy_kcal_per_tick": 55.0
+   },
+   "injury_deaths": [
+    {
+     "id": "human-b00000009",
+     "day": 103,
+     "adult": false,
+     "injury_gain_by_source": {
+      "predator": 1.28
+     },
+     "attacks": 4,
+     "attributed_to": "predator",
+     "share": 1.0
+    },
+    {
+     "id": "human-b00000010",
+     "day": 493,
+     "adult": false,
+     "injury_gain_by_source": {
+      "predator": 1.28
+     },
+     "attacks": 4,
+     "attributed_to": "predator",
+     "share": 1.0
+    },
+    {
+     "id": "human-b00000013",
+     "day": 497,
+     "adult": false,
+     "injury_gain_by_source": {
+      "predator": 1.28
+     },
+     "attacks": 4,
+     "attributed_to": "predator",
+     "share": 1.0
+    }
+   ],
+   "predator_attacks_by_year": {
+    "1": 18,
+    "2": 73
+   },
+   "deaths_by_cause": {
+    "injury": 3
+   },
+   "imitation_tries": [
+    {
+     "agent": "human-g00000006",
+     "epoch": 20,
+     "key": "twist:strands|held",
+     "step": 0,
+     "seen_from": [
+      "human-g00000007"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000007",
+       "epoch": 9,
+       "salience": 2,
+       "appeared": [
+        "strand_plant"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": true,
+     "energy": 5800.8,
+     "fatigue": 0.095,
+     "age_years": 18.1,
+     "options_offered": 7,
+     "animals_here": 0,
+     "held_objects": 3,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 8.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "strand_plant"
+     ],
+     "appeared_classes": [
+      "strand_plant"
+     ],
+     "ate_kg_by_kind": {
+      "plant_tissue": 1.35
+     },
+     "value_before": null,
+     "value_after_day": -0.004,
+     "reward_effort_term": -0.004,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.004,
+      "uses": 2,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000000",
+     "epoch": 68,
+     "key": "break:woody|none",
+     "step": 0,
+     "seen_from": [
+      "human-g00000001"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000001",
+       "epoch": 66,
+       "salience": 2,
+       "appeared": [
+        "stick"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 27595.0,
+     "fatigue": 0.198,
+     "age_years": 18.2,
+     "options_offered": 14,
+     "animals_here": 0,
+     "held_objects": 4,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 30.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "wood_short"
+     ],
+     "appeared_classes": [
+      "wood_short"
+     ],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.015,
+     "reward_effort_term": -0.015,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.015,
+      "uses": 2,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000001",
+     "epoch": 156,
+     "key": "interlace:strands|held",
+     "step": 0,
+     "seen_from": [
+      "human-g00000000"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000000",
+       "epoch": 144,
+       "salience": 2,
+       "appeared": [
+        "surface"
+       ],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 27945.0,
+     "fatigue": 0.217,
+     "age_years": 18.5,
+     "options_offered": 15,
+     "animals_here": 0,
+     "held_objects": 6,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 25.0,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [
+      "surface"
+     ],
+     "appeared_classes": [
+      "surface"
+     ],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.0125,
+     "reward_effort_term": -0.0125,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.0125,
+      "uses": 2,
+      "exploited_by_this_agent": false
+     }
+    },
+    {
+     "agent": "human-g00000000",
+     "epoch": 189,
+     "key": "separate:arranged_wood|none",
+     "step": 0,
+     "seen_from": [
+      "human-g00000001"
+     ],
+     "seen_events": [
+      {
+       "actor": "human-g00000001",
+       "epoch": 176,
+       "salience": 1,
+       "appeared": [],
+       "transformed": true,
+       "killed": false,
+       "exposed_kg": 0.0,
+       "eaten_kg": {},
+       "hurt": false
+      }
+     ],
+     "hungry": false,
+     "energy": 27945.0,
+     "fatigue": 0.06,
+     "age_years": 18.5,
+     "options_offered": 10,
+     "animals_here": 0,
+     "held_objects": 1,
+     "performed": true,
+     "same_day_repeat": false,
+     "effort_kcal": 5.92,
+     "injury": 0.0,
+     "capture": false,
+     "access_bonus_kg": 0.0,
+     "exposed_kg": 0.0,
+     "created_classes": [],
+     "appeared_classes": [],
+     "ate_kg_by_kind": {
+      "seed": 0.45,
+      "plant_tissue": 0.9
+     },
+     "value_before": null,
+     "value_after_day": -0.0029623091,
+     "reward_effort_term": -0.00296,
+     "reward_injury_term": -0.0,
+     "reward_is_cost_only": true,
+     "end_of_run": {
+      "alive": true,
+      "value": -0.0029623091,
+      "uses": 1,
+      "exploited_by_this_agent": false
+     }
+    }
+   ],
+   "seconds": 193.6
+  }
+ ],
+ "energy_summary": {
+  "non-caregiver adults": {
+   "days": 16174,
+   "mean_kcal_per_day": {
+    "intake": 2055.8,
+    "interactions": -0.7,
+    "nursing": 0.0,
+    "thermal": -2.6,
+    "catabolism": 0.0,
+    "basal": -2000.0,
+    "move": -10.8,
+    "birth": -0.3,
+    "clamp_loss": 714.7,
+    "change": 41.4
+   },
+   "gut_fill_mean": 0.988,
+   "gut_full_days": 0.979,
+   "food_in_cell_ge_gut_days": 0.974,
+   "mean_reserve": 0.888,
+   "dependents": {
+    "0": 16174
+   },
+   "nursing_per_dependent_kcal": 0.0,
+   "offered_kcal_by_kind": {
+    "fresh_tissue": 0.0,
+    "plant_tissue": 1626.3,
+    "seed": 1144.2
+   }
+  },
+  "caregivers": {
+   "days": 6285,
+   "mean_kcal_per_day": {
+    "intake": 2372.1,
+    "interactions": -0.5,
+    "nursing": -362.9,
+    "thermal": -0.8,
+    "catabolism": 0.0,
+    "basal": -2000.0,
+    "move": -3.8,
+    "birth": -0.1,
+    "clamp_loss": 452.5,
+    "change": 4.0
+   },
+   "gut_fill_mean": 0.998,
+   "gut_full_days": 0.992,
+   "food_in_cell_ge_gut_days": 0.989,
+   "mean_reserve": 0.913,
+   "dependents": {
+    "1": 6054,
+    "2": 231
+   },
+   "nursing_per_dependent_kcal": -350.0,
+   "offered_kcal_by_kind": {
+    "plant_tissue": 1596.6,
+    "seed": 1228.0
+   }
+  },
+  "caregivers, reserve < 0.75": {
+   "days": 82,
+   "mean_kcal_per_day": {
+    "intake": 2585.3,
+    "interactions": -1.1,
+    "nursing": -350.0,
+    "thermal": -3.3,
+    "catabolism": 0.0,
+    "basal": -2000.0,
+    "move": -28.8,
+    "birth": 0.0,
+    "clamp_loss": 0.0,
+    "change": 202.0
+   },
+   "gut_fill_mean": 1.0,
+   "gut_full_days": 1.0,
+   "food_in_cell_ge_gut_days": 1.0,
+   "mean_reserve": 0.342,
+   "dependents": {
+    "1": 82
+   },
+   "nursing_per_dependent_kcal": -350.0,
+   "offered_kcal_by_kind": {
+    "plant_tissue": 2015.1,
+    "seed": 570.3
+   }
+  },
+  "caregivers, reserve < 0.25": {
+   "days": 37,
+   "mean_kcal_per_day": {
+    "intake": 2424.0,
+    "interactions": -2.1,
+    "nursing": -350.0,
+    "thermal": -6.7,
+    "catabolism": 0.0,
+    "basal": -2000.0,
+    "move": -22.3,
+    "birth": 0.0,
+    "clamp_loss": 0.0,
+    "change": 42.9
+   },
+   "gut_fill_mean": 1.0,
+   "gut_full_days": 1.0,
+   "food_in_cell_ge_gut_days": 1.0,
+   "mean_reserve": 0.203,
+   "dependents": {
+    "1": 37
+   },
+   "nursing_per_dependent_kcal": -350.0,
+   "offered_kcal_by_kind": {
+    "plant_tissue": 2294.1,
+    "seed": 129.9
+   }
+  },
+  "caregivers, losing energy": {
+   "days": 199,
+   "mean_kcal_per_day": {
+    "intake": 2298.0,
+    "interactions": -0.5,
+    "nursing": -372.9,
+    "thermal": -15.4,
+    "catabolism": 0.0,
+    "basal": -2000.0,
+    "move": -4.7,
+    "birth": -3.0,
+    "clamp_loss": 342.2,
+    "change": -98.4
+   },
+   "gut_fill_mean": 0.943,
+   "gut_full_days": 0.824,
+   "food_in_cell_ge_gut_days": 0.824,
+   "mean_reserve": 0.87,
+   "dependents": {
+    "1": 186,
+    "2": 13
+   },
+   "nursing_per_dependent_kcal": -350.0,
+   "offered_kcal_by_kind": {
+    "plant_tissue": 1558.7,
+    "seed": 1081.6
+   }
+  }
+ }
+}
