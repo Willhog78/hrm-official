@@ -237,10 +237,44 @@ A 12-ticks/year world therefore runs a different plant ecology from a 365-ticks/
 
 Every opportunity conclusion of the ecology opening still holds.
 
-With opportunities equalized, predators now rarely meet agents. That is **not** a calibrated predation rate: animal speed (one cell per month) and the plant timebase are both still uncalibrated. It does mean the unprovoked-bite deaths of D2 were mostly an artefact of daily encounter frequency.
+With opportunities equalized, predators now rarely meet agents.
+
+**Limitation, stated explicitly (owner, 2026-10-08).** One movement, hunt or attack opportunity per month *preserves the old reference frequency*. It does not establish an appropriate animal speed or hunting rate. Zero injury deaths is therefore not evidence that predation is now correct, and attacks are not to be tuned toward any preferred death count. What can be said is narrower: the D2-era bite deaths were mostly a product of daily encounter frequency.
 
 **Decision needed before predator calibration (proposed, not implemented):**
 - **(a)** Score destinations by what the animal can actually eat there (food up to its per-tick bite) and by water need, not by standing mass. That is a behaviour change with a physical justification. It would also change monthly behaviour and require G3/G4 re-qualification.
 - **(b)** Audit the producer timebase first: are plant rates per tick converted, as consumer rates now are?
 
 Recommendation: (b), then (a). (b) now has a concrete target: give producers a stated reference timebase and convert their per-tick rates, as D2 did for consumers. Only then is a monthly-versus-daily comparison of animal behaviour like-for-like.
+
+## 10. Producer timebase (`producer_timebase`, implemented 2026-10-08)
+
+**Reference: daily.** Plant rates and ages are stated per day:
+- the germination constant is documented as "0.0165/tick lets 95% of a seed cohort germinate within ~180 viable days";
+- the plant-lifecycle corrections reason in days;
+- the daily world (365 ticks/year) is the operating target.
+
+**Converted under `elapsed-time-v1` (default):**
+- decomposition, germination, reproduction and mortality fractions, including stress and age terms and the woody share, by compounding;
+- growth, as a compounded relative rate;
+- maximum age and woody onset, by scaling.
+
+**Not converted, declared:**
+- fire, whose ignition comes from per-tick lightning in the world model;
+- the per-event minimum germinating mass;
+- stock ratios.
+
+`per-tick-legacy` reproduces every earlier run.
+
+**Verified:**
+- 365 ticks/year runs, including the Agentus world, are bit-identical (digest and fingerprint);
+- legacy reproduces all fixed-configuration digests;
+- 6 tests compare exact spans at 5-day and daily ticks, and conservation holds;
+- the full suite passes.
+
+**Consequence for monthly worlds.**
+- The G4 autonomy gate, run at 12 ticks/year, loses browsers in year 40 with converted plants.
+- The gate is pinned to legacy plants. Its qualification is kept as earned, with plants applying their daily rates once per month, and it does not transfer to time-converted monthly worlds.
+- Plant growth was not retuned.
+
+Monthly runs remain useful for checking timing consistency. Identical ecosystems at coarse and fine steps are not required, and the daily world is the operating target.
