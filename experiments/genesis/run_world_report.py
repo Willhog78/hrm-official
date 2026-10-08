@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import resource
 import sys
 import time
 from collections import Counter
@@ -102,6 +103,10 @@ def run(seed: str, arm: str, years: int) -> dict:
             "animal_deaths": {k: v for k, v in (cdeaths - prev_consumers["deaths"]).items() if v},
             "edible_plant_t": round(sum(_mass(cell["plant_elements_kg"]) for cell in sim.ecology_state()["cells"]) / 1000.0, 1),
         })
+        print(f"PROGRESS {seed} year {y + 1}/{years}: alive {yearly[-1]['alive']} births {yearly[-1]['births']} "
+              f"deaths {yearly[-1]['deaths']} animals {yearly[-1]['animals']} "
+              f"peak RSS {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6:.2f} GB "
+              f"{time.perf_counter() - started:.0f}s", flush=True)
         prev_stats = {**{k: (dict(v) if isinstance(v, dict) else v) for k, v in st.items()}, "_attacks": int(h.get("predator_attack_events", 0))}
         prev_consumers = {"births": int(c.get("cumulative_births", 0)), "deaths": cdeaths}
     end = years * year
@@ -129,8 +134,12 @@ def main(argv=None) -> int:
     p.add_argument("--parallel", type=int, default=4)
     p.add_argument("--json")
     a = p.parse_args(argv)
-    with ProcessPoolExecutor(max_workers=a.parallel) as pool:
-        results = list(pool.map(_job, [(s, a.arm, a.years) for s in a.seeds]))
+    jobs = [(s, a.arm, a.years) for s in a.seeds]
+    if a.parallel <= 1:
+        results = [_job(j) for j in jobs]  # in-process: no pool worker to lose
+    else:
+        with ProcessPoolExecutor(max_workers=a.parallel) as pool:
+            results = list(pool.map(_job, jobs))
     for r in results:
         print(f"\n=== {r['seed']} {r['arm']} fp {r['fingerprint']} ledger {'valid' if r['ledger_valid'] else 'INVALID'} {r['seconds']}s")
         print(f"  births {r['births_total']}  child survival {r['child_survival']}  child deaths {r['child_deaths_by_cause']}")
