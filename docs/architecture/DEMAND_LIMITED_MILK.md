@@ -90,8 +90,8 @@ These identities hold:
   - 24–29 kcal per nursing day across the four seeds;
   - zero in years 1–2;
   - seed a rises from 36,383 kcal in year 3 to 189,744 kcal in year 5.
-- **Correction to decide:** one store bound for children, applied wherever energy is credited (eating, hand-feeding and milk). Either:
-  - (a) `ingest` caps children at their size-scaled store, so food beyond it is refused, the same way an adult's full reserve refuses food; or
-  - (b) the child store is not size-scaled.
-
-  Either way, the nursing `min` then removes nothing. The choice changes child physiology, so it needs its own decision and its own legacy setting.
+- **Correction requirement** (owner, 2026-10-08):
+  - Eating, hand-feeding and nursing must use **one consistent storage capacity** for a child.
+  - Any energy offered beyond that capacity must be **explicitly accounted for**, for example as food left uneaten or an excess recorded as refused, never silently erased.
+  - Removing size scaling only to make the clamp disappear is not acceptable, because it would introduce a different distortion.
+  - Options (a) and (b) in the earlier draft were not exhaustive. The capacity rule needs a design note and its own legacy setting before any change.

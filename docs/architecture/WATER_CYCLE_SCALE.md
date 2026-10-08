@@ -93,3 +93,10 @@ It is not an initial boom settling to a sustainable level: the level it settles 
 - **Animal scale** (G10.3 / G10.4 open decision).
 - **The child energy clamp** (`DEMAND_LIMITED_MILK.md` §7): a separate correction.
 - **Plant growth and mortality rates.**
+
+## Scope of the claim (owner qualifications, 2026-10-08)
+
+- **The water cycle scales exactly, but the ecosystem does not.**
+  - The test proves that the water cycle at scale *k* is the unit water cycle × *k*.
+  - The whole ecosystem does not scale exactly. Three plant thresholds (germination, seeding, fire fuel) and animal body sizes are still in scale-1 units.
+- **Plants persist; a self-sustaining inhabited world is not yet shown.** The stable plant-only vegetation shows that plants can persist under the generated climate. It does not establish a self-sustaining inhabited world. That needs the inhabited runs, and generations beyond the founders.
