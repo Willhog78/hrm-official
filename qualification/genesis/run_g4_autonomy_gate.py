@@ -33,6 +33,13 @@ def main() -> int:
         ticks_per_year=12,
         producer_ecology_enabled=True,
         consumer_ecology_enabled=True,
+        # G4 was qualified with plant rates applied once per monthly tick.
+        # Plant rates are stated per day; with them converted to monthly ticks
+        # (producer timebase elapsed-time-v1) this century loses browsers in
+        # year 40. The qualification is kept as earned, on the legacy plant
+        # timebase; it does not transfer to the converted monthly world, and the
+        # daily world is the operating target (docs/architecture/D2_CONSUMER_TIMEBASE.md).
+        producer_timebase="per-tick-legacy",
     )
     sim = GenesisSimulation(config)
     samples = []

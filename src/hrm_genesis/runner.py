@@ -119,6 +119,8 @@ class GenesisSimulation:
             producer_state = build_producer_state(
                 width=config.world_width,
                 height=config.world_height,
+                ticks_per_year=config.ticks_per_year,
+                timebase=config.producer_timebase,
             )
             matter_state, producer_state = seed_initial_producers(
                 matter_state,
@@ -190,6 +192,9 @@ class GenesisSimulation:
                 if config.following_active:
                     human_state = dict(human_state)
                     human_state["following"] = True
+                if config.solid_food_active:
+                    human_state = dict(human_state)
+                    human_state["caregiving_model"] = config.caregiving_model
                 matter_state["initial_lithic_kg"] = lithic_total
                 consumer_state = enable_fresh_tissue(consumer_state)
                 human_state = enable_capacities(human_state)

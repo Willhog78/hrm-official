@@ -6,6 +6,8 @@ Run on the commit before the D2 correction and on this one, then compare:
   python experiments/genesis/check_consumer_timebase_digests.py legacy.json legacy   # per-tick-legacy
 Expected: legacy == before everywhere; default == before at 12 ticks/year only.
 (On the old commit, omit `legacy`: the flag does not exist there.)
+A third argument forces the producer timebase, e.g. `- legacy` keeps the
+consumer default and runs plants per tick.
 """
 import json
 import sys
@@ -16,10 +18,15 @@ sys.path[:0] = [str(ROOT / "src"), str(ROOT), str(ROOT / "experiments" / "genesi
 from hrm_genesis import GenesisConfig, GenesisSimulation
 from run_agentus_capacity_multiseed import config_for
 
-# Optional second argument: a consumer timebase to force ("legacy" means per-tick-legacy).
+# Optional second argument: a consumer timebase to force ("legacy" means
+# per-tick-legacy; "-" means the default). Optional third: a producer timebase.
 mode = sys.argv[2] if len(sys.argv) > 2 else ""
-legacy = bool(mode)
-extra = {"consumer_timebase": "per-tick-legacy" if mode == "legacy" else mode} if mode else {}
+extra = {}
+if mode and mode != "-":
+    extra["consumer_timebase"] = "per-tick-legacy" if mode == "legacy" else mode
+if len(sys.argv) > 3:
+    extra["producer_timebase"] = "per-tick-legacy" if sys.argv[3] == "legacy" else sys.argv[3]
+legacy = bool(extra)
 cases = {}
 for tpy, years in ((12, 30), (24, 10), (36, 6), (365, 1)):
     cfg = GenesisConfig(master_seed="units-check", world_width=6, world_height=6, ticks_per_year=tpy,

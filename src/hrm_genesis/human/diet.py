@@ -100,20 +100,36 @@ def ingest(
     """Move real mass from a pool into the body. Returns an intake record."""
     spec = FOOD_KINDS[kind]
     pool = pool_for(kind, producer_cell, carcass_cell)
-    record = {"kind": kind, "kg": 0.0, "kcal": 0.0, "hazard": 0.0, "handling_kcal": 0.0}
     if pool is None:
-        return record
-    available = _mass(pool)
+        return {"kind": kind, "kg": 0.0, "kcal": 0.0, "hazard": 0.0, "handling_kcal": 0.0}
     scale = max(0.10, float(profile.get("development_scale", 1.0)))
     # Plant tissue keeps the pre-G10.3 behavior: no handling limit beyond gut capacity.
     access = float("inf") if spec["hand_access_kg"] is None else float(spec["hand_access_kg"]) * scale + max(0.0, access_bonus_kg)
+    return ingest_pool(human, kind, request_kg, pool, producer_cell["detritus_elements_kg"], profile, access)
+
+
+def ingest_pool(
+    human: dict,
+    kind: str,
+    request_kg: float,
+    pool: dict[str, float],
+    detritus: dict[str, float],
+    profile: dict,
+    access: float = float("inf"),
+    pay_handling: bool = True,
+) -> dict:
+    """Ingest from a given element pool (a cell's pool, or food held in a
+    caregiver's hands). Unassimilated mass goes to `detritus`."""
+    spec = FOOD_KINDS[kind]
+    record = {"kind": kind, "kg": 0.0, "kcal": 0.0, "hazard": 0.0, "handling_kcal": 0.0}
+    available = _mass(pool)
+    scale = max(0.10, float(profile.get("development_scale", 1.0)))
     take = min(max(0.0, request_kg), available, access)
     if take <= 0.0 or available <= 0.0:
         return record
     fraction = take / available
     assimilation = kind_assimilation(kind, profile)
     target_dry_mass = float(profile.get("target_dry_mass_kg", profile["seed_dry_mass_kg"]))
-    detritus = producer_cell["detritus_elements_kg"]
     taken = 0.0
     for symbol in sorted(pool):
         amount = float(pool[symbol]) * fraction
@@ -125,7 +141,7 @@ def ingest(
         detritus[symbol] = float(detritus.get(symbol, 0.0)) + amount - keep
         taken += amount
     kcal = taken * kind_energy_per_kg(kind, profile)
-    handling = taken * float(spec["handling_kcal_per_kg"]) * scale
+    handling = taken * float(spec["handling_kcal_per_kg"]) * scale if pay_handling else 0.0
     human["energy"] = min(
         float(profile.get("energy_capacity_kcal", float("inf"))),
         float(human["energy"]) + kcal,

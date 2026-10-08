@@ -66,6 +66,15 @@ class GenesisConfig:
     # only (D2); "per-tick-legacy" reproduces pre-D2 runs. All identical at
     # 12 ticks/year.
     consumer_timebase: str = "elapsed-time-v2"
+    # Producer (plant) timebase. Plant rates and ages are stated per day (the
+    # daily world is the reference). "elapsed-time-v1" (default) converts them
+    # to the run's tick length; "per-tick-legacy" reproduces earlier runs.
+    # Both are identical at 365 ticks/year.
+    producer_timebase: str = "elapsed-time-v1"
+    # Caregiving (docs/architecture/CAREGIVING_SOLID_FOOD.md). "solid-food-v1"
+    # (default) lets a caregiver hand food it obtained from the shared cell to a
+    # dependent child; "none" reproduces earlier runs. Active with capacities.
+    caregiving_model: str = "solid-food-v1"
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -85,6 +94,8 @@ class GenesisConfig:
             raise ValueError("material_scale_factor must be >= 1.0")
         if self.consumer_timebase not in ("elapsed-time-v2", "elapsed-time-v1", "per-tick-legacy"):
             raise ValueError("consumer_timebase must be 'elapsed-time-v2', 'elapsed-time-v1' or 'per-tick-legacy'")
+        if self.producer_timebase not in ("elapsed-time-v1", "per-tick-legacy"):
+            raise ValueError("producer_timebase must be 'elapsed-time-v1' or 'per-tick-legacy'")
         if self.human_calibration_enabled and self.ticks_per_year != 365:
             raise ValueError("human_calibration_enabled requires ticks_per_year == 365")
         if self.human_calibration_enabled and self.material_scale_factor < 100.0:
@@ -110,6 +121,8 @@ class GenesisConfig:
         parts = [p for p in self.agentus_capacity_ablation.split("+") if p]
         if not set(parts) <= {"plant_diet", "no_interactions", "no_recall"} or len(parts) != len(set(parts)):
             raise ValueError("unknown agentus_capacity_ablation")
+        if self.caregiving_model not in {"solid-food-v1", "none"}:
+            raise ValueError("unknown caregiving_model")
         if self.agentus_observation_model not in {"visible-v1", "g10.4-legacy"}:
             raise ValueError("unknown agentus_observation_model")
         if self.agentus_event_memory_retention not in {"consequence", "fifo"}:
@@ -141,6 +154,10 @@ class GenesisConfig:
     def following_active(self) -> bool:
         return (self.agentus_following_enabled and self.agentus_capacities_enabled
                 and self.human_cognition_enabled and self.agentus_observation_model != "g10.4-legacy")
+
+    @property
+    def solid_food_active(self) -> bool:
+        return self.caregiving_model == "solid-food-v1" and self.agentus_capacities_enabled and self.human_cognition_enabled
 
     @property
     def contract_dt(self) -> Fraction:
@@ -183,6 +200,8 @@ class GenesisConfig:
             canonical["agentus_imitation"] = "witnessed-act-v1"
         if self.following_active:
             canonical["agentus_following"] = "visible-peer-v1"
+        if self.solid_food_active:
+            canonical["agentus_caregiving"] = self.caregiving_model
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":
@@ -192,6 +211,11 @@ class GenesisConfig:
             # Present only where it changes behaviour, so monthly-tick and
             # legacy fingerprints do not change.
             canonical["consumer_timebase"] = self.consumer_timebase
+        if (self.producer_ecology_enabled and self.ticks_per_year != 365
+                and self.producer_timebase != "per-tick-legacy"):
+            # Present only where it changes behaviour: daily and legacy
+            # fingerprints do not change.
+            canonical["producer_timebase"] = self.producer_timebase
         return canonical
 
     def fingerprint(self) -> str:

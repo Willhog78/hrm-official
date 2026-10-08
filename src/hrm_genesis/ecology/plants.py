@@ -31,6 +31,54 @@ BASE_MORTALITY_FRACTION = 0.004
 MAX_AGE_TICKS = 360
 REPRODUCTION_FRACTION = 0.012
 DECOMPOSITION_FRACTION = 0.035
+WOODY_ONSET_AGE_TICKS = 30
+WOODY_MORTALITY_SHARE = 0.35
+
+# Producer timebase. The rates and ages above are stated per day: the plant
+# model was tuned in the daily (365 ticks/year) world, as the germination
+# note shows ("~180 viable days"). "elapsed-time-v1" converts them to the run's
+# tick length (fractions by compounding, ages by scaling), so a simulated year
+# grows, dies, decomposes and seeds the same at any timebase; it is the
+# identity at 365 ticks/year. "per-tick-legacy" applies them per tick at any
+# timebase and reproduces earlier runs. Not converted: fire (ignition comes
+# from per-tick lightning in the world model), per-event minimum germinating
+# mass, and stock ratios such as water per kg of growth.
+PLANT_REFERENCE_TICKS_PER_YEAR = 365
+PRODUCER_TIMEBASE_ELAPSED = "elapsed-time-v1"
+PRODUCER_TIMEBASE_LEGACY = "per-tick-legacy"
+PRODUCER_TIMEBASES = (PRODUCER_TIMEBASE_ELAPSED, PRODUCER_TIMEBASE_LEGACY)
+
+
+def _plant_converts(ticks_per_year: int, timebase: str) -> bool:
+    if timebase not in PRODUCER_TIMEBASES:
+        raise ValueError(f"unknown producer timebase: {timebase}")
+    return timebase == PRODUCER_TIMEBASE_ELAPSED and int(ticks_per_year) != PLANT_REFERENCE_TICKS_PER_YEAR
+
+
+def plant_fraction_per_tick(per_day: float, ticks_per_year: int, timebase: str) -> float:
+    """A fraction removed per day, compounded to the fraction per tick."""
+    if not _plant_converts(ticks_per_year, timebase):
+        return per_day
+    return 1.0 - (1.0 - per_day) ** (PLANT_REFERENCE_TICKS_PER_YEAR / int(ticks_per_year))
+
+
+def plant_growth_per_tick(per_day: float, ticks_per_year: int, timebase: str) -> float:
+    """A relative growth rate per day, compounded to the rate per tick."""
+    if not _plant_converts(ticks_per_year, timebase):
+        return per_day
+    return (1.0 + per_day) ** (PLANT_REFERENCE_TICKS_PER_YEAR / int(ticks_per_year)) - 1.0
+
+
+def plant_age_ticks(days: int, ticks_per_year: int, timebase: str) -> int:
+    """An age in days as a count of ticks."""
+    if not _plant_converts(ticks_per_year, timebase):
+        return int(days)
+    return max(1, int(round(int(days) * int(ticks_per_year) / PLANT_REFERENCE_TICKS_PER_YEAR)))
+
+
+def producer_timebase(state: dict) -> str:
+    """States without the key predate the correction and replay as legacy."""
+    return str(state.get("rate_timebase", PRODUCER_TIMEBASE_LEGACY))
 
 
 def _blank_elements() -> dict[str, float]:
@@ -68,7 +116,19 @@ def _cell_lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
 
 
-def build_producer_state(*, width: int, height: int) -> dict:
+def build_producer_state(
+    *, width: int, height: int,
+    ticks_per_year: int = PLANT_REFERENCE_TICKS_PER_YEAR,
+    timebase: str = PRODUCER_TIMEBASE_LEGACY,
+) -> dict:
+    state = _build_producer_state(width, height)
+    # Recorded only where it changes behaviour; absent means legacy.
+    if _plant_converts(ticks_per_year, timebase):
+        state["rate_timebase"] = timebase
+    return state
+
+
+def _build_producer_state(width: int, height: int) -> dict:
     return {
         "width": width,
         "height": height,
@@ -183,6 +243,13 @@ def evolve_producers(
     pcells = _cell_lookup(ecology["cells"])
     mcells = _cell_lookup(matter["cells"])
     wcells = _cell_lookup(world_state["cells"])
+    timebase = producer_timebase(ecology)
+    tpy = int(world_state.get("ticks_per_year", PLANT_REFERENCE_TICKS_PER_YEAR))
+    decomposition = plant_fraction_per_tick(DECOMPOSITION_FRACTION, tpy, timebase)
+    germination = plant_fraction_per_tick(SEED_GERMINATION_FRACTION, tpy, timebase)
+    reproduction = plant_fraction_per_tick(REPRODUCTION_FRACTION, tpy, timebase)
+    max_age = plant_age_ticks(MAX_AGE_TICKS, tpy, timebase)
+    woody_onset = plant_age_ticks(WOODY_ONSET_AGE_TICKS, tpy, timebase)
     for pcell in pcells.values():
         pcell.setdefault("woody_elements_kg", _blank_elements())
         pcell.setdefault("loose_material_elements_kg", _blank_elements())
@@ -198,7 +265,7 @@ def evolve_producers(
         mcell = mcells[xy]
         for symbol in PLANT_ELEMENT_FRACTIONS:
             pool = float(pcell["detritus_elements_kg"][symbol])
-            returned = pool * DECOMPOSITION_FRACTION
+            returned = pool * decomposition
             pcell["detritus_elements_kg"][symbol] -= returned
             mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
 
@@ -208,7 +275,7 @@ def evolve_producers(
         light, temp, water = _environment_factors(wcells[xy], mcells[xy])
         seed_mass = _mass(pcell["seed_elements_kg"])
         if seed_mass >= GERMINATION_SEED_MASS_KG and min(light, temp, water) > 0.28:
-            germinating = max(GERMINATION_SEED_MASS_KG, seed_mass * SEED_GERMINATION_FRACTION)
+            germinating = max(GERMINATION_SEED_MASS_KG, seed_mass * germination)
             fraction = min(1.0, germinating / seed_mass)
             established = _live_mass(pcell)
             moved = _transfer_fraction(pcell["seed_elements_kg"], fraction)
@@ -228,12 +295,12 @@ def evolve_producers(
 
         light, temp, water = _environment_factors(wcells[xy], mcells[xy])
         condition = min(light, temp, water)
-        desired = max(0.0, live_mass * BASE_GROWTH_FRACTION * condition)
+        desired = max(0.0, live_mass * plant_growth_per_tick(BASE_GROWTH_FRACTION * condition, tpy, timebase))
         growth = _growth_limit(mcells[xy], desired)
 
         if growth > 0.0:
             woody_share = 0.0
-            if int(pcell["age_ticks"]) >= 30 and condition >= 0.60:
+            if int(pcell["age_ticks"]) >= woody_onset and condition >= 0.60:
                 # Woody structure emerges only under sustained viable growth
                 # conditions; it is not randomly assigned to cells.
                 woody_share = min(0.55, 0.15 + (condition - 0.60) * 0.80)
@@ -294,10 +361,12 @@ def evolve_producers(
             continue
         light, temp, water = _environment_factors(wcells[xy], mcells[xy])
         stress = 1.0 - min(light, temp, water)
-        old_age = max(0.0, (int(pcell["age_ticks"]) - MAX_AGE_TICKS) / MAX_AGE_TICKS)
-        mortality = min(0.85, BASE_MORTALITY_FRACTION + 0.08 * stress + 0.12 * old_age)
+        old_age = max(0.0, (int(pcell["age_ticks"]) - max_age) / max_age)
+        daily_mortality = min(0.85, BASE_MORTALITY_FRACTION + 0.08 * stress + 0.12 * old_age)
+        mortality = plant_fraction_per_tick(daily_mortality, tpy, timebase)
         dead = _transfer_fraction(pcell["plant_elements_kg"], mortality)
-        woody_dead = _transfer_fraction(pcell["woody_elements_kg"], mortality * 0.35)
+        woody_dead = _transfer_fraction(
+            pcell["woody_elements_kg"], plant_fraction_per_tick(daily_mortality * WOODY_MORTALITY_SHARE, tpy, timebase))
         for symbol, amount in dead.items():
             pcell["detritus_elements_kg"][symbol] += amount
         for symbol, amount in woody_dead.items():
@@ -316,7 +385,7 @@ def evolve_producers(
         if min(light, temp, water) < 0.5:
             continue
 
-        seed = _transfer_fraction(pcell["plant_elements_kg"], REPRODUCTION_FRACTION)
+        seed = _transfer_fraction(pcell["plant_elements_kg"], reproduction)
         destinations = (xy,) + neighbors(xy[0], xy[1], width, height)
         share_count = len(destinations)
         for destination in destinations:

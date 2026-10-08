@@ -7,7 +7,7 @@ from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
 from hrm_genesis.ecology.traits import opportunity_draw, opportunity_probability, trait_for
 
 from .actions import execute_live_sequence
-from .diet import FOOD_KINDS, forage_at_cell, innate_food_prior
+from .diet import FOOD_KINDS, forage_at_cell, ingest_pool, innate_food_prior, pool_for
 from . import interactions as cap
 from .learning import update_contextual_expectations, update_expectations
 from .memory import empty_memory, remember
@@ -238,6 +238,12 @@ def _age_profile(human: dict, profile: dict) -> dict:
         span = max(1, independent_age - dependent_age)
         dependence = max(0.0, 1.0 - (age - dependent_age) / span)
     adjusted["caregiver_dependence"] = dependence
+    # Three roles, separated (docs/architecture/CAREGIVING_SOLID_FOOD.md). Each
+    # is computed from the same age curve as before, so values are unchanged;
+    # each is read only where its role applies.
+    adjusted["nursing_factor"] = dependence           # milk energy, water and dry mass
+    adjusted["carried"] = dependence > 0.0            # goes with its caregiver
+    adjusted["self_feeding"] = 1.0 - dependence       # forages for itself when > 0
     return adjusted
 
 
@@ -389,7 +395,7 @@ def _provision_dependent(
     caregiver: dict | None,
     profile: dict,
 ) -> float:
-    dependence = max(0.0, min(1.0, float(profile.get("caregiver_dependence", 0.0))))
+    dependence = max(0.0, min(1.0, float(profile.get("nursing_factor", profile.get("caregiver_dependence", 0.0)))))
     if caregiver is None or dependence <= 0.0:
         return 0.0
 
@@ -441,6 +447,93 @@ def _provision_dependent(
         float(child["energy"]) + energy,
     )
     return transferred + water
+
+
+# Complementary (solid) food can be given from this age. Declared biological
+# reference: in humans complementary feeding begins at about six months. It is
+# not a weaning age; milk is unchanged.
+SOLID_FOOD_ONSET_DAYS = 180
+CHILD_HUNGER_RESERVE = 0.75  # the planner's own hunger threshold, as a visible cue
+
+
+def _provision_solid_food(
+    child: dict,
+    caregiver: dict | None,
+    child_profile: dict,
+    caregiver_profile: dict,
+    pcell: dict,
+    ccell: dict | None,
+    eaten_kg: float,
+    stats: dict,
+) -> float:
+    """A caregiver hands food it obtains from the shared cell to its dependent
+    child (caregiving_model "solid-food-v1"). The caregiver's hands hold
+    exactly what it took; the child ingests from the hands with its own
+    capacity, assimilation and hazard; what is not eaten goes back to the cell
+    the same day. The caregiver pays handling at adult scale. Returns kg eaten.
+    """
+    def outcome(name: str) -> float:
+        counts = dict(stats.get("solid_food_outcomes", {}))
+        counts[name] = int(counts.get(name, 0)) + 1
+        stats["solid_food_outcomes"] = counts
+        return 0.0
+
+    if float(child_profile.get("nursing_factor", 0.0)) <= 0.0:
+        return 0.0
+    if caregiver is None:
+        return outcome("no_caregiver")
+    if int(child.get("age_ticks", 0)) < SOLID_FOOD_ONSET_DAYS:
+        return outcome("too_young")
+    if (int(caregiver["x"]), int(caregiver["y"])) != (int(child["x"]), int(child["y"])):
+        return outcome("not_together")
+    reference = float(child_profile.get("satiety_reference_kcal", child_profile.get("energy_capacity_kcal", 1.0)))
+    reference *= max(0.10, float(child_profile.get("development_scale", 1.0)))
+    if float(child["energy"]) / max(1e-9, reference) >= CHILD_HUNGER_RESERVE:
+        return outcome("not_hungry")
+    room = float(child_profile["bite_cap_kg"]) - max(0.0, float(eaten_kg))
+    if room <= 1e-12:
+        return outcome("gut_full")
+    known = caregiver.get("cognition", {}).get("food_values", {})
+    kinds = sorted((k for k, v in known.items() if float(v) > 0.0 and k in FOOD_KINDS),
+                   key=lambda k: (-float(known[k]), list(FOOD_KINDS).index(k)))
+    adult_scale = max(0.10, float(caregiver_profile.get("development_scale", 1.0)))
+    eaten = 0.0
+    for kind in kinds:
+        if room <= 1e-12:
+            break
+        pool = pool_for(kind, pcell, ccell)
+        available = 0.0 if pool is None else sum(float(v) for v in pool.values())
+        if available <= 0.0:
+            continue
+        spec = FOOD_KINDS[kind]
+        reach = float("inf") if spec["hand_access_kg"] is None else float(spec["hand_access_kg"]) * adult_scale
+        take = min(room, available, reach)
+        if take <= 0.0:
+            continue
+        # Obtain: mass moves from the cell into the caregiver's hands.
+        fraction = take / available
+        hands = {}
+        for symbol in sorted(pool):
+            amount = float(pool[symbol]) * fraction
+            pool[symbol] = float(pool[symbol]) - amount
+            hands[symbol] = amount
+        caregiver["energy"] = float(caregiver["energy"]) - take * float(spec["handling_kcal_per_kg"]) * adult_scale
+        # Hand over: the child eats from the hands; the rest goes back.
+        rec = ingest_pool(child, kind, take, hands, pcell["detritus_elements_kg"], child_profile, pay_handling=False)
+        for symbol, amount in hands.items():
+            pool[symbol] = float(pool[symbol]) + amount
+        if rec["kg"] > 0.0:
+            room -= rec["kg"]
+            eaten += rec["kg"]
+            kg = dict(stats.get("solid_food_kg_by_kind", {}))
+            kg[kind] = float(kg.get(kind, 0.0)) + rec["kg"]
+            stats["solid_food_kg_by_kind"] = kg
+            stats["solid_food_kcal"] = float(stats.get("solid_food_kcal", 0.0)) + rec["kcal"]
+            stats["solid_food_handling_kcal"] = float(stats.get("solid_food_handling_kcal", 0.0)) + take * float(spec["handling_kcal_per_kg"]) * adult_scale
+    if eaten <= 0.0:
+        return outcome("no_known_food_here")
+    outcome("fed")
+    return eaten
 
 
 def _structural_protection(world_cell: dict, producer_cell: dict | None = None) -> tuple[float, float]:
@@ -734,7 +827,9 @@ def evolve_agentus_step(
         start_injury = float(human.get("injury", 0.0))
         caregiver = _resolve_caregiver(human, people_by_id, effective_profile)
         dependence = float(effective_profile.get("caregiver_dependence", 0.0))
-        if dependence > 0.0 and caregiver is not None:
+        carried = bool(effective_profile.get("carried", dependence > 0.0))
+        self_feeding = float(effective_profile.get("self_feeding", 1.0 - dependence))
+        if carried and caregiver is not None:
             target = (int(caregiver["x"]), int(caregiver["y"]))
             if integrity and origin != start_xy.get(str(caregiver["id"]), target):
                 # Not being carried: a separated dependent covers one cell a day.
@@ -797,7 +892,7 @@ def evolve_agentus_step(
             target = _move_toward_food(human, producers)
         moved = target != origin
         if moved:
-            movement_cost = float(effective_profile["move_energy_kcal_per_tick"]) * (0.25 if dependence > 0.0 else 1.0)
+            movement_cost = float(effective_profile["move_energy_kcal_per_tick"]) * (0.25 if carried else 1.0)
             human["energy"] = float(human["energy"]) - movement_cost
             human["x"], human["y"] = target
 
@@ -816,7 +911,8 @@ def evolve_agentus_step(
             human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
             human["last_action_trace"] = trace
         provisioned = _provision_dependent(human, caregiver, effective_profile)
-        if dependence < 1.0 and capacities and "cognition" in human:
+        ate_kg_today = 0.0
+        if self_feeding > 0.0 and capacities and "cognition" in human:
             _drink(human, mcells[xy], effective_profile)
             hungry = (
                 float(human["energy"])
@@ -842,13 +938,23 @@ def evolve_agentus_step(
                 ctx = cap.Context(humans, human, effective_profile, pcells[xy], ccells[xy], lithic_cells, wcells[xy], consumer_state, epoch)
             cap.learn_from_tick(ctx, intake)
             ate = sum(float(r["kg"]) for r in intake if float(r["kcal"]) > 0.0)
+            ate_kg_today = sum(float(r["kg"]) for r in intake)
             if perception is not None and "chosen_by" in perception:
                 cap.learn_following(humans, human, perception, ate)
-        elif dependence < 1.0:
+        elif self_feeding > 0.0:
             _drink(human, mcells[xy], effective_profile)
             ate = _eat(human, pcells[xy], effective_profile)
+            ate_kg_today = ate
         else:
             ate = 0.0
+        if humans.get("caregiving_model") == "solid-food-v1" and capacities:
+            given = _provision_solid_food(
+                human, caregiver, effective_profile,
+                _age_profile(caregiver, profile) if caregiver is not None else effective_profile,
+                pcells[xy], ccells[xy], ate_kg_today,
+                humans.setdefault("capacity_stats", cap.empty_stats()),
+            )
+            ate = float(ate) + given
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
         if capacities:
             _apply_physiology(

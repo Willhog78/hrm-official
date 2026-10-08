@@ -11,6 +11,7 @@ identical with and without the audit.
      clamp_loss    food energy offered but not credited (reserve at its cap)
      interactions  effort and anything else inside run_interactions
      nursing       energy drawn from a caregiver by _provision_dependent
+     provisioning  handling paid by a caregiver giving solid food (solid-food-v1)
      thermal       _apply_physiology (cold/heat stress)
      catabolism    lean tissue broken down to cover a deficit (reference-v2)
      basal, move   the inline costs, from the agent's effective profile
@@ -55,7 +56,7 @@ from hrm_genesis.human.diet import available_kg  # noqa: E402
 from qualification.genesis.tier_observer import build_config, unobserved_digest  # noqa: E402
 
 DEFAULT_SEEDS = ("agentus-demography-a", "agentus-demography-b", "agentus-demography-c", "agentus-demography-d")
-ENERGY_TERMS = ("intake", "interactions", "nursing", "thermal", "catabolism", "basal", "move", "birth")
+ENERGY_TERMS = ("intake", "interactions", "nursing", "provisioning", "thermal", "catabolism", "basal", "move", "birth")
 INJURY_SOURCES = ("predator", "ingestion", "interactions", "physiology")
 ATTRIBUTION_DAYS = 60
 
@@ -74,6 +75,7 @@ class Audit:
         audit = self
         o_forage = biology.forage_at_cell
         o_provision = biology._provision_dependent
+        o_solid = getattr(biology, "_provision_solid_food", None)
         o_physiology = biology._apply_physiology
         o_catabolize = biology._catabolize_lean_tissue
         o_predator = biology._apply_predator_threat
@@ -106,9 +108,23 @@ class Audit:
 
         def _provision_dependent(child, caregiver, profile):
             e0 = None if caregiver is None else float(caregiver["energy"])
+            c0 = float(child["energy"])
             out = o_provision(child, caregiver, profile)
             if caregiver is not None:
                 audit.energy[str(caregiver["id"])]["nursing"] += float(caregiver["energy"]) - e0
+                # What the child actually gained from milk (it is capped by the
+                # child's store); compare with what the mother paid.
+                audit.energy[str(caregiver["id"])]["milk_to_child"] += float(child["energy"]) - c0
+            return out
+
+        def _provision_solid_food(child, caregiver, *args, **kwargs):
+            e0 = None if caregiver is None else float(caregiver["energy"])
+            c0 = float(child["energy"])
+            out = o_solid(child, caregiver, *args, **kwargs)
+            if caregiver is not None:
+                audit.energy[str(caregiver["id"])]["provisioning"] += float(caregiver["energy"]) - e0
+                audit.energy[str(caregiver["id"])]["solid_to_child_kcal"] += float(child["energy"]) - c0
+                audit.energy[str(caregiver["id"])]["solid_to_child_kg"] += float(out)
             return out
 
         def _apply_physiology(human, *args, **kwargs):
@@ -206,6 +222,7 @@ class Audit:
 
         for module, name, fn in (
             (biology, "forage_at_cell", forage_at_cell), (biology, "_provision_dependent", _provision_dependent),
+            *([(biology, "_provision_solid_food", _provision_solid_food)] if o_solid is not None else []),
             (biology, "_apply_physiology", _apply_physiology), (biology, "_catabolize_lean_tissue", _catabolize_lean_tissue),
             (biology, "_apply_predator_threat", _apply_predator_threat), (biology, "_age_profile", _age_profile),
             (cap, "run_interactions", run_interactions), (cap, "choose", choose), (cap, "learn_from_tick", learn_from_tick),
@@ -295,6 +312,9 @@ def run_audit(seed: str, arm: str, days: int, consumer_timebase: str | None = No
                     "reserve": float(p0["energy"]) / satiety, "energy": float(p0["energy"]),
                     "change": change, "residual": residual,
                     **{t: float(terms.get(t, 0.0)) for t in ENERGY_TERMS}, "clamp_loss": float(terms.get("clamp_loss", 0.0)),
+                    "milk_to_child": float(terms.get("milk_to_child", 0.0)),
+                    "solid_to_child_kcal": float(terms.get("solid_to_child_kcal", 0.0)),
+                    "solid_to_child_kg": float(terms.get("solid_to_child_kg", 0.0)),
                     "kg": food.get("kg", 0.0), "gut_kg": food.get("gut_kg", 0.0), "plant_here_kg": food.get("plant_here_kg", 0.0),
                     "kcal_by_kind": food.get("kcal_by_kind", {}),
                     "born_today": births.get(pid, 0),
@@ -347,6 +367,8 @@ def summarize_energy(rows: list[dict]) -> dict:
         out[name] = {
             "days": n,
             "mean_kcal_per_day": {k: round(mean(k), 1) for k in ENERGY_TERMS + ("clamp_loss", "change")},
+            "milk_paid_vs_absorbed_kcal": (round(-mean("nursing"), 1), round(mean("milk_to_child"), 1)),
+            "solid_food_to_children": (round(mean("solid_to_child_kg"), 4), round(mean("solid_to_child_kcal"), 1)),
             "gut_fill_mean": round(sum(r["kg"] / r["gut_kg"] for r in rs if r["gut_kg"] > 0) / n, 3),
             "gut_full_days": round(sum(1 for r in rs if r["gut_kg"] > 0 and r["kg"] >= 0.99 * r["gut_kg"]) / n, 3),
             "food_in_cell_ge_gut_days": round(sum(1 for r in rs if r["plant_here_kg"] >= r["gut_kg"] > 0) / n, 3),
@@ -397,6 +419,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {s['mean_kcal_per_day']}")
             print(f"  gut fill {s['gut_fill_mean']}  gut full on {s['gut_full_days']:.0%} of days  "
                   f"food in own cell >= gut on {s['food_in_cell_ge_gut_days']:.0%}  mean reserve {s['mean_reserve']}")
+            print(f"  milk paid / absorbed by children (kcal/day) {s['milk_paid_vs_absorbed_kcal']}  "
+                  f"solid food to children (kg, kcal per day) {s['solid_food_to_children']}")
             print(f"  dependents per day {s['dependents']}  nursing per dependent {s['nursing_per_dependent_kcal']} kcal  "
                   f"food offered by kind (kcal/day, before any clamp) {s['offered_kcal_by_kind']}")
     print("\n== INJURY DEATHS ==")
