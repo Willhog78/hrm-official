@@ -202,6 +202,22 @@ Ecology experiments E1–E3 stay unimplemented. Physiology and life-history valu
   - Edible mass swings more than 10× within a year, and the plant-only control falls the same way from year 1 end to year 2 end. The year-end decline therefore has no established cause yet.
   - Animals remove about 0.1 kg of edible plant a year. Agentus remove about 2.7 t, which is 20% of growth in the low-season months.
 
+### Plant decline diagnosed and corrected: water cycle at material scale (2026-10-08)
+- **Decision: implementation defect** (`docs/architecture/WATER_CYCLE_SCALE.md`).
+  - G10.1 scaled the water and biomass inventories by `material_scale_factor` (1000), but left rain, infiltration, soil capacity, evaporation, runoff and the plants' water threshold in scale-1 kg.
+  - Year 1's boom spent the scaled reservoir. The vegetation then shrank toward what unscaled rain (104 t/yr) can support; transpiration was 1,998 t in year 1.
+- **Not the cause:**
+  - the climate, which is stationary;
+  - old-age mortality (0% of deaths);
+  - soil elements (growth got 96–100% of what it asked for);
+  - a conservation error (no water created).
+- **The rules can sustain vegetation.** The same world at scale 1 holds steady peaks of 1.79–1.84 kg in years 6–10.
+- **Correction:** `water_cycle_scale = "material-v1"` scales those fluxes and capacities with the stored scale.
+  - The corrected plant-only control at scale 1000 matches scale 1 × 1000: peaks 1,809–1,852 t in years 7–10, steady soil water, no dry cells.
+  - `unscaled-legacy` (arm suffix `-legacywater`) reproduces the earlier digest exactly. Scale-1 worlds are unchanged.
+  - Plant rates are unchanged.
+- **Recorded separately, not changed:** the child energy clamp (`DEMAND_LIMITED_MILK.md` §7).
+
 ## Verification infrastructure
 
 **CI has never run.** All 119 runs of the GitHub Actions `Stage-1 verification` workflow have failed in about 3 s, before a runner was assigned. That covers runs 1–119, from the first run on 2026-09-23 to the merge of PR #33. No log exists. GitHub's annotation on the job (checked for runs 1, 11 and 119) says:

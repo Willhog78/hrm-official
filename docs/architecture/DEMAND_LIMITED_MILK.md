@@ -80,3 +80,18 @@ These identities hold:
 - Nursing amounts, the dependence curve, weaning, physiology defaults and birth spacing.
 - The solid-food rule.
 - Milk still has priority: it is given before the child's own foraging and before any hand-feeding. Whether milk keeps children above the hand-feeding trigger is measured by the audit's hand-feeding checks. It is a hypothesis, not a finding.
+
+## 7. Open defect, recorded for an isolated correction: the child energy clamp
+
+**Not part of the milk change, and not to be bundled with plant or water changes.**
+
+- **Where.** `_provision_dependent` ends with `child.energy = min(child capacity, before + milk)`, where child capacity = `energy_capacity_kcal × development_scale`. `ingest` caps any eater at the adult `energy_capacity_kcal`. A child aged 2–5 who feeds itself can therefore sit above its size-scaled store. On its next nursing day the `min` cuts it back, and the excess energy is erased.
+- **Measured** (second daily-world run, `nursing_stats.child_store_clamp_kcal`):
+  - 24–29 kcal per nursing day across the four seeds;
+  - zero in years 1–2;
+  - seed a rises from 36,383 kcal in year 3 to 189,744 kcal in year 5.
+- **Correction to decide:** one store bound for children, applied wherever energy is credited (eating, hand-feeding and milk). Either:
+  - (a) `ingest` caps children at their size-scaled store, so food beyond it is refused, the same way an adult's full reserve refuses food; or
+  - (b) the child store is not size-scaled.
+
+  Either way, the nursing `min` then removes nothing. The choice changes child physiology, so it needs its own decision and its own legacy setting.

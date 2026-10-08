@@ -60,7 +60,7 @@ class PlantLedger:
         ledger = self
         o_producers = runner.evolve_producers
 
-        def observe(flow: str, kg: float) -> None:
+        def observe(flow: str, kg: float, *_args, **_terms) -> None:
             ledger.flows[flow] += float(kg)
 
         def evolve_producers(producer_state, *args, **kwargs):

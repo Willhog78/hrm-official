@@ -8,6 +8,18 @@ from hrm_genesis.world.grid import neighbors
 SOIL_WATER_CAPACITY_KG = 100.0
 MOBILE_ELEMENT_DIFFUSION_RATE = 0.01
 
+# Water-cycle scale (docs/architecture/WATER_CYCLE_SCALE.md). The quantities in
+# this water cycle (rain per event, infiltration per day, soil capacity,
+# evaporation, the runoff residue) are stated for material scale 1. A world
+# whose water and biomass inventories are scaled by `material_scale_factor`
+# stores that factor as `water_scale`, and its fluxes and capacities are
+# scaled with it so stocks and flows keep the same proportions. Absent (scale
+# 1, or "unscaled-legacy") it is 1 and nothing changes.
+
+
+def water_scale(matter_state: dict) -> float:
+    return float(matter_state.get("water_scale", 1.0))
+
 
 def _lookup(cells: list[dict]) -> dict[tuple[int, int], dict]:
     return {(int(c["x"]), int(c["y"])): c for c in cells}
@@ -25,21 +37,22 @@ def apply_water_cycle(
 
     precipitation_total = 0.0
     evaporation_total = 0.0
+    scale = water_scale(state)
 
     for cell in cells:
         xy = (int(cell["x"]), int(cell["y"]))
         climate = world_lookup[xy]
-        precipitation = float(climate["precipitation"])
+        precipitation = float(climate["precipitation"]) * scale
         precipitation_total += precipitation
 
         surface = float(cell["surface_water_kg"]) + precipitation
         soil = float(cell["soil_water_kg"])
 
-        infiltration = min(surface, max(0.0, SOIL_WATER_CAPACITY_KG - soil), 3.0)
+        infiltration = min(surface, max(0.0, SOIL_WATER_CAPACITY_KG * scale - soil), 3.0 * scale)
         surface -= infiltration
         soil += infiltration
 
-        evaporation = max(
+        evaporation = scale * max(
             0.0,
             0.03 * float(climate["solar"]) + 0.004 * max(float(climate["temperature"]), 0.0),
         )
@@ -65,7 +78,7 @@ def apply_water_cycle(
         lowest = min(adjacent, key=lambda xy: float(terrain[xy]["elevation"]))
         if float(terrain[lowest]["elevation"]) >= float(terrain[here]["elevation"]):
             continue
-        amount = min(local * 0.18, max(0.0, local - 0.5))
+        amount = min(local * 0.18, max(0.0, local - 0.5 * scale))
         if amount <= 0.0:
             continue
         transfers[here] = transfers.get(here, 0.0) - amount

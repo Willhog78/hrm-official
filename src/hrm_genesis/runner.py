@@ -112,6 +112,9 @@ class GenesisSimulation:
                 seed_bank=self.seed_bank,
                 scale_factor=config.material_scale_factor,
             )
+            if config.water_scale_active:
+                # Present only where it changes behaviour (scale != 1).
+                matter_state["water_scale"] = float(config.material_scale_factor)
 
         if config.producer_ecology_enabled:
             if matter_state is None:

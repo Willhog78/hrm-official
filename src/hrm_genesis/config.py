@@ -80,6 +80,12 @@ class GenesisConfig:
     # mother for what is made; "supply-capped-legacy" reproduces earlier runs.
     # Active for calibrated humans.
     nursing_model: str = "demand-limited-v1"
+    # Water cycle at material scale (docs/architecture/WATER_CYCLE_SCALE.md).
+    # "material-v1" (default) scales rain, infiltration, soil capacity,
+    # evaporation and the plants' water threshold with material_scale_factor,
+    # as G10.1 already scales the water and biomass inventories;
+    # "unscaled-legacy" reproduces earlier runs. Identical at scale 1.
+    water_cycle_scale: str = "material-v1"
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -130,6 +136,8 @@ class GenesisConfig:
             raise ValueError("unknown caregiving_model")
         if self.nursing_model not in {"demand-limited-v1", "supply-capped-legacy"}:
             raise ValueError("unknown nursing_model")
+        if self.water_cycle_scale not in {"material-v1", "unscaled-legacy"}:
+            raise ValueError("unknown water_cycle_scale")
         if self.agentus_observation_model not in {"visible-v1", "g10.4-legacy"}:
             raise ValueError("unknown agentus_observation_model")
         if self.agentus_event_memory_retention not in {"consequence", "fifo"}:
@@ -165,6 +173,11 @@ class GenesisConfig:
     @property
     def solid_food_active(self) -> bool:
         return self.caregiving_model == "solid-food-v1" and self.agentus_capacities_enabled and self.human_cognition_enabled
+
+    @property
+    def water_scale_active(self) -> bool:
+        return (self.water_cycle_scale == "material-v1" and self.matter_enabled
+                and self.material_scale_factor != 1.0)
 
     @property
     def demand_milk_active(self) -> bool:
@@ -216,6 +229,8 @@ class GenesisConfig:
             canonical["agentus_caregiving"] = self.caregiving_model
         if self.demand_milk_active:
             canonical["agentus_nursing"] = self.nursing_model
+        if self.water_scale_active:
+            canonical["water_cycle_scale"] = self.water_cycle_scale
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":

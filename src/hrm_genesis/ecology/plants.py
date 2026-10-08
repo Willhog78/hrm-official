@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from hrm_coordination.seeds import SeedBank
+from hrm_genesis.matter.transfers import water_scale
 from hrm_genesis.world.grid import neighbors
 
 
@@ -199,14 +200,15 @@ def seed_initial_producers(
     return matter, ecology
 
 
-def _environment_factors(world_cell: dict, matter_cell: dict) -> tuple[float, float, float]:
+def _environment_factors(world_cell: dict, matter_cell: dict, water_scale: float = 1.0) -> tuple[float, float, float]:
     solar = max(0.0, float(world_cell["solar"]))
     temp = float(world_cell["temperature"])
     water = max(0.0, float(matter_cell["soil_water_kg"]))
 
     light_factor = min(1.0, solar / 0.85)
     temp_factor = max(0.0, 1.0 - abs(temp - 22.0) / 24.0)
-    water_factor = min(1.0, water / 18.0)
+    # 18 kg is stated at material scale 1 (see matter/transfers.py water_scale).
+    water_factor = min(1.0, water / (18.0 * water_scale))
     return light_factor, temp_factor, water_factor
 
 
@@ -229,9 +231,11 @@ def _transfer_fraction(source: dict[str, float], fraction: float) -> dict[str, f
     return moved
 
 
-# Read-only flow observer (qualification/genesis/plant_ledger.py). When set, it
-# is called as FLOW_OBSERVER(flow, kg) for each material flow of a producer step.
-# It never changes state; production runs leave it None.
+# Read-only flow observer (qualification/genesis/plant_ledger.py,
+# plant_balance.py). When set, it is called as FLOW_OBSERVER(flow, kg, xy,
+# **terms) for each material flow of a producer step, with the cell and the
+# rate terms that produced it. It never changes state; production runs leave
+# it None.
 FLOW_OBSERVER = None
 
 
@@ -250,6 +254,7 @@ def evolve_producers(
     mcells = _cell_lookup(matter["cells"])
     wcells = _cell_lookup(world_state["cells"])
     timebase = producer_timebase(ecology)
+    wscale = water_scale(matter)
     observe = FLOW_OBSERVER
     tpy = int(world_state.get("ticks_per_year", PLANT_REFERENCE_TICKS_PER_YEAR))
     decomposition = plant_fraction_per_tick(DECOMPOSITION_FRACTION, tpy, timebase)
@@ -276,12 +281,12 @@ def evolve_producers(
             pcell["detritus_elements_kg"][symbol] -= returned
             mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
             if observe is not None:
-                observe("decomposition", returned)
+                observe("decomposition", returned, xy)
 
     # 2. Germination converts seed material into living material when the local
     # environment is viable. No material is created.
     for xy, pcell in pcells.items():
-        light, temp, water = _environment_factors(wcells[xy], mcells[xy])
+        light, temp, water = _environment_factors(wcells[xy], mcells[xy], wscale)
         seed_mass = _mass(pcell["seed_elements_kg"])
         if seed_mass >= GERMINATION_SEED_MASS_KG and min(light, temp, water) > 0.28:
             germinating = max(GERMINATION_SEED_MASS_KG, seed_mass * germination)
@@ -291,7 +296,7 @@ def evolve_producers(
             for symbol, amount in moved.items():
                 pcell["plant_elements_kg"][symbol] += amount
             if observe is not None:
-                observe("germination", _mass(moved))
+                observe("germination", _mass(moved), xy, seed_kg=seed_mass, light=light, temp=temp, water=water)
             # Cell age is the biomass-weighted age of its vegetation: seedlings
             # enter at age 0 without rejuvenating established plants.
             total = _live_mass(pcell)
@@ -304,7 +309,7 @@ def evolve_producers(
         if live_mass <= 0.0:
             continue
 
-        light, temp, water = _environment_factors(wcells[xy], mcells[xy])
+        light, temp, water = _environment_factors(wcells[xy], mcells[xy], wscale)
         condition = min(light, temp, water)
         desired = max(0.0, live_mass * plant_growth_per_tick(BASE_GROWTH_FRACTION * condition, tpy, timebase))
         growth = _growth_limit(mcells[xy], desired)
@@ -322,8 +327,9 @@ def evolve_producers(
                 pcell["woody_elements_kg"][symbol] += amount * woody_share
 
             if observe is not None:
-                observe("growth_edible", growth * (1.0 - woody_share))
-                observe("growth_woody", growth * woody_share)
+                observe("growth_edible", growth * (1.0 - woody_share), xy, live_kg=live_mass, desired=desired,
+                        light=light, temp=temp, water=water, age=int(pcell["age_ticks"]))
+                observe("growth_woody", growth * woody_share, xy)
             water_used = growth * WATER_KG_PER_KG_GROWTH
             mcells[xy]["soil_water_kg"] -= water_used
             # G2 does not model atmospheric vapor as a retained reservoir, so
@@ -351,7 +357,7 @@ def evolve_producers(
                 for symbol, amount in burned.items():
                     pcell["detritus_elements_kg"][symbol] += amount
                 if observe is not None:
-                    observe("fire_" + bucket.removesuffix("_elements_kg"), _mass(burned))
+                    observe("fire_" + bucket.removesuffix("_elements_kg"), _mass(burned), xy)
             fuel_after = _burnable_mass(pcell)
             rain_quench = min(0.85, float(wcell.get("precipitation", 0.0)) / 6.0)
             current = max(0.0, current * (0.82 - 0.55 * rain_quench))
@@ -375,7 +381,7 @@ def evolve_producers(
         live_mass = _live_mass(pcell)
         if live_mass <= 0.0:
             continue
-        light, temp, water = _environment_factors(wcells[xy], mcells[xy])
+        light, temp, water = _environment_factors(wcells[xy], mcells[xy], wscale)
         stress = 1.0 - min(light, temp, water)
         old_age = max(0.0, (int(pcell["age_ticks"]) - max_age) / max_age)
         daily_mortality = min(0.85, BASE_MORTALITY_FRACTION + 0.08 * stress + 0.12 * old_age)
@@ -388,8 +394,9 @@ def evolve_producers(
         for symbol, amount in woody_dead.items():
             pcell["detritus_elements_kg"][symbol] += amount
         if observe is not None:
-            observe("mortality_edible", _mass(dead))
-            observe("mortality_woody", _mass(woody_dead))
+            observe("mortality_edible", _mass(dead), xy, live_kg=live_mass, stress=stress, old_age=old_age,
+                    daily=daily_mortality, age=int(pcell["age_ticks"]))
+            observe("mortality_woody", _mass(woody_dead), xy)
         if _live_mass(pcell) <= 1e-12:
             pcell["age_ticks"] = 0
 
@@ -400,13 +407,13 @@ def evolve_producers(
         live_mass = _mass(pcell["plant_elements_kg"])
         if live_mass < 0.02:
             continue
-        light, temp, water = _environment_factors(wcells[xy], mcells[xy])
+        light, temp, water = _environment_factors(wcells[xy], mcells[xy], wscale)
         if min(light, temp, water) < 0.5:
             continue
 
         seed = _transfer_fraction(pcell["plant_elements_kg"], reproduction)
         if observe is not None:
-            observe("reproduction", _mass(seed))
+            observe("reproduction", _mass(seed), xy)
         destinations = (xy,) + neighbors(xy[0], xy[1], width, height)
         share_count = len(destinations)
         for destination in destinations:

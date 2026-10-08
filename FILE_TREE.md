@@ -112,6 +112,7 @@ hrm-official/
 │       ├── test_consumer_opportunity.py
 │       ├── test_budget_audit.py
 │       ├── test_plant_ledger.py
+│       ├── test_water_cycle_scale.py
 │       └── micro/                 # micro tier: test_micro_<topic>.py + _scenario.py
 │
 ├── qualification/
@@ -132,6 +133,7 @@ hrm-official/
 │       ├── opportunity.py         # read-only social-learning opportunity census
 │       ├── budget_audit.py        # read-only energy ledger, milk, hand-feeding checks, injury sources, imitation audit
 │       ├── plant_ledger.py        # read-only plant mass ledger (+ plant-only control)
+│       ├── plant_balance.py       # read-only plant balance by cell and season, limiting conditions
 │       ├── report_g4_results.py
 │       └── scenarios/
 │
