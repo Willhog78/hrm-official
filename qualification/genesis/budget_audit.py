@@ -125,9 +125,9 @@ class Audit:
             audit.energy[str(human["id"])]["catabolism"] += float(human["energy"]) - e0
             return out
 
-        def _apply_predator_threat(human, consumer_state):
+        def _apply_predator_threat(human, consumer_state, epoch=None):
             i0 = float(human.get("injury", 0.0))
-            n = o_predator(human, consumer_state)
+            n = o_predator(human, consumer_state, epoch)
             hid = str(human["id"])
             audit.injury[hid]["predator"] += float(human.get("injury", 0.0)) - i0
             audit.injury[hid]["predator_attacks"] += n
@@ -367,7 +367,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--parallel", type=int, default=4)
     p.add_argument("--json")
     p.add_argument("--check-digest", action="store_true")
-    p.add_argument("--consumer-timebase", choices=("elapsed-time-v1", "per-tick-legacy"),
+    p.add_argument("--consumer-timebase", choices=("elapsed-time-v2", "elapsed-time-v1", "per-tick-legacy"),
                    help="override the consumer timebase (per-tick-legacy reproduces pre-D2 runs)")
     a = p.parse_args(argv)
     t = time.perf_counter()

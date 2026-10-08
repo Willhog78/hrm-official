@@ -2,14 +2,17 @@
 
 Runs the Agentus world's ecology (16x16, material scale 1000, producers and
 consumers, no Agentus) for whole years at 12 ticks/year and at 365 ticks/year,
-the latter under "per-tick-legacy" and "elapsed-time-v1". Trajectories are not
+the latter under "per-tick-legacy", "elapsed-time-v1" (rates) and
+"elapsed-time-v2" (rates and opportunities). Trajectories are not
 expected to match (weather, plants and movement are per tick); per-year
 quantities are compared: animals alive, births, deaths by cause, mean energy
 and water state, element and water balance, and encounter frequency (cells
-travelled per animal-year, hunt attempts and kills). Movement stays one cell per
-tick and hunt success is per attempt at any timebase, so encounter frequency is
-expected to differ; it is measured here, not corrected. Hunt attempts are read
-by wrapping the per-attempt success roll (read-only).
+travelled per animal-year, hunt attempts and kills, and the share of movement
+decisions in which the animal wants to leave its cell). Under the earlier
+timebases movement and hunt attempts happen at most once per tick; under
+"elapsed-time-v2" once per reference month of elapsed time. Hunt attempts and
+decisions are counted by wrapping the per-attempt success roll and the step
+function (read-only).
 
   python experiments/genesis/run_consumer_timebase_comparison.py --years 5 --json out.json
 """
@@ -36,7 +39,8 @@ from hrm_genesis.ecology.plants import ecology_element_totals  # noqa: E402
 from hrm_genesis.ecology.traits import trait_for  # noqa: E402
 from hrm_genesis.matter.pools import total_elements, total_water  # noqa: E402
 
-ARMS = (("monthly", 12, "elapsed-time-v1"), ("daily-legacy", 365, "per-tick-legacy"), ("daily-elapsed", 365, "elapsed-time-v1"))
+ARMS = (("monthly", 12, "elapsed-time-v2"), ("daily-legacy", 365, "per-tick-legacy"),
+        ("daily-elapsed", 365, "elapsed-time-v1"), ("daily-v2", 365, "elapsed-time-v2"))
 SEEDS = ("agentus-demography-a", "agentus-demography-b", "agentus-demography-c")
 
 
@@ -56,6 +60,13 @@ def run(seed: str, arm: str, tpy: int, timebase: str, years: int) -> dict:
     started = time.perf_counter()
     attempts = Counter()
     original_hunt = animals_module._hunt_succeeds
+    original_step = animals_module._move_one_step
+
+    def step(origin, target):
+        out = original_step(origin, target)
+        attempts["decisions"] += 1
+        attempts["wants_to_move"] += out != origin
+        return out
 
     def hunt(predator, prey, epoch):
         ok = original_hunt(predator, prey, epoch)
@@ -64,10 +75,12 @@ def run(seed: str, arm: str, tpy: int, timebase: str, years: int) -> dict:
         return ok
 
     animals_module._hunt_succeeds = hunt
+    animals_module._move_one_step = step
     try:
         return _run(seed, arm, tpy, timebase, years, attempts, started)
     finally:
         animals_module._hunt_succeeds = original_hunt
+        animals_module._move_one_step = original_step
 
 
 def _run(seed, arm, tpy, timebase, years, attempts, started) -> dict:
@@ -106,6 +119,8 @@ def _run(seed, arm, tpy, timebase, years, attempts, started) -> dict:
             "deaths": {k: v for k, v in (deaths - deaths0).items() if v},
             "cells_per_animal_year": {k: round(travelled[k] / max(1e-9, alive_ticks[k] / tpy), 1) for k in sorted(alive_ticks)},
             "hunt_attempts": attempts["attempts"] - attempts0["attempts"],
+            "share_of_decisions_wanting_to_move": round((attempts["wants_to_move"] - attempts0["wants_to_move"])
+                                                        / max(1, attempts["decisions"] - attempts0["decisions"]), 4),
             "hunt_successes": attempts["successes"] - attempts0["successes"],
             "predator_years": round(sum(v for k, v in alive_ticks.items() if trait_for(k).trophic_role == "predator") / tpy, 3),
             "mean_energy": round(energy_sum / max(1, samples), 3),
@@ -159,6 +174,7 @@ def main(argv=None) -> int:
         years_alive = Counter()
         hunts = kills = 0
         pyears = 0.0
+        want = [y["share_of_decisions_wanting_to_move"] for r in rs for y in r["per_year"]]
         for r in rs:
             for y in r["per_year"]:
                 for sp, c in y["cells_per_animal_year"].items():
@@ -170,6 +186,7 @@ def main(argv=None) -> int:
                 pyears += y["predator_years"]
         per = {sp: round(cells[sp] / years_alive[sp], 1) for sp in sorted(cells) if years_alive[sp] > 0}
         print(f"{arm:14s} births per year {births}  deaths {dict(deaths)}  alive at end {dict(end)}")
+        print(f"{'':14s} share of decisions wanting to move (mean of seed-years) {sum(want) / max(1, len(want)):.4f}")
         print(f"{'':14s} cells travelled per animal-year {per}  hunt attempts {hunts}, kills {kills}, "
               f"over {pyears:.2f} predator-years ({hunts / max(1e-9, pyears):.1f} attempts per predator-year)")
     if a.json:

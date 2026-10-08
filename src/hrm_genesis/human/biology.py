@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from hrm_coordination.seeds import SeedBank
 from hrm_genesis.ecology.plants import PLANT_ELEMENT_FRACTIONS
-from hrm_genesis.ecology.traits import trait_for
+from hrm_genesis.ecology.traits import opportunity_draw, opportunity_probability, trait_for
 
 from .actions import execute_live_sequence
 from .diet import FOOD_KINDS, forage_at_cell, innate_food_prior
@@ -624,10 +624,15 @@ def _apply_physiology(
 
 
 
-def _apply_predator_threat(human: dict, consumer_state: dict | None) -> int:
+def _apply_predator_threat(human: dict, consumer_state: dict | None, epoch: int | None = None) -> int:
     if not consumer_state:
         return 0
     xy = (int(human["x"]), int(human["y"]))
+    # Consumer timebase "elapsed-time-v2": a predator has one attack
+    # opportunity per reference tick of elapsed time (traits.has_opportunity).
+    ticks_per_year = int(consumer_state.get("ticks_per_year", 12))
+    timebase = str(consumer_state.get("rate_timebase", "per-tick-legacy"))
+    attack_chance = opportunity_probability(ticks_per_year, timebase)
     attackers = []
     for animal in consumer_state.get("animals", []):
         traits = trait_for(str(animal["species"]))
@@ -636,6 +641,8 @@ def _apply_predator_threat(human: dict, consumer_state: dict | None) -> int:
         if (int(animal["x"]), int(animal["y"])) != xy:
             continue
         if float(animal["energy"]) >= traits.reproduction_energy * 2.0:
+            continue
+        if attack_chance < 1.0 and opportunity_draw(animal["id"], human.get("id"), epoch, "attack") >= attack_chance:
             continue
         attackers.append(animal)
 
@@ -852,7 +859,7 @@ def evolve_agentus_step(
             cap.credit_worn_benefit(humans, human, float(human.pop("insulation_saving_kcal", 0.0)), effective_profile)
         else:
             _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy], sleep_recovery=integrity)
-        attacks = _apply_predator_threat(human, consumer_state)
+        attacks = _apply_predator_threat(human, consumer_state, epoch)
         if attacks:
             humans["predator_attack_events"] = int(humans.get("predator_attack_events", 0)) + attacks
         loss = min(float(human["body_water_kg"]), float(effective_profile["water_loss_per_tick_kg"]))

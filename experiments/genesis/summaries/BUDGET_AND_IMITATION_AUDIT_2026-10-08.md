@@ -88,6 +88,28 @@ All from the code and these measurements.
 
 Both are physiology and life-history inputs. They are unchanged here, and choosing between them is D3.
 
+### Reconciliation: 400 versus 34 caregiver-days below reserve 0.25
+
+`ECOLOGY_OPPORTUNITY_OPENING.md` section 5.1 reported 400 caregiver-days below reserve 0.25 under `reference-v2`, and this audit reports 34.
+
+**The difference is the configuration, specifically the consumer timebase. It is not the population or the measurement definition.** Both counts are adults caring for a dependent, with reserve = energy ÷ 30,000 at the start of the day. Each method was run on both timebases (4 seeds × 730 days, `reference-v2`):
+
+| Caregiver-days below reserve 0.25 | pre-D2 (`per-tick-legacy`) | D2 (`elapsed-time-v1`) |
+|---|---|---|
+| opportunity census | **400** | **34** |
+| budget audit | **400** | **34** |
+| hungry caregiver-days (reserve < 0.75), census and audit | 544 | 108 |
+
+The 400 came from the census run before the D2 correction; the 34 from the audit after it.
+
+The likely pathway runs through the predator:
+- **Pre-D2**, the predator starved early: 0–6 attacks per seed in two years and no injury deaths. There were 923 caregiver-days with two dependents, and all 400 deep days had two.
+- **Under D2**, the predator survives: 8 injury deaths, 7 of them children. Two-dependent days fall to 736, and deep days to 34.
+
+Two-dependent days fall 20% while deep days fall 92%. This fits the loss of a second child ending a mother's drawdown before her store runs low. That per-mother pathway is **inferred**; it was not traced mother by mother. The attribution of 400 versus 34 to the timebase is **measured**.
+
+The mechanism found here holds on both timebases: on every deep day the mother has two dependents, a full gut and food in her cell. The timebase changes how often a mother gets there, not why.
+
 ## Question 2. What prevented each copied act from paying off?
 
 **Answer.** All 72 imitated tries were scored on their cost, because nothing they did was followed by food, and in this world nothing ever pays them back later. Across the three runs:

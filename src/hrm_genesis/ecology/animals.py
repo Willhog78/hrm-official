@@ -10,8 +10,10 @@ from .plants import PLANT_ELEMENT_FRACTIONS
 from .traits import (
     CONSUMER_TIMEBASE_ELAPSED,
     CONSUMER_TIMEBASE_LEGACY,
+    CONSUMER_TIMEBASES,
     SPECIES,
     TRAIT_REFERENCE_TICKS_PER_YEAR,
+    has_opportunity,
     per_tick_amount,
     per_tick_fraction,
     scaled_life_history_ticks,
@@ -20,14 +22,16 @@ from .traits import (
 )
 
 
-# TIMEBASE note. Under "elapsed-time-v1", flows stated per month (basal energy,
-# water loss, bite fraction and cap, carcass decomposition) are converted to the
-# run's tick length, as life-history durations are. Not converted: costs per
+# TIMEBASE note. Under "elapsed-time-v1" and "-v2", flows stated per month
+# (basal energy, water loss, bite fraction and cap, carcass decomposition) are
+# converted to the run's tick length, as life-history durations are. Costs per
 # event (movement energy per cell moved, a failed hunt, an escape), per-event
-# learning steps (forage_bias), hunt success per attempt, and movement speed,
-# which stays one cell per tick at any timebase. Speed and per-tick attempt
-# frequency therefore still differ between timebases; changing them would need
-# fractional movement and is a behaviour change, not a unit conversion.
+# learning steps (forage_bias) and hunt success per attempt are not converted.
+# Under "elapsed-time-v1" movement and hunt attempts happen at most once per
+# tick, so their frequency per simulated year scales with ticks per year.
+# "elapsed-time-v2" gives each animal one movement opportunity and one hunt
+# opportunity per reference tick of elapsed time (traits.has_opportunity);
+# the decision of where to go is still taken every tick.
 #
 # Per-month (reference tick) rates that are not traits: the bite cap and
 # carcass decomposition. Converted to the run's tick length like trait rates.
@@ -118,12 +122,12 @@ def build_consumer_state(
             for x in range(width)
         ],
     }
-    if timebase not in (CONSUMER_TIMEBASE_ELAPSED, CONSUMER_TIMEBASE_LEGACY):
+    if timebase not in CONSUMER_TIMEBASES:
         raise ValueError(f"unknown consumer timebase: {timebase}")
     # Recorded only where it changes behaviour; absent means legacy, and at
     # the reference timebase the two are identical. Earlier states and their
     # ledger digests are therefore unchanged.
-    if timebase == CONSUMER_TIMEBASE_ELAPSED and int(ticks_per_year) != TRAIT_REFERENCE_TICKS_PER_YEAR:
+    if timebase != CONSUMER_TIMEBASE_LEGACY and int(ticks_per_year) != TRAIT_REFERENCE_TICKS_PER_YEAR:
         state["rate_timebase"] = timebase
     return state
 
@@ -479,6 +483,8 @@ def evolve_consumers(
             target = _choose_destination(animal, producers, matter)
 
         step = _move_one_step(origin, target)
+        if step != origin and not has_opportunity(ticks_per_year, timebase, animal["id"], epoch, "move"):
+            step = origin
         if step != origin:
             animal["energy"] = float(animal["energy"]) - traits.movement_cost
             animal["x"], animal["y"] = step
@@ -496,6 +502,8 @@ def evolve_consumers(
                 and trait_for(str(other["species"])).trophic_role != "predator"
                 and (int(other["x"]), int(other["y"])) == xy
             ]
+            if prey_here and not has_opportunity(ticks_per_year, timebase, animal["id"], epoch, "hunt"):
+                prey_here = []
             if prey_here:
                 prey = _choose_prey(animal, {"animals": prey_here}) or prey_here[0]
                 if _hunt_succeeds(animal, prey, epoch):

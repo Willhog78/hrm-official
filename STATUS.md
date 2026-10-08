@@ -170,7 +170,16 @@ Opening, census and controlled-experiment proposal: `docs/architecture/ECOLOGY_O
   This does not show that imitation generally fails.
 - **Injury deaths.** Cause tracking attributes all of them (v1: 7; v2: 8; pre-D2: 2) to the unprovoked, foodless predator bite.
 
-**Encounter frequency (open).** At daily ticks, animals travel 25–80× farther per year and predators make about 14× more hunt attempts than at monthly ticks (D2 note, section 8). Predator-related mortality is not interpreted as ecologically calibrated until this is decided.
+**Reconciled (2026-10-08): 400 versus 34 caregiver-days below reserve 0.25.** The difference is the consumer timebase (pre-D2 versus D2), not the population or the measurement definition. The census and the audit give identical counts on both timebases. Details: audit report, reconciliation section.
+
+**Elapsed-time opportunities: IMPLEMENTED (consumer timebase `elapsed-time-v2`, new default; D2 note, section 9).**
+- **The rule.** Each animal has one movement, one hunt and one attack opportunity per month of elapsed time.
+- **Unchanged.** `elapsed-time-v1` and `per-tick-legacy` reproduce their runs exactly, and 12 ticks/year runs are bit-identical.
+- **Verified in fixed conditions.** Opportunities per simulated year now match monthly (6 tests).
+- **Population level, still open.** Daily animals still move 8–26× more than monthly ones (down from 25–80×), because episodes of wanting to move arise far more often per year. Plant rates are also per tick and unconverted (`ecology/plants.py`), so monthly and daily worlds have different plant ecologies, and the comparison is not like-for-like yet.
+- **Proposed next steps (not implemented):** (b) give producers a stated reference timebase; then (a) score animal destinations by edible intake rather than standing biomass.
+
+Predator-related mortality is still not interpreted as ecologically calibrated.
 
 Ecology experiments E1–E3 stay unimplemented. Physiology and life-history values are unchanged.
 

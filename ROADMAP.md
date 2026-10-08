@@ -339,10 +339,14 @@ Do not advance a phase if:
 - Step 1 (measurement) is done. Following has no opportunity because food is abundant and in view. Useful acts are rare at the source, so imitation has little to draw on. Co-presence is low only in the founding months.
 - D2 units fix: done (`docs/architecture/D2_CONSUMER_TIMEBASE.md`).
 
-Next, in order:
-1. Caregiver energy budget (closes D3).
-2. Inspect the unsuccessful imitation attempts.
-3. D2 life-history recalibration, if authorized.
+Next, in order (owner decision, 2026-10-08):
+1. ~~Reconcile the reserve counts.~~ Done: the consumer timebase explains 400 versus 34.
+2. Elapsed-time movement and encounter opportunities. `elapsed-time-v2` is done. The residual population-level difference is traced to plant rates that are not timebase-converted, and to destination scoring by standing biomass; both are proposed, not implemented.
+3. Separate nursing (milk), weaning and longer childhood dependence before changing birth spacing or milk cost. `reference-v1` stays the default.
+4. Complete the predation decision (D1) and its physical pathway: attempt, resistance or escape, injury, possible death, accessible tissue, possible consumption. Defensive bites stay separate.
+5. Reassess useful acts and social learning in the corrected world.
+
+Cognition stays paused. E1–E3 stay on hold. Preparation acts earn credit only when a real later benefit traces back to them.
 
 E1–E3 remain proposals and are not the next step. Higher density is not supported by the census.
 

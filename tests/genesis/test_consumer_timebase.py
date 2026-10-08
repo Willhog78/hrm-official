@@ -160,12 +160,13 @@ def test_carcass_decay_per_year_matches_across_timebases():
     assert left["legacy"][0] < 1e-6  # 0.95 ** 365: a month's decay applied daily
 
 
-def test_matter_is_conserved_under_the_elapsed_timebase():
+@pytest.mark.parametrize("timebase", [ELAPSED, "elapsed-time-v2"])
+def test_matter_is_conserved_under_the_elapsed_timebase(timebase):
     """Element and water balance of a whole consumer world at daily ticks."""
     sim = GenesisSimulation(GenesisConfig(
         master_seed="timebase-conservation", world_width=6, world_height=6, ticks_per_year=365,
-        producer_ecology_enabled=True, consumer_ecology_enabled=True))
-    assert sim.config.canonical()["consumer_timebase"] == ELAPSED
+        producer_ecology_enabled=True, consumer_ecology_enabled=True, consumer_timebase=timebase))
+    assert sim.config.canonical()["consumer_timebase"] == timebase
     from tests.genesis.test_g3_consumers import combined_element_errors, combined_water_error
     sim.run(365)
     assert sim.ledger.verify_chain()

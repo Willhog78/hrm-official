@@ -16,8 +16,10 @@ sys.path[:0] = [str(ROOT / "src"), str(ROOT), str(ROOT / "experiments" / "genesi
 from hrm_genesis import GenesisConfig, GenesisSimulation
 from run_agentus_capacity_multiseed import config_for
 
-legacy = len(sys.argv) > 2
-extra = {"consumer_timebase": "per-tick-legacy"} if legacy else {}
+# Optional second argument: a consumer timebase to force ("legacy" means per-tick-legacy).
+mode = sys.argv[2] if len(sys.argv) > 2 else ""
+legacy = bool(mode)
+extra = {"consumer_timebase": "per-tick-legacy" if mode == "legacy" else mode} if mode else {}
 cases = {}
 for tpy, years in ((12, 30), (24, 10), (36, 6), (365, 1)):
     cfg = GenesisConfig(master_seed="units-check", world_width=6, world_height=6, ticks_per_year=tpy,

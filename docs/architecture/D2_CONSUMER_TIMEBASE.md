@@ -152,3 +152,95 @@ The equivalence tests show that a simulated year *costs* the same at any timebas
   - `reference-v2`: 67 and 158.
 
 **Not changed here.** Making movement and encounter frequency timebase-independent needs fractional movement, or a per-time encounter rate. Either is a behaviour change, not a unit conversion, and needs its own decision.
+
+## 9. Elapsed-time opportunities (`elapsed-time-v2`, 2026-10-08)
+
+**Status:** implemented, and the new default. `elapsed-time-v1` (section 2, rates only) and `per-tick-legacy` remain selectable and reproduce their runs exactly.
+
+### Rule
+
+Each animal has **one movement opportunity, one hunt opportunity and one attack opportunity (on a co-located agent) per reference tick of elapsed time** (one month, as at 12 ticks/year).
+- At other tick lengths each opportunity is a deterministic per-tick draw with probability 12 / ticks per year (`traits.has_opportunity`).
+- The expected number per simulated year therefore matches the reference timebase. The process has a constant rate, like a Poisson process, rather than regular spacing.
+- The animal still chooses where it would go every tick. It moves only on a tick with a movement opportunity.
+- At 12 ticks/year the probability is 1, so no draw is made and nothing changes. Below 12 ticks/year it is capped at one per tick.
+
+What is not changed:
+- per-event costs;
+- escapes caused by Agentus;
+- Agentus movement, which is calibrated per day;
+- animal speed itself (one cell per reference month). That belongs with the life-history recalibration.
+
+### Unchanged runs (verified by ledger digest and fingerprint, `check_consumer_timebase_digests.py`)
+
+| | 12 ticks/yr | 24, 36, 365 ticks/yr and Agentus `v1` 60 days |
+|---|---|---|
+| `per-tick-legacy` vs pre-D2 commit | identical | identical |
+| `elapsed-time-v1` vs D2 commit | identical | identical |
+| `elapsed-time-v2` (default) | identical | changed (as intended) |
+
+### Opportunities in fixed conditions (`tests/genesis/test_consumer_opportunity.py`, 6 tests)
+
+| | monthly | daily, `v2` | daily, `v1` |
+|---|---|---|---|
+| cells moved in 5 years by a grazer that always wants to move | 60 | 56 | 89 (stopped at the strip's end; about 1,825 uncapped) |
+| hunt attempts in 1 year, hungry predator beside prey it never catches | 12 | 10 | 46 (until it starved from failed-hunt costs) |
+| attacks in 1 year, hungry predator in an agent's cell | 12 | 3–25 (test range) | 365 |
+
+The opportunity *rate* is now timebase-independent.
+
+### Population level: residual difference, measured
+
+Ecology without Agentus, 3 seeds × 5 years (`run_consumer_timebase_comparison.py`):
+
+| per simulated year | monthly | daily, legacy | daily, `v1` | daily, `v2` |
+|---|---|---|---|---|
+| cells travelled per browser / grazer / stalker | 0.2 / 0.1 / 1.1 | 15.7 / 5.9 / 27.3 | 15.6 / 5.9 / 29.1 | **5.2 / 1.6 / 7.3** |
+| hunt attempts per predator-year | 0.1 | 5.2 | 1.4 | **0.8** |
+| predator-years lived (sum) | 10.5 | 1.4 | 7.2 | 15.0 |
+| deaths (5 years) | starvation 2, predation 1 | starvation 3, predation 2 | starvation 3, predation 2 | predation 3 |
+| element / water balance | holds | holds | holds | holds |
+
+`v2` cuts daily movement 3–4× and hunt attempts about 2×, but **daily animals still move 8–26× more than monthly ones**. The cause, as far as it has been traced:
+- **More episodes, not more opportunities.** The excess comes from far more *episodes of wanting to move* per simulated year (an episode starts when the animal wants to leave its cell after not wanting to):
+  - monthly: 0.4–0.6 per year;
+  - daily `v2`: 8–15.5;
+  - daily `v1`: 53.5.
+
+  `v2` limits moves to about 12 per year, but each episode is eventually acted on.
+- **What starts episodes** (daily `v2`, seed a, 2 years): mostly the animal's own cell falling below a neighbour's (10 per year), then water or distance (3.5), then a neighbour rising (2).
+- **Sizes at onset** (1 year, seeds a and b): the animal stands on a median 119–262 kg of plant tissue, and the better neighbour holds a median of about 94 kg more. A grazer can eat at most 0.004 kg per month.
+
+So the destination rule responds to differences in standing biomass that are irrelevant to what the animal can eat.
+
+**Producer timebase, checked in code (2026-10-08).** The plant model applies its rates per tick with no timebase conversion (`ecology/plants.py`):
+- `BASE_GROWTH_FRACTION` 0.055;
+- `BASE_MORTALITY_FRACTION` 0.004;
+- `DECOMPOSITION_FRACTION` 0.035;
+- `SEED_GERMINATION_FRACTION` 0.0165;
+- `REPRODUCTION_FRACTION` 0.012;
+- `MAX_AGE_TICKS` 360.
+
+The plant-lifecycle corrections reason in days ("95% of a seed cohort germinates within about 180 viable days"), so plants appear to be tuned per day (**inferred**), while animal traits are stated per month.
+
+A 12-ticks/year world therefore runs a different plant ecology from a 365-ticks/year world: plants grow and die about 30× less per simulated year. **The monthly-versus-daily animal comparisons above are not like-for-like.** Part or all of the residual movement difference may come from plant fields that differ between the two worlds, not from animal behaviour. This is not yet separated.
+
+**Effect on Agentus** (two-year audit and census, `v1`, 4 seeds, default `elapsed-time-v2`; `budget_audit_v1_timebase-v2_2026-10-08.json`):
+
+| | D2 (`elapsed-time-v1`) | `elapsed-time-v2` |
+|---|---|---|
+| predator attacks on Agentus, year 1 / year 2 (sum of 4 seeds) | 110 / 101 | 2 / 3 |
+| injury deaths | 7 | 0 |
+| agents alive at end / births | 42 / 17 | 53 / 21 |
+| imitated tries (paid) | 11 (0) | 14 (0) |
+| useful non-meal acts (with an audience) | 763 (35%) | 793 (40%) |
+
+Every opportunity conclusion of the ecology opening still holds.
+
+With opportunities equalized, predators now rarely meet agents. That is **not** a calibrated predation rate: animal speed (one cell per month) and the plant timebase are both still uncalibrated. It does mean the unprovoked-bite deaths of D2 were mostly an artefact of daily encounter frequency.
+
+**Decision needed before predator calibration (proposed, not implemented):**
+- **(a)** Score destinations by what the animal can actually eat there (food up to its per-tick bite) and by water need, not by standing mass. That is a behaviour change with a physical justification. It would also change monthly behaviour and require G3/G4 re-qualification.
+- **(b)** Audit the producer timebase first: are plant rates per tick converted, as consumer rates now are?
+
+Recommendation: (b), then (a). (b) now has a concrete target: give producers a stated reference timebase and convert their per-tick rates, as D2 did for consumers. Only then is a monthly-versus-daily comparison of animal behaviour like-for-like.

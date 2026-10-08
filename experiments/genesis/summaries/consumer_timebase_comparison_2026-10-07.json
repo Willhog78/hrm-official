@@ -3,7 +3,7 @@
   "seed": "agentus-demography-a",
   "arm": "monthly",
   "ticks_per_year": 12,
-  "timebase": "elapsed-time-v1",
+  "timebase": "elapsed-time-v2",
   "years": 5,
   "fingerprint": "a7028dba5b63",
   "ledger_valid": true,
@@ -30,6 +30,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0333,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 34.304,
@@ -55,6 +56,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 42.269,
@@ -80,6 +82,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 43.288,
@@ -106,6 +109,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 0.167,
     "mean_energy": 54.538,
@@ -128,19 +132,20 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 47.659,
     "mean_water_fraction": 0.933
    }
   ],
-  "seconds": 8.5
+  "seconds": 7.8
  },
  {
   "seed": "agentus-demography-b",
   "arm": "monthly",
   "ticks_per_year": 12,
-  "timebase": "elapsed-time-v1",
+  "timebase": "elapsed-time-v2",
   "years": 5,
   "fingerprint": "44df49db5999",
   "ledger_valid": true,
@@ -167,6 +172,7 @@
      "stalker": 3.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.1,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 33.913,
@@ -192,6 +198,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0294,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 41.533,
@@ -218,6 +225,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 0.333,
     "mean_energy": 48.078,
@@ -240,6 +248,7 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.81,
@@ -262,19 +271,20 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 46.279,
     "mean_water_fraction": 0.927
    }
   ],
-  "seconds": 8.5
+  "seconds": 8.1
  },
  {
   "seed": "agentus-demography-c",
   "arm": "monthly",
   "ticks_per_year": 12,
-  "timebase": "elapsed-time-v1",
+  "timebase": "elapsed-time-v2",
   "years": 5,
   "fingerprint": "415b8ba1b1d7",
   "ledger_valid": true,
@@ -303,6 +313,7 @@
      "stalker": 6.0
     },
     "hunt_attempts": 1,
+    "share_of_decisions_wanting_to_move": 0.2745,
     "hunt_successes": 1,
     "predator_years": 1.0,
     "mean_energy": 38.397,
@@ -328,6 +339,7 @@
      "stalker": 3.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0625,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 48.951,
@@ -353,6 +365,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 45.384,
@@ -378,6 +391,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 52.564,
@@ -403,13 +417,14 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.02,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 46.659,
     "mean_water_fraction": 0.942
    }
   ],
-  "seconds": 8.6
+  "seconds": 7.9
  },
  {
   "seed": "agentus-demography-a",
@@ -443,6 +458,7 @@
      "stalker": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.02,
     "hunt_successes": 0,
     "predator_years": 0.104,
     "mean_energy": 54.048,
@@ -465,6 +481,7 @@
      "grazer": 17.7
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0693,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.66,
@@ -487,6 +504,7 @@
      "grazer": 3.2
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0196,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.546,
@@ -509,6 +527,7 @@
      "grazer": 6.5
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0226,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.68,
@@ -531,13 +550,14 @@
      "grazer": 9.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0339,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 54.787,
     "mean_water_fraction": 0.969
    }
   ],
-  "seconds": 287.2
+  "seconds": 264.2
  },
  {
   "seed": "agentus-demography-b",
@@ -571,6 +591,7 @@
      "stalker": 39.1
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0161,
     "hunt_successes": 0,
     "predator_years": 0.077,
     "mean_energy": 53.591,
@@ -593,6 +614,7 @@
      "grazer": 13.5
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.061,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.828,
@@ -615,6 +637,7 @@
      "grazer": 3.7
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0504,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.481,
@@ -637,6 +660,7 @@
      "grazer": 4.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0247,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.81,
@@ -659,13 +683,14 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 54.997,
     "mean_water_fraction": 0.969
    }
   ],
-  "seconds": 286.2
+  "seconds": 264.2
  },
  {
   "seed": "agentus-demography-c",
@@ -699,6 +724,7 @@
      "stalker": 31.0
     },
     "hunt_attempts": 7,
+    "share_of_decisions_wanting_to_move": 0.0582,
     "hunt_successes": 2,
     "predator_years": 1.0,
     "mean_energy": 54.466,
@@ -722,6 +748,7 @@
      "stalker": 16.8
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0768,
     "hunt_successes": 0,
     "predator_years": 0.178,
     "mean_energy": 55.6,
@@ -741,6 +768,7 @@
      "browser": 25.9
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0711,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 59.634,
@@ -760,6 +788,7 @@
      "browser": 12.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0329,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 59.82,
@@ -779,13 +808,14 @@
      "browser": 4.2
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0116,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 59.493,
     "mean_water_fraction": 0.969
    }
   ],
-  "seconds": 285.9
+  "seconds": 263.7
  },
  {
   "seed": "agentus-demography-a",
@@ -820,6 +850,7 @@
      "stalker": 13.0
     },
     "hunt_attempts": 1,
+    "share_of_decisions_wanting_to_move": 0.023,
     "hunt_successes": 1,
     "predator_years": 1.0,
     "mean_energy": 34.663,
@@ -845,6 +876,7 @@
      "stalker": 50.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0928,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 47.719,
@@ -870,6 +902,7 @@
      "stalker": 30.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0343,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 47.77,
@@ -895,6 +928,7 @@
      "stalker": 29.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0387,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 50.606,
@@ -921,13 +955,14 @@
      "stalker": 7.0
     },
     "hunt_attempts": 3,
+    "share_of_decisions_wanting_to_move": 0.0451,
     "hunt_successes": 0,
     "predator_years": 0.43,
     "mean_energy": 47.429,
     "mean_water_fraction": 0.998
    }
   ],
-  "seconds": 286.6
+  "seconds": 263.4
  },
  {
   "seed": "agentus-demography-b",
@@ -960,6 +995,7 @@
      "stalker": 14.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0192,
     "hunt_successes": 0,
     "predator_years": 1.0,
     "mean_energy": 29.396,
@@ -986,6 +1022,7 @@
      "stalker": 19.7
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0614,
     "hunt_successes": 0,
     "predator_years": 0.101,
     "mean_energy": 51.583,
@@ -1008,6 +1045,7 @@
      "grazer": 3.7
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0517,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 47.732,
@@ -1030,6 +1068,7 @@
      "grazer": 4.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0247,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 55.88,
@@ -1052,13 +1091,14 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 48.434,
     "mean_water_fraction": 0.998
    }
   ],
-  "seconds": 263.7
+  "seconds": 252.9
  },
  {
   "seed": "agentus-demography-c",
@@ -1093,6 +1133,7 @@
      "stalker": 25.0
     },
     "hunt_attempts": 6,
+    "share_of_decisions_wanting_to_move": 0.0456,
     "hunt_successes": 1,
     "predator_years": 1.0,
     "mean_energy": 35.501,
@@ -1119,6 +1160,7 @@
      "stalker": 63.7
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0803,
     "hunt_successes": 0,
     "predator_years": 0.69,
     "mean_energy": 46.777,
@@ -1141,6 +1183,7 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0468,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 48.421,
@@ -1163,6 +1206,7 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0219,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 57.324,
@@ -1185,12 +1229,451 @@
      "grazer": 0.0
     },
     "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0029,
     "hunt_successes": 0,
     "predator_years": 0.0,
     "mean_energy": 50.694,
     "mean_water_fraction": 0.998
    }
   ],
-  "seconds": 263.1
+  "seconds": 251.2
+ },
+ {
+  "seed": "agentus-demography-a",
+  "arm": "daily-v2",
+  "ticks_per_year": 365,
+  "timebase": "elapsed-time-v2",
+  "years": 5,
+  "fingerprint": "ff8bfb28c4be",
+  "ledger_valid": true,
+  "element_rel_error": 1.5694389531938002e-14,
+  "water_rel_error": 5.680824041007155e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 5.5,
+     "grazer": 3.5,
+     "stalker": 1.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.3096,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 32.835,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 1.99,
+     "grazer": 2.26,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 3,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {
+     "predation": 1
+    },
+    "cells_per_animal_year": {
+     "browser": 10.6,
+     "grazer": 4.0,
+     "stalker": 13.0
+    },
+    "hunt_attempts": 2,
+    "share_of_decisions_wanting_to_move": 0.6272,
+    "hunt_successes": 1,
+    "predator_years": 1.0,
+    "mean_energy": 48.424,
+    "mean_water_fraction": 0.997
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 3.71,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 4,
+     "stalker": 1
+    },
+    "births": 1,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 8.0,
+     "grazer": 0.0,
+     "stalker": 5.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.1847,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 56.028,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 4.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 4,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 6.0,
+     "grazer": 0.0,
+     "stalker": 7.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.2716,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 58.835,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 2.58,
+     "grazer": 6.27,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 8,
+     "stalker": 1
+    },
+    "births": 5,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 7.0,
+     "grazer": 0.0,
+     "stalker": 9.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.1903,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 49.44,
+    "mean_water_fraction": 0.998
+   }
+  ],
+  "seconds": 253.3
+ },
+ {
+  "seed": "agentus-demography-b",
+  "arm": "daily-v2",
+  "ticks_per_year": 365,
+  "timebase": "elapsed-time-v2",
+  "years": 5,
+  "fingerprint": "98b5a0b933f6",
+  "ledger_valid": true,
+  "element_rel_error": 1.3193633346629605e-14,
+  "water_rel_error": 7.082339662984294e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 3.0,
+     "grazer": 2.5,
+     "stalker": 11.0
+    },
+    "hunt_attempts": 2,
+    "share_of_decisions_wanting_to_move": 0.3238,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 30.221,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.36,
+     "grazer": 1.24,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 1,
+     "stalker": 1
+    },
+    "births": 1,
+    "deaths": {
+     "predation": 1
+    },
+    "cells_per_animal_year": {
+     "browser": 9.7,
+     "grazer": 4.0,
+     "stalker": 11.0
+    },
+    "hunt_attempts": 2,
+    "share_of_decisions_wanting_to_move": 0.6847,
+    "hunt_successes": 1,
+    "predator_years": 1.0,
+    "mean_energy": 53.466,
+    "mean_water_fraction": 0.997
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.66,
+     "grazer": 1.81,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 7.4,
+     "grazer": 1.7,
+     "stalker": 7.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.4807,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 52.147,
+    "mean_water_fraction": 0.998
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 5.0,
+     "grazer": 8.0,
+     "stalker": 7.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.4939,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 57.445,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.53,
+     "grazer": 2.79,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 5,
+     "grazer": 4,
+     "stalker": 1
+    },
+    "births": 3,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 4.2,
+     "grazer": 3.2,
+     "stalker": 8.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.288,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 51.198,
+    "mean_water_fraction": 0.998
+   }
+  ],
+  "seconds": 253.5
+ },
+ {
+  "seed": "agentus-demography-c",
+  "arm": "daily-v2",
+  "ticks_per_year": 365,
+  "timebase": "elapsed-time-v2",
+  "years": 5,
+  "fingerprint": "9e144a893e16",
+  "ledger_valid": true,
+  "element_rel_error": 1.8080696109008177e-14,
+  "water_rel_error": 7.016964976052845e-13,
+  "per_year": [
+   {
+    "year": 1,
+    "mean_alive": {
+     "browser": 2.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 2,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 7.0,
+     "grazer": 2.5,
+     "stalker": 4.0
+    },
+    "hunt_attempts": 4,
+    "share_of_decisions_wanting_to_move": 0.4208,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 32.852,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 2,
+    "mean_alive": {
+     "browser": 2.07,
+     "grazer": 1.34,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 3,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 2,
+    "deaths": {
+     "predation": 1
+    },
+    "cells_per_animal_year": {
+     "browser": 6.3,
+     "grazer": 3.7,
+     "stalker": 11.0
+    },
+    "hunt_attempts": 2,
+    "share_of_decisions_wanting_to_move": 0.6453,
+    "hunt_successes": 1,
+    "predator_years": 1.0,
+    "mean_energy": 55.116,
+    "mean_water_fraction": 0.997
+   },
+   {
+    "year": 3,
+    "mean_alive": {
+     "browser": 3.85,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 1,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 3.6,
+     "grazer": 0.0,
+     "stalker": 6.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.2539,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 52.224,
+    "mean_water_fraction": 0.998
+   },
+   {
+    "year": 4,
+    "mean_alive": {
+     "browser": 4.0,
+     "grazer": 2.0,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 4,
+     "grazer": 2,
+     "stalker": 1
+    },
+    "births": 0,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 2.8,
+     "grazer": 0.0,
+     "stalker": 5.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.2419,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 58.064,
+    "mean_water_fraction": 0.999
+   },
+   {
+    "year": 5,
+    "mean_alive": {
+     "browser": 4.26,
+     "grazer": 3.37,
+     "stalker": 1.0
+    },
+    "end_alive": {
+     "browser": 6,
+     "grazer": 4,
+     "stalker": 1
+    },
+    "births": 4,
+    "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.2,
+     "grazer": 0.0,
+     "stalker": 4.0
+    },
+    "hunt_attempts": 0,
+    "share_of_decisions_wanting_to_move": 0.0601,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
+    "mean_energy": 51.481,
+    "mean_water_fraction": 0.998
+   }
+  ],
+  "seconds": 240.4
  }
 ]

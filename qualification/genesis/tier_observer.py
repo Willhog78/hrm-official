@@ -10,7 +10,10 @@ up here.
 
 Arms are the multiseed arms (`v0`, `v1`, `plant_diet`, `no_interactions`,
 `no_recall`, `null`, each optionally `-nothirst`), then optionally
-`-preg106` (G10.6 integrity off), `-g104obs` (G10.4 observation) and `@<physiology>`, e.g. `v1-preg106@reference-v2`.
+`-preg106` (G10.6 integrity off), `-g104obs` (G10.4 observation), `-legacytb`
+or `-d2tb` (pre-D2 or D2 consumer timebase; outermost suffix; the default is
+elapsed-time-v2) and `@<physiology>`, e.g.
+`v1-preg106@reference-v2` or `v1-legacytb@reference-v2`.
 
 Checks are split into:
   FAIL: broken invariants (crash, NaN, negative mass, ledger, conservation,
@@ -57,10 +60,16 @@ NO_MEMORY = "-nomem"  # arm suffix: no witnessed-event memory (G10.7a step 2 off
 FIFO_MEMORY = "-fifo"  # arm suffix: step-2 newest-first retention (G10.7a step 2.5 off)
 NO_IMITATION = "-noimit"  # arm suffix: no imitation (G10.7a step 3 off)
 NO_FOLLOWING = "-nofollow"  # arm suffix: no following (G10.7a step 4 off)
+LEGACY_TIMEBASE = "-legacytb"  # arm suffix: pre-D2 consumer timebase (per-tick-legacy)
+D2_TIMEBASE = "-d2tb"  # arm suffix: D2 consumer timebase (elapsed-time-v1: rates only)
 
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    legacy_timebase = base.endswith(LEGACY_TIMEBASE)
+    base = base.removesuffix(LEGACY_TIMEBASE)
+    d2_timebase = base.endswith(D2_TIMEBASE)
+    base = base.removesuffix(D2_TIMEBASE)
     no_following = base.endswith(NO_FOLLOWING)
     base = base.removesuffix(NO_FOLLOWING)
     no_imitation = base.endswith(NO_IMITATION)
@@ -86,6 +95,10 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
         overrides["agentus_following_enabled"] = False
     if physiology:
         overrides["agentus_physiology_version"] = physiology
+    if legacy_timebase:
+        overrides["consumer_timebase"] = "per-tick-legacy"
+    elif d2_timebase:
+        overrides["consumer_timebase"] = "elapsed-time-v1"
     if not integrity:
         overrides["agentus_behavior_integrity_enabled"] = False
     if overrides:

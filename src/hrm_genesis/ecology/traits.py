@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 
 
@@ -12,20 +13,50 @@ def scaled_life_history_ticks(value: int, ticks_per_year: int) -> int:
     return max(1, int(round(int(value) * ticks_per_year / TRAIT_REFERENCE_TICKS_PER_YEAR)))
 
 
-# Consumer rate timebase. Trait rates (energy, water and food per tick, and
-# decay fractions per tick) are stated per reference tick, i.e. per month.
-# "elapsed-time-v1" converts them to the run's tick length, as durations
-# already are; "per-tick-legacy" applies them unchanged at any timebase and
-# reproduces earlier runs. At the reference timebase both are identical.
+# Consumer timebase. Trait rates (energy, water and food per tick, and decay
+# fractions per tick) are stated per reference tick, i.e. per month.
+#   "per-tick-legacy"  applies them unchanged at any timebase (pre-D2 runs).
+#   "elapsed-time-v1"  converts rates to the run's tick length, as durations
+#                      already are (D2).
+#   "elapsed-time-v2"  also gives movement, hunt attempts and predator attacks
+#                      one opportunity per reference tick of elapsed time: at
+#                      other tick lengths each is a per-tick chance of
+#                      12 / ticks_per_year, so the expected number per
+#                      simulated year matches the reference timebase.
+# At the reference timebase all three are identical.
 CONSUMER_TIMEBASE_ELAPSED = "elapsed-time-v1"
+CONSUMER_TIMEBASE_ELAPSED_V2 = "elapsed-time-v2"
 CONSUMER_TIMEBASE_LEGACY = "per-tick-legacy"
-CONSUMER_TIMEBASES = (CONSUMER_TIMEBASE_ELAPSED, CONSUMER_TIMEBASE_LEGACY)
+CONSUMER_TIMEBASES = (CONSUMER_TIMEBASE_ELAPSED_V2, CONSUMER_TIMEBASE_ELAPSED, CONSUMER_TIMEBASE_LEGACY)
 
 
 def _converts(ticks_per_year: int, timebase: str) -> bool:
     if timebase not in CONSUMER_TIMEBASES:
         raise ValueError(f"unknown consumer timebase: {timebase}")
-    return timebase == CONSUMER_TIMEBASE_ELAPSED and int(ticks_per_year) != TRAIT_REFERENCE_TICKS_PER_YEAR
+    return timebase != CONSUMER_TIMEBASE_LEGACY and int(ticks_per_year) != TRAIT_REFERENCE_TICKS_PER_YEAR
+
+
+def opportunity_probability(ticks_per_year: int, timebase: str) -> float:
+    """Chance per tick of one movement step, hunt attempt or attack, so that
+    opportunities per simulated year match one per reference tick. 1.0 (no
+    draw) at the reference timebase and under the earlier timebases. With
+    fewer than 12 ticks per year it is capped at one per tick."""
+    if timebase not in CONSUMER_TIMEBASES:
+        raise ValueError(f"unknown consumer timebase: {timebase}")
+    if timebase != CONSUMER_TIMEBASE_ELAPSED_V2 or int(ticks_per_year) == TRAIT_REFERENCE_TICKS_PER_YEAR:
+        return 1.0
+    return min(1.0, TRAIT_REFERENCE_TICKS_PER_YEAR / int(ticks_per_year))
+
+
+def opportunity_draw(*parts: object) -> float:
+    """Deterministic uniform draw in [0, 1) from the given identifiers."""
+    raw = hashlib.sha256("|".join(str(p) for p in parts).encode("utf-8")).digest()
+    return int.from_bytes(raw[:8], "big") / float(2**64)
+
+
+def has_opportunity(ticks_per_year: int, timebase: str, *parts: object) -> bool:
+    p = opportunity_probability(ticks_per_year, timebase)
+    return p >= 1.0 or opportunity_draw(*parts) < p
 
 
 def per_tick_amount(per_reference_tick: float, ticks_per_year: int, timebase: str) -> float:

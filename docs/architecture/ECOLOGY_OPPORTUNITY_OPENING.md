@@ -132,6 +132,8 @@ Consequence. A "hungry" rate cannot be compared across physiologies, or used as 
 
 ### 5.1 Caregiving check (reference-v2)
 
+*Reconciliation (2026-10-08).* The counts in this section (544 hungry, 400 below 0.25) were measured on the pre-D2 consumer timebase. On the D2 timebase the same measurement gives 108 and 34, and the budget audit reproduces both pairs exactly. The difference is the timebase, through predator survival and child deaths (`experiments/genesis/summaries/BUDGET_AND_IMITATION_AUDIT_2026-10-08.md`, reconciliation).
+
 The census marks an agent as *caring* on days when it is the caregiver of a living dependent. The reference-v2 rerun is deterministic, and every other number matches the run in section 4.
 
 | reference-v2, 4 seeds × 730 days | agent-days | of which caring |
