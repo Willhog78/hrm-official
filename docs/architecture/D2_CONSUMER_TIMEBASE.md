@@ -104,6 +104,7 @@ The Agentus world runs at 365 ticks/year, so every Agentus run's fingerprint cha
   - kills 2/0/1 → 2/0/1;
   - one injury death.
 - **Two-year opportunity census** under the corrected default: section 6.
+- **Cause of injury deaths (added 2026-10-08).** The budget audit (`qualification/genesis/budget_audit.py`) records injury gain by source. All 7 injury deaths in the two-year `v1` audit are 98–100% from the unprovoked predator bite: 5 children after about 4 bites each, and 2 adults after 21–22 bites in 60 days. The attribution in section 6 is now supported by cause tracking, not only by inference.
 
 ## 6. Two-year census under the corrected default
 
@@ -122,7 +123,7 @@ Arm `v1`, 4 seeds × 730 days (`experiments/genesis/summaries/opportunity_census
 | imitated tries (paid) | 18 (0) | 11 (0) |
 
 - **The opportunity conclusions of the ecology opening are unchanged.** Food is abundant and in view, following has no opportunity, and useful acts are rare at the source.
-- **What changes is mortality.** Injury deaths rise from 2 to 7, which lowers survivors and births. Predators now survive and bite Agentus, and on one smoke seed the extra injury death was attributed to predator attacks (section 5). The census does not attribute injury causes: exposure, fire and hunting can also injure, so the 2 → 7 is *mostly predators* only by inference.
+- **What changes is mortality.** Injury deaths rise from 2 to 7, which lowers survivors and births. Predators now survive and bite Agentus, and on one smoke seed the extra injury death was attributed to predator attacks (section 5). The census itself does not attribute injury causes. The later budget audit does: all 7 are predator bites (section 5).
 - This makes decision D1 (whether predators can eat what they kill or injure) a live question rather than a moot one.
 
 ## 7. What this exposes (not fixed here)
@@ -132,3 +133,22 @@ With rates honest, the trait values themselves become visible:
 - **Life-history scale:** maturity at 28 months, one young every 30 months, a 27-year lifespan. That is a large mammal's life history on a 50 g body.
 
 These values were tuned for persistence at monthly ticks and carry no body-size reference. Correcting them is D2's second part (allometric recalibration), which needs its own authorization and re-qualification of G3/G4.
+
+## 8. Encounter frequency: rates are equivalent, ecology is not
+
+The equivalence tests show that a simulated year *costs* the same at any timebase. They do not show that the ecology is equivalent. Movement is one cell per tick, and hunt success is rolled per attempt, so a daily-tick world offers far more movement and more encounters per simulated year. Measured in `run_consumer_timebase_comparison.py` (3 seeds × 5 years, ecology without Agentus):
+
+| per simulated year | monthly (12/yr) | daily, legacy | daily, elapsed-time |
+|---|---|---|---|
+| cells travelled per browser / grazer / stalker | 0.2 / 0.1 / 1.1 | 15.7 / 5.9 / 27.3 | 15.6 / 5.9 / 29.1 |
+| predator hunt attempts per predator-year | 0.1 | 5.2 | 1.4 |
+| predator-years lived (sum) | 10.5 | 1.4 | 7.2 |
+
+**Consequences:**
+- At daily ticks, animals travel 25–80× farther per year, and the predator makes about 14× more hunt attempts per predator-year than at monthly ticks.
+- Predator persistence at daily ticks (section 4) is therefore not evidence of ecological equivalence with the monthly world. It is the corrected cost budget combined with a much higher encounter rate.
+- Predator attacks on Agentus are counted by the budget audit, by year, before predator mortality or Agentus injury deaths are interpreted:
+  - `v1`: 110 attacks in year 1 and 101 in year 2, summed over 4 seeds;
+  - `reference-v2`: 67 and 158.
+
+**Not changed here.** Making movement and encounter frequency timebase-independent needs fractional movement, or a per-time encounter rate. Either is a behaviour change, not a unit conversion, and needs its own decision.

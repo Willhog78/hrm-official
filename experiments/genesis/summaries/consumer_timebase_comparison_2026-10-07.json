@@ -24,6 +24,14 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.5,
+     "grazer": 0.5,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 34.304,
     "mean_water_fraction": 0.971
    },
@@ -41,6 +49,14 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 42.269,
     "mean_water_fraction": 0.942
    },
@@ -58,6 +74,14 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 43.288,
     "mean_water_fraction": 0.951
    },
@@ -76,6 +100,14 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.167,
     "mean_energy": 54.538,
     "mean_water_fraction": 0.97
    },
@@ -91,11 +123,18 @@
     },
     "births": 5,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 47.659,
     "mean_water_fraction": 0.933
    }
   ],
-  "seconds": 8.6
+  "seconds": 8.5
  },
  {
   "seed": "agentus-demography-b",
@@ -122,6 +161,14 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 1.0,
+     "grazer": 0.5,
+     "stalker": 3.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 33.913,
     "mean_water_fraction": 0.971
    },
@@ -139,6 +186,14 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.7,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 41.533,
     "mean_water_fraction": 0.943
    },
@@ -157,6 +212,14 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.333,
     "mean_energy": 48.078,
     "mean_water_fraction": 0.951
    },
@@ -172,6 +235,13 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.81,
     "mean_water_fraction": 0.97
    },
@@ -187,11 +257,18 @@
     },
     "births": 6,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 46.279,
     "mean_water_fraction": 0.927
    }
   ],
-  "seconds": 8.9
+  "seconds": 8.5
  },
  {
   "seed": "agentus-demography-c",
@@ -220,6 +297,14 @@
     "deaths": {
      "predation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 2.5,
+     "grazer": 2.6,
+     "stalker": 6.0
+    },
+    "hunt_attempts": 1,
+    "hunt_successes": 1,
+    "predator_years": 1.0,
     "mean_energy": 38.397,
     "mean_water_fraction": 0.971
    },
@@ -237,6 +322,14 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0,
+     "stalker": 3.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 48.951,
     "mean_water_fraction": 0.932
    },
@@ -254,6 +347,14 @@
     },
     "births": 1,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 45.384,
     "mean_water_fraction": 0.959
    },
@@ -271,6 +372,14 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 52.564,
     "mean_water_fraction": 0.971
    },
@@ -288,11 +397,19 @@
     },
     "births": 3,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.5,
+     "grazer": 0.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 46.659,
     "mean_water_fraction": 0.942
    }
   ],
-  "seconds": 9.0
+  "seconds": 8.6
  },
  {
   "seed": "agentus-demography-a",
@@ -320,6 +437,14 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 7.0,
+     "grazer": 8.0,
+     "stalker": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.104,
     "mean_energy": 54.048,
     "mean_water_fraction": 0.97
    },
@@ -335,6 +460,13 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 32.4,
+     "grazer": 17.7
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.66,
     "mean_water_fraction": 0.956
    },
@@ -350,6 +482,13 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 11.3,
+     "grazer": 3.2
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.546,
     "mean_water_fraction": 0.967
    },
@@ -365,6 +504,13 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 10.0,
+     "grazer": 6.5
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.68,
     "mean_water_fraction": 0.97
    },
@@ -380,11 +526,18 @@
     },
     "births": 5,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 16.4,
+     "grazer": 9.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 54.787,
     "mean_water_fraction": 0.969
    }
   ],
-  "seconds": 302.2
+  "seconds": 287.2
  },
  {
   "seed": "agentus-demography-b",
@@ -412,6 +565,14 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 7.0,
+     "grazer": 3.5,
+     "stalker": 39.1
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.077,
     "mean_energy": 53.591,
     "mean_water_fraction": 0.97
    },
@@ -427,6 +588,13 @@
     },
     "births": 1,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 29.6,
+     "grazer": 13.5
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.828,
     "mean_water_fraction": 0.966
    },
@@ -442,6 +610,13 @@
     },
     "births": 3,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 33.6,
+     "grazer": 3.7
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.481,
     "mean_water_fraction": 0.968
    },
@@ -457,6 +632,13 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 14.0,
+     "grazer": 4.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.81,
     "mean_water_fraction": 0.969
    },
@@ -472,11 +654,18 @@
     },
     "births": 5,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 54.997,
     "mean_water_fraction": 0.969
    }
   ],
-  "seconds": 300.8
+  "seconds": 286.2
  },
  {
   "seed": "agentus-demography-c",
@@ -504,6 +693,14 @@
     "deaths": {
      "predation": 2
     },
+    "cells_per_animal_year": {
+     "browser": 19.5,
+     "grazer": 4.6,
+     "stalker": 31.0
+    },
+    "hunt_attempts": 7,
+    "hunt_successes": 2,
+    "predator_years": 1.0,
     "mean_energy": 54.466,
     "mean_water_fraction": 0.971
    },
@@ -520,6 +717,13 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 29.0,
+     "stalker": 16.8
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.178,
     "mean_energy": 55.6,
     "mean_water_fraction": 0.965
    },
@@ -533,6 +737,12 @@
     },
     "births": 1,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 25.9
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 59.634,
     "mean_water_fraction": 0.969
    },
@@ -546,6 +756,12 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 12.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 59.82,
     "mean_water_fraction": 0.968
    },
@@ -559,11 +775,17 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 4.2
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 59.493,
     "mean_water_fraction": 0.969
    }
   ],
-  "seconds": 300.1
+  "seconds": 285.9
  },
  {
   "seed": "agentus-demography-a",
@@ -592,6 +814,14 @@
     "deaths": {
      "predation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 7.0,
+     "grazer": 7.3,
+     "stalker": 13.0
+    },
+    "hunt_attempts": 1,
+    "hunt_successes": 1,
+    "predator_years": 1.0,
     "mean_energy": 34.663,
     "mean_water_fraction": 0.999
    },
@@ -609,6 +839,14 @@
     },
     "births": 2,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 32.4,
+     "grazer": 23.8,
+     "stalker": 50.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 47.719,
     "mean_water_fraction": 0.998
    },
@@ -626,6 +864,14 @@
     },
     "births": 1,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 11.3,
+     "grazer": 6.0,
+     "stalker": 30.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 47.77,
     "mean_water_fraction": 0.999
    },
@@ -643,6 +889,14 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 10.0,
+     "grazer": 15.0,
+     "stalker": 29.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 50.606,
     "mean_water_fraction": 0.999
    },
@@ -661,11 +915,19 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 16.4,
+     "grazer": 17.4,
+     "stalker": 7.0
+    },
+    "hunt_attempts": 3,
+    "hunt_successes": 0,
+    "predator_years": 0.43,
     "mean_energy": 47.429,
     "mean_water_fraction": 0.998
    }
   ],
-  "seconds": 263.3
+  "seconds": 286.6
  },
  {
   "seed": "agentus-demography-b",
@@ -692,6 +954,14 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 7.0,
+     "grazer": 3.5,
+     "stalker": 14.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 1.0,
     "mean_energy": 29.396,
     "mean_water_fraction": 0.999
    },
@@ -710,6 +980,14 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 29.6,
+     "grazer": 13.5,
+     "stalker": 19.7
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.101,
     "mean_energy": 51.583,
     "mean_water_fraction": 0.998
    },
@@ -725,6 +1003,13 @@
     },
     "births": 3,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 34.4,
+     "grazer": 3.7
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 47.732,
     "mean_water_fraction": 0.998
    },
@@ -740,6 +1025,13 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 14.0,
+     "grazer": 4.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 55.88,
     "mean_water_fraction": 0.999
    },
@@ -755,11 +1047,18 @@
     },
     "births": 5,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 0.0,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 48.434,
     "mean_water_fraction": 0.998
    }
   ],
-  "seconds": 264.3
+  "seconds": 263.7
  },
  {
   "seed": "agentus-demography-c",
@@ -788,6 +1087,14 @@
     "deaths": {
      "predation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 19.5,
+     "grazer": 2.0,
+     "stalker": 25.0
+    },
+    "hunt_attempts": 6,
+    "hunt_successes": 1,
+    "predator_years": 1.0,
     "mean_energy": 35.501,
     "mean_water_fraction": 0.999
    },
@@ -806,6 +1113,14 @@
     "deaths": {
      "starvation": 1
     },
+    "cells_per_animal_year": {
+     "browser": 29.0,
+     "grazer": 7.3,
+     "stalker": 63.7
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.69,
     "mean_energy": 46.777,
     "mean_water_fraction": 0.997
    },
@@ -821,6 +1136,13 @@
     },
     "births": 1,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 25.9,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 48.421,
     "mean_water_fraction": 0.999
    },
@@ -836,6 +1158,13 @@
     },
     "births": 0,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 12.0,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 57.324,
     "mean_water_fraction": 0.999
    },
@@ -851,10 +1180,17 @@
     },
     "births": 4,
     "deaths": {},
+    "cells_per_animal_year": {
+     "browser": 1.9,
+     "grazer": 0.0
+    },
+    "hunt_attempts": 0,
+    "hunt_successes": 0,
+    "predator_years": 0.0,
     "mean_energy": 50.694,
     "mean_water_fraction": 0.998
    }
   ],
-  "seconds": 261.5
+  "seconds": 263.1
  }
 ]

@@ -1,6 +1,6 @@
 # Ecology opening — why social learning has no opportunity
 
-**Timebase note (D2).** The census results in sections 4–5 ran before the consumer timebase correction (`docs/architecture/D2_CONSUMER_TIMEBASE.md`). That correction lets predators survive at daily ticks. Re-running the `v1` census under the corrected default leaves every opportunity conclusion unchanged. It raises injury deaths from 2 to 7, inferred to be mostly predator bites (D2 note, section 6).
+**Timebase note (D2).** The census results in sections 4–5 ran before the consumer timebase correction (`docs/architecture/D2_CONSUMER_TIMEBASE.md`). That correction lets predators survive at daily ticks. Re-running the `v1` census under the corrected default leaves every opportunity conclusion unchanged. It raises injury deaths from 2 to 7. Cause tracking in the budget audit attributes all 7 to unprovoked predator bites (D2 note, section 5).
 
 **Status:** design opening. Step 1 (measurement) is done. Step 2 (controlled experiments) is proposed here and **not implemented**. Owner decisions are listed in section 7.
 
@@ -171,25 +171,37 @@ See section 5. The two physiologies give different founding transients and diffe
 
 ## 7. Owner decisions, with concrete consequences
 
-### D1. Predation on Agentus (a code limitation must not become a biological rule)
+### D1. Predation on Agentus: three separate rules (open)
 
-What the code does now:
-- Predators bite Agentus on contact (`biology._apply_predator_threat`, raising injury).
-- Agentus is never a prey candidate (`animals._prey_candidates` lists animals only).
-- Agentus remains go to `human.remains_cells`, a pool that no animal reads.
-- So a predator can injure an agent but cannot gain from it.
-- `tests/genesis/micro/test_micro_cannibalism.py` records this as *current behaviour, not a decision*.
-- Under the old per-tick timebase the only predator starved in year 1 (G10.4), so the question was moot. **After the D2 units fix the predator survives, and the limitation is active.** Injury deaths of Agentus rose from 2 to 7 in the two-year census. That rise is attributed to predator bites on one smoke seed and is inferred for the rest. The predator cannot eat what it kills.
+A code limitation must not become a biological rule. D1 is three independent questions. Deciding any of them does **not** authorize Agentus cannibalism: Agentus remains are not an Agentus food kind, and that stays a separate decision.
 
-The options:
-- **(a) Declare it a rule:** Agentus is not prey. The consequence is an injury source with no ecological cause, which would need its own justification. It would also be a biological claim with no basis in the model.
-- **(b) Model predation on Agentus:** Agentus becomes a prey candidate, and remains become scavengeable carcass tissue under the same conservation path. The consequences:
-  - a new mortality source;
-  - remains enter the consumer element accounting;
-  - predator viability depends on fixing 6.1 first.
-- **(c) Remove the attack until (b) is decided.** The consequence is one less unexplained injury path. G10.4 encounter results that include predator bites would change.
+**What the code does now** (2026-10-08):
+- **Unprovoked attack without food.** A predator sharing an agent's cell bites it whenever the predator's energy is below 2× its reproduction energy (`biology._apply_predator_threat`). Injury per bite is 0.08, scaled up to 4× for small bodies. The predator gains nothing: Agentus is not in `animals._prey_candidates`.
+- **Remains.** Agentus remains go to `human.remains_cells`, which no animal reads.
+- **Defensive bite.** When an agent attempts to capture a predator and makes contact, the predator bites with probability 0.6 (`interactions`, G10.4 encounter model).
 
-**Recommendation:** record it now as an architectural limitation, not a rule, as this document does. Decide between (b) and (c) after 6.1. Do not take (a) without a biological argument.
+**Cause tracking** (`qualification/genesis/budget_audit.py`; injury gain by source over the last 60 days of life):
+- Every injury death in the two-year `v1` and `reference-v2` audits is 97–100% from the **unprovoked attack**. There are 7 such deaths under `v1` (5 children, 2 adults) and 8 under `reference-v2` (7 children, 1 adult).
+- Children die after about 4 bites; adults after about 21–22 bites in 60 days.
+- No death came from defensive bites, ingestion or exposure.
+
+**Encounter frequency caveat (D2 note, section 8).** At daily ticks, predators move about 25× more cells per year and make about 14× more hunt attempts per predator-year than at monthly ticks. Attack counts are therefore partly a product of the timebase's one-cell-per-tick movement, not only of predator biology. Rates of attack per year should not be read as ecologically calibrated.
+
+The three decisions:
+
+| Question | Option | Consequence |
+|---|---|---|
+| **D1a. May predators hunt living Agentus for food?** | yes | Agentus enters prey choice and hunt success. A kill moves the body to carcass tissue the predator eats (conservation path as for animals). The predator's energy budget gains a large prey. The unprovoked injury path is replaced by an actual hunt. |
+| | no | The unprovoked bite has no ecological reason to exist. It must be removed, or justified as something else (D1c). |
+| **D1b. May predators (or scavengers) consume dead Agentus?** | yes | Agentus remains become readable by animals, an element path from `remains_cells` into consumers. This is independent of D1a: scavenging without hunting is possible. |
+| | no | Remains decompose only, as now. |
+| **D1c. May predators injure Agentus defensively?** | yes, as now for capture attempts | Keep the encounter bite. Optionally extend it to an agent cornering or approaching a predator, but only through an explicit encounter, not co-location alone. |
+| | no | Remove the encounter bite. Capture of predators becomes riskless, which is a weaker claim. |
+
+**Recommendation:**
+- **D1c:** keep the defensive bite. It has a physical cause, an attempted capture.
+- **Unprovoked bite:** do not keep it in its present form under any answer. It is a hunting motive without a hunt.
+- **D1a and D1b:** decide after the D2 life-history recalibration and the encounter-frequency question, because both set how often predators meet agents.
 
 ### D2. Animal life history
 

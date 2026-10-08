@@ -5,7 +5,11 @@ consumers, no Agentus) for whole years at 12 ticks/year and at 365 ticks/year,
 the latter under "per-tick-legacy" and "elapsed-time-v1". Trajectories are not
 expected to match (weather, plants and movement are per tick); per-year
 quantities are compared: animals alive, births, deaths by cause, mean energy
-and water state, and element and water balance.
+and water state, element and water balance, and encounter frequency (cells
+travelled per animal-year, hunt attempts and kills). Movement stays one cell per
+tick and hunt success is per attempt at any timebase, so encounter frequency is
+expected to differ; it is measured here, not corrected. Hunt attempts are read
+by wrapping the per-attempt success roll (read-only).
 
   python experiments/genesis/run_consumer_timebase_comparison.py --years 5 --json out.json
 """
@@ -25,6 +29,7 @@ for extra in (ROOT / "src", ROOT):
     if str(extra) not in sys.path:
         sys.path.insert(0, str(extra))
 
+import hrm_genesis.ecology.animals as animals_module  # noqa: E402
 from hrm_genesis import GenesisConfig, GenesisSimulation  # noqa: E402
 from hrm_genesis.ecology.animals import consumer_element_totals, consumer_water_total_kg  # noqa: E402
 from hrm_genesis.ecology.plants import ecology_element_totals  # noqa: E402
@@ -49,6 +54,23 @@ def _balance(sim: GenesisSimulation) -> tuple[float, float]:
 
 def run(seed: str, arm: str, tpy: int, timebase: str, years: int) -> dict:
     started = time.perf_counter()
+    attempts = Counter()
+    original_hunt = animals_module._hunt_succeeds
+
+    def hunt(predator, prey, epoch):
+        ok = original_hunt(predator, prey, epoch)
+        attempts["attempts"] += 1
+        attempts["successes"] += ok
+        return ok
+
+    animals_module._hunt_succeeds = hunt
+    try:
+        return _run(seed, arm, tpy, timebase, years, attempts, started)
+    finally:
+        animals_module._hunt_succeeds = original_hunt
+
+
+def _run(seed, arm, tpy, timebase, years, attempts, started) -> dict:
     sim = GenesisSimulation(GenesisConfig(
         master_seed=seed, world_width=16, world_height=16, ticks_per_year=tpy, material_scale_factor=1000.0,
         producer_ecology_enabled=True, consumer_ecology_enabled=True, consumer_timebase=timebase))
@@ -56,11 +78,18 @@ def run(seed: str, arm: str, tpy: int, timebase: str, years: int) -> dict:
     births0, deaths0 = 0, Counter()
     for year in range(years):
         alive_ticks = Counter()
+        travelled = Counter()
         energy_sum = water_frac_sum = 0.0
         samples = 0
+        attempts0 = Counter(attempts)
         for _ in range(tpy):
+            where = {a["id"]: (int(a["x"]), int(a["y"])) for a in sim.consumer_state()["animals"]}
             sim.run(1)
             animals = sim.consumer_state()["animals"]
+            for a in animals:
+                if a["id"] in where:
+                    x0, y0 = where[a["id"]]
+                    travelled[a["species"]] += abs(int(a["x"]) - x0) + abs(int(a["y"]) - y0)
             for a in animals:
                 alive_ticks[a["species"]] += 1
                 energy_sum += float(a["energy"])
@@ -75,6 +104,10 @@ def run(seed: str, arm: str, tpy: int, timebase: str, years: int) -> dict:
             "end_alive": dict(Counter(a["species"] for a in c["animals"])),
             "births": births - births0,
             "deaths": {k: v for k, v in (deaths - deaths0).items() if v},
+            "cells_per_animal_year": {k: round(travelled[k] / max(1e-9, alive_ticks[k] / tpy), 1) for k in sorted(alive_ticks)},
+            "hunt_attempts": attempts["attempts"] - attempts0["attempts"],
+            "hunt_successes": attempts["successes"] - attempts0["successes"],
+            "predator_years": round(sum(v for k, v in alive_ticks.items() if trait_for(k).trophic_role == "predator") / tpy, 3),
             "mean_energy": round(energy_sum / max(1, samples), 3),
             "mean_water_fraction": round(water_frac_sum / max(1, samples), 3),
         })
@@ -108,7 +141,9 @@ def main(argv=None) -> int:
               f"balance elements {r['element_rel_error']:.1e} water {r['water_rel_error']:.1e}  {r['seconds']}s")
         for y in r["per_year"]:
             print(f"  y{y['year']} mean alive {y['mean_alive']}  end {y['end_alive']}  births {y['births']:3d}  "
-                  f"deaths {y['deaths']}  energy {y['mean_energy']}  water {y['mean_water_fraction']}")
+                  f"deaths {y['deaths']}  energy {y['mean_energy']}  water {y['mean_water_fraction']}  "
+                  f"cells/animal-year {y['cells_per_animal_year']}  hunts {y['hunt_attempts']} (kills {y['hunt_successes']}) "
+                  f"over {y['predator_years']} predator-years")
     print("\n== per arm, summed over seeds ==")
     for arm, _, _ in ARMS:
         rs = [r for r in results if r["arm"] == arm]
@@ -120,7 +155,23 @@ def main(argv=None) -> int:
         end = Counter()
         for r in rs:
             end.update(r["per_year"][-1]["end_alive"])
+        cells = Counter()
+        years_alive = Counter()
+        hunts = kills = 0
+        pyears = 0.0
+        for r in rs:
+            for y in r["per_year"]:
+                for sp, c in y["cells_per_animal_year"].items():
+                    ay = y["mean_alive"].get(sp, 0.0)
+                    cells[sp] += c * ay
+                    years_alive[sp] += ay
+                hunts += y["hunt_attempts"]
+                kills += y["hunt_successes"]
+                pyears += y["predator_years"]
+        per = {sp: round(cells[sp] / years_alive[sp], 1) for sp in sorted(cells) if years_alive[sp] > 0}
         print(f"{arm:14s} births per year {births}  deaths {dict(deaths)}  alive at end {dict(end)}")
+        print(f"{'':14s} cells travelled per animal-year {per}  hunt attempts {hunts}, kills {kills}, "
+              f"over {pyears:.2f} predator-years ({hunts / max(1e-9, pyears):.1f} attempts per predator-year)")
     if a.json:
         Path(a.json).write_text(json.dumps(results, indent=1))
     print(f"RESULT: {'FAIL' if status else 'PASS'}")
