@@ -394,6 +394,8 @@ def _provision_dependent(
     child: dict,
     caregiver: dict | None,
     profile: dict,
+    nursing_model: str | None = None,
+    stats: dict | None = None,
 ) -> float:
     dependence = max(0.0, min(1.0, float(profile.get("nursing_factor", profile.get("caregiver_dependence", 0.0)))))
     if caregiver is None or dependence <= 0.0:
@@ -427,6 +429,7 @@ def _provision_dependent(
     child["body_water_kg"] += water
 
     energy_cap = float(profile.get("nursing_energy_kcal_per_tick", 0.0)) * dependence
+    child_capacity = float(profile.get("energy_capacity_kcal", float("inf"))) * max(0.10, float(profile.get("development_scale", 1.0)))
     if "lactation_efficiency" in profile:
         # reference-v2: milk is drawn from the mother's own reserve, tapering
         # as that reserve runs low; synthesis costs her 1/efficiency per kcal.
@@ -435,18 +438,49 @@ def _provision_dependent(
         taper = max(0.0, min(1.0, float(caregiver["energy"]) / max(1e-9, reserve_reference)))
         mother_floor = float(profile.get("adult_basal_energy_kcal_per_tick", profile["basal_energy_kcal_per_tick"]))
         energy_available = max(0.0, float(caregiver["energy"]) - mother_floor) * efficiency
-        energy = min(energy_cap * taper, energy_available)
-        caregiver["energy"] -= energy / efficiency
+        supply = min(energy_cap * taper, energy_available)
     else:
+        # reference-v1 states no conversion loss: one kcal of milk costs one.
+        efficiency = 1.0
         caregiver_energy_floor = max(0.0, float(profile.get("basal_energy_kcal_per_tick", 0.0)))
         energy_available = max(0.0, float(caregiver["energy"]) - caregiver_energy_floor)
-        energy = min(energy_cap, energy_available)
-        caregiver["energy"] -= energy
-    child["energy"] = min(
-        float(profile.get("energy_capacity_kcal", float("inf"))) * max(0.10, float(profile.get("development_scale", 1.0))),
-        float(child["energy"]) + energy,
-    )
+        supply = min(energy_cap, energy_available)
+    if nursing_model == NURSING_DEMAND_LIMITED:
+        # docs/architecture/DEMAND_LIMITED_MILK.md: what the child can receive
+        # (room in its store) is fixed before any milk is made; the mother
+        # makes only that and pays for it, conversion loss included.
+        room = max(0.0, child_capacity - float(child["energy"]))
+        energy = min(supply, room)
+    else:
+        energy = supply
+    cost = energy / efficiency
+    caregiver["energy"] -= cost
+    before = float(child["energy"])
+    child["energy"] = min(child_capacity, before + energy)
+    if stats is not None:
+        absorbed = float(child["energy"]) - before
+        stats["nursing_days"] = int(stats.get("nursing_days", 0)) + 1
+        for key, value in (
+            ("milk_supply_kcal", supply),                  # what the supply cap would have drawn
+            ("milk_produced_kcal", energy),                # made and handed over
+            ("milk_cost_kcal", cost),                      # charged to the mother
+            ("milk_conversion_heat_kcal", cost - energy),  # synthesis loss, lost as heat
+            ("milk_absorbed_kcal", max(0.0, absorbed)),
+            # Produced but not taken into the child's store. Zero by construction
+            # when demand-limited; recorded so any gap is visible, not erased.
+            ("milk_unabsorbed_kcal", max(0.0, energy - max(0.0, absorbed))),
+            # Pre-existing: a child already above its size-scaled store (from
+            # food) is cut back to it. Not milk; kept visible.
+            ("child_store_clamp_kcal", max(0.0, before - float(child["energy"]))),
+        ):
+            stats[key] = float(stats.get(key, 0.0)) + value
+        if energy < supply:
+            stats["nursing_days_demand_limited"] = int(stats.get("nursing_days_demand_limited", 0)) + 1
     return transferred + water
+
+
+NURSING_DEMAND_LIMITED = "demand-limited-v1"
+NURSING_SUPPLY_CAPPED_LEGACY = "supply-capped-legacy"
 
 
 # Complementary (solid) food can be given from this age. Declared biological
@@ -910,7 +944,11 @@ def evolve_agentus_step(
             pcells[xy].update(updated_cell)
             human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
             human["last_action_trace"] = trace
-        provisioned = _provision_dependent(human, caregiver, effective_profile)
+        nursing_model = humans.get("nursing_model")
+        provisioned = _provision_dependent(
+            human, caregiver, effective_profile, nursing_model,
+            humans.setdefault("nursing_stats", {}) if nursing_model else None,
+        )
         ate_kg_today = 0.0
         if self_feeding > 0.0 and capacities and "cognition" in human:
             _drink(human, mcells[xy], effective_profile)

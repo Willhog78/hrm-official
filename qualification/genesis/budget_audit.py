@@ -17,7 +17,12 @@ identical with and without the audit.
      basal, move   the inline costs, from the agent's effective profile
      birth         energy given to a child born today
    residual = actual change - sum of terms. It must be ~0: the budget closes.
-   Also recorded: kg eaten against the gut cap, and food in the cell.
+   Also recorded: kg eaten against the gut cap, the share of it eaten beyond
+   need (its energy refused by a full reserve), and food in the cell. Milk is
+   accounted from the run's nursing_stats (produced, charged, conversion
+   heat, absorbed, unabsorbed) when nursing is demand-limited.
+   Hand-feeding checks: each check's outcome with the child's reserve against
+   the 0.75 trigger, grouped by the caregiver's own reserve.
 
 2. Injury ledger (everyone, per day): injury change by source
      predator      _apply_predator_threat
@@ -68,6 +73,7 @@ class Audit:
         self.injury: dict[str, Counter] = defaultdict(Counter)
         self.profiles: dict[str, dict] = {}
         self.tries: list[dict] = []
+        self.feeding_checks: list[tuple] = []
         self._pending: dict[int, dict] = {}
         self._originals: list[tuple[object, str, object]] = []
 
@@ -102,14 +108,18 @@ class Audit:
             kcal_by_kind = Counter()
             for r in records:
                 kcal_by_kind[r["kind"]] += float(r["kcal"]) - float(r["handling_kcal"])
-            audit.food[hid] = {"kg": sum(float(r["kg"]) for r in records), "gut_kg": float(profile["bite_cap_kg"]),
+            kg = sum(float(r["kg"]) for r in records)
+            # Food eaten whose energy the full reserve could not take: the
+            # matching share of the day's mass (removed from the world, unused).
+            surplus_kg = kg * (offered - credited) / offered if offered > 0.0 else 0.0
+            audit.food[hid] = {"kg": kg, "gut_kg": float(profile["bite_cap_kg"]), "surplus_kg": surplus_kg,
                                "plant_here_kg": plant_here, "kcal_by_kind": dict(kcal_by_kind)}
             return records
 
-        def _provision_dependent(child, caregiver, profile):
+        def _provision_dependent(child, caregiver, profile, *args, **kwargs):
             e0 = None if caregiver is None else float(caregiver["energy"])
             c0 = float(child["energy"])
-            out = o_provision(child, caregiver, profile)
+            out = o_provision(child, caregiver, profile, *args, **kwargs)
             if caregiver is not None:
                 audit.energy[str(caregiver["id"])]["nursing"] += float(caregiver["energy"]) - e0
                 # What the child actually gained from milk (it is capped by the
@@ -117,10 +127,25 @@ class Audit:
                 audit.energy[str(caregiver["id"])]["milk_to_child"] += float(child["energy"]) - c0
             return out
 
-        def _provision_solid_food(child, caregiver, *args, **kwargs):
+        def _provision_solid_food(child, caregiver, child_profile, caregiver_profile, pcell, ccell, eaten_kg, stats):
             e0 = None if caregiver is None else float(caregiver["energy"])
             c0 = float(child["energy"])
-            out = o_solid(child, caregiver, *args, **kwargs)
+            before = dict(stats.get("solid_food_outcomes", {}))
+            out = o_solid(child, caregiver, child_profile, caregiver_profile, pcell, ccell, eaten_kg, stats)
+            after = stats.get("solid_food_outcomes", {})
+            outcome = next((k for k in after if int(after[k]) > int(before.get(k, 0))), None)
+            if outcome is not None:
+                # One hand-feeding check: its outcome, the child's reserve
+                # against the trigger (same reference as the production check),
+                # and the caregiver's own reserve at that moment.
+                ref = float(child_profile.get("satiety_reference_kcal", child_profile.get("energy_capacity_kcal", 1.0)))
+                ref *= max(0.10, float(child_profile.get("development_scale", 1.0)))
+                cref = None if caregiver is None else float(caregiver_profile.get(
+                    "satiety_reference_kcal", caregiver_profile.get("energy_capacity_kcal", 1.0)))
+                audit.feeding_checks.append((
+                    outcome, int(child.get("age_ticks", 0)), c0 / max(1e-9, ref),
+                    None if caregiver is None else e0 / max(1e-9, cref),
+                ))
             if caregiver is not None:
                 audit.energy[str(caregiver["id"])]["provisioning"] += float(caregiver["energy"]) - e0
                 audit.energy[str(caregiver["id"])]["solid_to_child_kcal"] += float(child["energy"]) - c0
@@ -315,7 +340,7 @@ def run_audit(seed: str, arm: str, days: int, consumer_timebase: str | None = No
                     "milk_to_child": float(terms.get("milk_to_child", 0.0)),
                     "solid_to_child_kcal": float(terms.get("solid_to_child_kcal", 0.0)),
                     "solid_to_child_kg": float(terms.get("solid_to_child_kg", 0.0)),
-                    "kg": food.get("kg", 0.0), "gut_kg": food.get("gut_kg", 0.0), "plant_here_kg": food.get("plant_here_kg", 0.0),
+                    "kg": food.get("kg", 0.0), "surplus_kg": food.get("surplus_kg", 0.0), "gut_kg": food.get("gut_kg", 0.0), "plant_here_kg": food.get("plant_here_kg", 0.0),
                     "kcal_by_kind": food.get("kcal_by_kind", {}),
                     "born_today": births.get(pid, 0),
                 })
@@ -334,7 +359,10 @@ def run_audit(seed: str, arm: str, days: int, consumer_timebase: str | None = No
                                                           "satiety_reference_kcal", "move_energy_kcal_per_tick")},
                   "rows": rows, "injury_deaths": injury_deaths, "predator_attacks_by_year": dict(attacks_by_year),
                   "deaths_by_cause": {k: v for k, v in final.get("cumulative_deaths_by_cause", {}).items() if v},
-                  "imitation_tries": audit.tries}
+                  "imitation_tries": audit.tries,
+                  "feeding_checks": summarize_feeding(audit.feeding_checks),
+                  "nursing_model": config.nursing_model,
+                  "nursing_stats": final.get("nursing_stats", {})}
     except Exception as exc:
         import traceback
         result = {"seed": seed, "arm": arm, "days": days, "crash": f"{type(exc).__name__}: {exc}",
@@ -347,6 +375,32 @@ def run_audit(seed: str, arm: str, days: int, consumer_timebase: str | None = No
 
 def _job(args):
     return run_audit(*args)
+
+
+def summarize_feeding(checks: list[tuple]) -> dict:
+    """Hand-feeding outcomes, overall and by the caregiver's reserve band.
+
+    Tests one hypothesis: milk keeps children above the feeding trigger (child
+    reserve >= 0.75) even while caregivers run down their own reserves.
+    """
+    def band(r):
+        return "no caregiver" if r is None else ("< 0.25" if r < 0.25 else ("< 0.75" if r < 0.75 else ">= 0.75"))
+    out = {"checks": len(checks), "outcomes": dict(Counter(c[0] for c in checks).most_common())}
+    by_band = {}
+    for c in checks:
+        b = by_band.setdefault(band(c[3]), {"checks": 0, "outcomes": Counter(), "child_reserve": []})
+        b["checks"] += 1
+        b["outcomes"][c[0]] += 1
+        if c[0] != "too_young":
+            b["child_reserve"].append(c[2])
+    for b in by_band.values():
+        rs = sorted(b.pop("child_reserve"))
+        b["outcomes"] = dict(b["outcomes"].most_common())
+        b["past_onset_child_reserve"] = ({"n": len(rs), "min": round(rs[0], 3), "median": round(rs[len(rs) // 2], 3),
+                                          "share_at_or_above_trigger": round(sum(1 for r in rs if r >= 0.75) / len(rs), 3)}
+                                         if rs else {"n": 0})
+    out["by_caregiver_reserve"] = dict(sorted(by_band.items()))
+    return out
 
 
 def summarize_energy(rows: list[dict]) -> dict:
@@ -369,6 +423,7 @@ def summarize_energy(rows: list[dict]) -> dict:
             "mean_kcal_per_day": {k: round(mean(k), 1) for k in ENERGY_TERMS + ("clamp_loss", "change")},
             "milk_paid_vs_absorbed_kcal": (round(-mean("nursing"), 1), round(mean("milk_to_child"), 1)),
             "solid_food_to_children": (round(mean("solid_to_child_kg"), 4), round(mean("solid_to_child_kcal"), 1)),
+            "eaten_vs_beyond_need_kg": (round(mean("kg"), 3), round(mean("surplus_kg"), 3)),
             "gut_fill_mean": round(sum(r["kg"] / r["gut_kg"] for r in rs if r["gut_kg"] > 0) / n, 3),
             "gut_full_days": round(sum(1 for r in rs if r["gut_kg"] > 0 and r["kg"] >= 0.99 * r["gut_kg"]) / n, 3),
             "food_in_cell_ge_gut_days": round(sum(1 for r in rs if r["plant_here_kg"] >= r["gut_kg"] > 0) / n, 3),
@@ -419,10 +474,27 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {s['mean_kcal_per_day']}")
             print(f"  gut fill {s['gut_fill_mean']}  gut full on {s['gut_full_days']:.0%} of days  "
                   f"food in own cell >= gut on {s['food_in_cell_ge_gut_days']:.0%}  mean reserve {s['mean_reserve']}")
+            print(f"  kg eaten / of which beyond need (energy not taken up, reserve full) per day {s['eaten_vs_beyond_need_kg']}")
             print(f"  milk paid / absorbed by children (kcal/day) {s['milk_paid_vs_absorbed_kcal']}  "
                   f"solid food to children (kg, kcal per day) {s['solid_food_to_children']}")
             print(f"  dependents per day {s['dependents']}  nursing per dependent {s['nursing_per_dependent_kcal']} kcal  "
                   f"food offered by kind (kcal/day, before any clamp) {s['offered_kcal_by_kind']}")
+    print("\n== MILK (whole run, all caregivers) ==")
+    for r in ok:
+        n = r.get("nursing_stats") or {}
+        if not n:
+            print(f"  {r['seed']}: {r.get('nursing_model')} (no milk accounting recorded)")
+            continue
+        days = max(1, int(n.get("nursing_days", 0)))
+        per = {k.removesuffix("_kcal"): round(float(v) / days, 1) for k, v in n.items() if k.endswith("_kcal")}
+        print(f"  {r['seed']}: {r['nursing_model']}  nursing days {n.get('nursing_days', 0)}  "
+              f"demand-limited on {int(n.get('nursing_days_demand_limited', 0)) / days:.0%}  kcal per nursing day {per}")
+    print("\n== HAND-FEEDING CHECKS (outcome; child reserve vs trigger 0.75, by caregiver reserve) ==")
+    for r in ok:
+        f = r.get("feeding_checks") or {}
+        print(f"  {r['seed']}: {f.get('checks', 0)} checks  {f.get('outcomes', {})}")
+        for b, row in (f.get("by_caregiver_reserve") or {}).items():
+            print(f"    caregiver reserve {b}: {row['checks']} checks {row['outcomes']}  past onset: {row['past_onset_child_reserve']}")
     print("\n== INJURY DEATHS ==")
     for r in ok:
         for d in r["injury_deaths"]:

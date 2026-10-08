@@ -46,6 +46,7 @@ def run(seed: str, arm: str, years: int) -> dict:
     yearly = []
     prev_stats: dict = {}
     prev_consumers = {"births": 0, "deaths": Counter()}
+    prev_milk: dict = {}
     for y in range(years):
         alive_stage = Counter()
         for day in range(year):
@@ -70,6 +71,10 @@ def run(seed: str, arm: str, years: int) -> dict:
         people = h["humans"]
         def delta(key):
             return round(float(st.get(key, 0.0)) - float(prev_stats.get(key, 0.0)), 3)
+        milk = {k: float(v) for k, v in h.get("nursing_stats", {}).items()}
+        milk_year = {k: round(v - prev_milk.get(k, 0.0), 1) for k, v in milk.items()}
+        prev_milk = milk
+
         def delta_map(key):
             now, before = Counter(st.get(key, {})), Counter(prev_stats.get(key, {}))
             return {k: round(v, 3) for k, v in (now - before).items() if v}
@@ -84,6 +89,9 @@ def run(seed: str, arm: str, years: int) -> dict:
             "births": sum(1 for pid, ep in born.items() if y * year <= ep < (y + 1) * year),
             "deaths": dict(deaths_this_year),
             "max_generation": max((int(p.get("generation", 0)) for p in people), default=0),
+            "milk_kcal": {k.removesuffix("_kcal"): v for k, v in milk_year.items()
+                          if k in ("milk_supply_kcal", "milk_produced_kcal", "milk_cost_kcal", "milk_unabsorbed_kcal",
+                                   "child_store_clamp_kcal", "nursing_days")},
             "solid_food_outcomes": delta_map("solid_food_outcomes"),
             "solid_food_kg": delta_map("solid_food_kg_by_kind"),
             "intake_kg_by_kind": delta_map("intake_kg_by_kind"),
@@ -147,6 +155,7 @@ def main(argv=None) -> int:
             print(f"  y{y['year']}: alive {y['alive']} {y['alive_by_stage']} births {y['births']} deaths {y['deaths']} gen {y['max_generation']} | "
                   f"solid food {y['solid_food_outcomes']} kg {y['solid_food_kg']} | animals {y['animals']} (+{y['animal_births']} {y['animal_deaths']}) "
                   f"captures {y['captures']} attacks {y['predator_attacks_on_agentus']} | plants {y['edible_plant_t']} t")
+            print(f"       milk (kcal over the year) {y['milk_kcal']}")
             print(f"       learned: foods {y['food_kinds_valued_by_living']} positive acts {y['positive_acts_living']} repeated {y['repeated_use']} "
                   f"imitation {y['imitation_tries']}/{y['imitation_paid']} follow {y['follow_days']} warmth {y['insulation_saving_kcal']} worn {y['worn_objects']} objects {y['objects']}")
     if a.json:

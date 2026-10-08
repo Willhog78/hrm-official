@@ -155,10 +155,10 @@ def instrumented(recorder: Recorder):
             "xy": [int(human["x"]), int(human["y"])],
         }
 
-    def provision(child, caregiver, profile):
+    def provision(child, caregiver, profile, *args, **kwargs):
         caregiver_energy = float(caregiver["energy"]) if caregiver is not None else 0.0
         child_energy = float(child["energy"])
-        result = originals["provision"](child, caregiver, profile)
+        result = originals["provision"](child, caregiver, profile, *args, **kwargs)
         if caregiver is not None:
             recorder.tick["nursing_out"][str(caregiver["id"])] += caregiver_energy - float(caregiver["energy"])
         recorder.tick["nursing_in"][str(child["id"])] = float(child["energy"]) - child_energy

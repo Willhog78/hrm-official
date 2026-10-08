@@ -183,6 +183,25 @@ Predator-related mortality is still not interpreted as ecologically calibrated.
 
 Ecology experiments E1–E3 stay unimplemented. Physiology and life-history values are unchanged.
 
+### Daily world: first history, and demand-limited milk (2026-10-08)
+- **First 5-year daily world** (4 seeds; `experiments/genesis/summaries/DAILY_WORLD_RUN_2026-10-08.md`):
+  - Children survive early childhood: 30 of 31 reached 1 year, and 2 children died, of energy, in year 5. Adults are still the founders.
+  - Hand-feeding is almost never triggered; the reason recorded is `not_hungry`.
+  - Caregivers paid 392–806 kcal/day for milk their children absorbed only 141–230 of.
+  - Year-end edible plant mass fell from 45–59 t to 1.4–1.8 t.
+- **Demand-limited milk** (`docs/architecture/DEMAND_LIMITED_MILK.md`, owner-authorized):
+  - What a child can take is fixed first. The mother makes and pays only that, including the stated conversion cost; the loss is recorded as heat.
+  - Unabsorbed milk is recorded, not erased. It is zero by construction.
+  - `supply-capped-legacy` (arm suffix `-legacymilk`) reproduces the earlier digest exactly.
+  - It does not guarantee energy for mothers nursing three or four children.
+- **Diagnostics added (read-only; digests identical):**
+  - Plant mass ledger (`qualification/genesis/plant_ledger.py`): growth, germination, mortality, seeding, fire, decomposition, and removal by animals and by Agentus, monthly. It runs with a matching plant-only control.
+  - Hand-feeding checks, grouped by the caregiver's reserve.
+  - Food eaten beyond need.
+- **First reading, seed a, 2 years:**
+  - Edible mass swings more than 10× within a year, and the plant-only control falls the same way from year 1 end to year 2 end. The year-end decline therefore has no established cause yet.
+  - Animals remove about 0.1 kg of edible plant a year. Agentus remove about 2.7 t, which is 20% of growth in the low-season months.
+
 ## Verification infrastructure
 
 **CI has never run.** All 119 runs of the GitHub Actions `Stage-1 verification` workflow have failed in about 3 s, before a runner was assigned. That covers runs 1–119, from the first run on 2026-09-23 to the merge of PR #33. No log exists. GitHub's annotation on the job (checked for runs 1, 11 and 119) says:

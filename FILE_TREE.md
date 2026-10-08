@@ -111,6 +111,7 @@ hrm-official/
 │       ├── test_consumer_timebase.py
 │       ├── test_consumer_opportunity.py
 │       ├── test_budget_audit.py
+│       ├── test_plant_ledger.py
 │       └── micro/                 # micro tier: test_micro_<topic>.py + _scenario.py
 │
 ├── qualification/
@@ -129,7 +130,8 @@ hrm-official/
 │       ├── diagnostic.py
 │       ├── tier_observer.py       # read-only observer for smoke and diagnostic
 │       ├── opportunity.py         # read-only social-learning opportunity census
-│       ├── budget_audit.py        # read-only energy ledger, injury sources, imitation audit
+│       ├── budget_audit.py        # read-only energy ledger, milk, hand-feeding checks, injury sources, imitation audit
+│       ├── plant_ledger.py        # read-only plant mass ledger (+ plant-only control)
 │       ├── report_g4_results.py
 │       └── scenarios/
 │

@@ -11,8 +11,8 @@ up here.
 Arms are the multiseed arms (`v0`, `v1`, `plant_diet`, `no_interactions`,
 `no_recall`, `null`, each optionally `-nothirst`), then optionally
 `-preg106` (G10.6 integrity off), `-g104obs` (G10.4 observation), `-legacytb`
-or `-d2tb` (pre-D2 or D2 consumer timebase; outermost suffix; the default is
-elapsed-time-v2) and `@<physiology>`, e.g.
+or `-d2tb` (pre-D2 or D2 consumer timebase; the default is elapsed-time-v2),
+`-legacymilk` (supply-capped nursing; outermost) and `@<physiology>`, e.g.
 `v1-preg106@reference-v2` or `v1-legacytb@reference-v2`.
 
 Checks are split into:
@@ -62,10 +62,13 @@ NO_IMITATION = "-noimit"  # arm suffix: no imitation (G10.7a step 3 off)
 NO_FOLLOWING = "-nofollow"  # arm suffix: no following (G10.7a step 4 off)
 LEGACY_TIMEBASE = "-legacytb"  # arm suffix: pre-D2 consumer timebase (per-tick-legacy)
 D2_TIMEBASE = "-d2tb"  # arm suffix: D2 consumer timebase (elapsed-time-v1: rates only)
+LEGACY_MILK = "-legacymilk"  # arm suffix: supply-capped nursing (pre demand-limited milk); outermost
 
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    legacy_milk = base.endswith(LEGACY_MILK)
+    base = base.removesuffix(LEGACY_MILK)
     legacy_timebase = base.endswith(LEGACY_TIMEBASE)
     base = base.removesuffix(LEGACY_TIMEBASE)
     d2_timebase = base.endswith(D2_TIMEBASE)
@@ -101,6 +104,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
         overrides["consumer_timebase"] = "elapsed-time-v1"
     if not integrity:
         overrides["agentus_behavior_integrity_enabled"] = False
+    if legacy_milk:
+        overrides["nursing_model"] = "supply-capped-legacy"
     if overrides:
         config = GenesisConfig(**{**config.__dict__, **overrides})
     return config

@@ -75,6 +75,11 @@ class GenesisConfig:
     # (default) lets a caregiver hand food it obtained from the shared cell to a
     # dependent child; "none" reproduces earlier runs. Active with capacities.
     caregiving_model: str = "solid-food-v1"
+    # Nursing (docs/architecture/DEMAND_LIMITED_MILK.md). "demand-limited-v1"
+    # (default) makes only the milk the child can receive and charges the
+    # mother for what is made; "supply-capped-legacy" reproduces earlier runs.
+    # Active for calibrated humans.
+    nursing_model: str = "demand-limited-v1"
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -123,6 +128,8 @@ class GenesisConfig:
             raise ValueError("unknown agentus_capacity_ablation")
         if self.caregiving_model not in {"solid-food-v1", "none"}:
             raise ValueError("unknown caregiving_model")
+        if self.nursing_model not in {"demand-limited-v1", "supply-capped-legacy"}:
+            raise ValueError("unknown nursing_model")
         if self.agentus_observation_model not in {"visible-v1", "g10.4-legacy"}:
             raise ValueError("unknown agentus_observation_model")
         if self.agentus_event_memory_retention not in {"consequence", "fifo"}:
@@ -158,6 +165,11 @@ class GenesisConfig:
     @property
     def solid_food_active(self) -> bool:
         return self.caregiving_model == "solid-food-v1" and self.agentus_capacities_enabled and self.human_cognition_enabled
+
+    @property
+    def demand_milk_active(self) -> bool:
+        return (self.nursing_model == "demand-limited-v1" and self.human_biology_enabled
+                and self.human_calibration_enabled)
 
     @property
     def contract_dt(self) -> Fraction:
@@ -202,6 +214,8 @@ class GenesisConfig:
             canonical["agentus_following"] = "visible-peer-v1"
         if self.solid_food_active:
             canonical["agentus_caregiving"] = self.caregiving_model
+        if self.demand_milk_active:
+            canonical["agentus_nursing"] = self.nursing_model
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":

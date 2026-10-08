@@ -36,10 +36,10 @@ def run(seed: str, days: int, overrides: dict) -> dict:
     transfers: dict[str, dict] = {}
     original = biology._provision_dependent
 
-    def provision(child, caregiver, profile):
+    def provision(child, caregiver, profile, *args, **kwargs):
         energy_before = float(child["energy"])
         caregiver_energy = None if caregiver is None else float(caregiver["energy"])
-        result = original(child, caregiver, profile)
+        result = original(child, caregiver, profile, *args, **kwargs)
         transfers[str(child["id"])] = {
             "caregiver": None if caregiver is None else str(caregiver["id"]),
             "co_located": caregiver is not None and (int(child["x"]), int(child["y"])) == (int(caregiver["x"]), int(caregiver["y"])),
