@@ -304,6 +304,24 @@ def _drink(human: dict, mcell: dict, profile: dict) -> float:
     return drank
 
 
+def enable_subcell_positions(state: dict, seed: str) -> dict:
+    """Assign reproducible within-cell metre offsets to new simulation founders.
+
+    A 2 m local placement window is a declared geometric assumption, not
+    inferred historic position. This function is never called on restoration.
+    """
+    import hashlib
+    result = deepcopy(state)
+    result["subcell_position_model"] = "cell-local-v1"
+    for human in result["humans"]:
+        digest = hashlib.sha256(f"{seed}|position|{human['id']}".encode()).digest()
+        human["subcell_offset_m"] = [
+            round((int.from_bytes(digest[i:i+8], "big") / (2**64 - 1) - 0.5) * 1.5, 10)
+            for i in (0, 8)
+        ]
+    return result
+
+
 def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
     body = _blank_elements()
     for symbol in HUMAN_TRACKED_ELEMENTS:
@@ -323,6 +341,8 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
         "body_water_kg": water,
         "generation": int(mother["generation"]) + 1,
         "caregiver_id": str(mother["id"]),
+        **({"subcell_offset_m": list(mother["subcell_offset_m"])}
+           if "subcell_offset_m" in mother else {}),
         "last_reproduction_epoch": -1000000,
         "fatigue": 0.0,
         "injury": 0.0,
