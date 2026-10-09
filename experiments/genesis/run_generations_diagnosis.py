@@ -16,7 +16,7 @@ from hrm_genesis.human import biology as bio, interactions as cap
 parser=argparse.ArgumentParser()
 parser.add_argument('--seed',default='c')
 parser.add_argument('--years',type=int,default=30)
-parser.add_argument('--arm',default='v1',choices=('v1','v1-remainingmilk'))
+parser.add_argument('--arm',default='v1',choices=('v1','v1-remainingmilk','v1-reservepredators','v1-remainingmilk-reservepredators'))
 parser.add_argument('--parity-days',type=int,default=30)
 parser.add_argument('--owned-state',action='store_true',help='Diagnostic replay consumes its private states in place; never use with a live fabric')
 parser.add_argument('--spatial-index',action='store_true',help='Exact index of animal positions for repeated support queries')

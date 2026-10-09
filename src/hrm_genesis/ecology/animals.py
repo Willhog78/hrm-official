@@ -40,6 +40,7 @@ CARCASS_RETURN_FRACTION_PER_REFERENCE_TICK = 0.05
 CARCASS_WATER_RETURN_FRACTION_PER_REFERENCE_TICK = 0.10
 # Minimum consecutive supported reference ticks before reproduction.
 MIN_SUPPORT_STREAK_REFERENCE_TICKS = 5
+PREDATOR_SUPPORT_RESERVE = "reserve-backed-v1"
 
 
 def consumer_timebase(consumers: dict) -> str:
@@ -449,6 +450,7 @@ def evolve_consumers(
     carcasses = _cell_lookup(consumers["carcass_cells"])
 
     timebase = consumer_timebase(consumers)
+    reserve_support = consumers.get("predator_support_model") == PREDATOR_SUPPORT_RESERVE
     births: list[dict] = []
     survivors: list[dict] = []
     deaths_by_cause = {"old_age": 0, "starvation": 0, "dehydration": 0, "predation": 0}
@@ -548,6 +550,7 @@ def evolve_consumers(
             ccell["water_kg"] += float(animal["body_water_kg"])
             continue
 
+        predator_prey_ready = True
         if traits.trophic_role == "herbivore":
             local_forage_per_consumer = _local_forage_per_consumer(animal, consumers, producers)
             # Basal cost per tick times cooldown ticks is the energy needed over
@@ -563,6 +566,25 @@ def evolve_consumers(
             support_now = (
                 float(animal["last_forage_success"]) > 0.0
                 and local_forage_per_consumer >= required_forage_support
+            )
+        elif reserve_support:
+            # A real meal funds subsequent non-feeding days through the finite
+            # energy store. No extra meal-per-day condition or synthetic grace.
+            if float(animal["last_forage_success"]) > 0.0:
+                animal["predator_last_meal_epoch"] = epoch
+            support_now = (
+                "predator_last_meal_epoch" in animal
+                and float(animal["energy"]) >= basal_cost
+            )
+            # Local live prey is required when reproducing, not every day that
+            # an earlier meal still pays maintenance. A consumed animal cannot
+            # certify replacement habitat on the same tick it was killed.
+            predator_prey_ready = any(
+                str(prey["id"]) not in killed_ids
+                and float(prey["energy"]) > 0.0
+                and float(prey["body_water_kg"]) > 1e-6
+                and _element_mass(prey["body_elements_kg"]) > 0.002
+                for prey in _prey_candidates(animal, consumers)
             )
         else:
             local_prey = len(_prey_candidates(animal, consumers))
@@ -581,6 +603,7 @@ def evolve_consumers(
                 reproduction_cooldown_ticks // 3,
             )
             and since_reproduction >= reproduction_cooldown_ticks
+            and predator_prey_ready
         )
         if reproduction_ready:
             ordinal = int(consumers["next_birth_ordinal"])
