@@ -116,3 +116,9 @@ A fresh calibrated 4×4, 365-tick/year, scale-1000, capacity-enabled simulation 
 - Scoped commits: `63a9628` config; `5422427` runner; `5c27cb3` positions; `a353494` tests.
 - Tests: local main ZIP with exactly corresponding subcell patches passed deterministic opt-in initialization/newborn/legacy smoke; existing `test_survival_affordances.py`, `test_g0_integration.py`, `test_g10_5_physiology.py` **16 passed, 0 failed**. These are *patched-local* results, not an integrated checkout of the complete PR head.
 - Physical limits: 2 m cell-local coordinate convention is an explicit simplified geometry assumption, not a measured world-grid scale. No wind-generation, snow, new anatomy, learning claim, merge, or Railway deployment.
+
+## Gate 2 implementation increment — opt-in persistent wind
+- Added `world/climate.py::wind_vector_m_s`: deterministic, locally coherent east/north wind components in m/s, derived from separate persistent hash-based weather channels (5 m/s component amplitude). This is a declared simplified forcing, not fluid dynamics.
+- `world/state.py` now includes per-cell wind components, speed and incoming compass angle only when `wind_model=persistent-vector-v1` is present. `GenesisConfig.genesis_wind_enabled=False` preserves legacy fingerprint and state by default; `runner.py` opts in explicitly for new worlds.
+- Test `tests/genesis/test_gate2_wind_field.py` added. Reproduced the wind-scope patch locally against the uploaded main ZIP and ran `pytest -q tests/genesis/test_gate2_wind_field.py tests/genesis/test_g1_physical_world.py`: **6 passed, 0 failed**. This validates the equivalent local wind patch, not the full #39 branch.
+- Wind currently informs the previously wired physical protection inputs when enabled, but wind-dependent evaporation, drying, fire spread, bodily heat flux, snowfall/wetness and accumulated exposure remain **unimplemented**. No Gate 2 completion or emergent behavior claim.
