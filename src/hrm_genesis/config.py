@@ -70,6 +70,8 @@ class GenesisConfig:
     # non-feeding days; live prey must be locally reachable at reproduction.
     predator_support_model: str = "consecutive-feeding-legacy"
     predator_search_model: str = "plant-score-legacy"
+    # Opt-in pairing identity and persistent ancestry; no kinship gate.
+    agentus_parentage_model: str = "none"
     # Producer (plant) timebase. Plant rates and ages are stated per day (the
     # daily world is the reference). "elapsed-time-v1" (default) converts them
     # to the run's tick length; "per-tick-legacy" reproduces earlier runs.
@@ -146,6 +148,8 @@ class GenesisConfig:
             raise ValueError("unknown agentus_capacity_ablation")
         if self.predator_search_model not in {"plant-score-legacy", "seen-prey-v1"}:
             raise ValueError("unknown predator_search_model")
+        if self.agentus_parentage_model not in {"none", "recorded-pair-v1"}:
+            raise ValueError("unknown agentus_parentage_model")
         if self.predator_support_model not in {"consecutive-feeding-legacy", "reserve-backed-v1"}:
             raise ValueError("unknown predator_support_model")
         if self.caregiving_model not in {"solid-food-v1", "none"}:
@@ -262,6 +266,8 @@ class GenesisConfig:
             canonical["agentus_physiology_version"] = self.agentus_physiology_version
         if self.consumer_ecology_enabled and self.predator_search_model == "seen-prey-v1":
             canonical["predator_search_model"] = self.predator_search_model
+        if self.human_biology_enabled and self.agentus_parentage_model == "recorded-pair-v1":
+            canonical["agentus_parentage_model"] = self.agentus_parentage_model
         if self.consumer_ecology_enabled and self.predator_support_model == "reserve-backed-v1":
             canonical["predator_support_model"] = self.predator_support_model
         if (self.consumer_ecology_enabled and self.ticks_per_year != 12

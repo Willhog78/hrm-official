@@ -16,7 +16,7 @@ from hrm_genesis.human import biology as bio, interactions as cap
 parser=argparse.ArgumentParser()
 parser.add_argument('--seed',default='c')
 parser.add_argument('--years',type=int,default=30)
-parser.add_argument('--arm',default='v1',choices=('v1','v1-remainingmilk','v1-reservepredators','v1-remainingmilk-reservepredators','v1-remainingmilk-reservepredators-searchpredators'))
+parser.add_argument('--arm',default='v1',choices=('v1','v1-remainingmilk','v1-reservepredators','v1-remainingmilk-reservepredators','v1-remainingmilk-reservepredators-searchpredators','v1-remainingmilk-reservepredators-searchpredators-parentage'))
 parser.add_argument('--parity-days',type=int,default=30)
 parser.add_argument('--owned-state',action='store_true',help='Diagnostic replay consumes its private states in place; never use with a live fabric')
 parser.add_argument('--spatial-index',action='store_true',help='Exact index of animal positions for repeated support queries')
@@ -262,6 +262,11 @@ if args.resume_state:
     states=json.loads(args.resume_state.read_text())
     start_epoch=int(states[4]['epoch_applied'])+1
     saved=json.loads((args.resume_state.parent/(args.seed+'.json')).read_text())
+    if config.agentus_parentage_model != 'none' and (
+        states[4].get('parentage_model') != config.agentus_parentage_model
+        or saved.get('config_fingerprint') != config.fingerprint()
+    ):
+        raise ValueError('parentage replay requires a matching recorded-parentage snapshot; legacy paternity cannot be recovered')
     annual=[a for a in saved['annual'] if a['year']<=start_epoch//365]
     for a in annual:
         repro[a['year']].update(a['reproduction'])
@@ -287,6 +292,9 @@ for epoch in range(start_epoch,args.years*365):
         rec={'year':year,'alive':len(h['humans']),'generations':dict(Counter(p['generation'] for p in h['humans'])),'animals':dict(Counter(a['species'] for a in c['animals'])),'deaths':h.get('cumulative_deaths',0),'births':h.get('cumulative_births',0),'captures':stats.get('captures',0),'imitation_tries':sum(stats.get('imitation_tries',{}).values()),'imitation_paid':sum(stats.get('imitation_paid',{}).values()),'reproduction':dict(repro[year]),'predators':dict(predators[year]),'imitation_details':dict(imitations[year]),'positive_copied_keys':positive_copied,'nursing':deepcopy(h.get('nursing_stats',{})),'refused_food':deepcopy(h.get('energy_store_stats',{})),'elapsed_s':round(time.monotonic()-start,1)}
         annual.append(rec)
         result={'seed':args.seed,'arm':args.arm,'config_fingerprint':config.fingerprint(),'parity_days':args.parity_days,'resume_epoch':start_epoch,'copy_attribution_start_epoch':start_epoch,'annual':annual,'birth_events':births,'death_events':deaths,'predator_deaths':predator_deaths,'predator_birth_events':predator_births}
+        if h.get('parentage_model'):
+            result['parentage_model']=h['parentage_model']
+            result['lineage']=deepcopy(h['lineage'])
         (out/(args.seed+'.json')).write_text(json.dumps(result,indent=2))
         print(json.dumps(rec),flush=True)
         if year in (18,25,30) or year==args.years:(out/(args.seed+'-state-y'+str(year)+'.json')).write_text(json.dumps(states))
