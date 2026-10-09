@@ -72,3 +72,12 @@ Gate 0 **not passed yet**: no verified baseline suite, exhaustive production set
 
 ## Gate 0 exit summary (plain English)
 Identified all affected owner modules and the integration branch. Confirmed meaningful flaws in arrangement size vs actual wood, thermal water accounting, non-directional fire, and loss of animal anatomy in pooled carcasses. Confirmed reusable physical actions, reward traces, legacy configuration mechanisms and strict checkpoint fingerprinting. Documented transfer invariants, isolated implementation sequence and executable-baseline blocker. **Files changed:** this document only. **Physical capabilities:** unchanged. **Tests run:** 0 Python tests; 1 unsuccessful repository network access attempt. **Replay and conservation:** not executed, no pass claimed. **Observed Agentus behavior:** none newly observed. **PR:** draft #39; not merged.
+
+## Uploaded main ZIP: executable baseline (2026-10-09)
+The user supplied `hrm-official-main (1).zip` after the original audit. It is a local **main** export dated 2026-10-07, **not** a checkout of the PR #35 ancestry or this integration branch. It is valid as a baseline for the source contained in the archive, but cannot establish whether the #34/#35 fixes on the target branch pass tests.
+
+Executed from the extracted tree with `PYTHONPATH=src:.`:
+- `pytest -q tests/genesis/test_survival_affordances.py tests/genesis/test_g10_5_physiology.py tests/genesis/test_g1_5_matter.py tests/genesis/micro/test_micro_imitation.py`: **28 passed, 0 failed**.
+- `pytest -q tests/genesis`: advanced to at least 155 passing progress indicators, then terminated by execution timeout; **incomplete, not a suite pass**. No failure trace was printed prior to timeout. Do not count this as validated completion.
+
+Updated Gate 0 conclusion: executable baseline has been established for uploaded main, but the integration branch still needs its own complete set of targeted determinism, conservation, and replay checks. This is a precise revision to the earlier 'zero Python tests' note, not a claim that the historical source at the PR head was executed. No simulation code was changed during this audit.
