@@ -127,11 +127,11 @@ class Audit:
                 audit.energy[str(caregiver["id"])]["milk_to_child"] += float(child["energy"]) - c0
             return out
 
-        def _provision_solid_food(child, caregiver, child_profile, caregiver_profile, pcell, ccell, eaten_kg, stats):
+        def _provision_solid_food(child, caregiver, child_profile, caregiver_profile, pcell, ccell, eaten_kg, stats, **kwargs):
             e0 = None if caregiver is None else float(caregiver["energy"])
             c0 = float(child["energy"])
             before = dict(stats.get("solid_food_outcomes", {}))
-            out = o_solid(child, caregiver, child_profile, caregiver_profile, pcell, ccell, eaten_kg, stats)
+            out = o_solid(child, caregiver, child_profile, caregiver_profile, pcell, ccell, eaten_kg, stats, **kwargs)
             after = stats.get("solid_food_outcomes", {})
             outcome = next((k for k in after if int(after[k]) > int(before.get(k, 0))), None)
             if outcome is not None:

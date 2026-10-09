@@ -142,10 +142,14 @@ def ingest_pool(
         taken += amount
     kcal = taken * kind_energy_per_kg(kind, profile)
     handling = taken * float(spec["handling_kcal_per_kg"]) * scale if pay_handling else 0.0
-    human["energy"] = min(
-        float(profile.get("energy_capacity_kcal", float("inf"))),
-        float(human["energy"]) + kcal,
-    ) - handling
+    # The store bound: the size-scaled store when the profile carries one
+    # (docs/architecture/CHILD_ENERGY_STORE.md), else the adult capacity.
+    store = float(profile.get("energy_store_capacity_kcal", profile.get("energy_capacity_kcal", float("inf"))))
+    before = float(human["energy"])
+    human["energy"] = min(store, before + kcal) - handling
+    if "energy_store_capacity_kcal" in profile:
+        # Energy the full store could not take: recorded, not erased.
+        record["refused_kcal"] = max(0.0, before + kcal - max(before, store))
     hazard = min(MAX_INGESTION_HAZARD_PER_TICK, taken * float(spec["hazard_per_kg"]) / max(0.1, scale))
     if hazard > 0.0:
         human["injury"] = float(human.get("injury", 0.0)) + hazard

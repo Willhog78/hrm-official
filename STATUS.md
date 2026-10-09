@@ -218,6 +218,24 @@ Ecology experiments E1–E3 stay unimplemented. Physiology and life-history valu
   - Plant rates are unchanged.
 - **Recorded separately, not changed:** the child energy clamp (`DEMAND_LIMITED_MILK.md` §7).
 
+### Third daily world, caregiver audit, and the child energy store (2026-10-09)
+- **Third run (water cycle at material scale, 4 seeds × 5 years):**
+  - 0 deaths; every child born survived.
+  - Births: 8, 11, 5 and 20 (seed d: 8 adults, 20 dependents).
+  - Edible vegetation persists at 771–789 t at year 5.
+  - Agentus eliminated grazers in seeds a and d; the stalkers there later starved. Seed c kept all three species.
+  - 8 hunts, 34 imitation tries (none paid off), no following, 0 hand-feedings.
+  - Details in `experiments/genesis/summaries/DAILY_WORLD_RUN_2026-10-08.md`.
+- **Caregiver audit (same code):**
+  - Caregiver days below reserve 0.75 fell to 10, 71, 6 and 122 (from 426, 143, 85 and 153). Mean caregiver reserve is 0.91–0.93.
+  - Every child past 180 days was at or above the hand-feeding trigger.
+- **Child energy store** (`docs/architecture/CHILD_ENERGY_STORE.md`): an isolated accounting fix.
+  - One size-scaled store bound for eating, hand-feeding and nursing.
+  - Refused energy is recorded by age class. The nursing clamp is 0.
+  - `-legacystore` reproduces the previous build exactly.
+- **Next question:** whether children reach adulthood (age 18) and found another generation.
+  - That needs runs of 20+ years. The replay ledger holds about 0.83 GB per simulated year per seed, so such a run does not fit the current 8 GB runner.
+
 ## Verification infrastructure
 
 **CI has never run.** All 119 runs of the GitHub Actions `Stage-1 verification` workflow have failed in about 3 s, before a runner was assigned. That covers runs 1–119, from the first run on 2026-09-23 to the merge of PR #33. No log exists. GitHub's annotation on the job (checked for runs 1, 11 and 119) says:

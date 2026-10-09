@@ -286,7 +286,7 @@ def _eat(human: dict, pcell: dict, profile: dict) -> float:
         pcell["detritus_elements_kg"][symbol] += amount - keep
         consumed += amount
     human["energy"] = min(
-        float(profile.get("energy_capacity_kcal", float("inf"))),
+        float(profile.get("energy_store_capacity_kcal", profile.get("energy_capacity_kcal", float("inf")))),
         float(human["energy"]) + consumed * float(profile["food_energy_kcal_per_kg"]) * float(profile["assimilation"]),
     )
     return consumed
@@ -429,7 +429,9 @@ def _provision_dependent(
     child["body_water_kg"] += water
 
     energy_cap = float(profile.get("nursing_energy_kcal_per_tick", 0.0)) * dependence
-    child_capacity = float(profile.get("energy_capacity_kcal", float("inf"))) * max(0.10, float(profile.get("development_scale", 1.0)))
+    child_capacity = float(profile.get(
+        "energy_store_capacity_kcal",
+        float(profile.get("energy_capacity_kcal", float("inf"))) * max(0.10, float(profile.get("development_scale", 1.0)))))
     if "lactation_efficiency" in profile:
         # reference-v2: milk is drawn from the mother's own reserve, tapering
         # as that reserve runs low; synthesis costs her 1/efficiency per kcal.
@@ -479,6 +481,27 @@ def _provision_dependent(
     return transferred + water
 
 
+ENERGY_STORE_SIZE_SCALED = "size-scaled-v1"
+ENERGY_STORE_LEGACY = "unscaled-eating-legacy"
+
+
+def energy_store_capacity(profile: dict) -> float:
+    """The one energy store bound for eating, hand-feeding and nursing: the
+    adult capacity scaled by body development (adults: scale 1, unchanged)."""
+    return float(profile.get("energy_capacity_kcal", float("inf"))) * max(0.10, float(profile.get("development_scale", 1.0)))
+
+
+def _record_refused(stats: dict, profile: dict, kcal: float) -> None:
+    """Energy offered by food that a full store could not take, by age class.
+    The food mass is eaten as before; only its surplus energy is refused."""
+    if kcal <= 0.0:
+        return
+    key = "child" if float(profile.get("development_scale", 1.0)) < 1.0 else "adult"
+    refused = dict(stats.get("refused_kcal", {}))
+    refused[key] = float(refused.get(key, 0.0)) + kcal
+    stats["refused_kcal"] = refused
+
+
 NURSING_DEMAND_LIMITED = "demand-limited-v1"
 NURSING_SUPPLY_CAPPED_LEGACY = "supply-capped-legacy"
 
@@ -499,6 +522,7 @@ def _provision_solid_food(
     ccell: dict | None,
     eaten_kg: float,
     stats: dict,
+    store_stats: dict | None = None,
 ) -> float:
     """A caregiver hands food it obtains from the shared cell to its dependent
     child (caregiving_model "solid-food-v1"). The caregiver's hands hold
@@ -554,6 +578,8 @@ def _provision_solid_food(
         caregiver["energy"] = float(caregiver["energy"]) - take * float(spec["handling_kcal_per_kg"]) * adult_scale
         # Hand over: the child eats from the hands; the rest goes back.
         rec = ingest_pool(child, kind, take, hands, pcell["detritus_elements_kg"], child_profile, pay_handling=False)
+        if store_stats is not None:
+            _record_refused(store_stats, child_profile, float(rec.get("refused_kcal", 0.0)))
         for symbol, amount in hands.items():
             pool[symbol] = float(pool[symbol]) + amount
         if rec["kg"] > 0.0:
@@ -856,6 +882,13 @@ def evolve_agentus_step(
     for human in order:
         origin = (int(human["x"]), int(human["y"]))
         effective_profile = _age_profile(human, profile)
+        store_stats = None
+        if humans.get("energy_store_model") == ENERGY_STORE_SIZE_SCALED and "development_scale" in effective_profile:
+            # One store for eating, hand-feeding and nursing
+            # (docs/architecture/CHILD_ENERGY_STORE.md).
+            effective_profile = dict(effective_profile)
+            effective_profile["energy_store_capacity_kcal"] = energy_store_capacity(effective_profile)
+            store_stats = humans.setdefault("energy_store_stats", {})
         start_energy = float(human["energy"])
         start_water = float(human["body_water_kg"])
         start_injury = float(human.get("injury", 0.0))
@@ -972,6 +1005,8 @@ def evolve_agentus_step(
                 samples,
                 {} if ctx is None else ctx.access_bonus,
             )
+            if store_stats is not None:
+                _record_refused(store_stats, effective_profile, sum(float(r.get("refused_kcal", 0.0)) for r in intake))
             if ctx is None:
                 ctx = cap.Context(humans, human, effective_profile, pcells[xy], ccells[xy], lithic_cells, wcells[xy], consumer_state, epoch)
             cap.learn_from_tick(ctx, intake)
@@ -991,6 +1026,7 @@ def evolve_agentus_step(
                 _age_profile(caregiver, profile) if caregiver is not None else effective_profile,
                 pcells[xy], ccells[xy], ate_kg_today,
                 humans.setdefault("capacity_stats", cap.empty_stats()),
+                **({"store_stats": store_stats} if store_stats is not None else {}),
             )
             ate = float(ate) + given
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])

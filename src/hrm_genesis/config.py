@@ -86,6 +86,12 @@ class GenesisConfig:
     # as G10.1 already scales the water and biomass inventories;
     # "unscaled-legacy" reproduces earlier runs. Identical at scale 1.
     water_cycle_scale: str = "material-v1"
+    # One energy store for eating, hand-feeding and nursing
+    # (docs/architecture/CHILD_ENERGY_STORE.md). "size-scaled-v1" (default)
+    # bounds every credit by energy_capacity_kcal x development_scale and
+    # records energy a full store refuses; "unscaled-eating-legacy" reproduces
+    # earlier runs (eating capped at the adult capacity, nursing cuts back).
+    child_energy_store: str = "size-scaled-v1"
     world_width: int = 8
     world_height: int = 8
     ticks_per_year: int = 120
@@ -138,6 +144,8 @@ class GenesisConfig:
             raise ValueError("unknown nursing_model")
         if self.water_cycle_scale not in {"material-v1", "unscaled-legacy"}:
             raise ValueError("unknown water_cycle_scale")
+        if self.child_energy_store not in {"size-scaled-v1", "unscaled-eating-legacy"}:
+            raise ValueError("unknown child_energy_store")
         if self.agentus_observation_model not in {"visible-v1", "g10.4-legacy"}:
             raise ValueError("unknown agentus_observation_model")
         if self.agentus_event_memory_retention not in {"consequence", "fifo"}:
@@ -173,6 +181,11 @@ class GenesisConfig:
     @property
     def solid_food_active(self) -> bool:
         return self.caregiving_model == "solid-food-v1" and self.agentus_capacities_enabled and self.human_cognition_enabled
+
+    @property
+    def energy_store_active(self) -> bool:
+        return (self.child_energy_store == "size-scaled-v1" and self.human_biology_enabled
+                and self.human_calibration_enabled)
 
     @property
     def water_scale_active(self) -> bool:
@@ -231,6 +244,8 @@ class GenesisConfig:
             canonical["agentus_nursing"] = self.nursing_model
         if self.water_scale_active:
             canonical["water_cycle_scale"] = self.water_cycle_scale
+        if self.energy_store_active:
+            canonical["agentus_energy_store"] = self.child_energy_store
         if self.behavior_integrity_active:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":

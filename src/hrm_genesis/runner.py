@@ -170,6 +170,9 @@ class GenesisSimulation:
             if config.demand_milk_active:
                 human_state = dict(human_state)
                 human_state["nursing_model"] = config.nursing_model
+            if config.energy_store_active:
+                human_state = dict(human_state)
+                human_state["energy_store_model"] = config.child_energy_store
             if config.thirst_planning_active:
                 human_state = dict(human_state)
                 human_state["thirst_planning"] = True

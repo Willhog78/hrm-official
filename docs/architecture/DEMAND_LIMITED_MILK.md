@@ -95,3 +95,5 @@ These identities hold:
   - Any energy offered beyond that capacity must be **explicitly accounted for**, for example as food left uneaten or an excess recorded as refused, never silently erased.
   - Removing size scaling only to make the clamp disappear is not acceptable, because it would introduce a different distortion.
   - Options (a) and (b) in the earlier draft were not exhaustive. The capacity rule needs a design note and its own legacy setting before any change.
+
+**Corrected (2026-10-09):** `docs/architecture/CHILD_ENERGY_STORE.md` (`child_energy_store = "size-scaled-v1"`): one store bound for every credit path; refused energy is recorded; the clamp is 0.
