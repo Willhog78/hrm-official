@@ -1,3 +1,19 @@
+## Current qualification checkpoint — 2026-10-09 (supersedes the preliminary status line below)
+
+**Inspection has advanced into implementation and qualification; PR #39 remains DRAFT / NOT MERGE-APPROVED.** The original opening status below describes the initial inspection and must not be interpreted as the current branch state. No production rollout is authorized by this record.
+
+- Gate 1 and Gate 2 source changes and focused regression tests now exist on this branch. This does **not** certify both gates or complete the requested Gate 3–5 animal-material work.
+- Independent Railway validation on the PR branch reached 100% for the Genesis pytest progress output (299 progress dots, no visible errors/failures). The log contains no printed pytest summary and this is **not** a blanket sign-off on physical qualification.
+- Opt-in weather-mode 120-day checkpoint replay and four-seed 90-day water conservation checks passed; legacy historical mode still has a separately documented postmortem/caregiver water imbalance. Neither is grounds to relax the water ledger.
+- Controlled thermal challenges demonstrated lower cold/heat stress under an appropriately placed protective surface. Those controls do not demonstrate a practical autonomously made garment.
+- Initial autonomous audits found no lasting wear. Tracing identified the mechanical cause: woven surface constituent strands were omitted from object mass, so weather cleanup erased the surfaces. The branch correction includes surface mass in object accounting and a conservation regression.
+- Following that correction, unchanged 365-day production-profile autonomous audits found **seven retained worn woven surfaces in each of two seeds**. The first measured surface was about **0.000163 m²** (1.63 cm²). **Recorded insulation saving remained zero kcal** in both seeds. These observations establish unprompted wear and persistence, not meaningful thermal protection or a learned cold-survival strategy.
+- The latest Railway regression deployment on commit `d647a51d2d98b366309d1f9af4b77646231f4f51` reached 100% progress. The full qualification gate remains open: quantify physically attainable coverage, show nonzero relevant physiological effects in an autonomous viable world, confirm complete regressions and conservation at the exact final source head, and complete the separately scoped animal-material gates before calling the mission complete.
+
+**Disposition:** No merge to the production lineage, no production Railway deployment, no invented crafting goals. Continue with controlled attainable-surface thermal tests and causal autonomous outcome measurements. Keep configuration, ports and environment variables unchanged.
+
+---
+
 # Gate 0 — Consequential weather, exposure, and animal materials (inspection record)
 
 Date: 2026-10-09. Status: **PARTIAL INSPECTION; IMPLEMENTATION BLOCKED until remaining checks complete.** This is an evidence/provenance record, not a declaration that any requested physical gate passed.
