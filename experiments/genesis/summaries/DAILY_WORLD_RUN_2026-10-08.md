@@ -305,3 +305,5 @@ These track the corrected plant-only control (771 t at year 5 for seed a).
 - **Vegetation recovered; family outcomes did not move together.** Births fell in seed a and rose sharply in seed d. No one died in either run.
 - **Hunting fell and hand-feeding stopped.** Both are consistent with the larger food supply lowering the need to hunt or to hand-feed. That is recorded as a result, not tuned.
 - **Grazer extinctions in a and d are caused by Agentus hunting in years 1–2.** The stalker deaths in those two seeds follow them, recorded as starvation.
+
+**Reproducibility check.** A redeploy of build 83ba80b (`8ed5e891`) reused its stored start command by mistake and re-ran the seed a world report. The result was identical: 16 alive, 8 births, 0 deaths, the same animals by year (grazers killed by Agentus in years 1–2, the stalker starved in year 3), and 771.3 t of edible plants at year 5. The caregiver audit runs from a fresh deployment of the same code. The commits since 83ba80b change documentation only.
