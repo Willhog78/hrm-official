@@ -31,7 +31,7 @@ def main():
         for day in range(1, DAYS + 1):
             sim.run(1)
             humans = sim.human_state()
-            producers = sim.producer_state()
+            producers = sim.ecology_state()
             # Producer representation may differ by configuration: this
             # audit must fail visibly rather than fabricate a zero baseline.
             if not isinstance(producers, dict):
