@@ -5,6 +5,7 @@ world state, or reward. The observed surface area comes from the 365-day
 production-profile audit; other scenarios are explicitly counterfactual.
 """
 from copy import deepcopy
+from math import ceil
 
 from hrm_genesis.human import interactions as cap
 from hrm_genesis.human.biology import _apply_physiology
@@ -39,7 +40,7 @@ def main():
 
     # Compute necessary quantity from actual area/cohesion and model constants;
     # do not insert a fictional large garment into the autonomous audit.
-    equivalent_count = int(cap.BODY_SURFACE_M2 /
+    equivalent_count = ceil(cap.BODY_SURFACE_M2 /
                            (OBSERVED_AREA_M2 * OBSERVED_COHESION))
     for count in (1, 7, 100, equivalent_count):
         moderation, person = trial(count)
