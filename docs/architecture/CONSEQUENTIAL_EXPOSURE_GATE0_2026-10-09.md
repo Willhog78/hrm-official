@@ -1,0 +1,49 @@
+# Gate 0 — Consequential weather, exposure, and animal materials (inspection record)
+
+Date: 2026-10-09. Status: **PARTIAL INSPECTION; IMPLEMENTATION BLOCKED until remaining checks complete.** This is an evidence/provenance record, not a declaration that any requested physical gate passed.
+
+## Branch ancestry and review target
+- Repository default: `main`.
+- PR #34 merged into `ccr-12877dfd-gxegwl`, merge commit `646ef3f96e82928e7618196bf8df8272d7e28167`; not into main.
+- PR #35 merged into `codex/30-year-diagnosis`, merge commit `54eee90122d5a8c57e8ccfc513f778b51390d718`; not into main.
+- Working branch `codex/genesis-consequential-exposure-materials` was created from `codex/30-year-diagnosis` to retain the merged #35 nursing work. Do not silently retarget to main or presume #35 is included in the older ccr branch.
+- `AGENTS.md` was absent at the inspected branch root (GitHub returned 404). Search for nested agent rules before making implementation edits.
+
+## Verified code ownership / current behavior
+- `src/hrm_genesis/world/climate.py` computes seeded temperature, precipitation, persistent anomalies and lightning. `world/state.py` writes these per cell. No explicit wind or snow in inspected climate/world state.
+- `matter/transfers.py` owns the rain -> surface -> soil -> runoff/evaporation water cycle and cumulative precipitation/evaporation ledger. Snow and body/material wetness would need explicit transfer boundaries.
+- `human/biology.py` contains `_structural_protection`, `_apply_physiology`, `_experienced_reward`, and human state creation. Current arrangement protection multiplies geometry and area but applies only a zero/nonzero check to arranged mass. Terrain/canopy moderate effective ambient temperature; worn insulation adds degrees to effective ambient rather than balancing heat flux. Thermal energy cost, water loss, severe-exposure injury and a bounded core-temperature estimate exist. There is no demonstrated persistent wetness or physiological cold/heat debt.
+- `human/interactions.py` contains in-cell affordance enumeration, grasp/carried objects, force interactions, learned values, eligibility trace, witnessed memory and imitation. Current surface insulation derives from worn surface area and cohesion. `weather_objects` decomposes organic objects, transfers their elements into detritus, and applies fire damage/stone heating.
+- `matter/objects.py` owns stone properties/fracture/edge wear, fibers, wood, interlacing and bindings. Reuse primitive force and contact mechanics; do not introduce a named bone-tool recipe.
+- `ecology/animals.py` `kill_animal` removes animals once and transfers full tracked body elemental mass to pooled fresh/legacy carcass tissue and water to carcass water. `consumer_element_totals` counts living animals and both carcass pools. Current carcass pools cannot identify individual historical skeletons or hides; backfilling those parts would fabricate information.
+- `config.py` stores explicit switches with checkpoint fingerprint effects; `checkpoint.py` rejects incompatible configuration fingerprints and delegates state persistence to Stage-1 coordination.
+
+## Dependency map
+Climate/world fields -> matter hydrology -> producer fire/detritus/material geometry -> ecology carcasses -> human body + carried/arranged objects + sensation/learning -> read-only observer. Keep world state, matter state, animal state and human state under their current owners and pass effects through existing interfaces. Add state migration/initialization logic only where the saved-state boundary demands it.
+
+## Physical invariants to enforce
+1. Precipitation is an accounted open-system water input; evapotranspiration is an accounted output; rain, snow, meltwater, body/material wetness and water pools cannot duplicate water.
+2. Every deceased animal transfers tracked elements and water once; partitions into soft tissue, bone, marrow, hide/fur and tendons must sum to the original animal's accounted mass/elements.
+3. Removing or burning an arrangement or pelt must decrease both the object's conserved elemental inventory and its effective protective properties.
+4. Thermal energy debits count once; sweat/evaporated body moisture uses explicitly accounted water. Cold/heat strain is stateful and reversible when physically appropriate.
+5. Existing seed/config/state combinations remain replayable in an explicitly labeled legacy mode. Never infer anatomy or prior exposure from historical aggregate remains.
+6. Observers measure without affecting world state, action choices, rewards or random streams.
+
+## Risk assessment
+**High:** changing climate/hydrology and thermoregulation simultaneously risks water/energy double counting, changing death classification, and invalidating historical checkpoints.
+**High:** existing animal deaths lose individual body anatomy inside cell pools, so old remains cannot be decomposed retroactively into individual bones/hides.
+**High:** arrangement geometry currently has a nonphysical tiny-mass loophole; closing it changes survival outcomes even without agent decisions.
+**Medium:** attributing later exposure relief to a particular action can reward unrelated acts; eligibility and causal position must be checked before learning.
+**Medium:** base ancestry diverges from `main`, and #34/#35 merged into different non-default branches.
+**Medium:** no local executable checkout/test runner was available at inspection time; no baseline pass counts or replay claims are asserted.
+
+## Smallest proposed implementation surface and sequence
+1. Finish reading geometry setters, existing fire/carcass/physiology/learning pathways, production runner and all applicable nested rules; establish tests and integration ancestry.
+2. Gate 1: `human/biology.py` + geometry object logic where needed + focused tests; protection must be driven by surviving volume, coverage, orientation, position and damage.
+3. Gate 2: `world/climate.py`, `world/state.py`, `matter/transfers.py`, `human/biology.py`, minimal linked interaction/state plumbing and tests. Add explicit units, flux ledgers and legacy switch.
+4. Gate 3: `ecology/animals.py`, `matter/objects.py`, `human/interactions.py`, focused transfer and checkpoint tests.
+5. Gate 4: same material/interaction paths and controlled physiology/decay coupling.
+6. Gate 5: human perception/learning and read-only diagnostics, deterministic bounded local comparisons. Railway remains untouched.
+
+## Gate status / limitations
+Gate 0 **not passed yet**: no verified baseline suite, exhaustive production settings, full save-state schema and action/cognition/fire ownership trace. Gates 1–5 must not be described as implemented, tested, observed or learned. No full Railway experiment, deploy or merge authorized.
