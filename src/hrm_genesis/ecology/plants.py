@@ -339,6 +339,23 @@ def evolve_producers(
         pcell["age_ticks"] = int(pcell["age_ticks"]) + 1
 
 
+def _wind_fire_spread_factor(wcell: dict, source: tuple[int, int], destination: tuple[int, int]) -> float:
+    """Directional ember transport, maintaining unchanged calm/legacy spread."""
+    speed = max(0.0, float(wcell.get("wind_speed_m_s", 0.0)))
+    if speed <= 0.0:
+        return 1.0
+    east = float(wcell.get("wind_east_m_s", 0.0))
+    north = float(wcell.get("wind_north_m_s", 0.0))
+    magnitude = (east * east + north * north) ** 0.5
+    if magnitude <= 1e-12:
+        return 1.0
+    dx, dy = destination[0] - source[0], destination[1] - source[1]
+    projection = (east * dx + north * dy) / (magnitude * max(1.0, (dx * dx + dy * dy) ** 0.5))
+    # A crosswind retains the existing coupling, a tailwind enhances it,
+    # and an upwind direction dampens it without magically extinguishing fire.
+    return max(0.2, min(1.8, 1.0 + min(0.8, speed * 0.08) * projection))
+
+
     # 3b. Natural combustion: ignition comes from the physical world, not humans.
     # Existing fire can persist/spread locally while dry combustible material exists.
     ignition_additions: dict[tuple[int, int], float] = {xy: 0.0 for xy in pcells}
@@ -367,7 +384,7 @@ def evolve_producers(
                 for other in neighbors(xy[0], xy[1], width, height):
                     if _burnable_mass(pcells[other]) > 0.05:
                         ignition_additions[other] = max(
-                            ignition_additions[other], min(0.35, current * 0.18)
+                            ignition_additions[other], min(0.35, current * 0.18 * _wind_fire_spread_factor(wcell, xy, other))
                         )
         pcell["fire_intensity"] = current
 
