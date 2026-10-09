@@ -353,12 +353,56 @@ def _hunt_succeeds(predator: dict, prey: dict, epoch: int) -> bool:
     return u < chance
 
 
+# Opt-in anatomy is recorded only for deaths after the mode is enabled.
+# Legacy pooled carcasses are never retroactively assigned invented parts.
+ANATOMICAL_DRY_FRACTIONS = {
+    "bone": 0.18,
+    "marrow": 0.06,
+    "hide": 0.10,
+    "fur": 0.04,
+    "tendon": 0.04,
+    "soft_tissue": 0.58,
+}
+
+
+def enable_anatomical_remains(consumer_state: dict) -> dict:
+    """Enable conserved, source-identified anatomical remains for future deaths."""
+    result = deepcopy(consumer_state)
+    result["anatomical_remains_v1"] = True
+    for cell in result["carcass_cells"]:
+        cell.setdefault("anatomical_remains", [])
+    return result
+
+
+def _deposit_anatomical_remains(consumers: dict, animal: dict, cell: dict) -> None:
+    """Move all residual animal matter once, without changing legacy history."""
+    if not consumers.get("anatomical_remains_v1", False):
+        target = _carcass_target(cell)
+        for symbol in ANIMAL_TRACKED_ELEMENTS:
+            target[symbol] += float(animal["body_elements_kg"][symbol])
+        cell["water_kg"] += float(animal["body_water_kg"])
+        return
+    parts = {}
+    for name, fraction in ANATOMICAL_DRY_FRACTIONS.items():
+        parts[name] = {
+            symbol: float(animal["body_elements_kg"][symbol]) * fraction
+            for symbol in ANIMAL_TRACKED_ELEMENTS
+        }
+    water = float(animal["body_water_kg"])
+    cell.setdefault("anatomical_remains", []).append({
+        "animal_id": str(animal["id"]),
+        "species": str(animal["species"]),
+        "parts_elements_kg": parts,
+        "water_kg": water,
+    })
+
+
 def _carcass_target(carcass_cell: dict) -> dict:
     """Newly dead tissue enters the fresh pool when that pool is modeled."""
     return carcass_cell["fresh_elements_kg"] if "fresh_elements_kg" in carcass_cell else carcass_cell["elements_kg"]
 
 
-def _consume_prey(predator: dict, prey: dict, carcass_cell: dict) -> float:
+def _consume_prey(predator: dict, prey: dict, carcass_cell: dict, consumers: dict | None = None) -> float:
     traits = trait_for(str(predator["species"]))
     prey_mass = _element_mass(prey["body_elements_kg"])
     if prey_mass <= 0.0:
@@ -372,11 +416,15 @@ def _consume_prey(predator: dict, prey: dict, carcass_cell: dict) -> float:
         retainable = amount * traits.assimilation_efficiency
         keep = min(retainable, deficit)
         predator["body_elements_kg"][symbol] += keep
-        _carcass_target(carcass_cell)[symbol] += amount - keep
+        if consumers is None or not consumers.get("anatomical_remains_v1", False):
+            _carcass_target(carcass_cell)[symbol] += amount - keep
         retained_total += keep
         prey["body_elements_kg"][symbol] = 0.0
 
-    carcass_cell["water_kg"] += float(prey["body_water_kg"])
+    if consumers is None or not consumers.get("anatomical_remains_v1", False):
+        carcass_cell["water_kg"] += float(prey["body_water_kg"])
+    else:
+        _deposit_anatomical_remains(consumers, prey, carcass_cell)
     prey["body_water_kg"] = 0.0
     predator["energy"] = min(
         traits.reproduction_energy * 4.0,
@@ -507,7 +555,7 @@ def evolve_consumers(
             if prey_here:
                 prey = _choose_prey(animal, {"animals": prey_here}) or prey_here[0]
                 if _hunt_succeeds(animal, prey, epoch):
-                    _consume_prey(animal, prey, carcasses[xy])
+                    _consume_prey(animal, prey, carcasses[xy], consumers)
                     killed_ids.add(str(prey["id"]))
                     deaths_by_cause["predation"] += 1
                 else:
@@ -542,10 +590,7 @@ def evolve_consumers(
             elif old:
                 deaths_by_cause["old_age"] += 1
             ccell = carcasses[xy]
-            target = _carcass_target(ccell)
-            for symbol in ANIMAL_TRACKED_ELEMENTS:
-                target[symbol] += float(animal["body_elements_kg"][symbol])
-            ccell["water_kg"] += float(animal["body_water_kg"])
+            _deposit_anatomical_remains(consumers, animal, ccell)
             continue
 
         if traits.trophic_role == "herbivore":
@@ -630,6 +675,21 @@ def evolve_consumers(
                 ccell["fresh_elements_kg"][symbol] = fresh - returned - spoiled
                 ccell["elements_kg"][symbol] += spoiled
                 mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
+        for remains in ccell.get("anatomical_remains", []):
+            # Every part decays independently into environmental Matter.
+            for part_name, part in remains["parts_elements_kg"].items():
+                # Dense bones persist longer than soft tissue; loose fur and
+                # hides remain physically distinguishable while present.
+                decay = carcass_return * (0.20 if part_name == "bone" else
+                                          0.35 if part_name == "marrow" else
+                                          0.65 if part_name in {"hide", "fur", "tendon"} else 1.0)
+                for symbol in ANIMAL_TRACKED_ELEMENTS:
+                    returned = float(part[symbol]) * decay
+                    part[symbol] -= returned
+                    mcell["elements_kg"][symbol] = float(mcell["elements_kg"].get(symbol, 0.0)) + returned
+            returned_water = float(remains["water_kg"]) * carcass_water_return
+            remains["water_kg"] -= returned_water
+            mcell["soil_water_kg"] += returned_water
         water_return = float(ccell["water_kg"]) * carcass_water_return
         ccell["water_kg"] -= water_return
         mcell["soil_water_kg"] += water_return
@@ -698,10 +758,7 @@ def kill_animal(consumers: dict, animal_id: str, cause: str) -> dict | None:
     animal = consumers["animals"].pop(index)
     xy = (int(animal["x"]), int(animal["y"]))
     ccell = _cell_lookup(consumers["carcass_cells"])[xy]
-    target = _carcass_target(ccell)
-    for symbol in ANIMAL_TRACKED_ELEMENTS:
-        target[symbol] = float(target.get(symbol, 0.0)) + float(animal["body_elements_kg"][symbol])
-    ccell["water_kg"] = float(ccell["water_kg"]) + float(animal["body_water_kg"])
+    _deposit_anatomical_remains(consumers, animal, ccell)
     counts = dict(consumers.get("cumulative_deaths_by_cause", {}))
     counts[cause] = int(counts.get(cause, 0)) + 1
     consumers["cumulative_deaths_by_cause"] = counts
@@ -734,11 +791,15 @@ def consumer_element_totals(state: dict) -> dict[str, float]:
             totals[symbol] += float(amount)
         for symbol, amount in cell.get("fresh_elements_kg", {}).items():
             totals[symbol] += float(amount)
+        for remains in cell.get("anatomical_remains", []):
+            for part in remains["parts_elements_kg"].values():
+                for symbol, amount in part.items():
+                    totals[symbol] += float(amount)
     return {s: round(v, 10) for s, v in sorted(totals.items())}
 
 
 def consumer_water_total_kg(state: dict) -> float:
     return (
         sum(float(a["body_water_kg"]) for a in state["animals"])
-        + sum(float(c["water_kg"]) for c in state["carcass_cells"])
+        + sum(float(c["water_kg"]) + sum(float(r["water_kg"]) for r in c.get("anatomical_remains", [])) for c in state["carcass_cells"])
     )
