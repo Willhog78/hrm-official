@@ -1197,16 +1197,25 @@ def evolve_agentus_step(
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
         water_before_physiology = float(human["body_water_kg"])
         if capacities:
+            arrangement_reference = None if ctx is None else ctx.arrangement_before
+            insulation_reference = None if ctx is None else ctx.insulation_before
+            if humans.get("transition_model") == cap.transitions.DELAYED_MODEL:
+                arrangement_reference, insulation_reference = cap.prepare_thermal_trials(
+                    humans, human, pcells[xy], epoch, effective_profile, ctx,
+                )
             _apply_physiology(
                 human, wcells[xy], moved, effective_profile, pcells[xy],
                 insulation_c=cap.insulation_c(humans, str(human["id"])),
                 sleep_recovery=integrity,
-                record_arrangement_benefit=humans.get("transition_model") == cap.transitions.VALUED_MODEL,
-                arrangement_reference=None if ctx is None else ctx.arrangement_before,
-                insulation_reference_c=None if ctx is None else ctx.insulation_before,
+                record_arrangement_benefit=humans.get("transition_model") in cap.transitions.VALUED_MODELS,
+                arrangement_reference=arrangement_reference,
+                insulation_reference_c=insulation_reference,
             )
             worn_saving = float(human.pop("insulation_saving_kcal", 0.0))
-            if humans.get("transition_model") == cap.transitions.VALUED_MODEL:
+            if humans.get("transition_model") == cap.transitions.DELAYED_MODEL:
+                cap.settle_thermal_trials(humans, human, epoch, worn_saving,
+                                         float(human.pop("arrangement_saving_kcal", 0.0)))
+            elif humans.get("transition_model") == cap.transitions.VALUED_MODEL:
                 cap.credit_transition_heat(ctx, worn_saving, float(human.pop("arrangement_saving_kcal", 0.0)))
             else:
                 cap.credit_worn_benefit(humans, human, worn_saving, effective_profile)

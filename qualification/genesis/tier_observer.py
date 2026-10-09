@@ -73,7 +73,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
     transition_model = "none"
     for suffix, model in (("-transitionsv1", cap.transitions.MODEL),
-                          ("-transitionsv2", cap.transitions.VALUED_MODEL)):
+                          ("-transitionsv2", cap.transitions.VALUED_MODEL),
+                          ("-transitionsv3", cap.transitions.DELAYED_MODEL)):
         if base.endswith(suffix):
             transition_model = model
             base = base.removesuffix(suffix)

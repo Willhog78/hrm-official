@@ -458,3 +458,12 @@ by actual received energy; newly changed cover/worn material receives only its
 marginal first-tick thermal benefit. Default and v1 recording remain available.
 Evidence and limits: `docs/architecture/SEQUENCE_VALUATION_V2.md`. Longer delayed
 thermal returns and sequential imitation remain separate validation steps.
+
+### Delayed thermal returns — opt-in v3 (2026-10-09)
+
+Owner-authorized continuation tracks up to two own material contributions over
+32 ticks. Discounted actual thermal savings can repay an originating attempt;
+transfer, departure, physical intervention, forgetting and expiry end credit.
+Default, v1 and v2 remain available. Controlled valuation works; autonomous
+ecological discovery and sequential imitation remain unproven. Contract and
+verification: `docs/architecture/DELAYED_THERMAL_V3.md`.
