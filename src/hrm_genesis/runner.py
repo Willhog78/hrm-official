@@ -102,6 +102,7 @@ class GenesisSimulation:
                 ticks_per_year=config.ticks_per_year,
                 master_seed=config.master_seed,
                 seed_bank=self.seed_bank,
+                wind_enabled=config.genesis_wind_enabled,
             )
             authorities.append(
                 StateAuthority(WORLD_AUTHORITY, {WORLD_STATE_RESOURCE: world_state})
@@ -213,6 +214,11 @@ class GenesisSimulation:
                 matter_state["initial_lithic_kg"] = lithic_total
                 consumer_state = enable_fresh_tissue(consumer_state)
                 human_state = enable_capacities(human_state)
+                if config.agentus_subcell_position_enabled:
+                    # Explicit new-run initialization only. Checkpoint restores
+                    # read persisted positions and never synthesize old history.
+                    from .human.biology import enable_subcell_positions
+                    human_state = enable_subcell_positions(human_state, config.master_seed)
                 if config.agentus_capacity_ablation:
                     human_state["capacity_ablation"] = config.agentus_capacity_ablation
 

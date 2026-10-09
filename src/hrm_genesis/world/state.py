@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import math
 
 from hrm_coordination.seeds import SeedBank
 
-from .climate import lightning_activity, persistent_weather_anomaly, precipitation_amount, temperature_c
+from .climate import lightning_activity, persistent_weather_anomaly, precipitation_amount, temperature_c, wind_vector_m_s
 from .energy import solar_input
 from .grid import build_grid
 from .terrain import latitude_factor
@@ -17,6 +18,7 @@ def build_world_state(
     ticks_per_year: int,
     master_seed: str,
     seed_bank: SeedBank,
+    wind_enabled: bool = False,
 ) -> dict:
     return {
         "width": width,
@@ -24,6 +26,7 @@ def build_world_state(
         "ticks_per_year": ticks_per_year,
         "master_seed": master_seed,
         "epoch_applied": -1,
+        **({"wind_model": "persistent-vector-v1"} if wind_enabled else {}),
         "cells": build_grid(width, height, seed_bank),
     }
 
@@ -72,6 +75,12 @@ def evolve_world(state: dict, epoch: int) -> dict:
             x=x,
             y=y,
         )
+        if world.get("wind_model") == "persistent-vector-v1":
+            east, north = wind_vector_m_s(seed=seed, epoch=epoch, ticks_per_year=ticks_per_year, x=x, y=y)
+            cell["wind_east_m_s"] = east
+            cell["wind_north_m_s"] = north
+            cell["wind_speed_m_s"] = round(math.hypot(east, north), 10)
+            cell["wind_from_deg"] = round(math.degrees(math.atan2(-north, -east)) % 360.0, 10) if east or north else 0.0
         cell["precipitation"] = precipitation_amount(
             seed=seed,
             epoch=epoch,

@@ -44,6 +44,22 @@ def _add_elements(target: dict[str, float], addition: dict[str, float]) -> None:
         target[symbol] = float(target.get(symbol, 0.0)) + float(amount)
 
 
+def constrain_arrangement_geometry(geometry: dict, arranged_mass_kg: float) -> None:
+    """Bound effective surface by remaining mass; never add material by shaping.
+
+    Simplified unprocessed woody lattice: density 500 kg/m3, wall thickness
+    0.03 m. The existing placement dimensions are upper bounds, not grants.
+    """
+    area = min(max(0.0, float(geometry.get("surface_area_m2", 0.0))),
+               max(0.0, arranged_mass_kg) / (500.0 * 0.03))
+    span = min(max(0.0, float(geometry.get("span_m", 0.0))), area ** 0.5)
+    height = min(max(0.0, float(geometry.get("height_m", 0.0))), area / max(0.01, span))
+    geometry["span_m"] = round(span, 10)
+    geometry["height_m"] = round(height, 10)
+    geometry["surface_area_m2"] = round(area, 10)
+    geometry["density"] = round(min(1.0, max(0.0, arranged_mass_kg) / max(1e-9, 500.0 * 0.03 * area)), 10) if area else 0.0
+
+
 def execute_live_sequence(
     sequence: list[str] | tuple[str, ...],
     human: dict,
@@ -109,12 +125,12 @@ def execute_live_sequence(
             _add_elements(arranged, moved)
             moved_mass = _mass(moved)
             total_mass = _mass(arranged)
-            geometry["span_m"] = min(2.5, float(geometry["span_m"]) + 0.45 + moved_mass * 0.35)
-            geometry["height_m"] = min(2.2, float(geometry["height_m"]) + 0.20 + moved_mass * 0.30)
+            geometry["span_m"] = min(2.5, float(geometry["span_m"]) + moved_mass * 0.35)
+            geometry["height_m"] = min(2.2, float(geometry["height_m"]) + moved_mass * 0.30)
             geometry["surface_area_m2"] = min(
-                8.0, float(geometry["surface_area_m2"]) + 0.5 + moved_mass * 0.9
+                8.0, float(geometry["surface_area_m2"]) + moved_mass * 0.9
             )
-            geometry["density"] = min(1.0, total_mass / max(0.5, float(geometry["surface_area_m2"])))
+            constrain_arrangement_geometry(geometry, total_mass)
             trace["arranged"] = True
             trace["effort_energy_kcal"] += 8.0 + 5.0 * moved_mass
 
@@ -140,6 +156,7 @@ def execute_live_sequence(
             trace["material_moved_kg"] += _mass(moved)
             trace["effort_energy_kcal"] += 10.0 + 10.0 * _mass(moved)
 
+    constrain_arrangement_geometry(geometry, _mass(arranged))
     h["held_material_elements_kg"] = held
     cell["woody_elements_kg"] = wood
     cell["loose_material_elements_kg"] = loose

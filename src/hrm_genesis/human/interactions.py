@@ -317,7 +317,11 @@ class Context:
         return str(self.human["id"])
 
     def wetness(self) -> float:
-        return max(0.0, min(1.0, float(self.wcell.get("precipitation", 0.0)) / 3.0))
+        rain = max(0.0, min(1.0, float(self.wcell.get("precipitation", 0.0)) / 3.0))
+        # Where weathering is enabled, the actual fibres retain moisture from
+        # previous ticks. Legacy objects without a moisture field behave as before.
+        stored = [float(o["wetness"]) for o in self.held() if "wetness" in o]
+        return max(rain, max(stored, default=0.0))
 
     def draw(self, *parts: object) -> float:
         return mo.unit_draw(self.agent_id, self.epoch, *parts)
@@ -424,7 +428,7 @@ def enumerate_affordances(ctx: Context) -> list[tuple[str, dict]]:
         options.append(("interlace:strands|held", {"verb": "interlace"}))
     if strands and len(rigid) >= 2:
         options.append((f"bind:{object_class(rigid[0])}+{object_class(rigid[1])}|strand", {"verb": "bind"}))
-    for surface in [o for o in soft if o["material"] == "surface"]:
+    for surface in [o for o in soft if o["material"] == "surface" and not o.get("worn", False)]:
         options.append(("wear:surface|held", {"verb": "wear", "id": surface["id"]}))
         break
 
@@ -629,6 +633,10 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
     tool_history = list(tool.get("history", [])) if tool is not None else []
     out = _execute_physical(ctx, key, spec)
     out["tool_history"] = tool_history
+    if "wind_speed_m_s" in ctx.wcell:
+        for obj in ctx.humans["objects"]:
+            if obj["id"] not in before:
+                obj["first_handled_epoch"] = int(ctx.epoch)
     after_ids = {o["id"] for o in ctx.humans["objects"]}
     # What anyone present can see appear: the classes of objects this act made.
     out["created_classes"] = sorted(object_class(o) for o in ctx.humans["objects"] if o["id"] not in before)
@@ -963,8 +971,24 @@ def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: boo
                 _bump_map(ctx.stats, "imitation_tries", option[0], 1)
                 return option
     explore_p = EXPLORE_HUNGRY if hungry else EXPLORE_SATED
+    candidates = untried
+    if "wind_speed_m_s" in ctx.wcell and untried:
+        # General physical novelty, not garment knowledge: any newly handled
+        # object briefly draws attention to interactions involving that object.
+        # Existing reward learning still decides whether the act is repeated.
+        fresh = []
+        for option in untried:
+            obj_id = option[1].get("id")
+            obj = _find(ctx.humans, obj_id) if obj_id is not None else None
+            if (obj is not None and obj.get("holder") == ctx.agent_id
+                    and 0 <= ctx.epoch - int(obj.get("first_handled_epoch", -999999)) <= 2):
+                fresh.append(option)
+        if fresh:
+            explore_p = max(explore_p, 0.30)
+            # Fresh objects receive more chances but never mandate an act.
+            candidates = untried + fresh * 3
     if untried and ctx.draw("explore", step) < explore_p:
-        return untried[int(ctx.draw("explore-pick", step) * len(untried)) % len(untried)]
+        return candidates[int(ctx.draw("explore-pick", step) * len(candidates)) % len(candidates)]
     known = [o for o in options if o[0] in values]
     positive = [o for o in known if float(values[o[0]]["v"]) > 0.0]
     if positive:
@@ -1008,7 +1032,16 @@ def run_interactions(
     for step in range(MAX_INTERACTIONS_PER_TICK):
         if float(human.get("fatigue", 0.0)) > 0.8:
             break
-        picked = choose(ctx, enumerate_affordances(ctx), step, hungry)
+        options = enumerate_affordances(ctx)
+        # Record opportunities, not intentions or prescribed behavior. An
+        # interlaced surface can be made without the agent ever seeing an
+        # opportunity to place it against the body.
+        if "wind_speed_m_s" in wcell:
+            if any(spec.get("verb") == "wear" for _, spec in options):
+                _bump(ctx.stats, "wear_affordance_offered")
+            if any(spec.get("verb") == "interlace" for _, spec in options):
+                _bump(ctx.stats, "interlace_affordance_offered")
+        picked = choose(ctx, options, step, hungry)
         if picked is None:
             break
         key, spec = picked
@@ -1374,6 +1407,17 @@ def weather_objects(humans: dict, pcells: dict, wcells: dict, epoch: int) -> Non
         intensity = float(pcell.get("fire_intensity", 0.0))
         detritus = pcell["detritus_elements_kg"]
         held = obj.get("holder") is not None
+        climate = wcells[xy]
+        # Opt-in environmental moisture: liquid contact leaves residual
+        # wetness, while wind and sunlight dry material gradually. Wetness
+        # is a bounded material property, not newly created water mass.
+        if "wind_speed_m_s" in climate and obj["material"] in {"fiber", "surface", "assembly", "wood"}:
+            rain = max(0.0, min(1.0, float(climate.get("precipitation", 0.0)) / 3.0))
+            previous = float(obj.get("wetness", 0.0))
+            wind = max(0.0, float(climate["wind_speed_m_s"]))
+            solar = max(0.0, float(climate.get("solar", 0.0)))
+            drying = min(0.7, 0.04 + wind * 0.015 + solar * 0.08)
+            obj["wetness"] = round(max(rain, previous * (1.0 - drying)), 10)
         decay = ORGANIC_DECAY_HELD if held else ORGANIC_DECAY_GROUND
         burn = 0.1 * intensity if (intensity > 0.2 and not held) else 0.0
         _degrade(obj, decay + burn, detritus)

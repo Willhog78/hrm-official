@@ -25,6 +25,10 @@ class GenesisConfig:
     # G10.3 capacity model v1. Off by default; earlier configs, fingerprints
     # and results are unchanged.
     agentus_capacities_enabled: bool = False
+    # Opt-in physical placement; absent/False preserves historical fingerprints.
+    agentus_subcell_position_enabled: bool = False
+    # Opt-in real wind; omitted from legacy fingerprints.
+    genesis_wind_enabled: bool = False
     # Experimental ablation of capacity v1: "" or a "+"-joined set of
     # "plant_diet" (no sampling of unknown food kinds), "no_interactions" (no
     # manipulation or capture) and "no_recall" (no travel toward remembered
@@ -150,6 +154,8 @@ class GenesisConfig:
             raise ValueError("unknown child_energy_store")
         if self.agentus_observation_model not in {"visible-v1", "g10.4-legacy"}:
             raise ValueError("unknown agentus_observation_model")
+        if self.agentus_subcell_position_enabled and not self.agentus_capacities_enabled:
+            raise ValueError("subcell position requires Agentus capacities")
         if self.agentus_event_memory_retention not in {"consequence", "fifo"}:
             raise ValueError("unknown agentus_event_memory_retention")
         if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
@@ -234,6 +240,10 @@ class GenesisConfig:
             canonical["agentus_thirst_enabled"] = True
         if self.agentus_capacities_enabled and self.agentus_observation_model != "g10.4-legacy":
             canonical["agentus_observation_model"] = self.agentus_observation_model
+        if self.genesis_wind_enabled:
+            canonical["genesis_wind"] = "persistent-vector-v1"
+        if self.agentus_subcell_position_enabled:
+            canonical["agentus_subcell_position"] = "cell-local-v1"
         if self.event_memory_active:
             canonical["agentus_event_memory"] = "witnessed-v2" if self.agentus_event_memory_retention == "consequence" else "witnessed-v1"
         if self.imitation_active:

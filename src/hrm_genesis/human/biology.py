@@ -304,6 +304,24 @@ def _drink(human: dict, mcell: dict, profile: dict) -> float:
     return drank
 
 
+def enable_subcell_positions(state: dict, seed: str) -> dict:
+    """Assign reproducible within-cell metre offsets to new simulation founders.
+
+    A 2 m local placement window is a declared geometric assumption, not
+    inferred historic position. This function is never called on restoration.
+    """
+    import hashlib
+    result = deepcopy(state)
+    result["subcell_position_model"] = "cell-local-v1"
+    for human in result["humans"]:
+        digest = hashlib.sha256(f"{seed}|position|{human['id']}".encode()).digest()
+        human["subcell_offset_m"] = [
+            round((int.from_bytes(digest[i:i+8], "big") / (2**64 - 1) - 0.5) * 1.5, 10)
+            for i in (0, 8)
+        ]
+    return result
+
+
 def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
     body = _blank_elements()
     for symbol in HUMAN_TRACKED_ELEMENTS:
@@ -323,6 +341,8 @@ def _offspring(mother: dict, ordinal: int, profile: dict) -> dict:
         "body_water_kg": water,
         "generation": int(mother["generation"]) + 1,
         "caregiver_id": str(mother["id"]),
+        **({"subcell_offset_m": list(mother["subcell_offset_m"])}
+           if "subcell_offset_m" in mother else {}),
         "last_reproduction_epoch": -1000000,
         "fatigue": 0.0,
         "injury": 0.0,
@@ -597,25 +617,47 @@ def _provision_solid_food(
     return eaten
 
 
-def _structural_protection(world_cell: dict, producer_cell: dict | None = None) -> tuple[float, float]:
-    """Return canopy and terrain protection from physical state, not named techniques."""
+def _structural_protection(
+    world_cell: dict,
+    producer_cell: dict | None = None,
+    *,
+    occupant_offset_m: tuple[float, float] = (0.0, 0.0),
+    wind_from_deg: float | None = None,
+) -> tuple[float, float]:
+    """Canopy and physical shielding, bounded by present wood mass and placement.
+
+    Cell-centred woody arrangement: orientation is its outward-facing normal,
+    measured clockwise from +x. An occupant outside the footprint gets no
+    arrangement protection. Windward shielding is attenuated if the exposed
+    face is aligned away from the incoming wind. This is a coarse projection,
+    not a claim to solve air flow or body-scale heat transport.
+    """
+    import math
+
     producer_cell = producer_cell or {}
     woody_mass = sum(float(v) for v in producer_cell.get("woody_elements_kg", {}).values())
-    arranged_mass = sum(
-        float(v) for v in producer_cell.get("arranged_material_elements_kg", {}).values()
-    )
-    geometry = producer_cell.get("arrangement_geometry", {})
-    span = max(0.0, float(geometry.get("span_m", 0.0)))
-    height = max(0.0, float(geometry.get("height_m", 0.0)))
-    density = max(0.0, min(1.0, float(geometry.get("density", 0.0))))
-    area = max(0.0, float(geometry.get("surface_area_m2", 0.0)))
+    arranged_mass = sum(float(v) for v in producer_cell.get("arranged_material_elements_kg", {}).values())
+    g = producer_cell.get("arrangement_geometry", {})
+    span = max(0.0, float(g.get("span_m", 0.0)))
+    height = max(0.0, float(g.get("height_m", 0.0)))
+    density = max(0.0, min(1.0, float(g.get("density", 0.0))))
+    integrity = max(0.0, min(1.0, float(g.get("integrity", 1.0))))
+    area = max(0.0, float(g.get("surface_area_m2", 0.0)))
+    supported = min(area, arranged_mass / 15.0)  # 500 kg/m^3 x 0.03 m
     canopy = min(0.80, max(0.0, woody_mass / 8.0))
-    terrain_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
-    geometry_factor = min(1.0, (span / 1.5) * (height / 1.2) * density)
-    arranged_cover = min(0.45, max(0.0, geometry_factor * min(1.0, area / 2.0) * 0.45))
-    if arranged_mass <= 0.0:
-        arranged_cover = 0.0
-    return canopy, min(0.95, terrain_cover + arranged_cover)
+    terrain = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
+    x, y = occupant_offset_m
+    footprint = (abs(x) <= min(span, supported ** 0.5) * 0.5 and
+                 abs(y) <= max(0.0, supported / max(0.01, span)) * 0.5)
+    directional = 1.0
+    if wind_from_deg is not None:
+        normal = float(g.get("orientation_deg", 0.0))
+        angle = math.radians((float(wind_from_deg) - normal) % 360.0)
+        directional = max(0.0, math.cos(angle))
+    shape = min(1.0, (span / 1.5) * (height / 1.2) * density)
+    arrangement = (min(0.45, shape * min(1.0, supported / 2.0) * 0.45)
+                   * integrity * directional if footprint else 0.0)
+    return canopy, min(0.95, terrain + arrangement)
 
 def _add_interoception(perception: dict, human: dict, profile: dict, base_profile: dict) -> None:
     """Thirst and hunger as felt reserves, in days (agentus_thirst_enabled).
@@ -693,6 +735,19 @@ def _one_step_toward(origin: tuple[int, int], target: tuple[int, int]) -> tuple[
     return origin
 
 
+def _account_heat_water_loss(matter: dict, world_cell: dict, before_kg: float, after_kg: float) -> float:
+    """Move evaporated body water to the atmospheric-output ledger once.
+
+    Only newly opted-in weather worlds change behavior. No value is added
+    for hydration or water retained in the body.
+    """
+    if "wind_speed_m_s" not in world_cell:
+        return 0.0
+    amount = max(0.0, before_kg - after_kg)
+    matter["water_output_kg"] = float(matter["water_output_kg"]) + amount
+    return amount
+
+
 def _apply_physiology(
     human: dict,
     world_cell: dict,
@@ -708,7 +763,15 @@ def _apply_physiology(
     producer_cell = producer_cell or {}
     fire_intensity = max(0.0, min(1.0, float(producer_cell.get("fire_intensity", 0.0))))
     ambient += fire_intensity * 28.0
-    canopy, terrain_cover = _structural_protection(world_cell, producer_cell)
+    # Optional sub-cell location and incident wind are physical inputs, not a
+    # shelter flag. Older states have no sub-cell coordinate and use cell centre.
+    offset = human.get("subcell_offset_m", (0.0, 0.0))
+    wind = (world_cell.get("wind_from_deg")
+            if float(world_cell.get("wind_speed_m_s", 0.0)) > 0.0 else None)
+    canopy, terrain_cover = _structural_protection(
+        world_cell, producer_cell, occupant_offset_m=(float(offset[0]), float(offset[1])),
+        wind_from_deg=None if wind is None else float(wind),
+    )
 
     # Canopy primarily reduces hot exposure; cave/overhang terrain moderates
     # both hot and cold extremes toward a stable subsurface-like temperature.
@@ -721,6 +784,38 @@ def _apply_physiology(
     if insulation_c > 0.0 and ambient < HUMAN_COMFORT_TEMPERATURE_C:
         # Worn interlaced material slows heat loss in the cold (capacity v1).
         ambient = min(HUMAN_COMFORT_TEMPERATURE_C, ambient + insulation_c)
+
+    # New weather-enabled worlds accumulate real physiological consequences.
+    # Existing worlds have no wind field and retain the original calculation.
+    if "wind_speed_m_s" in world_cell:
+        wind_speed = max(0.0, float(world_cell["wind_speed_m_s"]))
+        precipitation = max(0.0, float(world_cell.get("precipitation", 0.0)))
+        prior_wet = max(0.0, min(1.0, float(human.get("skin_wetness", 0.0))))
+        # Protection reduces direct rain exposure, while sun and wind dry skin.
+        rain_wetting = min(1.0, precipitation / 3.0) * (1.0 - min(0.9, terrain_cover))
+        dry_rate = min(0.75, 0.06 + 0.015 * wind_speed
+                       + 0.06 * max(0.0, float(world_cell.get("solar", 0.0))))
+        skin_wetness = max(rain_wetting, prior_wet * (1.0 - dry_rate))
+        human["skin_wetness"] = round(skin_wetness, 10)
+        # Moving air strips insulating warmth, especially from wet skin.
+        # The combined effect is bounded, with zero added cold load above comfort.
+        convective_c = min(12.0, wind_speed * (0.30 + 0.75 * skin_wetness))
+        if ambient < HUMAN_COMFORT_TEMPERATURE_C:
+            ambient -= convective_c
+        cold_load = max(0.0, HUMAN_COMFORT_TEMPERATURE_C - ambient - HUMAN_THERMAL_TOLERANCE_C)
+        heat_load = max(0.0, ambient - HUMAN_COMFORT_TEMPERATURE_C - HUMAN_THERMAL_TOLERANCE_C)
+        previous_cold = max(0.0, float(human.get("cold_exposure", 0.0)))
+        previous_heat = max(0.0, float(human.get("heat_exposure", 0.0)))
+        cold_stress = min(100.0, max(0.0, previous_cold * 0.90 + cold_load * 0.06 - (1.0 if cold_load == 0.0 else 0.0)))
+        heat_stress = min(100.0, max(0.0, previous_heat * 0.90 + heat_load * 0.06 - (1.0 if heat_load == 0.0 else 0.0)))
+        human["cold_exposure"] = round(cold_stress, 10)
+        human["heat_exposure"] = round(heat_stress, 10)
+        # Accumulated injury uses the existing injury and survival mechanism,
+        # avoiding a new scripted death rule or arbitrary mortality lottery.
+        cumulative_exposure_injury = min(0.05, max(0.0, cold_stress - 6.0) * 0.002
+                                        + max(0.0, heat_stress - 6.0) * 0.002)
+    else:
+        cumulative_exposure_injury = 0.0
 
     thermal_delta = abs(ambient - HUMAN_COMFORT_TEMPERATURE_C)
     excess = max(0.0, thermal_delta - HUMAN_THERMAL_TOLERANCE_C)
@@ -756,6 +851,8 @@ def _apply_physiology(
             )
 
     injury = float(human.get("injury", 0.0))
+    if cumulative_exposure_injury > 0.0:
+        injury = min(1.5, injury + cumulative_exposure_injury)
     severe_exposure = max(0.0, thermal_delta - 28.0)
     if severe_exposure > 0.0:
         injury_scale = max(0.15, float(profile.get("thermal_scale", 1.0)))
@@ -1048,6 +1145,7 @@ def evolve_agentus_step(
                 humans.setdefault("nursing_stats", {}),
             )
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
+        water_before_physiology = float(human["body_water_kg"])
         if capacities:
             _apply_physiology(
                 human, wcells[xy], moved, effective_profile, pcells[xy],
@@ -1057,6 +1155,11 @@ def evolve_agentus_step(
             cap.credit_worn_benefit(humans, human, float(human.pop("insulation_saving_kcal", 0.0)), effective_profile)
         else:
             _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy], sleep_recovery=integrity)
+        # Thermoregulation can evaporate body water before routine basal loss.
+        # In wind-enabled worlds every such kilogram must leave the human
+        # inventory and enter Matter's existing water-output account exactly once.
+        # Preserve historical accounting in old windless simulations.
+        _account_heat_water_loss(matter, wcells[xy], water_before_physiology, float(human["body_water_kg"]))
         attacks = _apply_predator_threat(human, consumer_state, epoch)
         if attacks:
             humans["predator_attack_events"] = int(humans.get("predator_attack_events", 0)) + attacks
@@ -1147,6 +1250,11 @@ def evolve_agentus_step(
             humans["cumulative_deaths"] = int(humans.get("cumulative_deaths", 0)) + 1
             if capacities:
                 cap.drop_all(humans, str(human["id"]))
+            # The remains already own this body's water and elements. A
+            # dependent processed later cannot nurse from that body again.
+            # Weather-only to preserve legacy replay parity.
+            if "wind_speed_m_s" in wcells[xy]:
+                people_by_id.pop(str(human["id"]), None)
             continue
 
         survivors.append(human)

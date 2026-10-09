@@ -132,3 +132,16 @@ def precipitation_amount(
     intensity = 0.5 + 4.5 * _unit_noise(seed + ":intensity", epoch, x, y)
     intensity *= max(0.35, 1.0 + 0.25 * moisture)
     return intensity
+
+
+def wind_vector_m_s(*, seed: str, epoch: int, ticks_per_year: int, x: int, y: int) -> tuple[float, float]:
+    """Persistent deterministic east/north wind components in metres/second.
+
+    Two independently phased five-day weather anomalies produce a coherent
+    coarse-cell flow. No random generator state is consumed by this function.
+    """
+    east = persistent_weather_anomaly(seed=seed, epoch=epoch, ticks_per_year=ticks_per_year,
+                                      x=x, y=y, channel="wind-east")
+    north = persistent_weather_anomaly(seed=seed, epoch=epoch, ticks_per_year=ticks_per_year,
+                                       x=x, y=y, channel="wind-north")
+    return round(5.0 * east, 10), round(5.0 * north, 10)
