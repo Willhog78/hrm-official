@@ -4,6 +4,7 @@ Version 1 is write-only. Version 2 values short experienced chains from actual
 physiological benefit, cost and uncertainty. Inputs are local perceptual
 projections supplied by interactions, never raw world or peer state.
 Version 3 additionally accumulates bounded delayed thermal returns.
+Version 4 joins own observed consecutive progress over a six-action horizon.
 """
 
 from __future__ import annotations
@@ -16,7 +17,9 @@ import json
 MODEL = "experienced-transitions-v1"
 VALUED_MODEL = "experienced-transitions-v2"
 DELAYED_MODEL = "experienced-transitions-v3"
-VALUED_MODELS = {VALUED_MODEL, DELAYED_MODEL}
+PROCEDURAL_MODEL = "experienced-transitions-v4"
+DELAYED_MODELS = {DELAYED_MODEL, PROCEDURAL_MODEL}
+VALUED_MODELS = {VALUED_MODEL, *DELAYED_MODELS}
 MODELS = {MODEL, *VALUED_MODELS}
 THERMAL_HORIZON = 32
 THERMAL_DISCOUNT = 0.97
@@ -30,6 +33,36 @@ RECENT_LENGTH = 8
 FORGET_AFTER_TICKS = 96
 MAX_OBJECT_FORMS = 24
 MAX_ACTS = 64
+PROCEDURAL_DEPTH = 6
+MAX_LINKS = 128
+
+
+def _procedural_state(state: dict) -> str:
+    # Current body reserves still guard live choice. They are not material
+    # prerequisites and must not sever an otherwise intact overnight procedure.
+    physical = {k: v for k, v in state.items() if k != "body"}
+    if len(state.get("body", [])) >= 4:
+        physical["injury"] = state["body"][3]
+    return json.dumps(physical,
+                      sort_keys=True, separators=(",", ":"))
+
+
+def _material_changes(edge: dict) -> set[str]:
+    """Coarse perceptible aspects changed by an actual transition."""
+    before, after = edge["before"], edge["after"]
+    changed = set()
+    for field in ("held", "ground", "worn"):
+        old = {json.dumps(f): f for f in before.get(field, [])}
+        new = {json.dumps(f): f for f in after.get(field, [])}
+        for key in old.keys() ^ new.keys():
+            form = old.get(key, new.get(key))
+            changed.add(f"{field}:{form[0]}")
+    for i, (old, new) in enumerate(zip(before.get("pools", []), after.get("pools", []))):
+        if old != new:
+            changed.add(f"pool:{i}")
+    if before.get("geometry") != after.get("geometry"):
+        changed.add("geometry")
+    return changed
 
 
 def magnitude_band(value: float, thresholds: tuple[float, ...]) -> int:
@@ -63,6 +96,10 @@ def forget(cognition: dict, epoch: int) -> None:
     recent = [r for r in memory["recent"]
               if r["edge"] in retained and int(epoch) - int(r["epoch"]) <= FORGET_AFTER_TICKS]
     cognition["transition_memory"] = {"model": memory["model"], "edges": edges, "recent": recent}
+    if memory["model"] == PROCEDURAL_MODEL:
+        cognition["transition_memory"]["links"] = [link for link in memory.get("links", [])
+                                                    if link["from"] in retained and link["to"] in retained
+                                                    and int(epoch) - int(link["last_epoch"]) <= FORGET_AFTER_TICKS][-MAX_LINKS:]
 
 
 def record(cognition: dict, before: dict, act: str, after: dict,
@@ -99,9 +136,26 @@ def record(cognition: dict, before: dict, act: str, after: dict,
     edges = edges[-MAX_TRANSITIONS:]
     retained = {e["id"] for e in edges}
     recent = [r for r in memory["recent"] if r["edge"] in retained]
+    prior_ref = recent[-1] if recent else None
     recent.append({"edge": edge_id, "epoch": int(epoch)})
     cognition["transition_memory"] = {"model": model, "edges": edges,
                                        "recent": recent[-RECENT_LENGTH:]}
+    if model == PROCEDURAL_MODEL:
+        links = [dict(link) for link in memory.get("links", [])
+                 if link["from"] in retained and link["to"] in retained]
+        previous = next((e for e in edges if prior_ref and e["id"] == prior_ref["edge"]), None)
+        if (previous is not None and 0 <= int(epoch) - int(prior_ref["epoch"]) <= 1
+                and _procedural_state(previous["after"]) == _procedural_state(before)
+                and (act in previous["enabled"] or _material_changes(previous) & _material_changes(edge))):
+            link = next((link for link in links if link["from"] == previous["id"] and link["to"] == edge_id), None)
+            if link is None:
+                link = {"from": previous["id"], "to": edge_id, "n": 0}
+            else:
+                links.remove(link)
+            link["n"] += 1
+            link["last_epoch"] = int(epoch)
+            links.append(link)
+        cognition["transition_memory"]["links"] = links[-MAX_LINKS:]
     return edge_id
 
 
@@ -125,17 +179,20 @@ def credit(cognition: dict, edge_id: str, gain_basal: float) -> None:
 
 
 def action_values(cognition: dict, state: dict, basal_kcal: float,
-                  depth: int = PLAN_DEPTH) -> dict[str, float]:
+                  depth: int | None = None) -> dict[str, float]:
     """Bounded expected net value over experienced state transitions only.
 
     Costs and failures count. Two unknown adverse outcomes shrink expected
-    benefit, without discounting costs. Continuation can use only an action
-    newly enabled by the preceding transition. No state is applied to reality,
-    and no search branch can revisit an action or exceed three actions.
+    benefit, without discounting costs. V2/V3 use newly enabled actions over
+    three steps; V4 uses repeatedly observed consecutive progress over six.
+    No state is applied to reality.
     """
     memory = cognition.get("transition_memory", {})
     if memory.get("model") not in VALUED_MODELS:
         return {}
+    if memory["model"] == PROCEDURAL_MODEL:
+        return _procedural_values(memory, state, basal_kcal,
+                                  PROCEDURAL_DEPTH if depth is None else depth)
     basal = max(1e-9, float(basal_kcal))
     indexed: dict[str, dict[str, list[dict]]] = {}
     state_key = lambda s: json.dumps(s, sort_keys=True, separators=(",", ":"))
@@ -170,4 +227,48 @@ def action_values(cognition: dict, state: dict, basal_kcal: float,
             results[act] = round(benefit / (n + UNKNOWN_OUTCOMES) - cost / n, 10)
         return results
 
-    return evaluate(state, max(1, min(PLAN_DEPTH, int(depth))), frozenset())
+    return evaluate(state, max(1, min(PLAN_DEPTH, PLAN_DEPTH if depth is None else int(depth))), frozenset())
+
+
+def _procedural_values(memory: dict, state: dict, basal_kcal: float, depth: int) -> dict[str, float]:
+    """Search only repeated own observed adjacency, with bounded state progress.
+
+    Material-change overlap is a conservative dependence cue, not a complete
+    causal proof. No no-op or return to an already visited material state can
+    bootstrap a rewarded loop. Changed weather/access remain distinct states.
+    """
+    basal = max(1e-9, float(basal_kcal))
+    indexed: dict[str, dict[str, list[dict]]] = {}
+    for edge in memory["edges"]:
+        indexed.setdefault(_procedural_state(edge["before"]), {}).setdefault(edge["act"], []).append(edge)
+    links = {(link["from"], link["to"]) for link in memory.get("links", [])
+             if int(link["n"]) >= MIN_PLAN_EXPERIENCE}
+    budget = MAX_PLAN_EXPANSIONS
+
+    def evaluate(current: dict, remaining: int, visited: frozenset[str], predecessor=None):
+        nonlocal budget
+        key = _procedural_state(current)
+        if budget <= 0 or key in visited:
+            return {}
+        budget -= 1
+        result = {}
+        for act, outcomes in sorted(indexed.get(key, {}).items()):
+            # All outcomes count, even outcomes not linked to the predecessor.
+            if predecessor is not None and not any((predecessor, e["id"]) in links for e in outcomes):
+                continue
+            n = sum(int(e["n"]) for e in outcomes)
+            if n < MIN_PLAN_EXPERIENCE:
+                continue
+            benefit = cost = 0.0
+            for edge in outcomes:
+                trials = int(edge["n"])
+                future = {}
+                if remaining > 1 and _procedural_state(edge["after"]) != key:
+                    future = evaluate(edge["after"], remaining - 1, visited | {key}, edge["id"])
+                benefit += float(edge.get("gain_sum_basal", 0.0))
+                benefit += trials * CONTINUATION_DISCOUNT * max(0.0, max(future.values(), default=0.0))
+                cost += trials * (float(edge["effort_kcal"]) / basal + 2.0 * float(edge["injury"]))
+            result[act] = round(benefit / (n + UNKNOWN_OUTCOMES) - cost / n, 10)
+        return result
+
+    return evaluate(state, max(1, min(PROCEDURAL_DEPTH, int(depth))), frozenset())

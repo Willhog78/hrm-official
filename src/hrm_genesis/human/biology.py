@@ -1199,7 +1199,7 @@ def evolve_agentus_step(
         if capacities:
             arrangement_reference = None if ctx is None else ctx.arrangement_before
             insulation_reference = None if ctx is None else ctx.insulation_before
-            if humans.get("transition_model") == cap.transitions.DELAYED_MODEL:
+            if humans.get("transition_model") in cap.transitions.DELAYED_MODELS:
                 arrangement_reference, insulation_reference = cap.prepare_thermal_trials(
                     humans, human, pcells[xy], epoch, effective_profile, ctx,
                 )
@@ -1212,7 +1212,7 @@ def evolve_agentus_step(
                 insulation_reference_c=insulation_reference,
             )
             worn_saving = float(human.pop("insulation_saving_kcal", 0.0))
-            if humans.get("transition_model") == cap.transitions.DELAYED_MODEL:
+            if humans.get("transition_model") in cap.transitions.DELAYED_MODELS:
                 cap.settle_thermal_trials(humans, human, epoch, worn_saving,
                                          float(human.pop("arrangement_saving_kcal", 0.0)))
             elif humans.get("transition_model") == cap.transitions.VALUED_MODEL:

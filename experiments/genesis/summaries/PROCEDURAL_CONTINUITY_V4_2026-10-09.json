@@ -1,0 +1,93 @@
+{
+  "model": "experienced-transitions-v4",
+  "date": "2026-10-09",
+  "controlled_stone_fixture": {
+    "training_opportunities": 40,
+    "successful_fracture_and_cut_trials": 21,
+    "unpaid_blunt_outcomes": 19,
+    "three_step_grasp_value": -0.0035,
+    "six_step_grasp_value": 0.3053458634,
+    "live_replay": {
+      "failed_fracture_epoch": 81,
+      "failed_fracture_actions": 2,
+      "successful_first_tick_epoch": 83,
+      "successful_first_tick_actions": 3,
+      "next_tick_cut_epoch": 84
+    },
+    "limits": "Explicitly controlled training on supplied blunt stones and known fresh tissue. No recipe is stored by runtime. Live replay choices are unpatched; autonomous ecological discovery is not established."
+  },
+  "smoke": [
+    {
+      "seed": "agentus-demography-a",
+      "days": 75,
+      "alive": 8,
+      "births": 0,
+      "ledger_valid": true,
+      "ledger_digest": "9bf204a94d6dd2cdb445e6984decb7fcdcbdcbbb073ccfff2d81b3da93160503",
+      "conservation": {
+        "element_rel_error": 1.2052320645430459e-15,
+        "water_rel_error": 0.0,
+        "lithic_abs_error_kg": 5.684341886080802e-14
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {},
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    },
+    {
+      "seed": "agentus-demography-b",
+      "days": 75,
+      "alive": 9,
+      "births": 1,
+      "ledger_valid": true,
+      "ledger_digest": "22d50e6535a8a3ff5bce06dcadae401f3ae733f1269e491758dd7abdbfa36ff0",
+      "conservation": {
+        "element_rel_error": 5.614872932731481e-16,
+        "water_rel_error": 0.0,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {
+        "release:stone_heavy|none": 1
+      },
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "days": 75,
+      "alive": 10,
+      "births": 2,
+      "ledger_valid": true,
+      "ledger_digest": "a60db9ae2419365c52b79150eaaac1b66b327fbdc19ae4de7b79427598a32bb9",
+      "conservation": {
+        "element_rel_error": 6.426180038615956e-16,
+        "water_rel_error": 1.9769457440192208e-16,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {},
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    }
+  ],
+  "verification": {
+    "distinct_tests_passed": 235,
+    "micro_tests": 174,
+    "selected_integration_and_regression_tests": 61,
+    "default_fast": "PASS",
+    "v4_smoke": "PASS",
+    "observer_ledger_parity": true,
+    "full_repository_suite_run": false,
+    "long_run_survival_run": false
+  }
+}
