@@ -597,27 +597,47 @@ def _provision_solid_food(
     return eaten
 
 
-def _structural_protection(world_cell: dict, producer_cell: dict | None = None) -> tuple[float, float]:
-    """Return canopy and terrain protection from physical state, not named techniques."""
+def _structural_protection(
+    world_cell: dict,
+    producer_cell: dict | None = None,
+    *,
+    occupant_offset_m: tuple[float, float] = (0.0, 0.0),
+    wind_from_deg: float | None = None,
+) -> tuple[float, float]:
+    """Canopy and physical shielding, bounded by present wood mass and placement.
+
+    Cell-centred woody arrangement: orientation is its outward-facing normal,
+    measured clockwise from +x. An occupant outside the footprint gets no
+    arrangement protection. Windward shielding is attenuated if the exposed
+    face is aligned away from the incoming wind. This is a coarse projection,
+    not a claim to solve air flow or body-scale heat transport.
+    """
+    import math
+
     producer_cell = producer_cell or {}
     woody_mass = sum(float(v) for v in producer_cell.get("woody_elements_kg", {}).values())
-    arranged_mass = sum(
-        float(v) for v in producer_cell.get("arranged_material_elements_kg", {}).values()
-    )
-    geometry = producer_cell.get("arrangement_geometry", {})
-    span = max(0.0, float(geometry.get("span_m", 0.0)))
-    height = max(0.0, float(geometry.get("height_m", 0.0)))
-    density = max(0.0, min(1.0, float(geometry.get("density", 0.0))))
-    area = max(0.0, float(geometry.get("surface_area_m2", 0.0)))
+    arranged_mass = sum(float(v) for v in producer_cell.get("arranged_material_elements_kg", {}).values())
+    g = producer_cell.get("arrangement_geometry", {})
+    span = max(0.0, float(g.get("span_m", 0.0)))
+    height = max(0.0, float(g.get("height_m", 0.0)))
+    density = max(0.0, min(1.0, float(g.get("density", 0.0))))
+    integrity = max(0.0, min(1.0, float(g.get("integrity", 1.0))))
+    area = max(0.0, float(g.get("surface_area_m2", 0.0)))
+    supported = min(area, arranged_mass / 15.0)  # 500 kg/m^3 x 0.03 m
     canopy = min(0.80, max(0.0, woody_mass / 8.0))
-    terrain_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
-    # Recheck surviving mass every tick: burning or dismantling must remove
-    # protection even if an old checkpoint still contains oversized geometry.
-    # Approximate woody density 500 kg/m3 and 3 cm structural thickness.
-    supported_area = min(area, arranged_mass / (500.0 * 0.03))
-    geometry_factor = min(1.0, (span / 1.5) * (height / 1.2) * density)
-    arranged_cover = min(0.45, max(0.0, geometry_factor * min(1.0, supported_area / 2.0) * 0.45))
-    return canopy, min(0.95, terrain_cover + arranged_cover)
+    terrain = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
+    x, y = occupant_offset_m
+    footprint = (abs(x) <= min(span, supported ** 0.5) * 0.5 and
+                 abs(y) <= max(0.0, supported / max(0.01, span)) * 0.5)
+    directional = 1.0
+    if wind_from_deg is not None:
+        normal = float(g.get("orientation_deg", 0.0))
+        angle = math.radians((float(wind_from_deg) - normal) % 360.0)
+        directional = max(0.0, math.cos(angle))
+    shape = min(1.0, (span / 1.5) * (height / 1.2) * density)
+    arrangement = (min(0.45, shape * min(1.0, supported / 2.0) * 0.45)
+                   * integrity * directional if footprint else 0.0)
+    return canopy, min(0.95, terrain + arrangement)
 
 def _add_interoception(perception: dict, human: dict, profile: dict, base_profile: dict) -> None:
     """Thirst and hunger as felt reserves, in days (agentus_thirst_enabled).
