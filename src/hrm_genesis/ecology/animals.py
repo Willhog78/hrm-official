@@ -409,6 +409,7 @@ def _consume_prey(predator: dict, prey: dict, carcass_cell: dict, consumers: dic
         return 0.0
 
     retained_total = 0.0
+    residual_elements = _blank_elements()
     for symbol in ANIMAL_TRACKED_ELEMENTS:
         amount = float(prey["body_elements_kg"][symbol])
         target_symbol = traits.adult_body_mass_kg * PLANT_ELEMENT_FRACTIONS[symbol]
@@ -418,13 +419,16 @@ def _consume_prey(predator: dict, prey: dict, carcass_cell: dict, consumers: dic
         predator["body_elements_kg"][symbol] += keep
         if consumers is None or not consumers.get("anatomical_remains_v1", False):
             _carcass_target(carcass_cell)[symbol] += amount - keep
+        else:
+            residual_elements[symbol] = amount - keep
         retained_total += keep
         prey["body_elements_kg"][symbol] = 0.0
 
     if consumers is None or not consumers.get("anatomical_remains_v1", False):
         carcass_cell["water_kg"] += float(prey["body_water_kg"])
     else:
-        _deposit_anatomical_remains(consumers, prey, carcass_cell)
+        residual_prey = dict(prey, body_elements_kg=residual_elements)
+        _deposit_anatomical_remains(consumers, residual_prey, carcass_cell)
     prey["body_water_kg"] = 0.0
     predator["energy"] = min(
         traits.reproduction_energy * 4.0,
