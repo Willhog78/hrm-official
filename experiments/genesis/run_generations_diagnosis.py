@@ -1,5 +1,5 @@
 """Read-only replay diagnostics; production source and Railway are untouched."""
-import argparse, ast, inspect, json, sys, time
+import argparse, ast, inspect, json, sys, time, types
 from collections import Counter, defaultdict, deque
 from copy import deepcopy
 from pathlib import Path
@@ -19,6 +19,8 @@ parser.add_argument('--years',type=int,default=30)
 parser.add_argument('--parity-days',type=int,default=30)
 parser.add_argument('--owned-state',action='store_true',help='Diagnostic replay consumes its private states in place; never use with a live fabric')
 parser.add_argument('--spatial-index',action='store_true',help='Exact index of animal positions for repeated support queries')
+parser.add_argument('--resume-state',type=Path,help='Private diagnostic state snapshot, with the matching seed result JSON alongside it')
+parser.add_argument('--out',type=Path,default=ROOT/'runs'/'generations-diagnosis')
 args=parser.parse_args()
 config=build_config('agentus-demography-'+args.seed,'v1')
 
@@ -57,9 +59,10 @@ predators=defaultdict(Counter)
 predator_deaths=[]
 imitations=defaultdict(Counter)
 imitated_keys=defaultdict(set)
-deferred=[]
 current_epoch=0
 spatial_cache={}
+milk_day={}
+milk_epoch=None
 
 def repro_hook(human,survivors,profile,fed_ids,epoch,can_reproduce):
     if human['sex']!='female' or human['age_ticks']<profile['maturity_ticks']:return
@@ -84,7 +87,7 @@ def repro_hook(human,survivors,profile,fed_ids,epoch,can_reproduce):
         births.append({'epoch':epoch,'year':year,'mother':human['id'],'mother_generation':human['generation'],'candidate_males':relationships})
 
 def death_hook(human,dead,effective_profile,caregiver,ate_kg_today,epoch,origin,moved,start_energy,provisioned):
-    rec={'epoch':epoch,'age_days':human['age_ticks'],'energy_before':start_energy,'energy_end':human['energy'],'food_kg':ate_kg_today,'body_mass_kg':sum(human['body_elements_kg'].values()),'xy':[human['x'],human['y']],'origin':origin,'moved':moved,'caregiver':None if caregiver is None else {'id':caregiver['id'],'xy':[caregiver['x'],caregiver['y']],'energy':caregiver['energy']},'dependence':effective_profile.get('caregiver_dependence'),'basal':effective_profile['basal_energy_kcal_per_tick'],'nursing_cap':effective_profile.get('nursing_energy_kcal_per_tick',0)*effective_profile.get('nursing_factor',0),'capacity':effective_profile.get('energy_store_capacity_kcal'),'provisioned_mass_water':provisioned}
+    rec={'epoch':epoch,'age_days':human['age_ticks'],'energy_before':start_energy,'energy_end':human['energy'],'food_kg':ate_kg_today,'body_mass_kg':sum(human['body_elements_kg'].values()),'xy':[human['x'],human['y']],'origin':origin,'moved':moved,'caregiver':None if caregiver is None else {'id':caregiver['id'],'xy':[caregiver['x'],caregiver['y']],'energy':caregiver['energy']},'dependence':effective_profile.get('caregiver_dependence'),'basal':effective_profile['basal_energy_kcal_per_tick'],'nursing_cap':effective_profile.get('nursing_energy_kcal_per_tick',0)*effective_profile.get('nursing_factor',0),'capacity':effective_profile.get('energy_store_capacity_kcal'),'provisioned_mass_water':provisioned,'family_milk_today':deepcopy(milk_day.get(str(caregiver['id']),[])) if caregiver else []}
     history[human['id']].append(rec)
     if dead:deaths.append({'id':human['id'],'generation':human['generation'],'recent_days':list(history[human['id']])})
 
@@ -153,6 +156,28 @@ def offspring_wrapper(mother,ordinal,profile):
     return child
 bio._offspring=offspring_wrapper
 
+original_nurse=bio._provision_dependent
+def nursing_wrapper(child,caregiver,profile,nursing_model=None,stats=None):
+    global milk_epoch
+    if milk_epoch!=current_epoch:milk_day.clear();milk_epoch=current_epoch
+    before=float(child['energy'])
+    adult_before=None if caregiver is None else float(caregiver['energy'])
+    result=original_nurse(child,caregiver,profile,nursing_model,stats)
+    if caregiver is not None and profile.get('nursing_factor',0)>0:
+        milk_day.setdefault(str(caregiver['id']),[]).append({'child':child['id'],'age_days':child['age_ticks'],'milk_kcal':float(child['energy'])-before,'caregiver_energy_before':adult_before,'caregiver_energy_after':caregiver['energy'],'child_energy_before':before,'child_energy_after_milk':child['energy']})
+    return result
+bio._provision_dependent=nursing_wrapper
+original_forage=bio.forage_at_cell
+def forage_wrapper(human,*a,**kw):
+    result=original_forage(human,*a,**kw)
+    for records in milk_day.values():
+        for rec in records:
+            if rec['child']==human['id']:
+                rec['self_food_kcal']=sum(x['kcal'] for x in result)
+                rec['self_food_refused_kcal']=sum(x.get('refused_kcal',0) for x in result)
+    return result
+bio.forage_at_cell=forage_wrapper
+
 if args.owned_state:
     # Only remove entry-point copies of exclusively owned component states.
     # All local copies and the old/new climate boundary remain intact.
@@ -177,6 +202,16 @@ if args.owned_state:
     em.__globals__['diffuse_elements']=diff
     fast_functions=(em,consume_clone(plants,'evolve_producers'),consume_clone(animal,'evolve_consumers'),consume_clone(bio,'evolve_agentus_step'))
     if args.spatial_index:
+        cell_maps={}
+        def cached_cells(cells):
+            old=cell_maps.get(id(cells))
+            if old is not None and old[0] is cells:return old[1]
+            result=animal._cell_lookup(cells)
+            cell_maps[id(cells)]=(cells,result)
+            return result
+        chooser_globals=dict(animal._choose_destination.__globals__)
+        chooser_globals['_cell_lookup']=cached_cells
+        fast_functions[2].__globals__['_choose_destination']=types.FunctionType(animal._choose_destination.__code__,chooser_globals,animal._choose_destination.__name__,animal._choose_destination.__defaults__)
         def indexed_support(a,consumers,producers):
             if 'pcells' not in spatial_cache:spatial_cache['pcells']=animal._cell_lookup(producers['cells'])
             patch=animal._visible_cells(int(a['x']),int(a['y']),int(producers['width']),int(producers['height']),1)
@@ -199,11 +234,27 @@ print('INSTRUMENTED_PARITY_PASS',args.seed,args.parity_days,flush=True)
 repro.clear();births.clear();parents.clear();deaths.clear();history.clear();predators.clear();predator_deaths.clear();imitations.clear();imitated_keys.clear()
 del canonical,instrumented_states
 
-out=ROOT/'audit-results';out.mkdir(exist_ok=True)
+out=args.out;out.mkdir(parents=True,exist_ok=True)
 states=initial()
 start=time.monotonic()
 annual=[]
-for epoch in range(args.years*365):
+start_epoch=0
+if args.resume_state:
+    states=json.loads(args.resume_state.read_text())
+    start_epoch=int(states[4]['epoch_applied'])+1
+    saved=json.loads((args.resume_state.parent/(args.seed+'.json')).read_text())
+    annual=[a for a in saved['annual'] if a['year']<=start_epoch//365]
+    for a in annual:
+        repro[a['year']].update(a['reproduction'])
+        predators[a['year']].update(a['predators'])
+        imitations[a['year']].update(a['imitation_details'])
+    births.extend(b for b in saved['birth_events'] if b['epoch']<start_epoch)
+    deaths.extend(d for d in saved['death_events'] if d['recent_days'][-1]['epoch']<start_epoch)
+    predator_deaths.extend(d for d in saved['predator_deaths'] if d['epoch']<start_epoch)
+    for person in states[4]['humans']:
+        if person.get('caregiver_id'):parents[person['id']]=person['caregiver_id']
+    print('DIAGNOSTIC_RESUME',args.seed,start_epoch//365,flush=True)
+for epoch in range(start_epoch,args.years*365):
     current_epoch=epoch
     states=tick(states,epoch)
     if (epoch+1)%365==0:
@@ -216,7 +267,7 @@ for epoch in range(args.years*365):
         stats=h.get('capacity_stats',{})
         rec={'year':year,'alive':len(h['humans']),'generations':dict(Counter(p['generation'] for p in h['humans'])),'animals':dict(Counter(a['species'] for a in c['animals'])),'deaths':h.get('cumulative_deaths',0),'births':h.get('cumulative_births',0),'captures':stats.get('captures',0),'imitation_tries':sum(stats.get('imitation_tries',{}).values()),'imitation_paid':sum(stats.get('imitation_paid',{}).values()),'reproduction':dict(repro[year]),'predators':dict(predators[year]),'imitation_details':dict(imitations[year]),'positive_copied_keys':positive_copied,'elapsed_s':round(time.monotonic()-start,1)}
         annual.append(rec)
-        result={'seed':args.seed,'config_fingerprint':config.fingerprint(),'parity_days':args.parity_days,'annual':annual,'birth_events':births,'death_events':deaths,'predator_deaths':predator_deaths}
+        result={'seed':args.seed,'config_fingerprint':config.fingerprint(),'parity_days':args.parity_days,'resume_epoch':start_epoch,'copy_attribution_start_epoch':start_epoch,'annual':annual,'birth_events':births,'death_events':deaths,'predator_deaths':predator_deaths}
         (out/(args.seed+'.json')).write_text(json.dumps(result,indent=2))
         print(json.dumps(rec),flush=True)
         if year in (18,25,30):(out/(args.seed+'-state-y'+str(year)+'.json')).write_text(json.dumps(states))
