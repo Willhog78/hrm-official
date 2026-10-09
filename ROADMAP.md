@@ -440,3 +440,12 @@ Later G10 candidates: richer cognition, tool complexity, disease, larger populat
 ## Infrastructure
 
 GitHub Actions has never run. Every job since run 1 has been refused with "account is locked due to a billing issue". Restoring it needs the account owner to resolve billing, then a workflow update (see `STATUS.md`, "Verification infrastructure"). Until then, the local tiers and gate scripts are the verification record.
+
+## Experienced transition learning — owner resumption (2026-10-09)
+
+The owner authorized beginning the bounded transition extension. This resumes
+this specific cognition work despite the older pause above. Stage 1 is opt-in,
+write-only recording of own local before/action/after experience and real costs;
+physical action choice and production defaults remain unchanged. Sequence
+valuation and sequential imitation require separate evidence before activation.
+Contract and verification: `docs/architecture/EXPERIENCED_TRANSITIONS_V1.md`.
