@@ -25,6 +25,8 @@ class GenesisConfig:
     # G10.3 capacity model v1. Off by default; earlier configs, fingerprints
     # and results are unchanged.
     agentus_capacities_enabled: bool = False
+    # Write-only, bounded own-experience model; legacy fingerprints omit "none".
+    agentus_transition_model: str = "none"
     # Opt-in physical placement; absent/False preserves historical fingerprints.
     agentus_subcell_position_enabled: bool = False
     # Opt-in real wind; omitted from legacy fingerprints.
@@ -137,6 +139,10 @@ class GenesisConfig:
             raise ValueError("human_actions_enabled requires human_cognition_enabled")
         if self.agentus_capacities_enabled and not (self.human_actions_enabled and self.human_calibration_enabled):
             raise ValueError("agentus_capacities_enabled requires human_actions_enabled and human_calibration_enabled")
+        if self.agentus_transition_model not in {"none", "experienced-transitions-v1"}:
+            raise ValueError("unknown agentus_transition_model")
+        if self.agentus_transition_model != "none" and not self.agentus_capacities_enabled:
+            raise ValueError("agentus_transition_model requires agentus_capacities_enabled")
         if self.agentus_physiology_version not in {"reference-v1", "reference-v2"}:
             raise ValueError("unknown agentus_physiology_version")
         if self.agentus_physiology_version != "reference-v1" and not self.human_calibration_enabled:
@@ -236,6 +242,8 @@ class GenesisConfig:
             canonical["agentus_capacity_model"] = "capacity-v2"
         if self.agentus_capacity_ablation:
             canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
+        if self.agentus_transition_model != "none":
+            canonical["agentus_transition_model"] = self.agentus_transition_model
         if self.thirst_planning_active:
             canonical["agentus_thirst_enabled"] = True
         if self.agentus_capacities_enabled and self.agentus_observation_model != "g10.4-legacy":

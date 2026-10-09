@@ -208,6 +208,9 @@ class GenesisSimulation:
                 if config.following_active:
                     human_state = dict(human_state)
                     human_state["following"] = True
+                if config.agentus_transition_model != "none":
+                    human_state = dict(human_state)
+                    human_state["transition_model"] = config.agentus_transition_model
                 if config.solid_food_active:
                     human_state = dict(human_state)
                     human_state["caregiving_model"] = config.caregiving_model

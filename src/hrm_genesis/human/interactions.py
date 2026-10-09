@@ -32,6 +32,7 @@ from hrm_genesis.matter import objects as mo
 
 from .actions import execute_live_sequence
 from .diet import FOOD_KINDS, available_kg, innate_food_prior
+from . import transitions
 
 
 CAPACITY_MODEL = "capacity-v2"
@@ -623,10 +624,59 @@ def _material_forms(ctx: Context) -> tuple[dict, tuple]:
     return forms, pools
 
 
+def _transition_perception(ctx: Context) -> dict:
+    """Coarse local physical cues, without identities or hidden utility.
+
+    This deliberately approximates quantity, shape and weather. It includes
+    only own-held/worn and unheld local objects; other people's inventories,
+    elemental composition, food value and object histories are excluded.
+    """
+    band = transitions.magnitude_band
+    mass_thresholds = (0.05, 0.2, 0.5, 2.0, 10.0, 100.0)
+
+    def form(obj: dict) -> tuple:
+        return (object_class(obj), band(mo.object_mass(obj), mass_thresholds),
+                band(float(obj.get("length_m", 0.0)), (0.1, 0.3, 0.6, 1.5)),
+                band(float(obj.get("area_m2", 0.0)), (0.01, 0.1, 0.5, 1.8)),
+                band(float(obj.get("cohesion", 0.0)), (0.3, 0.5, 0.8)),
+                band(float(obj.get("wetness", 0.0)), (0.25, 0.75)))
+
+    ground = [form(o) for o in ground_objects(ctx.humans, ctx.xy)]
+    ground.extend((_stone_class(f), band(float(f["m"]), mass_thresholds), 0, 0, 0, 0)
+                  for f in ctx.mcell_lithics())
+    worn = [form(o) for o in ctx.humans.get("objects", [])
+            if o.get("holder") == ctx.agent_id and o.get("worn")]
+    geometry = ctx.pcell.get("arrangement_geometry", {})
+    pools = [band(_mass(ctx.pcell.get(pool, {})), mass_thresholds) for pool in
+             ("plant_elements_kg", "woody_elements_kg", "loose_material_elements_kg",
+              "arranged_material_elements_kg")]
+    pools.extend(band(available_kg(kind, ctx.pcell, ctx.ccell), mass_thresholds)
+                 for kind in ("fresh_tissue", "decayed_tissue", "seed"))
+    return {
+        "held": transitions.bounded_forms([form(o) for o in ctx.held()]),
+        "ground": transitions.bounded_forms(ground),
+        "worn": transitions.bounded_forms(worn),
+        "pools": pools,
+        "geometry": [band(float(geometry.get(k, 0.0)), (0.01, 0.1, 0.5, 1.5, 3.0))
+                     for k in ("span_m", "height_m", "surface_area_m2")]
+                    + [band(float(geometry.get("density", 0.0)), (0.25, 0.75)),
+                       int(float(geometry.get("orientation_deg", 0.0)) % 360 // 45)],
+        "position": [round(float(v), 1) for v in ctx.human.get("subcell_offset_m", (0.0, 0.0))],
+        "weather": [int(float(ctx.wcell.get("temperature", 22.0)) // 5),
+                    band(float(ctx.wcell.get("precipitation", 0.0)), (0.5, 3.0)),
+                    band(float(ctx.wcell.get("wind_speed_m_s", 0.0)), (2.0, 6.0, 12.0)),
+                    int(float(ctx.wcell.get("wind_from_deg", 0.0)) % 360 // 45),
+                    band(float(ctx.human.get("skin_wetness", 0.0)), (0.25, 0.75))],
+        "acts": sorted({key for key, _ in enumerate_affordances(ctx)})[:transitions.MAX_ACTS],
+    }
+
+
 def execute(ctx: Context, key: str, spec: dict) -> dict:
     """Run one interaction and record it in the history of every object it
     made, shaped or picked up. Object history is how later benefit reaches the
     preparation that made it possible, however long ago that was."""
+    transition_before = (_transition_perception(ctx)
+                         if ctx.humans.get("transition_model") == transitions.MODEL else None)
     before = {o["id"]: (_signature(o), o.get("history", []), o.get("holder")) for o in ctx.humans["objects"]}
     forms_before, pools_before = _material_forms(ctx)
     tool = _find(ctx.humans, spec.get("tool"))
@@ -655,6 +705,9 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
             obj["history"] = _merge_history(*consumed, tool_history, obj.get("history", []), [key])
         elif prior[0] != _signature(obj) or (obj.get("holder") == ctx.agent_id and prior[2] != ctx.agent_id):
             obj["history"] = _merge_history(prior[1], [key])
+    if transition_before is not None:
+        transitions.record(ctx.human["cognition"], transition_before, key,
+                           _transition_perception(ctx), out["effort_kcal"], out["injury"], ctx.epoch)
     return out
 
 
@@ -1029,6 +1082,8 @@ def run_interactions(
 ) -> Context:
     """Perform up to MAX_INTERACTIONS_PER_TICK chosen interactions."""
     ctx = Context(humans, human, profile, pcell, ccell, lithic_cells, wcell, consumers, epoch)
+    if humans.get("transition_model") == transitions.MODEL:
+        transitions.forget(human["cognition"], epoch)
     for step in range(MAX_INTERACTIONS_PER_TICK):
         if float(human.get("fatigue", 0.0)) > 0.8:
             break
