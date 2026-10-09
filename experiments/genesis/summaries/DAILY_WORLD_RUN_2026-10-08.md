@@ -234,3 +234,74 @@ Readings:
 - The plant gate (`run_g2_gate.py`) validates plants at 24 ticks/year for 10 years. No gate covers multi-year plant persistence in the 365-day world.
 
 **Not yet established:** why year 1's conditions differ from later years (weather drift, or initial state), and whether the break-even arithmetic holds cell by cell. Both can be measured without changing growth.
+
+---
+
+# Third run: water cycle at material scale (Railway, build 83ba80b, 2026-10-08/09)
+
+## Setup
+
+- Same configuration as the second run, plus `water_cycle_scale = "material-v1"`.
+- Each ledger is valid. All four seeds completed 5 years.
+- World report and plant ledger: deployment `03e9b68a`.
+- The caregiver audit runs separately on the same build (deployment `8ed5e891`).
+
+## Families (previous run in brackets)
+
+| Seed | Births | Survived to 1 year | Survived to 2 years | Deaths | Alive at end of year 5 | Dependents at end of year 5 |
+|---|---|---|---|---|---|---|
+| a | 8 (11) | 7/7 | 6/6 | 0 (0) | 16 (19) | 8 |
+| b | 11 (9) | 9/9 | 7/7 | 0 (0) | 19 (17) | 11 |
+| c | 5 (4) | 4/4 | 3/3 | 0 (0) | 13 (12) | 5 |
+| d | 20 (11) | 16/16 | 12/12 | 0 (0) | 28 (19) | 20 |
+
+- Adults are still the 8 founders; no child has had children yet.
+- Seed d had 4 births in every one of the 5 years, so 8 adults now care for 20 dependents.
+
+## Hand-feeding
+
+- 0 hand-feedings in any seed (82 in the previous run).
+- Every check of a child past 180 days found the child not hungry.
+
+## Milk and the child energy clamp
+
+- Milk produced, charged and absorbed are equal; nothing is unabsorbed.
+- The child energy clamp, a separate open defect, is larger than before. Seed d alone erased 319,867 kcal in year 5.
+
+## Animals
+
+| Seed | End of year 5 (previous run) | Grazers | Stalker |
+|---|---|---|---|
+| a | 3 browsers (4 grazers) | All killed by Agentus: 2 in year 1, 1 in year 2 | Died of starvation in year 3 |
+| b | 5 browsers, 4 grazers (1 browser, 4 grazers) | Survive | — |
+| c | 6 browsers, 2 grazers, 1 stalker (3 browsers, 4 grazers) | Survive | Survives, and killed one animal itself in year 2 |
+| d | 5 browsers (3 browsers) | Killed by Agentus in year 1, as in the previous run | Died of starvation in year 2 |
+
+- **Successful hunts:** 8 in total (a 3, b 2, c 1, d 2), all in years 1–3. The previous run had 15, spread through year 5.
+
+## Learned behaviour
+
+- **Imitation:** 34 tries, none paid off (previous run: 15, none paid off).
+- **Following:** 0 days in every seed, in both runs.
+- **Acts with positive learned value:**
+  - Striking a grazer with a stone (seeds a and d), learned from the captures in years 1–2.
+  - A few fibre and stone acts.
+- **Repeated acts:** almost all in year 1. The previous run had more repeated stone and fibre acts in years 4–5.
+- **Objects:** 219–279 made. None worn.
+
+## Plants (year-end edible mass, inhabited)
+
+| Seed | Year 1 | Year 2 | Year 3 | Year 4 | Year 5 | Year 5, previous run |
+|---|---|---|---|---|---|---|
+| a | 47.8 t | 566.5 t | 698.6 t | 768.5 t | 771.3 t | 1.86 t |
+| b | 49.1 t | 599.6 t | 702.8 t | 748.0 t | 772.6 t | 1.51 t |
+| c | 69.2 t | 608.0 t | 721.6 t | 759.1 t | 789.4 t | 1.52 t |
+| d | 51.5 t | 594.1 t | 702.5 t | 758.3 t | 777.6 t | 1.69 t |
+
+These track the corrected plant-only control (771 t at year 5 for seed a).
+
+## Readings, not repairs
+
+- **Vegetation recovered; family outcomes did not move together.** Births fell in seed a and rose sharply in seed d. No one died in either run.
+- **Hunting fell and hand-feeding stopped.** Both are consistent with the larger food supply lowering the need to hunt or to hand-feed. That is recorded as a result, not tuned.
+- **Grazer extinctions in a and d are caused by Agentus hunting in years 1–2.** The stalker deaths in those two seeds follow them, recorded as starvation.
