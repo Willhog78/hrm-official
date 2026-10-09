@@ -15,7 +15,8 @@ or `-d2tb` (pre-D2 or D2 consumer timebase; the default is elapsed-time-v2),
 `-legacymilk` (supply-capped nursing) or `-remainingmilk` (solids-first,
 youngest-first allocation), `-reservepredators` (reserve-backed predator
 support; after milk), `-searchpredators` (observed-prey search; outermost
-predator suffix), `-legacywater` (unscaled water cycle),
+predator suffix), `-parentage` (recorded pairing; after predator suffixes),
+`-legacywater` (unscaled water cycle),
 `-legacystore` (unscaled eating store; outermost) and `@<physiology>`, e.g.
 `v1-preg106@reference-v2` or `v1-legacytb@reference-v2`.
 
@@ -77,6 +78,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
     base = base.removesuffix(LEGACY_STORE)
     legacy_water = base.endswith(LEGACY_WATER)
     base = base.removesuffix(LEGACY_WATER)
+    parentage = base.endswith("-parentage")
+    base = base.removesuffix("-parentage")
     search_predators = base.endswith("-searchpredators")
     base = base.removesuffix("-searchpredators")
     reserve_predators = base.endswith("-reservepredators")
@@ -102,6 +105,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
     integrity = not base.endswith(PRE_G10_6)
     config = config_for(seed, base.removesuffix(PRE_G10_6))
     overrides = {}
+    if parentage:
+        overrides["agentus_parentage_model"] = "recorded-pair-v1"
     if legacy_observation:
         overrides["agentus_observation_model"] = "g10.4-legacy"
     if no_memory:

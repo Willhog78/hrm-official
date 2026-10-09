@@ -11,6 +11,7 @@ from .diet import FOOD_KINDS, forage_at_cell, ingest_pool, innate_food_prior, po
 from . import interactions as cap
 from .learning import update_contextual_expectations, update_expectations
 from .memory import empty_memory, remember
+from . import lineage
 from .perception import extend_perception_with_materials, perceive_local
 from .planning import choose_destination
 from .regions import POPULATION_IDS, cells_for_population
@@ -1145,6 +1146,8 @@ def evolve_agentus_step(
                 )
             cell["water_kg"] += float(human["body_water_kg"])
             humans["cumulative_deaths"] = int(humans.get("cumulative_deaths", 0)) + 1
+            if humans.get("parentage_model") == lineage.PARENTAGE_MODEL:
+                lineage.record_death(humans, str(human["id"]), epoch)
             if capacities:
                 cap.drop_all(humans, str(human["id"]))
             continue
@@ -1155,9 +1158,12 @@ def evolve_agentus_step(
 
     # Reproduction sees the living adults' positions after today's movement.
     adults_by_cell: dict[tuple[int, int], set[str]] = {}
+    males_by_cell: dict[tuple[int, int], list[dict]] = {}
     for person in survivors:
         if int(person["age_ticks"]) >= int(profile["maturity_ticks"]):
             adults_by_cell.setdefault((int(person["x"]), int(person["y"])), set()).add(str(person["sex"]))
+            if humans.get("parentage_model") == lineage.PARENTAGE_MODEL and person["sex"] == "male":
+                males_by_cell.setdefault((int(person["x"]), int(person["y"])), []).append(person)
     for human in survivors:
         xy = (int(human["x"]), int(human["y"]))
         body_mass = _mass(human["body_elements_kg"])
@@ -1175,6 +1181,8 @@ def evolve_agentus_step(
             ordinal = int(humans["next_birth_ordinal"])
             humans["next_birth_ordinal"] = ordinal + 1
             child = _offspring(human, ordinal, profile)
+            if humans.get("parentage_model") == lineage.PARENTAGE_MODEL:
+                lineage.record_birth(humans, child, human, males_by_cell[xy], epoch)
             if capacities and "cognition" in child:
                 cap.init_capacity_cognition(child, profile)
             human["energy"] = max(0.0, float(human["energy"]) - float(child["energy"]))

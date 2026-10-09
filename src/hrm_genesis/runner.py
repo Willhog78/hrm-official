@@ -177,6 +177,9 @@ class GenesisSimulation:
                 producer_state,
                 matter_state,
             )
+            if config.agentus_parentage_model == "recorded-pair-v1":
+                from .human.lineage import enable_parentage
+                enable_parentage(human_state)
             if config.demand_milk_active:
                 human_state = dict(human_state)
                 human_state["nursing_model"] = config.nursing_model
