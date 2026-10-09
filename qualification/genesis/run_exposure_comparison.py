@@ -28,7 +28,10 @@ def run(weather, days):
     largest_error = abs(inventory_error(sim))
     for day in range(1, days + 1):
         sim.run(1)
-        largest_error = max(largest_error, abs(inventory_error(sim)))
+        error = inventory_error(sim)
+        largest_error = max(largest_error, abs(error))
+        if weather and abs(error) > 1e-5:
+            print(f"BALANCE_DAY={day} DELTA_KG={error:.9f}", flush=True)
         if day % 10 == 0 or day == days:
             h = sim.human_state()["humans"]
             w = sim.world_state()["cells"]
