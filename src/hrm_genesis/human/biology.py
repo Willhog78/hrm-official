@@ -772,6 +772,38 @@ def _apply_physiology(
         # Worn interlaced material slows heat loss in the cold (capacity v1).
         ambient = min(HUMAN_COMFORT_TEMPERATURE_C, ambient + insulation_c)
 
+    # New weather-enabled worlds accumulate real physiological consequences.
+    # Existing worlds have no wind field and retain the original calculation.
+    if "wind_speed_m_s" in world_cell:
+        wind_speed = max(0.0, float(world_cell["wind_speed_m_s"]))
+        precipitation = max(0.0, float(world_cell.get("precipitation", 0.0)))
+        prior_wet = max(0.0, min(1.0, float(human.get("skin_wetness", 0.0))))
+        # Protection reduces direct rain exposure, while sun and wind dry skin.
+        rain_wetting = min(1.0, precipitation / 3.0) * (1.0 - min(0.9, terrain_cover))
+        dry_rate = min(0.75, 0.06 + 0.015 * wind_speed
+                       + 0.06 * max(0.0, float(world_cell.get("solar", 0.0))))
+        skin_wetness = max(rain_wetting, prior_wet * (1.0 - dry_rate))
+        human["skin_wetness"] = round(skin_wetness, 10)
+        # Moving air strips insulating warmth, especially from wet skin.
+        # The combined effect is bounded, with zero added cold load above comfort.
+        convective_c = min(12.0, wind_speed * (0.30 + 0.75 * skin_wetness))
+        if ambient < HUMAN_COMFORT_TEMPERATURE_C:
+            ambient -= convective_c
+        cold_load = max(0.0, HUMAN_COMFORT_TEMPERATURE_C - ambient - HUMAN_THERMAL_TOLERANCE_C)
+        heat_load = max(0.0, ambient - HUMAN_COMFORT_TEMPERATURE_C - HUMAN_THERMAL_TOLERANCE_C)
+        previous_cold = max(0.0, float(human.get("cold_exposure", 0.0)))
+        previous_heat = max(0.0, float(human.get("heat_exposure", 0.0)))
+        cold_stress = min(100.0, max(0.0, previous_cold * 0.90 + cold_load * 0.06 - (1.0 if cold_load == 0.0 else 0.0)))
+        heat_stress = min(100.0, max(0.0, previous_heat * 0.90 + heat_load * 0.06 - (1.0 if heat_load == 0.0 else 0.0)))
+        human["cold_exposure"] = round(cold_stress, 10)
+        human["heat_exposure"] = round(heat_stress, 10)
+        # Accumulated injury uses the existing injury and survival mechanism,
+        # avoiding a new scripted death rule or arbitrary mortality lottery.
+        cumulative_exposure_injury = min(0.05, max(0.0, cold_stress - 6.0) * 0.002
+                                        + max(0.0, heat_stress - 6.0) * 0.002)
+    else:
+        cumulative_exposure_injury = 0.0
+
     thermal_delta = abs(ambient - HUMAN_COMFORT_TEMPERATURE_C)
     excess = max(0.0, thermal_delta - HUMAN_THERMAL_TOLERANCE_C)
 
@@ -806,6 +838,8 @@ def _apply_physiology(
             )
 
     injury = float(human.get("injury", 0.0))
+    if cumulative_exposure_injury > 0.0:
+        injury = min(1.5, injury + cumulative_exposure_injury)
     severe_exposure = max(0.0, thermal_delta - 28.0)
     if severe_exposure > 0.0:
         injury_scale = max(0.15, float(profile.get("thermal_scale", 1.0)))
