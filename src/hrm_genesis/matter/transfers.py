@@ -45,7 +45,19 @@ def apply_water_cycle(
         precipitation = float(climate["precipitation"]) * scale
         precipitation_total += precipitation
 
-        surface = float(cell["surface_water_kg"]) + precipitation
+        # Snow is a real water reservoir. Existing windless worlds retain the
+        # historical rain-only behavior and do not acquire a snow field.
+        snow_enabled = "wind_speed_m_s" in climate
+        snowfall = precipitation if snow_enabled and float(climate["temperature"]) <= 0.0 else 0.0
+        snow = max(0.0, float(cell.get("snow_water_kg", 0.0)))
+        if snow_enabled:
+            snow += snowfall
+            melt = min(snow, scale * 0.08 * max(0.0, float(climate["temperature"])))
+            snow -= melt
+            cell["snow_water_kg"] = snow
+        else:
+            melt = 0.0
+        surface = float(cell["surface_water_kg"]) + precipitation - snowfall + melt
         soil = float(cell["soil_water_kg"])
 
         infiltration = min(surface, max(0.0, SOIL_WATER_CAPACITY_KG * scale - soil), 3.0 * scale)
@@ -143,6 +155,8 @@ def evolve_matter(matter_state: dict, world_state: dict, epoch: int) -> dict:
     for cell in state["cells"]:
         cell["surface_water_kg"] = round(float(cell["surface_water_kg"]), 10)
         cell["soil_water_kg"] = round(float(cell["soil_water_kg"]), 10)
+        if "snow_water_kg" in cell:
+            cell["snow_water_kg"] = round(float(cell["snow_water_kg"]), 10)
         cell["elements_kg"] = {
             symbol: round(float(amount), 10)
             for symbol, amount in sorted(cell["elements_kg"].items())
