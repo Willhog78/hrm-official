@@ -1132,6 +1132,7 @@ def evolve_agentus_step(
                 humans.setdefault("nursing_stats", {}),
             )
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
+        water_before_physiology = float(human["body_water_kg"])
         if capacities:
             _apply_physiology(
                 human, wcells[xy], moved, effective_profile, pcells[xy],
@@ -1141,6 +1142,13 @@ def evolve_agentus_step(
             cap.credit_worn_benefit(humans, human, float(human.pop("insulation_saving_kcal", 0.0)), effective_profile)
         else:
             _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy], sleep_recovery=integrity)
+        # Thermoregulation can evaporate body water before routine basal loss.
+        # In wind-enabled worlds every such kilogram must leave the human
+        # inventory and enter Matter's existing water-output account exactly once.
+        # Preserve historical accounting in old windless simulations.
+        if "wind_speed_m_s" in wcells[xy]:
+            heat_water_loss = max(0.0, water_before_physiology - float(human["body_water_kg"]))
+            matter["water_output_kg"] = float(matter["water_output_kg"]) + heat_water_loss
         attacks = _apply_predator_threat(human, consumer_state, epoch)
         if attacks:
             humans["predator_attack_events"] = int(humans.get("predator_attack_events", 0)) + attacks
