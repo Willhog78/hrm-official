@@ -58,7 +58,7 @@ def build_matter_state(*, width: int, height: int, seed_bank: SeedBank, scale_fa
 
 
 def total_water(cells: list[dict]) -> float:
-    return sum(float(c["surface_water_kg"]) + float(c["soil_water_kg"]) for c in cells)
+    return sum(float(c["surface_water_kg"]) + float(c["soil_water_kg"]) + float(c.get("snow_water_kg", 0.0)) for c in cells)
 
 
 def total_elements(cells: list[dict]) -> dict[str, float]:
