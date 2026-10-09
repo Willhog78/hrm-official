@@ -1,11 +1,12 @@
 """Woven surfaces retain their real strand mass during weathering."""
+from copy import deepcopy
 from hrm_genesis.matter import objects as mo
 from hrm_genesis.human.interactions import weather_objects
 
 
 def test_interlaced_surface_mass_survives_weathering():
     strand = {"material": "fiber", "elements_kg": {"C": 0.02}, "integrity": 1.0}
-    surface = {"id": "woven", "material": "surface", "strands": [dict(strand) for _ in range(4)],
+    surface = {"id": "woven", "material": "surface", "strands": [deepcopy(strand) for _ in range(4)],
                "area_m2": 0.5, "cohesion": 0.8, "x": 0, "y": 0,
                "holder": "human-g00000000", "worn": True}
     assert abs(mo.object_mass(surface) - 0.08) < 1e-12
