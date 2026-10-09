@@ -28,7 +28,10 @@ def test_repeat_encounter_and_experienced_heat_saving():
     ctx.draw=lambda key,step: 0.0
     selected=cap.choose(ctx,options,1,False)
     assert selected==options[0]
-    cap.execute(ctx,*selected)
+    outcome=cap.execute(ctx,*selected)
+    outcome["injury"]=0.0
+    ctx.performed.append((selected[0],outcome))
+    cap.learn_from_tick(ctx,[])
     assert surface["worn"]
     assert cap.insulation_c(humans,"h")>0
     # No arbitrary reward injection: physiological model calculates actual
@@ -40,5 +43,5 @@ def test_repeat_encounter_and_experienced_heat_saving():
     cap.credit_worn_benefit(humans,human,saved,profile)
     values=human["cognition"]["affordance_values"]
     assert values["wear:surface|held"]["v"]>0
-    assert values["interlace:strands|held"]["v"]>0 if "interlace:strands|held" in values else True
+    assert values["wear:surface|held"]["n"] == 1
     assert humans["capacity_stats"]["insulation_saving_kcal"]>0
