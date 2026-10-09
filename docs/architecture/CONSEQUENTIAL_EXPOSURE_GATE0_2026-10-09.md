@@ -1,3 +1,15 @@
+## Surface scale review — analytical check, not a Railway run (2026-10-09)
+
+Source: `qualification/genesis/audit_surface_scale.py` (commit `3c5a87b`), `human.interactions.insulation_c`, and the production-profile day-110 trace.
+
+The first observed retained worn surface measured area 0.0001630477 m² and cohesion 0.8603248981. Existing insulation calculation uses `8.0 * min(1.0, sum(area * cohesion) / 1.8)`. This yields approximately 0.0006235 °C cold moderation per equivalent single surface, with just 0.00779% effective body coverage. The integer count needed to reach 1.8 m² effective area at this single-item scale is around 12,800 individual surfaces, a purely mathematical counterfactual rather than a demonstrated attainable construction. This explains why persistence of several small objects is not sufficient evidence for thermally consequential use.
+
+**Execution status:** The script is committed but has NOT run on Railway. The existing `hrm-pr39-exposure-validation` service is pinned to a pytest start command and older source commit. Redeploying its existing build would not run this newly added script. Do not change established Railway start/build/environment configuration just to claim completion. Next qualification must execute the committed script with an appropriately isolated, authorized runner and report its actual logs. A mass- and length-constrained test of interlacing (with elements conserved) is needed before proposing any alteration to weaving geometry or Agentus preferences.
+
+**Decision:** Physical protection remains not demonstrated in autonomous runs; do not merge.
+
+---
+
 ## Current qualification checkpoint — 2026-10-09 (supersedes the preliminary status line below)
 
 **Inspection has advanced into implementation and qualification; PR #39 remains DRAFT / NOT MERGE-APPROVED.** The original opening status below describes the initial inspection and must not be interpreted as the current branch state. No production rollout is authorized by this record.
