@@ -324,7 +324,7 @@ class Context:
         self.insulation_before = insulation_c(humans, str(human["id"])) if self.arrangement_before is not None else None
         self.worn_before_ids = ({str(o["id"]) for o in humans.get("objects", [])
                                  if o.get("holder") == self.agent_id and o.get("worn")}
-                                if humans.get("transition_model") == transitions.DELAYED_MODEL else set())
+                                if humans.get("transition_model") in transitions.DELAYED_MODELS else set())
 
     @property
     def agent_id(self) -> str:
@@ -702,7 +702,7 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
     preparation that made it possible, however long ago that was."""
     transition_model = ctx.humans.get("transition_model")
     arrangement_before = (_thermal_arrangement(ctx.pcell)
-                          if transition_model == transitions.DELAYED_MODEL else None)
+                          if transition_model in transitions.DELAYED_MODELS else None)
     transition_before = (_transition_perception(ctx)
                          if transition_model in transitions.MODELS else None)
     fresh_before = (available_kg("fresh_tissue", ctx.pcell, ctx.ccell)
@@ -1299,7 +1299,7 @@ def prepare_thermal_trials(humans: dict, human: dict, pcell: dict, epoch: int,
     """
     current_arrangement = _thermal_arrangement(pcell)
     current_insulation = insulation_c(humans, str(human["id"]))
-    if humans.get("transition_model") != transitions.DELAYED_MODEL:
+    if humans.get("transition_model") not in transitions.DELAYED_MODELS:
         return current_arrangement, current_insulation
     retained = {e["id"] for e in human.get("cognition", {}).get("transition_memory", {}).get("edges", [])}
     worn = {str(o["id"]): o for o in humans.get("objects", [])
@@ -1351,7 +1351,7 @@ def prepare_thermal_trials(humans: dict, human: dict, pcell: dict, epoch: int,
 def settle_thermal_trials(humans: dict, human: dict, epoch: int,
                           worn_kcal: float, arrangement_kcal: float) -> None:
     """Add only today's discounted realized benefit to originating attempts."""
-    if (humans.get("transition_model") != transitions.DELAYED_MODEL
+    if (humans.get("transition_model") not in transitions.DELAYED_MODELS
             or int(human.get("thermal_settled_epoch", -1)) >= int(epoch)):
         return
     human["thermal_settled_epoch"] = int(epoch)

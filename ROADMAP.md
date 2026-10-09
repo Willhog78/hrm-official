@@ -467,3 +467,12 @@ transfer, departure, physical intervention, forgetting and expiry end credit.
 Default, v1 and v2 remain available. Controlled valuation works; autonomous
 ecological discovery and sequential imitation remain unproven. Contract and
 verification: `docs/architecture/DELAYED_THERMAL_V3.md`.
+
+### Own procedural continuity — opt-in v4 (2026-10-09)
+
+Owner-authorized continuation joins repeatedly observed own consecutive material
+transitions over a six-action horizon, including repeated progress and overnight
+bodily drift. Every step still uses current physical options and reserve guards;
+the three-interaction tick limit remains. Controlled four-action stone preparation
+replays across ticks; independent ecological discovery and sequential imitation
+remain unproven. Contract: `docs/architecture/PROCEDURAL_CONTINUITY_V4.md`.
