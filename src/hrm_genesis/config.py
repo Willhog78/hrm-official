@@ -69,6 +69,7 @@ class GenesisConfig:
     # Opt-in predator support: a real meal plus finite stored energy covers
     # non-feeding days; live prey must be locally reachable at reproduction.
     predator_support_model: str = "consecutive-feeding-legacy"
+    predator_search_model: str = "plant-score-legacy"
     # Producer (plant) timebase. Plant rates and ages are stated per day (the
     # daily world is the reference). "elapsed-time-v1" (default) converts them
     # to the run's tick length; "per-tick-legacy" reproduces earlier runs.
@@ -143,6 +144,8 @@ class GenesisConfig:
         parts = [p for p in self.agentus_capacity_ablation.split("+") if p]
         if not set(parts) <= {"plant_diet", "no_interactions", "no_recall"} or len(parts) != len(set(parts)):
             raise ValueError("unknown agentus_capacity_ablation")
+        if self.predator_search_model not in {"plant-score-legacy", "seen-prey-v1"}:
+            raise ValueError("unknown predator_search_model")
         if self.predator_support_model not in {"consecutive-feeding-legacy", "reserve-backed-v1"}:
             raise ValueError("unknown predator_support_model")
         if self.caregiving_model not in {"solid-food-v1", "none"}:
@@ -257,6 +260,8 @@ class GenesisConfig:
             canonical["agentus_behavior_integrity"] = "g10.6"
         if self.agentus_physiology_version != "reference-v1":
             canonical["agentus_physiology_version"] = self.agentus_physiology_version
+        if self.consumer_ecology_enabled and self.predator_search_model == "seen-prey-v1":
+            canonical["predator_search_model"] = self.predator_search_model
         if self.consumer_ecology_enabled and self.predator_support_model == "reserve-backed-v1":
             canonical["predator_support_model"] = self.predator_support_model
         if (self.consumer_ecology_enabled and self.ticks_per_year != 12

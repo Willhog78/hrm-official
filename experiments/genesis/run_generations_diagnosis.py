@@ -16,7 +16,7 @@ from hrm_genesis.human import biology as bio, interactions as cap
 parser=argparse.ArgumentParser()
 parser.add_argument('--seed',default='c')
 parser.add_argument('--years',type=int,default=30)
-parser.add_argument('--arm',default='v1',choices=('v1','v1-remainingmilk','v1-reservepredators','v1-remainingmilk-reservepredators'))
+parser.add_argument('--arm',default='v1',choices=('v1','v1-remainingmilk','v1-reservepredators','v1-remainingmilk-reservepredators','v1-remainingmilk-reservepredators-searchpredators'))
 parser.add_argument('--parity-days',type=int,default=30)
 parser.add_argument('--owned-state',action='store_true',help='Diagnostic replay consumes its private states in place; never use with a live fabric')
 parser.add_argument('--spatial-index',action='store_true',help='Exact index of animal positions for repeated support queries')
@@ -58,6 +58,7 @@ deaths=[]
 history=defaultdict(lambda:deque(maxlen=10))
 predators=defaultdict(Counter)
 predator_deaths=[]
+predator_births=[]
 imitations=defaultdict(Counter)
 imitated_keys=defaultdict(set)
 current_epoch=0
@@ -110,6 +111,8 @@ def predator_hook(a,consumers,predator_hungry,epoch,starved,dehydrated,old,basal
     p=predators[year]
     candidates=animal._prey_candidates(a,consumers)
     p['days']+=1;p['hungry_days']+=int(predator_hungry)
+    live_visible=[x for x in candidates if x['energy']>0 and x['body_water_kg']>1e-6 and sum(x['body_elements_kg'].values())>0.002]
+    p['visible_live_prey_days']+=int(bool(live_visible))
     p['hungry_no_visible_prey']+=int(predator_hungry and not candidates)
     p['hungry_visible_prey']+=int(predator_hungry and bool(candidates))
     p['hungry_prey_in_cell']+=int(predator_hungry and any((x['x'],x['y'])==(a['x'],a['y']) for x in candidates))
@@ -157,6 +160,14 @@ def offspring_wrapper(mother,ordinal,profile):
     parents[child['id']]=mother['id']
     return child
 bio._offspring=offspring_wrapper
+
+original_animal_offspring=animal._offspring
+def animal_offspring_wrapper(parent,ordinal):
+    child=original_animal_offspring(parent,ordinal)
+    if animal.trait_for(parent['species']).trophic_role=='predator':
+        predator_births.append({'epoch':current_epoch,'year':current_epoch//365+1,'parent':parent['id'],'child':child['id'],'generation':child['generation']})
+    return child
+animal._offspring=animal_offspring_wrapper
 
 original_nurse=bio._provision_dependent
 def start_milk_day():
@@ -239,7 +250,7 @@ for epoch in range(args.parity_days):
     canonical.run(1)
     assert instrumented_states==[canonical.world_state(),canonical.matter_state(),canonical.ecology_state(),canonical.consumer_state(),canonical.human_state()],('instrumented parity mismatch',epoch)
 print('INSTRUMENTED_PARITY_PASS',args.seed,args.parity_days,flush=True)
-repro.clear();births.clear();parents.clear();deaths.clear();history.clear();predators.clear();predator_deaths.clear();imitations.clear();imitated_keys.clear()
+repro.clear();births.clear();parents.clear();deaths.clear();history.clear();predators.clear();predator_deaths.clear();predator_births.clear();imitations.clear();imitated_keys.clear()
 del canonical,instrumented_states
 
 out=args.out;out.mkdir(parents=True,exist_ok=True)
@@ -275,8 +286,8 @@ for epoch in range(start_epoch,args.years*365):
         stats=h.get('capacity_stats',{})
         rec={'year':year,'alive':len(h['humans']),'generations':dict(Counter(p['generation'] for p in h['humans'])),'animals':dict(Counter(a['species'] for a in c['animals'])),'deaths':h.get('cumulative_deaths',0),'births':h.get('cumulative_births',0),'captures':stats.get('captures',0),'imitation_tries':sum(stats.get('imitation_tries',{}).values()),'imitation_paid':sum(stats.get('imitation_paid',{}).values()),'reproduction':dict(repro[year]),'predators':dict(predators[year]),'imitation_details':dict(imitations[year]),'positive_copied_keys':positive_copied,'nursing':deepcopy(h.get('nursing_stats',{})),'refused_food':deepcopy(h.get('energy_store_stats',{})),'elapsed_s':round(time.monotonic()-start,1)}
         annual.append(rec)
-        result={'seed':args.seed,'arm':args.arm,'config_fingerprint':config.fingerprint(),'parity_days':args.parity_days,'resume_epoch':start_epoch,'copy_attribution_start_epoch':start_epoch,'annual':annual,'birth_events':births,'death_events':deaths,'predator_deaths':predator_deaths}
+        result={'seed':args.seed,'arm':args.arm,'config_fingerprint':config.fingerprint(),'parity_days':args.parity_days,'resume_epoch':start_epoch,'copy_attribution_start_epoch':start_epoch,'annual':annual,'birth_events':births,'death_events':deaths,'predator_deaths':predator_deaths,'predator_birth_events':predator_births}
         (out/(args.seed+'.json')).write_text(json.dumps(result,indent=2))
         print(json.dumps(rec),flush=True)
-        if year in (18,25,30):(out/(args.seed+'-state-y'+str(year)+'.json')).write_text(json.dumps(states))
+        if year in (18,25,30) or year==args.years:(out/(args.seed+'-state-y'+str(year)+'.json')).write_text(json.dumps(states))
 print('AUDIT_DONE',args.seed,flush=True)

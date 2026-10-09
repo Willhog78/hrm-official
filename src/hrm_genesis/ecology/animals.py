@@ -41,6 +41,10 @@ CARCASS_WATER_RETURN_FRACTION_PER_REFERENCE_TICK = 0.10
 # Minimum consecutive supported reference ticks before reproduction.
 MIN_SUPPORT_STREAK_REFERENCE_TICKS = 5
 PREDATOR_SUPPORT_RESERVE = "reserve-backed-v1"
+PREDATOR_SEARCH_MEMORY = "seen-prey-v1"
+PREY_MEMORY_REFERENCE_TICKS = 12  # declared one-year encounter memory
+MAX_PREY_MEMORY_CELLS = 16
+MAX_PREDATOR_SEARCH_VISITS = 32
 
 
 def consumer_timebase(consumers: dict) -> str:
@@ -327,6 +331,66 @@ def _prey_candidates(predator: dict, consumers: dict) -> list[dict]:
     return visible
 
 
+def _choose_predator_destination(
+    predator: dict, consumers: dict, producers: dict, matter: dict,
+    epoch: int, killed_ids: set[str],
+) -> tuple[int, int]:
+    """Local prey, remembered encounters, then exploration of adjacent cells.
+
+    Memory records only actual visible live prey, and is cleared where a
+    fresh local observation contradicts it. No off-screen animal positions
+    or plant abundance enter the destination score.
+    """
+    traits = trait_for(str(predator["species"]))
+    width, height = int(producers["width"]), int(producers["height"])
+    origin = (int(predator["x"]), int(predator["y"]))
+    visible = set(_visible_cells(*origin, width, height, traits.perception_radius))
+    prey = [a for a in _prey_candidates(predator, consumers)
+            if str(a["id"]) not in killed_ids and float(a["energy"]) > 0.0
+            and float(a["body_water_kg"]) > 1e-6
+            and _element_mass(a["body_elements_kg"]) > 0.002]
+    seen = {(int(a["x"]), int(a["y"])) for a in prey}
+    memory = predator.setdefault("prey_encounters", {})
+    lifetime = scaled_life_history_ticks(PREY_MEMORY_REFERENCE_TICKS, int(consumers.get("ticks_per_year", 12)))
+    for key, last_seen in list(memory.items()):
+        xy = tuple(int(v) for v in key.split(","))
+        if epoch - int(last_seen) > lifetime or (xy in visible and xy not in seen):
+            del memory[key]
+    for x, y in seen:
+        memory[f"{x},{y}"] = epoch
+    while len(memory) > MAX_PREY_MEMORY_CELLS:
+        del memory[min(memory, key=lambda k: (int(memory[k]), k))]
+    visits = predator.setdefault("predator_search_visits", {})
+    visits[f"{origin[0]},{origin[1]}"] = epoch
+    while len(visits) > MAX_PREDATOR_SEARCH_VISITS:
+        del visits[min(visits, key=lambda k: (int(visits[k]), k))]
+
+    if float(predator["body_water_kg"]) < traits.water_capacity_kg * 0.5:
+        mcells = _cell_lookup(matter["cells"])
+        water = [xy for xy in visible if _water_available(mcells[xy]) > 0.0]
+        if water:
+            return min(water, key=lambda xy: (abs(xy[0]-origin[0])+abs(xy[1]-origin[1]), xy))
+    hungry = float(predator["energy"]) < traits.reproduction_energy * 0.60
+    if prey:
+        if not hungry:
+            return origin  # remain in an actually observed prey patch when sated
+        target = _choose_prey(predator, {"animals": prey})
+        return (int(target["x"]), int(target["y"]))
+    if memory:
+        key = min(memory, key=lambda k: (
+            abs(int(k.split(",")[0])-origin[0])+abs(int(k.split(",")[1])-origin[1]),
+            -int(memory[k]), k))
+        return tuple(int(v) for v in key.split(","))
+    adjacent = neighbors(*origin, width, height)
+    if not adjacent:
+        return origin
+    def search_score(xy: tuple[int, int]) -> tuple[int, bytes]:
+        last = int(visits.get(f"{xy[0]},{xy[1]}", -1))
+        tie = hashlib.sha256(f"{predator['id']}|{epoch}|search|{xy}".encode()).digest()
+        return last, tie
+    return min(adjacent, key=search_score)
+
+
 def _choose_prey(predator: dict, consumers: dict) -> dict | None:
     candidates = _prey_candidates(predator, consumers)
     if not candidates:
@@ -475,7 +539,10 @@ def evolve_consumers(
             traits.trophic_role == "predator"
             and float(animal["energy"]) < traits.reproduction_energy * 0.60
         )
-        if predator_hungry:
+        if (traits.trophic_role == "predator"
+                and consumers.get("predator_search_model") == PREDATOR_SEARCH_MEMORY):
+            target = _choose_predator_destination(animal, consumers, producers, matter, epoch, killed_ids)
+        elif predator_hungry:
             prey = _choose_prey(animal, consumers)
             if prey is not None:
                 target = (int(prey["x"]), int(prey["y"]))
