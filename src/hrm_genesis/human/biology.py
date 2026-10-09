@@ -730,7 +730,15 @@ def _apply_physiology(
     producer_cell = producer_cell or {}
     fire_intensity = max(0.0, min(1.0, float(producer_cell.get("fire_intensity", 0.0))))
     ambient += fire_intensity * 28.0
-    canopy, terrain_cover = _structural_protection(world_cell, producer_cell)
+    # Optional sub-cell location and incident wind are physical inputs, not a
+    # shelter flag. Older states have no sub-cell coordinate and use cell centre.
+    offset = human.get("subcell_offset_m", (0.0, 0.0))
+    wind = (world_cell.get("wind_from_deg")
+            if float(world_cell.get("wind_speed_m_s", 0.0)) > 0.0 else None)
+    canopy, terrain_cover = _structural_protection(
+        world_cell, producer_cell, occupant_offset_m=(float(offset[0]), float(offset[1])),
+        wind_from_deg=None if wind is None else float(wind),
+    )
 
     # Canopy primarily reduces hot exposure; cave/overhang terrain moderates
     # both hot and cold extremes toward a stable subsurface-like temperature.
