@@ -317,7 +317,11 @@ class Context:
         return str(self.human["id"])
 
     def wetness(self) -> float:
-        return max(0.0, min(1.0, float(self.wcell.get("precipitation", 0.0)) / 3.0))
+        rain = max(0.0, min(1.0, float(self.wcell.get("precipitation", 0.0)) / 3.0))
+        # Where weathering is enabled, the actual fibres retain moisture from
+        # previous ticks. Legacy objects without a moisture field behave as before.
+        stored = [float(o["wetness"]) for o in self.held() if "wetness" in o]
+        return max(rain, max(stored, default=0.0))
 
     def draw(self, *parts: object) -> float:
         return mo.unit_draw(self.agent_id, self.epoch, *parts)
@@ -1374,6 +1378,17 @@ def weather_objects(humans: dict, pcells: dict, wcells: dict, epoch: int) -> Non
         intensity = float(pcell.get("fire_intensity", 0.0))
         detritus = pcell["detritus_elements_kg"]
         held = obj.get("holder") is not None
+        climate = wcells[xy]
+        # Opt-in environmental moisture: liquid contact leaves residual
+        # wetness, while wind and sunlight dry material gradually. Wetness
+        # is a bounded material property, not newly created water mass.
+        if "wind_speed_m_s" in climate and obj["material"] in {"fiber", "surface", "assembly", "wood"}:
+            rain = max(0.0, min(1.0, float(climate.get("precipitation", 0.0)) / 3.0))
+            previous = float(obj.get("wetness", 0.0))
+            wind = max(0.0, float(climate["wind_speed_m_s"]))
+            solar = max(0.0, float(climate.get("solar", 0.0)))
+            drying = min(0.7, 0.04 + wind * 0.015 + solar * 0.08)
+            obj["wetness"] = round(max(rain, previous * (1.0 - drying)), 10)
         decay = ORGANIC_DECAY_HELD if held else ORGANIC_DECAY_GROUND
         burn = 0.1 * intensity if (intensity > 0.2 and not held) else 0.0
         _degrade(obj, decay + burn, detritus)
