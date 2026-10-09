@@ -148,6 +148,8 @@ class GenesisSimulation:
                 ticks_per_year=config.ticks_per_year,
                 timebase=config.consumer_timebase,
             )
+            if config.predator_support_model == "reserve-backed-v1":
+                consumer_state["predator_support_model"] = config.predator_support_model
             consumer_state, producer_state, matter_state = seed_initial_consumers(
                 consumer_state,
                 producer_state,
