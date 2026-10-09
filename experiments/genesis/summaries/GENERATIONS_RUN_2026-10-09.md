@@ -23,7 +23,7 @@
 | Seed | Alive | Gen 0 / 1 / 2 | Adults (gen 0 + gen 1) | Gen-1 adults | Gen-1 births | Gen-2 births | Human deaths |
 |---|---|---|---|---|---|---|---|
 | a | 80 | 8 / 39 / 33 | 21 | 13 | 39 | 34 | 1 |
-| b | B_ALIVE | B_GENS | B_ADULTS | B_G1A | B_G1B | B_G2B | B_DEATHS |
+| b | 91 | 8 / 34 / 49 | 22 | 14 | 35 | 52 | 4 |
 | c | 25 | 8 / 9 / 8 | 12 | 4 | 9 | 8 | 0 |
 | d | 127 | 8 / 53 / 66 | 24 | 16 | 57 | 70 | 8 |
 
@@ -48,7 +48,7 @@
 | 22 | 47 | 42 | 20 | 59 |
 | 25 | 62 | 57 | 25 | 85 |
 | 28 | 76 | 77 | 25 | 115 |
-| 30 | 80 | B_ALIVE | 25 | 127 |
+| 30 | 80 | 91 | 25 | 127 |
 
 ### The year-5 to year-18 plateau and its end
 
@@ -60,6 +60,7 @@
 - **Year 19 onward.** In all four seeds, founder mothers (gen-1 births) and the new generation-1 mothers (gen-2 births) began giving birth in the same year, year 19. That is the year the first world-born individuals became adults.
   - Inference, not measured: new adult males now share cells with founder and generation-1 females, which removes the `no_adult_male_in_cell` block. A per-day diagnostic at year 19 would confirm or refute this.
 - **Seed d's 4-a-year pattern.** d had exactly 4 gen-1 births in years 1–4, 19–22 and 24–27, which is consistent with all 4 founder females giving birth in those years.
+- **Founder births ending.** In seed a, founders had no births after year 27; generation-1 mothers continued (2–3 births a year in years 28–30). In b and d, both founders and generation-1 mothers were still giving birth in year 30.
 - **Seed c after year 25.** c had no births at all from year 26 to year 30, with 12 adults alive (8 founders and 4 generation-1). This was not diagnosed.
 
 ### Adulthood (generation 1 becoming adult)
@@ -67,7 +68,7 @@
 | Seed | Year 19 | Year 20 | Year 21 | Year 22 | Years 23–30 | Total |
 |---|---|---|---|---|---|---|
 | a | 4 | 1 | 1 | 1 | 6 (one each in 24, 25, 26, 27, 29, 30) | 13 |
-| b | 3 | 2 | 2 | 2 | B_LATE_ADULTS | B_G1A |
+| b | 3 | 2 | 2 | 2 | 5 (one each in 24, 25, 26, 27, 29) | 14 |
 | c | 1 | 1 | 1 | 1 | 0 | 4 |
 | d | 4 | 4 | 4 | 4 | 0 | 16 |
 
@@ -78,7 +79,7 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 | Seed | Deaths |
 |---|---|
 | a | energy, gen 2, dependent: 1 (year 27) |
-| b | energy, gen 1, dependent: 1 (year 5); energy, gen 2, dependent: B_G2D |
+| b | energy, gen 1, dependent: 1 (year 5); energy, gen 2, dependent: 1 (year 24) + 2 (year 29) |
 | c | none |
 | d | energy, gen 1, dependent: 2 (year 5) + 2 (year 29); energy, gen 2, dependent: 1 (year 24) + 2 (year 25) + 1 (year 27) |
 
@@ -92,7 +93,7 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 | Seed | Grazer | Stalker | Browser (start → year 30) |
 |---|---|---|---|
 | a | extinct by year 2: 3 captured by Agentus (years 1–2) | starved, year 3 | 1 → 631 |
-| b | 1 survived year 1 (2 captured); then grew to 3,861 by year 29 (B_GRAZER at year 30) | none alive at the end of year 1 | 2 → B_BROWSER |
+| b | 1 survived year 1 (2 captured); then grew to 4,090 at year 30 | none alive at the end of year 1 | 2 → 819 |
 | c | persisted; 2,044 at year 30 | 1 alive until year 23; starved | 2 → 712 |
 | d | extinct in year 1: 2 captured by Agentus | starved, year 2 | 2 → 864 |
 
@@ -108,7 +109,7 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 | Seed | Captures (30 y) | Imitation tries / paid | Follow days | Repeated acts (years) | Worn objects |
 |---|---|---|---|---|---|
 | a | 3 (years 1–2) | 444 / 0 | 0 | years 1, 2, 11, 12 only | 0 |
-| b | 2 (year 1) | B_IMIT / 0 | 0 | none | 0 |
+| b | 2 (year 1) | 283 / 0 | 0 | none | 0 |
 | c | 28 (years 3–30) | 70 / 0 | 0 | many, years 12–30 | 0 |
 | d | 2 (year 1) | 593 / 0 | 0 | years 1, 8 only | 0 |
 
@@ -131,7 +132,7 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 | Seed | Finished (UTC) | Wall time | Final ledger digest | Peak RSS | Disk (ledger + checkpoints) |
 |---|---|---|---|---|---|
 | a | 05:24 | 7,569 s | `d5ad155f7b374d93…` | 0.41 GB | 956 MB |
-| b | B_DONE | B_WALL | `B_DIGEST…` | B_RSS | B_DISK |
+| b | 05:56 | 9,506 s | `3270197ada885795…` | 0.55 GB | 962 MB |
 | c | 05:02 | 6,257 s | `b33bce361106989d…` | 0.37 GB | 858 MB |
 | d | 05:40 | 8,559 s | `5c2257fda22e3587…` | 0.48 GB | 1,002 MB |
 
@@ -140,6 +141,7 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 - **Determinism.** The first 30-year attempt (gzip, no volume) was killed at years 17–22. Each of its yearly ledger digests, 37 in all, matches this run's digest for the same seed and year.
   - Last common years: a year 19 `d0d3f6e1…`, b year 19 `825312cc…`, c year 22 `ac791e82…`, d year 17 `46faab51…`.
   - The two runs used different codecs and grouping, and the matches confirm both are deterministic.
+- **Volume.** After all four seeds: 3.6 GB of 4.6 GB used, 958 MB free.
 - **No restarts.** No resume was needed: the runner did not restart, there was no Traceback, and the disk guard did not trigger.
 
 ## 6. What this does and does not establish
