@@ -9,7 +9,7 @@ def _body(animal_id="prey"):
     return {
         "id": animal_id, "species": "grazer", "x": 0, "y": 0,
         "body_elements_kg": {symbol: 0.1 for symbol in a.ANIMAL_TRACKED_ELEMENTS},
-        "body_water_kg": 2.0,
+        "body_water_kg": 2.0, "energy": 10.0, "last_forage_success": 0.0,
     }
 
 
