@@ -27,7 +27,13 @@ def run(weather, days):
     sim = GenesisSimulation(cfg)
     largest_error = abs(inventory_error(sim))
     for day in range(1, days + 1):
+        if weather and day >= 29:
+            mm = sim.matter_state()
+            print(f"PRE_DAY={day} MATTER={total_water(mm['cells']):.6f} IN={mm['water_input_kg']:.6f} OUT={mm['water_output_kg']:.6f} ANIMAL={consumer_water_total_kg(sim.consumer_state()):.6f} HUMAN={human_water_total_kg(sim.human_state()):.6f} ANIMALS={len(sim.consumer_state()['animals'])} HUMANS={len(sim.human_state()['humans'])}", flush=True)
         sim.run(1)
+        if weather and day >= 29:
+            mm = sim.matter_state()
+            print(f"POST_DAY={day} MATTER={total_water(mm['cells']):.6f} IN={mm['water_input_kg']:.6f} OUT={mm['water_output_kg']:.6f} ANIMAL={consumer_water_total_kg(sim.consumer_state()):.6f} HUMAN={human_water_total_kg(sim.human_state()):.6f} ANIMALS={len(sim.consumer_state()['animals'])} HUMANS={len(sim.human_state()['humans'])}", flush=True)
         error = inventory_error(sim)
         largest_error = max(largest_error, abs(error))
         if weather and abs(error) > 1e-5:
