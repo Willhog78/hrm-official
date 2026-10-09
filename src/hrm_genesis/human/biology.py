@@ -1250,6 +1250,11 @@ def evolve_agentus_step(
             humans["cumulative_deaths"] = int(humans.get("cumulative_deaths", 0)) + 1
             if capacities:
                 cap.drop_all(humans, str(human["id"]))
+            # The remains already own this body's water and elements. A
+            # dependent processed later cannot nurse from that body again.
+            # Weather-only to preserve legacy replay parity.
+            if "wind_speed_m_s" in wcells[xy]:
+                people_by_id.pop(str(human["id"]), None)
             continue
 
         survivors.append(human)
