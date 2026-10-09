@@ -27,6 +27,8 @@ class GenesisConfig:
     agentus_capacities_enabled: bool = False
     # Opt-in physical placement; absent/False preserves historical fingerprints.
     agentus_subcell_position_enabled: bool = False
+    # Opt-in real wind; omitted from legacy fingerprints.
+    genesis_wind_enabled: bool = False
     # Experimental ablation of capacity v1: "" or a "+"-joined set of
     # "plant_diet" (no sampling of unknown food kinds), "no_interactions" (no
     # manipulation or capture) and "no_recall" (no travel toward remembered
@@ -238,6 +240,8 @@ class GenesisConfig:
             canonical["agentus_thirst_enabled"] = True
         if self.agentus_capacities_enabled and self.agentus_observation_model != "g10.4-legacy":
             canonical["agentus_observation_model"] = self.agentus_observation_model
+        if self.genesis_wind_enabled:
+            canonical["genesis_wind"] = "persistent-vector-v1"
         if self.agentus_subcell_position_enabled:
             canonical["agentus_subcell_position"] = "cell-local-v1"
         if self.event_memory_active:
