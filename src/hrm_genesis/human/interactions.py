@@ -428,7 +428,7 @@ def enumerate_affordances(ctx: Context) -> list[tuple[str, dict]]:
         options.append(("interlace:strands|held", {"verb": "interlace"}))
     if strands and len(rigid) >= 2:
         options.append((f"bind:{object_class(rigid[0])}+{object_class(rigid[1])}|strand", {"verb": "bind"}))
-    for surface in [o for o in soft if o["material"] == "surface"]:
+    for surface in [o for o in soft if o["material"] == "surface" and not o.get("worn", False)]:
         options.append(("wear:surface|held", {"verb": "wear", "id": surface["id"]}))
         break
 
