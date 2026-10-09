@@ -30,7 +30,7 @@ def main():
                 for o in worn_now:
                     owner=next((p for p in h["humans"] if p["id"]==o.get("holder")),None)
                     print(f"WEAR_TRACE seed={seed} day={day} object={o.get('id')} worn={o.get('worn')} holder={o.get('holder')} cohesion={o.get('cohesion')} area={o.get('area_m2')} owner_cold={None if owner is None else owner.get('cold_exposure')} history={o.get('history',[])[-5:]}",flush=True)
-                print(f"WEAR_EVENT seed={seed} day={day} attempts_delta={wear_count-previous_wear} worn_now={len(worn_now)}",flush=True)
+                print(f"WEAR_EVENT seed={seed} day={day} attempts_delta={wear_count-previous_wear} worn_now={len(worn_now)} surfaces_state={[(o.get('id'),o.get('holder'),o.get('worn'),o.get('area_m2'),o.get('cohesion')) for o in objs if o.get('material')=='surface']}",flush=True)
                 previous_wear=wear_count
             if day in (30,90,180,270,365):
                 worn=sum(o.get("worn",False) and o.get("material")=="surface" for o in objs)
