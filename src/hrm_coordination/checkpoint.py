@@ -6,15 +6,19 @@ import json
 
 from .authority import StateAuthority
 from .fabric import TransactionFabric
-from .ledger import ProvenanceError, ReplayLedger
+from .ledger import ProvenanceError, ReplayLedger, StreamingReplayLedger
 
 
 def write_checkpoint(path: str | Path, orchestrator_state: dict[str, Any], fabric: TransactionFabric, ledger: ReplayLedger) -> None:
     payload = {
         "orchestrator": orchestrator_state,
         "fabric": fabric.checkpoint(),
-        "ledger": ledger.export(),
     }
+    if isinstance(ledger, StreamingReplayLedger):
+        # The evidence is already on disk; the checkpoint records where it ends.
+        payload["ledger_stream"] = ledger.tip()
+    else:
+        payload["ledger"] = ledger.export()
     Path(path).write_text(json.dumps(payload, sort_keys=True, separators=(",", ":")), encoding="utf-8")
 
 
@@ -24,7 +28,9 @@ def _verify_state_matches_ledger(authority_payloads: list[dict[str, Any]], ledge
     The ledger is hash-chained; authority state is not. Without this check an edited
     state value would load silently and diverge from replay evidence.
     """
-    replayed = ledger.replay_state()
+    # A streaming ledger reads each resource's latest value from the epoch that
+    # last wrote it (digest-checked), instead of replaying every day in memory.
+    replayed = ledger.latest_state() if isinstance(ledger, StreamingReplayLedger) else ledger.replay_state()
     stored: dict[str, dict[str, dict[str, Any]]] = {}
     for raw in authority_payloads:
         state = dict(raw["state"])
@@ -41,9 +47,12 @@ def _verify_state_matches_ledger(authority_payloads: list[dict[str, Any]], ledge
         raise ProvenanceError(f"checkpoint authority state does not match ledger replay: {diverged}")
 
 
-def load_checkpoint(path: str | Path) -> tuple[dict[str, Any], TransactionFabric, ReplayLedger, list[StateAuthority]]:
+def load_checkpoint(path: str | Path, ledger_path: str | None = None) -> tuple[dict[str, Any], TransactionFabric, ReplayLedger, list[StateAuthority]]:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    ledger = ReplayLedger.from_export(payload["ledger"])
+    if "ledger_stream" in payload:
+        ledger = StreamingReplayLedger.resume(payload["ledger_stream"], ledger_path)
+    else:
+        ledger = ReplayLedger.from_export(payload["ledger"])
     _verify_state_matches_ledger(payload["fabric"]["authorities"], ledger)
     authorities = [StateAuthority.from_checkpoint(p) for p in payload["fabric"]["authorities"]]
     fabric = TransactionFabric(

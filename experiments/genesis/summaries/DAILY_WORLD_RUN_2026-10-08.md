@@ -256,7 +256,7 @@ Readings:
 | d | 20 (11) | 16/16 | 12/12 | 0 (0) | 28 (19) | 20 |
 
 - Adults are still the 8 founders; no child has had children yet.
-- Seed d had 4 births in every one of the 5 years, so 8 adults now care for 20 dependents.
+- Seed d had 4 births in every one of the 5 years. The population ends with 8 adults and 20 dependents; each dependent has one caregiver, and no single adult nurses all 20.
 
 ## Hand-feeding
 
@@ -319,7 +319,7 @@ Deployment `eafa5026`; code identical to 83ba80b. Second-run values in brackets.
 | c | 6 (85) | 0 (0) | 0.915 (0.91) | 140.6 (135.6) | 29.9 (29.3) | 0 |
 | d | 122 (153) | 28 (28) | 0.910 (0.91) | 142.6 (143.5) | 28.9 (26.1) | 0 |
 
-- **Low-reserve days fell sharply in every seed.** In seed d, 8 adults care for up to 20 dependents and still hold a mean caregiver reserve of 0.91. Its 28 days below 0.25 match the second run exactly. That run had them on single-infant days (one dependent, 290 kcal of milk a day, full stomach every day).
+- **Low-reserve days fell sharply in every seed.** Seed d has 20 dependents across its population, each with one caregiver, and its caregivers hold a mean reserve of 0.91. Its 28 days below 0.25 match the second run exactly. That run had them on single-infant days (one dependent, 290 kcal of milk a day, full stomach every day).
 - **Hand-feeding checks:**
   - Every child past 180 days was at or above the 0.75 trigger. Its reserve was 1.0 or higher in all four seeds, at whatever reserve its caregiver had.
   - The only checks of children past 180 days whose caregiver was below 0.75 are 5 in seed b, and all 5 children were full.

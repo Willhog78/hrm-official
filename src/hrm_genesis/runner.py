@@ -8,6 +8,7 @@ from hrm_coordination import (
     Mutation,
     ProvenanceContribution,
     ReplayLedger,
+    StreamingReplayLedger,
     ResourceRef,
     ScheduleSpec,
     StateAuthority,
@@ -78,7 +79,11 @@ class GenesisSimulation:
     atomically so feeding/drinking cannot race lower-level material updates.
     """
 
-    def __init__(self, config: GenesisConfig):
+    def __init__(self, config: GenesisConfig, *, ledger_path: str | None = None, ledger_buffer_epochs: int = 8):
+        """`ledger_path`: stream replay evidence to this file and keep only the
+        last `ledger_buffer_epochs` epochs in memory (StreamingReplayLedger).
+        The simulation never reads ledger history, so outcomes and the ledger
+        digest are identical either way; only memory use differs."""
         self.config = config
         self.seed_bank = SeedBank(config.master_seed)
 
@@ -237,7 +242,10 @@ class GenesisSimulation:
         )
         validate_registrations(registrations)
 
-        self.ledger = ReplayLedger(config.fingerprint())
+        self.ledger = (
+            ReplayLedger(config.fingerprint()) if ledger_path is None
+            else StreamingReplayLedger(config.fingerprint(), ledger_path, buffer_epochs=ledger_buffer_epochs)
+        )
         for authority in self.authorities:
             state = {
                 resource_id: snapshot.value

@@ -221,7 +221,7 @@ Ecology experiments E1–E3 stay unimplemented. Physiology and life-history valu
 ### Third daily world, caregiver audit, and the child energy store (2026-10-09)
 - **Third run (water cycle at material scale, 4 seeds × 5 years):**
   - 0 deaths; every child born survived.
-  - Births: 8, 11, 5 and 20 (seed d: 8 adults, 20 dependents).
+  - Births: 8, 11, 5 and 20 (seed d's population: 8 adults and 20 dependents).
   - Edible vegetation persists at 771–789 t at year 5.
   - Agentus eliminated grazers in seeds a and d; the stalkers there later starved. Seed c kept all three species.
   - 8 hunts, 34 imitation tries (none paid off), no following, 0 hand-feedings.
@@ -235,6 +235,17 @@ Ecology experiments E1–E3 stay unimplemented. Physiology and life-history valu
   - `-legacystore` reproduces the previous build exactly.
 - **Next question:** whether children reach adulthood (age 18) and found another generation.
   - That needs runs of 20+ years. The replay ledger holds about 0.83 GB per simulated year per seed, so such a run does not fit the current 8 GB runner.
+
+### Streaming replay ledger and the multi-generation runner (2026-10-09)
+- **Change** (`docs/architecture/STREAMING_LEDGER.md`): `StreamingReplayLedger` streams each epoch's evidence to a gzip file and keeps 8 epochs in RAM.
+  - It is opt-in, via `GenesisSimulation(config, ledger_path=...)`.
+  - Checkpoints store the ledger's tip. Resume truncates the stream and checks the tip and the latest state.
+  - Nothing in a simulation step reads ledger history (inspected), so outcomes cannot depend on it.
+- **Verified:**
+  - 5 years, seed a: in-memory, streaming, and checkpoint + resume give an identical ledger digest, world-state digest and outcomes.
+  - The streaming runner reproduces the third run's seed a year by year.
+  - Peak memory is 0.06 GB, against 4.35 GB. The stream is about 43 MB per simulated year.
+- **Runner:** `experiments/genesis/run_generations.py` writes a checkpoint every 5 years, can resume automatically, and reports yearly on adulthood, descendant births, deaths, animals and behaviour.
 
 ## Verification infrastructure
 

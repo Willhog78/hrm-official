@@ -16,10 +16,12 @@ def write_genesis_checkpoint(path: str | Path, simulation: "GenesisSimulation") 
     )
 
 
-def load_genesis_checkpoint(path: str | Path, config: GenesisConfig) -> "GenesisSimulation":
+def load_genesis_checkpoint(path: str | Path, config: GenesisConfig, ledger_path: str | None = None) -> "GenesisSimulation":
+    """Resume a simulation. A checkpoint of a streaming ledger continues its
+    stream (at `ledger_path` if the file moved), truncated to the checkpoint."""
     from .runner import GenesisSimulation
 
-    orchestrator_state, fabric, ledger, authorities = load_checkpoint(path)
+    orchestrator_state, fabric, ledger, authorities = load_checkpoint(path, ledger_path)
     if ledger.config_fingerprint != config.fingerprint():
         raise ValueError("checkpoint config fingerprint does not match GenesisConfig")
     return GenesisSimulation._from_restored(

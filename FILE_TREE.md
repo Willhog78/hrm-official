@@ -113,6 +113,7 @@ hrm-official/
 │       ├── test_budget_audit.py
 │       ├── test_plant_ledger.py
 │       ├── test_water_cycle_scale.py
+│       ├── test_streaming_ledger.py
 │       └── micro/                 # micro tier: test_micro_<topic>.py + _scenario.py
 │
 ├── qualification/
