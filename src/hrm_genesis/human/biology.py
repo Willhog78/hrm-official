@@ -611,10 +611,12 @@ def _structural_protection(world_cell: dict, producer_cell: dict | None = None) 
     area = max(0.0, float(geometry.get("surface_area_m2", 0.0)))
     canopy = min(0.80, max(0.0, woody_mass / 8.0))
     terrain_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
+    # Recheck surviving mass every tick: burning or dismantling must remove
+    # protection even if an old checkpoint still contains oversized geometry.
+    # Approximate woody density 500 kg/m3 and 3 cm structural thickness.
+    supported_area = min(area, arranged_mass / (500.0 * 0.03))
     geometry_factor = min(1.0, (span / 1.5) * (height / 1.2) * density)
-    arranged_cover = min(0.45, max(0.0, geometry_factor * min(1.0, area / 2.0) * 0.45))
-    if arranged_mass <= 0.0:
-        arranged_cover = 0.0
+    arranged_cover = min(0.45, max(0.0, geometry_factor * min(1.0, supported_area / 2.0) * 0.45))
     return canopy, min(0.95, terrain_cover + arranged_cover)
 
 def _add_interoception(perception: dict, human: dict, profile: dict, base_profile: dict) -> None:
