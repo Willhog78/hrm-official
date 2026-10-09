@@ -152,8 +152,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--ledger-group-epochs", type=int, default=30,
                    help="epochs per compressed member (day-to-day similarity compresses well)")
     p.add_argument("--keep-checkpoints", type=int, default=2, help="keep only the newest N checkpoints (disk)")
-    p.add_argument("--stop-at-disk-gb", type=float, default=0.0,
-                   help="if the filesystem holding --out has used more than this, checkpoint and stop cleanly")
+    p.add_argument("--min-free-gb", type=float, default=0.0,
+                   help="if the filesystem holding --out has less free space than this, checkpoint and stop cleanly")
     p.add_argument("--resume", help="checkpoint file to continue from")
     p.add_argument("--auto-resume", action="store_true",
                    help="continue from the latest checkpoint in --out if there is one (survives runner restarts)")
@@ -175,6 +175,7 @@ def main(argv: list[str] | None = None) -> int:
         sim = load_genesis_checkpoint(a.resume, config)
         reporter = Reporter(json.loads(Path(a.resume + ".report.json").read_text()))
     else:
+        (out / "yearly_reports.jsonl").unlink(missing_ok=True)  # a fresh run starts its reports anew
         sim = GenesisSimulation(config, ledger_path=str(out / f"ledger.jsonl.{'xz' if a.ledger_codec == 'xz' else 'gz'}"),
                                 ledger_group_epochs=a.ledger_group_epochs, ledger_codec=a.ledger_codec)
         reporter = Reporter()
@@ -198,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
             f.write(json.dumps(r) + "\n")
         print(f"YEAR {a.seed} {json.dumps(r, separators=(',', ':'))}", flush=True)
         import shutil
-        disk_full = a.stop_at_disk_gb > 0 and shutil.disk_usage(out).used / 1e9 > a.stop_at_disk_gb
+        disk_full = a.min_free_gb > 0 and shutil.disk_usage(out).free / 1e9 < a.min_free_gb
         if year % a.checkpoint_years == 0 or year == a.years or disk_full:
             ck = out / f"checkpoint_y{year:03d}.json"
             write_genesis_checkpoint(ck, sim)
@@ -208,7 +209,7 @@ def main(argv: list[str] | None = None) -> int:
                 old.unlink()
                 Path(str(old) + ".report.json").unlink(missing_ok=True)
         if disk_full:
-            print(f"STOPPED_DISK {a.seed} year={year} used_gb={shutil.disk_usage(out).used / 1e9:.2f}", flush=True)
+            print(f"STOPPED_DISK {a.seed} year={year} free_gb={shutil.disk_usage(out).free / 1e9:.2f}", flush=True)
             return 0
     print(f"GENERATIONS_DONE seed={a.seed} years={a.years} digest={sim.ledger.digest()} "
           f"{time.perf_counter() - started:.0f}s", flush=True)
