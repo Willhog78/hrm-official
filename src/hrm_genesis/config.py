@@ -29,6 +29,8 @@ class GenesisConfig:
     agentus_transition_model: str = "none"
     # Opt-in physical placement; absent/False preserves historical fingerprints.
     agentus_subcell_position_enabled: bool = False
+    # Opt-in costed local movement, material placement and surface joining.
+    agentus_local_work_enabled: bool = False
     # Opt-in real wind; omitted from legacy fingerprints.
     genesis_wind_enabled: bool = False
     # Experimental ablation of capacity v1: "" or a "+"-joined set of
@@ -164,6 +166,8 @@ class GenesisConfig:
             raise ValueError("unknown agentus_observation_model")
         if self.agentus_subcell_position_enabled and not self.agentus_capacities_enabled:
             raise ValueError("subcell position requires Agentus capacities")
+        if self.agentus_local_work_enabled and not self.agentus_subcell_position_enabled:
+            raise ValueError("local work requires subcell position")
         if self.agentus_event_memory_retention not in {"consequence", "fifo"}:
             raise ValueError("unknown agentus_event_memory_retention")
         if self.agentus_capacity_ablation and not self.agentus_capacities_enabled:
@@ -254,6 +258,8 @@ class GenesisConfig:
             canonical["genesis_wind"] = "persistent-vector-v1"
         if self.agentus_subcell_position_enabled:
             canonical["agentus_subcell_position"] = "cell-local-v1"
+        if self.agentus_local_work_enabled:
+            canonical["agentus_local_work"] = "local-material-v1"
         if self.event_memory_active:
             canonical["agentus_event_memory"] = "witnessed-v2" if self.agentus_event_memory_retention == "consequence" else "witnessed-v1"
         if self.imitation_active:

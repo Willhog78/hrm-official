@@ -626,7 +626,7 @@ def _structural_protection(
 ) -> tuple[float, float]:
     """Canopy and physical shielding, bounded by present wood mass and placement.
 
-    Cell-centred woody arrangement: orientation is its outward-facing normal,
+    Placed woody arrangement (cell centre for legacy states): orientation is its outward-facing normal,
     measured clockwise from +x. An occupant outside the footprint gets no
     arrangement protection. Windward shielding is attenuated if the exposed
     face is aligned away from the incoming wind. This is a coarse projection,
@@ -647,6 +647,8 @@ def _structural_protection(
     canopy = min(0.80, max(0.0, woody_mass / 8.0))
     terrain = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
     x, y = occupant_offset_m
+    center = g.get("center_offset_m", (0.0, 0.0))
+    x, y = x - float(center[0]), y - float(center[1])
     footprint = (abs(x) <= min(span, supported ** 0.5) * 0.5 and
                  abs(y) <= max(0.0, supported / max(0.01, span)) * 0.5)
     directional = 1.0
@@ -786,9 +788,10 @@ def _apply_physiology(
         # readout changes no physical state and grants no predicted benefit.
         natural_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
         if arrangement_reference is not None:
+            reference_offset = arrangement_reference.get("occupant_offset_m", offset)
             _, natural_cover = _structural_protection(
                 world_cell, {**producer_cell, **arrangement_reference},
-                occupant_offset_m=(float(offset[0]), float(offset[1])),
+                occupant_offset_m=(float(reference_offset[0]), float(reference_offset[1])),
                 wind_from_deg=None if wind is None else float(wind),
             )
         natural_moderation = min(0.55, natural_cover * 0.55)

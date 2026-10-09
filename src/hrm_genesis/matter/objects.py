@@ -353,6 +353,34 @@ def interlace(strands: list[dict], object_id: str) -> dict | None:
     }
 
 
+def join_surfaces(surfaces: list[dict], binder: dict, object_id: str, wetness: float) -> dict | None:
+    """A coarse stitched seam: no area or material is created.
+
+    Assume square patches, 10% overlap, and two strand lengths along the
+    shorter edge. A seam must bear the joined material's own weight. Weak,
+    short or stiff strands fail intact; this operation does not yank them.
+    """
+    if len(surfaces) != 2 or any(s["material"] != "surface" for s in surfaces):
+        return None
+    areas = [max(0.0, float(s["area_m2"])) for s in surfaces]
+    seam = math.sqrt(min(areas))
+    if seam <= 0.0 or float(binder["length_m"]) < 2.0 * seam:
+        return None
+    if float(binder["flexibility"]) < 0.5 or float(binder["friction"]) < 0.3:
+        return None
+    strength = tensile_strength_n(binder, wetness)
+    load = (sum(object_mass(s) for s in surfaces) + object_mass(binder)) * 9.81
+    cohesion = min(float(s["cohesion"]) for s in surfaces)
+    cohesion *= min(1.0, float(binder["friction"]) / 0.6) * float(binder.get("integrity", 1.0))
+    if strength < load or cohesion < 0.5:
+        return None
+    return {"id": object_id, "material": "surface",
+            "strands": [dict(strand) for s in surfaces for strand in s["strands"]] + [dict(binder)],
+            "area_m2": round(sum(areas) - 0.1 * min(areas), 10),
+            "cohesion": round(cohesion, 10),
+            "wetness": max(wetness, *(float(s.get("wetness", 0.0)) for s in surfaces))}
+
+
 def wrap_and_tighten(binder: dict, parts: list[dict], applied_tension_n: float, wetness: float) -> dict:
     """Wrap a strand around parts and tighten it.
 

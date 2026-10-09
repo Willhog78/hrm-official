@@ -38,6 +38,11 @@ from . import transitions
 CAPACITY_MODEL = "capacity-v2"
 
 MAX_INTERACTIONS_PER_TICK = 3
+# Declared geometry: the existing 2 m local window, quarter-metre steps,
+# and 1 m reach for the single bulk arrangement represented in each cell.
+LOCAL_STEP_M = 0.25
+LOCAL_LIMIT_M = 1.0
+LOCAL_REACH_M = 1.0
 MAX_RIGID_IN_HAND = 2
 MAX_SOFT_IN_HAND = 6
 CARRY_LIMIT_KG = 20.0
@@ -321,6 +326,8 @@ class Context:
             "arranged_material_elements_kg": dict(pcell.get("arranged_material_elements_kg", {})),
             "arrangement_geometry": dict(pcell.get("arrangement_geometry", {})),
         } if humans.get("transition_model") in transitions.VALUED_MODELS else None)
+        if self.arrangement_before is not None and humans.get("local_work_model") == "local-material-v1":
+            self.arrangement_before["occupant_offset_m"] = list(human["subcell_offset_m"])
         self.insulation_before = insulation_c(humans, str(human["id"])) if self.arrangement_before is not None else None
         self.worn_before_ids = ({str(o["id"]) for o in humans.get("objects", [])
                                  if o.get("holder") == self.agent_id and o.get("worn")}
@@ -367,6 +374,13 @@ class Context:
 
 def _mass(elements: dict) -> float:
     return sum(float(v) for v in elements.values())
+
+
+def _arrangement_in_reach(ctx: Context) -> bool:
+    center = ctx.pcell.get("arrangement_geometry", {}).get("center_offset_m", (0.0, 0.0))
+    offset = ctx.human.get("subcell_offset_m", (0.0, 0.0))
+    return math.hypot(float(center[0]) - float(offset[0]),
+                      float(center[1]) - float(offset[1])) <= LOCAL_REACH_M
 
 
 def enumerate_affordances(ctx: Context) -> list[tuple[str, dict]]:
@@ -446,12 +460,29 @@ def enumerate_affordances(ctx: Context) -> list[tuple[str, dict]]:
         options.append(("wear:surface|held", {"verb": "wear", "id": surface["id"]}))
         break
 
+    local_work = ctx.humans.get("local_work_model") == "local-material-v1"
+    if local_work:
+        surfaces = [o for o in soft if o["material"] == "surface" and not o.get("worn", False)]
+        if len(surfaces) >= 2 and strands:
+            options.append(("join:surfaces|strand", {"verb": "join_surfaces",
+                            "surfaces": [o["id"] for o in surfaces[:2]], "binder": strands[0]["id"]}))
+        offset = ctx.human["subcell_offset_m"]
+        for name, dx, dy in (("positive_x", LOCAL_STEP_M, 0.0), ("negative_x", -LOCAL_STEP_M, 0.0),
+                             ("positive_y", 0.0, LOCAL_STEP_M), ("negative_y", 0.0, -LOCAL_STEP_M)):
+            if abs(float(offset[0]) + dx) <= LOCAL_LIMIT_M and abs(float(offset[1]) + dy) <= LOCAL_LIMIT_M:
+                options.append((f"move:local_{name}|none", {"verb": "move_local", "delta": [dx, dy]}))
+        if _mass(ctx.pcell.get("arranged_material_elements_kg", {})) > 0.0 and _arrangement_in_reach(ctx):
+            for angle in (-90, 90):
+                options.append((f"rotate:arranged_wood_{angle}|none", {"verb": "rotate_arrangement", "angle": angle}))
+
     # Existing bulk-wood primitives (G7), now reachable in live runs.
     if _mass(ctx.pcell.get("woody_elements_kg", {})) > 0.0:
         options.append(("apply_force:woody|none", {"verb": "pool", "sequence": ("apply_force",)}))
-    if _mass(ctx.pcell.get("loose_material_elements_kg", {})) > 0.0:
+    arranged_mass = _mass(ctx.pcell.get("arranged_material_elements_kg", {}))
+    reachable = not local_work or arranged_mass <= 0.0 or _arrangement_in_reach(ctx)
+    if _mass(ctx.pcell.get("loose_material_elements_kg", {})) > 0.0 and reachable:
         options.append(("arrange:loose_wood|none", {"verb": "pool", "sequence": ("arrange",)}))
-    if _mass(ctx.pcell.get("arranged_material_elements_kg", {})) > 0.0:
+    if arranged_mass > 0.0 and reachable:
         options.append(("separate:arranged_wood|none", {"verb": "pool", "sequence": ("separate",)}))
     return options
 
@@ -682,6 +713,8 @@ def _transition_perception(ctx: Context) -> dict:
                     band(float(ctx.human.get("skin_wetness", 0.0)), (0.25, 0.75))],
         "acts": sorted({key for key, _ in enumerate_affordances(ctx)})[:transitions.MAX_ACTS],
     }
+    if ctx.humans.get("local_work_model") == "local-material-v1":
+        state["geometry"].extend(round(float(v), 1) for v in geometry.get("center_offset_m", (0.0, 0.0)))
     if ctx.humans.get("transition_model") in transitions.VALUED_MODELS:
         basal = max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"]))
         water_loss = max(1e-9, float(ctx.profile.get("water_loss_per_tick_kg", 1.0)))
@@ -711,7 +744,11 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
     forms_before, pools_before = _material_forms(ctx)
     tool = _find(ctx.humans, spec.get("tool"))
     tool_history = list(tool.get("history", [])) if tool is not None else []
+    position_before = list(ctx.human.get("subcell_offset_m", (0.0, 0.0)))
     out = _execute_physical(ctx, key, spec)
+    if ctx.humans.get("local_work_model") == "local-material-v1":
+        out["placement_changed"] = (position_before != ctx.human["subcell_offset_m"]
+                                    or arrangement_before is not None and arrangement_before != _thermal_arrangement(ctx.pcell))
     if arrangement_before is not None and arrangement_before != _thermal_arrangement(ctx.pcell):
         ctx.pcell["thermal_revision"] = int(ctx.pcell.get("thermal_revision", 0)) + 1
     out["tool_history"] = tool_history
@@ -1027,11 +1064,45 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
             out["effort_kcal"] = 4.0
             _bump(ctx.stats, "worn_surfaces")
 
+    elif verb == "join_surfaces" and humans.get("local_work_model") == "local-material-v1":
+        surfaces = [_held(ctx, oid) for oid in spec.get("surfaces", [])]
+        binder = _held(ctx, spec.get("binder"))
+        if (len(surfaces) == 2 and all(s is not None and s["material"] == "surface" and not s.get("worn") for s in surfaces)
+                and surfaces[0]["id"] != surfaces[1]["id"] and binder is not None and binder["material"] == "fiber"):
+            out["effort_kcal"] = (8.0 + 20.0 * math.sqrt(min(float(s["area_m2"]) for s in surfaces))) * scale
+            joined = mo.join_surfaces(surfaces, binder, _new_id(humans, "surface"), ctx.wetness())
+            if joined is not None:
+                removed = {binder["id"], *(s["id"] for s in surfaces)}
+                humans["objects"] = [o for o in humans["objects"] if o["id"] not in removed]
+                humans["objects"].append(_place(joined, ctx.xy[0], ctx.xy[1], ctx.agent_id))
+
+    elif verb == "move_local" and humans.get("local_work_model") == "local-material-v1":
+        dx, dy = spec.get("delta", (0.0, 0.0))
+        offset = ctx.human["subcell_offset_m"]
+        target = [float(offset[0]) + float(dx), float(offset[1]) + float(dy)]
+        if ((dx, dy) in ((LOCAL_STEP_M, 0.0), (-LOCAL_STEP_M, 0.0), (0.0, LOCAL_STEP_M), (0.0, -LOCAL_STEP_M))
+                and all(abs(v) <= LOCAL_LIMIT_M for v in target)):
+            ctx.human["subcell_offset_m"] = [round(v, 10) for v in target]
+            out["effort_kcal"] = (2.0 + LOCAL_STEP_M * (2.0 + 0.25 * ctx.held_mass())) * scale
+
+    elif verb == "rotate_arrangement" and humans.get("local_work_model") == "local-material-v1":
+        mass = _mass(ctx.pcell.get("arranged_material_elements_kg", {}))
+        if mass > 0.0 and _arrangement_in_reach(ctx) and spec.get("angle") in (-90, 90):
+            geometry = ctx.pcell.setdefault("arrangement_geometry", {})
+            geometry["orientation_deg"] = (float(geometry.get("orientation_deg", 0.0)) + spec["angle"]) % 360.0
+            out["effort_kcal"] = (4.0 + 2.0 * mass) * scale
+
     elif verb == "pool":
-        updated, cell, trace = execute_live_sequence(spec["sequence"], ctx.human, ctx.pcell)
-        ctx.human.update(updated)
-        ctx.pcell.update(cell)
-        out["effort_kcal"] = float(trace.get("effort_energy_kcal", 0.0))
+        local_work = humans.get("local_work_model") == "local-material-v1"
+        touches_arrangement = any(a in {"arrange", "separate", "combine"} for a in spec["sequence"])
+        if (not local_work or not touches_arrangement
+                or _mass(ctx.pcell.get("arranged_material_elements_kg", {})) <= 0.0 or _arrangement_in_reach(ctx)):
+            placement = tuple(ctx.human["subcell_offset_m"]) if local_work else None
+            updated, cell, trace = execute_live_sequence(spec["sequence"], ctx.human, ctx.pcell,
+                                                        placement_offset_m=placement)
+            ctx.human.update(updated)
+            ctx.pcell.update(cell)
+            out["effort_kcal"] = float(trace.get("effort_energy_kcal", 0.0))
 
     # Every attempt takes time and some effort, even one that changes nothing.
     # Without this floor a positive expectation for a costless repeat decays
@@ -1298,6 +1369,9 @@ def prepare_thermal_trials(humans: dict, human: dict, pcell: dict, epoch: int,
     those exact IDs from the current worn inventory, not freezing old warmth.
     """
     current_arrangement = _thermal_arrangement(pcell)
+    local_work = humans.get("local_work_model") == "local-material-v1"
+    if local_work:
+        current_arrangement["occupant_offset_m"] = list(human["subcell_offset_m"])
     current_insulation = insulation_c(humans, str(human["id"]))
     if humans.get("transition_model") not in transitions.DELAYED_MODELS:
         return current_arrangement, current_insulation
@@ -1325,8 +1399,11 @@ def prepare_thermal_trials(humans: dict, human: dict, pcell: dict, epoch: int,
         basal = max(1e-9, float(profile["basal_energy_kcal_per_tick"]))
         for kind, prefix in (("worn", "wear:"), ("arrangement", "arrange:")):
             candidates = [out["transition_edge"] for key, out in ctx.performed
-                          if key.startswith(prefix) and out.get("transition_edge")
-                          and (out.get("wear_changed") if kind == "worn" else out.get("transformed"))]
+                          if (key.startswith(prefix) or local_work and kind == "arrangement"
+                              and key.startswith(("move:local_", "rotate:arranged_wood_")))
+                          and out.get("transition_edge")
+                          and (out.get("wear_changed") if kind == "worn" else
+                               out.get("placement_changed") if local_work else out.get("transformed"))]
             if not candidates:
                 continue
             # A new overlapping trial gets only its own marginal contribution.

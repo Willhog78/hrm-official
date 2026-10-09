@@ -222,6 +222,8 @@ class GenesisSimulation:
                     # read persisted positions and never synthesize old history.
                     from .human.biology import enable_subcell_positions
                     human_state = enable_subcell_positions(human_state, config.master_seed)
+                if config.agentus_local_work_enabled:
+                    human_state["local_work_model"] = "local-material-v1"
                 if config.agentus_capacity_ablation:
                     human_state["capacity_ablation"] = config.agentus_capacity_ablation
 
