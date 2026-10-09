@@ -1,0 +1,5463 @@
+{
+  "passed": true,
+  "surface_work_model": "incremental-interlace-v1",
+  "independent_ecological_seeds": 3,
+  "active": [
+    {
+      "seed": "agentus-demography-a",
+      "weather": true,
+      "days": 365,
+      "observed": true,
+      "fingerprint": "c51adee8bc75a9b5de11fc56a57aaca5257c2cf7756a050962bcdd6527d3c05a",
+      "ledger_digest": "05a5f967fdc2855286abffb0dc4ae31737bfcf2920f6d56ebe8cdc09a6c679d6",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.6095779603180396e-15,
+        "water_rel_error": 1.3749490051630674e-15,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      },
+      "initial_agents": 8,
+      "alive": 11,
+      "births": 3,
+      "capacity_stats": {
+        "intake_kg_by_kind": {
+          "plant_tissue": 2539.0241161940244,
+          "seed": 1085.2569635451491,
+          "decayed_tissue": 0.0090167417,
+          "woody_tissue": 0.4154916241
+        },
+        "intake_kcal_by_kind": {
+          "plant_tissue": 4468682.444494999,
+          "seed": 3092982.346108,
+          "decayed_tissue": 0.0,
+          "woody_tissue": 0.0
+        },
+        "ingestion_hazard": 0.00541004502,
+        "interaction_counts": {
+          "grasp": 43,
+          "move": 58,
+          "strike": 31,
+          "separate": 57,
+          "release": 70,
+          "twist": 12,
+          "interlace": 8,
+          "wear": 8,
+          "cut": 3,
+          "apply_force": 11,
+          "break": 11,
+          "bind": 7,
+          "arrange": 8,
+          "rotate": 8
+        },
+        "interaction_injury": 0.0,
+        "interaction_effort_kcal": 2393.048405653539,
+        "capture_attempts": 12,
+        "captures": 1,
+        "capture_escapes": 11,
+        "fractures": 3,
+        "sharp_flakes": 0,
+        "bindings": 0,
+        "binding_failures": 7,
+        "binding_load_slips": 0,
+        "binding_load_breaks": 0,
+        "fibers_extracted": 50,
+        "wood_pieces": 13,
+        "surfaces": 8,
+        "worn_surfaces": 8,
+        "interlace_affordance_offered": 391,
+        "encounter_contact_failed": 2,
+        "encounter_outrun": 8,
+        "wear_affordance_offered": 202,
+        "encounter_kill": 1,
+        "witnessed_events": 1205,
+        "witnessed_by_act": {
+          "eat:plant_tissue": 567,
+          "eat:seed": 577,
+          "strike:animal_stalker|stone_heavy": 1,
+          "release:stone_heavy|none": 1,
+          "grasp:stone_heavy|none": 1,
+          "release:stone_small|none": 2,
+          "separate:strand_bark|held": 7,
+          "move:local_positive_y|none": 4,
+          "twist:strands|held": 3,
+          "break:woody|none": 4,
+          "release:stick|none": 3,
+          "strike:stone_small|stick": 2,
+          "apply_force:woody|none": 1,
+          "release:strand_plant|none": 1,
+          "release:strand_bark|none": 3,
+          "grasp:strand_bark|none": 2,
+          "grasp:strand_plant|none": 1,
+          "interlace:strands|held": 4,
+          "wear:surface|held": 3,
+          "grasp:surface|none": 2,
+          "separate:bark|none": 1,
+          "move:local_negative_x|none": 3,
+          "arrange:loose_wood|none": 2,
+          "grasp:stick|none": 2,
+          "rotate:arranged_wood_-90|none": 1,
+          "move:local_positive_x|none": 1,
+          "bind:stick+stick|strand": 1,
+          "strike:animal_grazer|none": 2,
+          "strike:animal_grazer|stick": 1,
+          "release:surface|none": 1,
+          "release:surface|worn": 1
+        },
+        "observed_ingestions": {
+          "plant_tissue": 567,
+          "seed": 577
+        },
+        "explore_days": 8,
+        "encounter_reached_cover": 1,
+        "solid_food_outcomes": {
+          "too_young": 366,
+          "not_hungry": 117
+        },
+        "observed_transmissions": {
+          "break:woody|none": 2
+        },
+        "imitation_tries": {
+          "separate:strand_bark|held": 2,
+          "interlace:strands|held": 1
+        },
+        "imitation_unpaid": {
+          "separate:strand_bark|held": 2,
+          "interlace:strands|held": 1
+        },
+        "imitated_from": {
+          "separate:strand_bark|held": [
+            "human-g00000002"
+          ],
+          "interlace:strands|held": [
+            "human-g00000000"
+          ]
+        },
+        "sequence_exploration": {
+          "release:strand_bark|none": 1
+        }
+      },
+      "seconds": 113.43,
+      "census": {
+        "counts": {
+          "interaction_agent_days": 2920,
+          "reserve_ready": 2903,
+          "untried_options_present": 1579,
+          "stone_pickup_offered": 1269,
+          "stone_pickup_offered_reserve_ready": 1258,
+          "fiber_extraction_offered": 2866,
+          "fiber_extraction_offered_reserve_ready": 2851,
+          "no_choice_with_options": 2908,
+          "all_worn_saving_kcal": 0.0089300448,
+          "all_arrangement_saving_kcal": 0.00023206570000000002,
+          "ambient_below_16C_agent_days": 1113,
+          "worn_readout_kcal": 0.0089300448,
+          "arrangement_readout_kcal": 0.0,
+          "at_least_one_action_chosen": 277,
+          "stone_two_local_targets": 1156,
+          "experienced_cold_agent_days": 381,
+          "stone_strike_offered": 917,
+          "stone_strike_offered_reserve_ready": 917,
+          "strands_created": 93,
+          "fiber_split_offered": 2223,
+          "fiber_split_offered_reserve_ready": 2206,
+          "fiber_twist_offered": 1870,
+          "fiber_twist_offered_reserve_ready": 1853,
+          "soft_hands_full": 16,
+          "surface_interlace_offered": 366,
+          "surface_interlace_offered_reserve_ready": 366,
+          "rigid_hands_full": 793,
+          "surfaces_created": 8,
+          "surface_wear_offered": 194,
+          "surface_wear_offered_reserve_ready": 194,
+          "actual_wear_changes": 16,
+          "all_options_previously_tried": 1370,
+          "wood_force_offered": 2396,
+          "wood_force_offered_reserve_ready": 2391,
+          "reserve_blocked": 17,
+          "energy_guard_blocks_sequence": 17,
+          "stone_fractures": 3,
+          "wood_arrange_offered": 332,
+          "wood_arrange_offered_reserve_ready": 331,
+          "all_worn_benefit_agent_days": 2,
+          "all_arrangement_benefit_agent_days": 6,
+          "all_arrangement_benefit_without_trial_days": 6
+        },
+        "offered_keys": {
+          "grasp:stone_small|none": 887,
+          "strike:animal_browser|none": 160,
+          "separate:plant_tissue|none": 2842,
+          "move:local_positive_x|none": 2690,
+          "move:local_negative_x|none": 2501,
+          "move:local_positive_y|none": 2550,
+          "move:local_negative_y|none": 2654,
+          "release:stone_small|none": 421,
+          "grasp:stone_heavy|none": 964,
+          "strike:animal_grazer|none": 59,
+          "release:stone_heavy|none": 93,
+          "strike:stone_heavy|stone_heavy": 50,
+          "strike:stone_small|stone_small": 105,
+          "release:strand_plant|none": 1344,
+          "separate:strand_plant|held": 1208,
+          "twist:strands|held": 1870,
+          "strike:animal_browser|stone_small": 31,
+          "interlace:strands|held": 366,
+          "grasp:strand_plant|none": 472,
+          "strike:stone_small|stone_heavy": 49,
+          "strike:stone_heavy|stone_small": 271,
+          "strike:animal_grazer|stone_small": 1,
+          "bind:stone_heavy+stone_small|strand": 25,
+          "release:surface|none": 194,
+          "wear:surface|held": 194,
+          "cut:fresh_tissue|none": 4,
+          "separate:tendon|none": 4,
+          "release:surface|worn": 88,
+          "grasp:surface|none": 607,
+          "strike:animal_stalker|none": 7,
+          "strike:animal_stalker|stone_heavy": 3,
+          "strike:animal_stalker|stone_small": 3,
+          "apply_force:woody|none": 2396,
+          "separate:bark|none": 2205,
+          "break:woody|none": 1453,
+          "separate:bark|stone_small": 279,
+          "cut:woody|stone_small": 54,
+          "separate:bark|stone_heavy": 19,
+          "cut:woody|stone_heavy": 7,
+          "release:stick|none": 1000,
+          "strike:stone_heavy|stick": 484,
+          "strike:stone_small|stick": 533,
+          "bind:stone_heavy+stick|strand": 15,
+          "grasp:stick|none": 182,
+          "release:strand_bark|none": 1603,
+          "arrange:loose_wood|none": 332,
+          "separate:strand_bark|held": 1534,
+          "release:wood_short|none": 1,
+          "strike:stone_heavy|wood_short": 1,
+          "grasp:wood_short|none": 5,
+          "interlace:surface+strands|held": 35,
+          "grasp:strand_bark|none": 632,
+          "bind:stone_small+stick|strand": 204,
+          "rotate:arranged_wood_-90|none": 254,
+          "rotate:arranged_wood_90|none": 254,
+          "separate:arranged_wood|none": 254,
+          "bind:stick+stick|strand": 328,
+          "strike:animal_grazer|stick": 31,
+          "strike:animal_browser|stick": 109,
+          "bind:stick+stone_small|strand": 24
+        },
+        "attempts": {
+          "grasp:stone_small|none": 10,
+          "move:local_negative_x|none": 18,
+          "move:local_negative_y|none": 11,
+          "grasp:stone_heavy|none": 7,
+          "strike:stone_heavy|stone_heavy": 2,
+          "separate:plant_tissue|none": 12,
+          "release:stone_small|none": 9,
+          "move:local_positive_y|none": 16,
+          "release:strand_plant|none": 14,
+          "move:local_positive_x|none": 13,
+          "separate:strand_plant|held": 10,
+          "strike:animal_browser|none": 2,
+          "release:stone_heavy|none": 7,
+          "twist:strands|held": 12,
+          "strike:animal_grazer|none": 5,
+          "interlace:strands|held": 8,
+          "strike:stone_small|stone_small": 2,
+          "separate:tendon|none": 1,
+          "wear:surface|held": 8,
+          "release:surface|worn": 8,
+          "grasp:surface|none": 8,
+          "release:surface|none": 7,
+          "strike:animal_stalker|stone_heavy": 1,
+          "strike:stone_small|stone_heavy": 3,
+          "cut:woody|stone_heavy": 1,
+          "release:stick|none": 9,
+          "separate:bark|none": 11,
+          "grasp:stick|none": 4,
+          "apply_force:woody|none": 11,
+          "break:woody|none": 11,
+          "release:wood_short|none": 1,
+          "bind:stone_heavy+stick|strand": 1,
+          "grasp:strand_plant|none": 5,
+          "separate:strand_bark|held": 17,
+          "release:strand_bark|none": 15,
+          "grasp:strand_bark|none": 9,
+          "separate:bark|stone_small": 3,
+          "strike:animal_browser|stone_small": 1,
+          "cut:woody|stone_small": 2,
+          "strike:stone_small|stick": 6,
+          "arrange:loose_wood|none": 8,
+          "strike:stone_heavy|stick": 4,
+          "bind:stick+stick|strand": 4,
+          "strike:animal_browser|stick": 2,
+          "strike:stone_heavy|stone_small": 2,
+          "separate:arranged_wood|none": 3,
+          "rotate:arranged_wood_-90|none": 4,
+          "bind:stick+stone_small|strand": 1,
+          "strike:animal_grazer|stick": 1,
+          "rotate:arranged_wood_90|none": 4,
+          "bind:stone_small+stick|strand": 1
+        },
+        "progress": {
+          "grasp:stone_small|none": 10,
+          "grasp:stone_heavy|none": 6,
+          "separate:plant_tissue|none": 12,
+          "separate:strand_plant|held": 10,
+          "twist:strands|held": 12,
+          "interlace:strands|held": 8,
+          "wear:surface|held": 8,
+          "release:surface|worn": 8,
+          "strike:stone_small|stone_heavy": 2,
+          "cut:woody|stone_heavy": 1,
+          "separate:bark|none": 11,
+          "apply_force:woody|none": 11,
+          "break:woody|none": 10,
+          "separate:strand_bark|held": 17,
+          "separate:bark|stone_small": 3,
+          "cut:woody|stone_small": 2,
+          "strike:stone_small|stick": 1,
+          "arrange:loose_wood|none": 8,
+          "bind:stick+stick|strand": 3,
+          "separate:arranged_wood|none": 3,
+          "bind:stone_small+stick|strand": 1
+        },
+        "effort": {
+          "grasp:stone_small|none": 40.667522835599996,
+          "move:local_negative_x|none": 45.12759328503141,
+          "move:local_negative_y|none": 27.54976199759179,
+          "grasp:stone_heavy|none": 54.7601418668,
+          "strike:stone_heavy|stone_heavy": 18.42834793843368,
+          "separate:plant_tissue|none": 216.0,
+          "release:stone_small|none": 18.0,
+          "move:local_positive_y|none": 40.067708487484204,
+          "release:strand_plant|none": 28.0,
+          "move:local_positive_x|none": 32.65122775317627,
+          "separate:strand_plant|held": 30.0,
+          "strike:animal_browser|none": 14.101083338670493,
+          "release:stone_heavy|none": 14.0,
+          "twist:strands|held": 96.0,
+          "strike:animal_grazer|none": 38.46596376514654,
+          "interlace:strands|held": 200.0,
+          "strike:stone_small|stone_small": 16.748371964639233,
+          "separate:tendon|none": 18.0,
+          "wear:surface|held": 32.0,
+          "release:surface|worn": 32.0,
+          "grasp:surface|none": 24.038694926071837,
+          "release:surface|none": 14.0,
+          "strike:animal_stalker|stone_heavy": 10.26388072669388,
+          "strike:stone_small|stone_heavy": 27.516878332039504,
+          "cut:woody|stone_heavy": 25.0,
+          "release:stick|none": 18.0,
+          "separate:bark|none": 198.0,
+          "grasp:stick|none": 14.728093380506818,
+          "apply_force:woody|none": 132.0395825,
+          "break:woody|none": 330.0,
+          "release:wood_short|none": 2.0,
+          "bind:stone_heavy+stick|strand": 15.0,
+          "grasp:strand_plant|none": 15.007877958483974,
+          "separate:strand_bark|held": 51.0,
+          "release:strand_bark|none": 30.0,
+          "grasp:strand_bark|none": 27.028553611233857,
+          "separate:bark|stone_small": 46.0,
+          "strike:animal_browser|stone_small": 8.592683165221928,
+          "cut:woody|stone_small": 50.0,
+          "strike:stone_small|stick": 52.3428435571785,
+          "arrange:loose_wood|none": 69.8761312095,
+          "strike:stone_heavy|stick": 35.683758916389294,
+          "bind:stick+stick|strand": 60.0,
+          "strike:animal_browser|stick": 17.11227101883926,
+          "strike:stone_heavy|stone_small": 17.873897769250284,
+          "separate:arranged_wood|none": 16.7857150365,
+          "rotate:arranged_wood_-90|none": 16.869709474399997,
+          "bind:stick+stone_small|strand": 15.0,
+          "strike:animal_grazer|stick": 8.89272829685491,
+          "rotate:arranged_wood_90|none": 16.8273825418,
+          "bind:stone_small+stick|strand": 15.0
+        },
+        "reward": {
+          "thermal:wear:surface|held": 2.0861469767315328e-06
+        },
+        "reward_events": {
+          "thermal:wear:surface|held": 2
+        },
+        "choice_reasons": {
+          "none": 2908,
+          "ordinary_explore_retry_or_imitation": 334,
+          "sequence_exploration": 1
+        }
+      },
+      "quarters": {
+        "1": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 719,
+          "untried_options_present": 626,
+          "stone_pickup_offered": 457,
+          "stone_pickup_offered_reserve_ready": 446,
+          "fiber_extraction_offered": 701,
+          "fiber_extraction_offered_reserve_ready": 686,
+          "no_choice_with_options": 729,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 0.0,
+          "at_least_one_action_chosen": 119,
+          "stone_two_local_targets": 254,
+          "stone_strike_offered": 195,
+          "stone_strike_offered_reserve_ready": 195,
+          "fiber_split_offered": 507,
+          "fiber_split_offered_reserve_ready": 490,
+          "fiber_twist_offered": 479,
+          "fiber_twist_offered_reserve_ready": 462,
+          "soft_hands_full": 16,
+          "surface_interlace_offered": 85,
+          "surface_interlace_offered_reserve_ready": 85,
+          "rigid_hands_full": 43,
+          "surface_wear_offered": 60,
+          "surface_wear_offered_reserve_ready": 60,
+          "all_options_previously_tried": 116,
+          "wood_force_offered": 238,
+          "wood_force_offered_reserve_ready": 233,
+          "reserve_blocked": 17,
+          "energy_guard_blocks_sequence": 17,
+          "wood_arrange_offered": 29,
+          "wood_arrange_offered_reserve_ready": 28
+        },
+        "2": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "untried_options_present": 536,
+          "stone_pickup_offered": 376,
+          "stone_pickup_offered_reserve_ready": 376,
+          "stone_strike_offered": 176,
+          "stone_strike_offered_reserve_ready": 176,
+          "fiber_extraction_offered": 717,
+          "fiber_extraction_offered_reserve_ready": 717,
+          "fiber_split_offered": 660,
+          "fiber_split_offered_reserve_ready": 660,
+          "fiber_twist_offered": 520,
+          "fiber_twist_offered_reserve_ready": 520,
+          "at_least_one_action_chosen": 72,
+          "no_choice_with_options": 732,
+          "all_worn_saving_kcal": 0.0089300448,
+          "all_arrangement_saving_kcal": 0.0,
+          "wood_force_offered": 710,
+          "wood_force_offered_reserve_ready": 710,
+          "all_options_previously_tried": 205,
+          "stone_two_local_targets": 337,
+          "surface_wear_offered": 44,
+          "surface_wear_offered_reserve_ready": 44,
+          "wood_arrange_offered": 44,
+          "wood_arrange_offered_reserve_ready": 44,
+          "surface_interlace_offered": 88,
+          "surface_interlace_offered_reserve_ready": 88,
+          "rigid_hands_full": 146
+        },
+        "3": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "rigid_hands_full": 294,
+          "untried_options_present": 299,
+          "stone_two_local_targets": 293,
+          "stone_strike_offered": 281,
+          "stone_strike_offered_reserve_ready": 281,
+          "fiber_extraction_offered": 736,
+          "fiber_extraction_offered_reserve_ready": 736,
+          "fiber_split_offered": 515,
+          "fiber_split_offered_reserve_ready": 515,
+          "wood_force_offered": 736,
+          "wood_force_offered_reserve_ready": 736,
+          "wood_arrange_offered": 106,
+          "wood_arrange_offered_reserve_ready": 106,
+          "no_choice_with_options": 736,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 0.0001623974,
+          "all_options_previously_tried": 448,
+          "fiber_twist_offered": 422,
+          "fiber_twist_offered_reserve_ready": 422,
+          "at_least_one_action_chosen": 53,
+          "stone_pickup_offered": 211,
+          "stone_pickup_offered_reserve_ready": 211,
+          "surface_wear_offered": 29,
+          "surface_wear_offered_reserve_ready": 29,
+          "surface_interlace_offered": 41,
+          "surface_interlace_offered_reserve_ready": 41
+        },
+        "4": {
+          "interaction_agent_days": 712,
+          "reserve_ready": 712,
+          "rigid_hands_full": 310,
+          "untried_options_present": 118,
+          "fiber_extraction_offered": 712,
+          "fiber_extraction_offered_reserve_ready": 712,
+          "fiber_split_offered": 541,
+          "fiber_split_offered_reserve_ready": 541,
+          "fiber_twist_offered": 449,
+          "fiber_twist_offered_reserve_ready": 449,
+          "wood_force_offered": 712,
+          "wood_force_offered_reserve_ready": 712,
+          "at_least_one_action_chosen": 33,
+          "all_options_previously_tried": 601,
+          "no_choice_with_options": 711,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 6.966829999999999e-05,
+          "wood_arrange_offered": 153,
+          "wood_arrange_offered_reserve_ready": 153,
+          "stone_pickup_offered": 225,
+          "stone_pickup_offered_reserve_ready": 225,
+          "stone_strike_offered": 265,
+          "stone_strike_offered_reserve_ready": 265,
+          "stone_two_local_targets": 272,
+          "surface_interlace_offered": 152,
+          "surface_interlace_offered_reserve_ready": 152,
+          "surface_wear_offered": 61,
+          "surface_wear_offered_reserve_ready": 61
+        }
+      },
+      "max_interactions_per_agent_tick": 3,
+      "final_memory": {
+        "edges": 41,
+        "links": 2,
+        "repeated_links": 0,
+        "credited_edges": 0
+      },
+      "final_surfaces": [
+        {
+          "area_m2": 8.57661e-05,
+          "cohesion": 0.1184567935,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0001394326,
+          "cohesion": 0.0756071051,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0001027038,
+          "cohesion": 0.1894312285,
+          "worn": false
+        },
+        {
+          "area_m2": 0.000110537,
+          "cohesion": 0.4028719777,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0001930156,
+          "cohesion": 0.3220310156,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0003570263,
+          "cohesion": 0.323653401,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0001005875,
+          "cohesion": 0.3166669164,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0001437797,
+          "cohesion": 0.485950408,
+          "worn": false
+        }
+      ],
+      "final_arranged_mass_kg": 0.18766184389999999
+    },
+    {
+      "seed": "agentus-demography-b",
+      "weather": true,
+      "days": 365,
+      "observed": true,
+      "fingerprint": "f56832f66a03aed51ac1cc6c1ce22021c961520e334657056176ee49616b3ad4",
+      "ledger_digest": "a873d6a2d4717accce9747c09d8af50af24e455d15ff637dd663552648f4d924",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.3948882907918074e-15,
+        "water_rel_error": 2.7114627616214127e-16,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      },
+      "initial_agents": 8,
+      "alive": 10,
+      "births": 2,
+      "capacity_stats": {
+        "intake_kg_by_kind": {
+          "plant_tissue": 2371.7809289685993,
+          "seed": 1144.2241766318555,
+          "fresh_tissue": 0.0120000005,
+          "woody_tissue": 0.432,
+          "decayed_tissue": 0.026001086
+        },
+        "intake_kcal_by_kind": {
+          "plant_tissue": 4174334.4349800018,
+          "seed": 3261038.9034039997,
+          "fresh_tissue": 51.840002000000005,
+          "woody_tissue": 0.0,
+          "decayed_tissue": 0.0
+        },
+        "ingestion_hazard": 0.015600651600000001,
+        "interaction_counts": {
+          "grasp": 46,
+          "move": 60,
+          "strike": 19,
+          "separate": 55,
+          "release": 69,
+          "interlace": 9,
+          "twist": 11,
+          "wear": 8,
+          "apply_force": 15,
+          "arrange": 10,
+          "break": 10,
+          "bind": 5,
+          "rotate": 8,
+          "cut": 2
+        },
+        "interaction_injury": 0.0,
+        "interaction_effort_kcal": 2360.4367078590153,
+        "capture_attempts": 4,
+        "captures": 2,
+        "capture_escapes": 2,
+        "fractures": 3,
+        "sharp_flakes": 0,
+        "bindings": 0,
+        "binding_failures": 5,
+        "binding_load_slips": 0,
+        "binding_load_breaks": 0,
+        "fibers_extracted": 64,
+        "wood_pieces": 10,
+        "surfaces": 8,
+        "worn_surfaces": 8,
+        "encounter_kill": 2,
+        "interlace_affordance_offered": 727,
+        "encounter_contact_failed": 1,
+        "wear_affordance_offered": 195,
+        "explore_days": 4,
+        "witnessed_events": 2255,
+        "witnessed_by_act": {
+          "eat:seed": 1108,
+          "eat:plant_tissue": 1059,
+          "separate:bark|stone_small": 2,
+          "release:strand_bark|none": 5,
+          "grasp:strand_bark|none": 4,
+          "arrange:loose_wood|none": 6,
+          "break:woody|none": 4,
+          "release:stone_small|none": 1,
+          "release:stick|none": 3,
+          "separate:plant_tissue|none": 8,
+          "apply_force:woody|none": 3,
+          "wear:surface|held": 4,
+          "separate:bark|none": 1,
+          "grasp:wood_short|none": 1,
+          "strike:stone_small|wood_short": 1,
+          "release:surface|worn": 4,
+          "strike:animal_grazer|none": 2,
+          "move:local_negative_x|none": 8,
+          "move:local_positive_y|none": 1,
+          "eat:decayed_tissue": 4,
+          "cut:fresh_tissue|none": 2,
+          "eat:fresh_tissue": 1,
+          "interlace:strands|held": 1,
+          "grasp:surface|none": 6,
+          "separate:strand_bark|held": 3,
+          "release:surface|none": 1,
+          "move:local_positive_x|none": 2,
+          "release:strand_plant|none": 1,
+          "separate:arranged_wood|none": 2,
+          "release:wood_short|none": 1,
+          "rotate:arranged_wood_90|none": 3,
+          "rotate:arranged_wood_-90|none": 3
+        },
+        "observed_ingestions": {
+          "seed": 1108,
+          "plant_tissue": 1059,
+          "decayed_tissue": 4,
+          "fresh_tissue": 1
+        },
+        "solid_food_outcomes": {
+          "too_young": 360,
+          "not_hungry": 172
+        },
+        "encounter_outrun": 1,
+        "observed_transmissions": {
+          "break:woody|none": 1
+        }
+      },
+      "seconds": 113.11,
+      "census": {
+        "counts": {
+          "interaction_agent_days": 2920,
+          "reserve_ready": 2920,
+          "untried_options_present": 1580,
+          "fiber_extraction_offered": 2713,
+          "fiber_extraction_offered_reserve_ready": 2713,
+          "no_choice_with_options": 2909,
+          "all_worn_saving_kcal": 0.0193897323,
+          "all_arrangement_saving_kcal": 7.72e-08,
+          "ambient_below_16C_agent_days": 1099,
+          "worn_readout_kcal": 0.0193897323,
+          "arrangement_readout_kcal": 7.72e-08,
+          "stone_pickup_offered": 1518,
+          "stone_pickup_offered_reserve_ready": 1518,
+          "at_least_one_action_chosen": 266,
+          "stone_two_local_targets": 932,
+          "experienced_cold_agent_days": 290,
+          "stone_targets_and_fresh_tissue": 1,
+          "stone_strike_offered": 977,
+          "stone_strike_offered_reserve_ready": 977,
+          "tool_tissue_cut_offered": 1,
+          "strands_created": 94,
+          "fiber_split_offered": 1904,
+          "fiber_split_offered_reserve_ready": 1904,
+          "fiber_twist_offered": 1649,
+          "fiber_twist_offered_reserve_ready": 1649,
+          "soft_hands_full": 167,
+          "surface_interlace_offered": 684,
+          "surface_interlace_offered_reserve_ready": 684,
+          "surfaces_created": 9,
+          "surface_wear_offered": 189,
+          "surface_wear_offered_reserve_ready": 189,
+          "rigid_hands_full": 458,
+          "all_options_previously_tried": 1359,
+          "actual_wear_changes": 15,
+          "wood_force_offered": 2031,
+          "wood_force_offered_reserve_ready": 2031,
+          "stone_fractures": 2,
+          "wood_arrange_offered": 589,
+          "wood_arrange_offered_reserve_ready": 589,
+          "all_worn_benefit_agent_days": 5,
+          "all_arrangement_benefit_agent_days": 1
+        },
+        "offered_keys": {
+          "separate:plant_tissue|none": 2693,
+          "move:local_positive_x|none": 2550,
+          "move:local_negative_x|none": 2920,
+          "move:local_positive_y|none": 2745,
+          "move:local_negative_y|none": 2521,
+          "grasp:stone_small|none": 935,
+          "release:stone_small|none": 165,
+          "strike:animal_stalker|none": 4,
+          "strike:animal_browser|none": 12,
+          "grasp:stone_heavy|none": 972,
+          "strike:animal_grazer|none": 51,
+          "release:stone_heavy|none": 185,
+          "cut:fresh_tissue|none": 36,
+          "separate:tendon|none": 16,
+          "strike:stone_small|stone_small": 103,
+          "cut:fresh_tissue|stone_small": 1,
+          "separate:tendon|stone_small": 1,
+          "release:strand_plant|none": 1818,
+          "separate:strand_plant|held": 1660,
+          "twist:strands|held": 1649,
+          "interlace:strands|held": 684,
+          "grasp:strand_plant|none": 692,
+          "strike:animal_browser|stone_heavy": 5,
+          "strike:stone_heavy|stone_heavy": 35,
+          "strike:stone_small|stone_heavy": 62,
+          "release:surface|none": 189,
+          "wear:surface|held": 189,
+          "grasp:surface|none": 575,
+          "strike:stone_heavy|stone_small": 77,
+          "release:surface|worn": 186,
+          "apply_force:woody|none": 2031,
+          "separate:bark|none": 1584,
+          "break:woody|none": 1339,
+          "arrange:loose_wood|none": 589,
+          "rotate:arranged_wood_-90|none": 400,
+          "rotate:arranged_wood_90|none": 400,
+          "separate:arranged_wood|none": 400,
+          "release:strand_bark|none": 972,
+          "separate:strand_bark|held": 755,
+          "separate:bark|stone_small": 50,
+          "cut:woody|stone_small": 33,
+          "release:stick|none": 983,
+          "strike:stone_heavy|stick": 479,
+          "separate:bark|stone_heavy": 120,
+          "cut:woody|stone_heavy": 77,
+          "grasp:strand_bark|none": 513,
+          "bind:stone_heavy+stick|strand": 10,
+          "grasp:stick|none": 190,
+          "strike:animal_browser|stone_small": 2,
+          "strike:stone_small|stick": 211,
+          "strike:animal_grazer|stick": 2,
+          "release:wood_short|none": 412,
+          "strike:stone_small|wood_short": 243,
+          "bind:stick+stone_small|strand": 36,
+          "strike:stone_heavy|wood_short": 7,
+          "bind:stick+stone_heavy|strand": 23,
+          "grasp:wood_short|none": 29,
+          "bind:stick+stick|strand": 92,
+          "interlace:surface+strands|held": 10
+        },
+        "attempts": {
+          "grasp:stone_small|none": 9,
+          "move:local_negative_x|none": 17,
+          "move:local_negative_y|none": 12,
+          "grasp:stone_heavy|none": 9,
+          "move:local_positive_x|none": 15,
+          "strike:animal_stalker|none": 1,
+          "separate:plant_tissue|none": 17,
+          "release:strand_plant|none": 17,
+          "separate:strand_plant|held": 12,
+          "move:local_positive_y|none": 16,
+          "strike:animal_browser|none": 1,
+          "grasp:strand_plant|none": 8,
+          "interlace:strands|held": 8,
+          "release:stone_heavy|none": 9,
+          "twist:strands|held": 11,
+          "release:stone_small|none": 9,
+          "release:surface|none": 7,
+          "strike:stone_small|stone_small": 2,
+          "strike:stone_heavy|stone_small": 3,
+          "wear:surface|held": 8,
+          "release:surface|worn": 7,
+          "strike:stone_small|stone_heavy": 2,
+          "apply_force:woody|none": 15,
+          "arrange:loose_wood|none": 10,
+          "separate:bark|none": 11,
+          "break:woody|none": 10,
+          "separate:bark|stone_small": 2,
+          "separate:arranged_wood|none": 4,
+          "release:strand_bark|none": 10,
+          "grasp:strand_bark|none": 6,
+          "bind:stone_heavy+stick|strand": 1,
+          "separate:strand_bark|held": 7,
+          "release:stick|none": 7,
+          "strike:animal_grazer|none": 2,
+          "bind:stick+stone_small|strand": 1,
+          "separate:bark|stone_heavy": 2,
+          "strike:stone_heavy|stick": 3,
+          "strike:stone_small|stick": 4,
+          "grasp:surface|none": 8,
+          "rotate:arranged_wood_-90|none": 4,
+          "cut:woody|stone_heavy": 1,
+          "rotate:arranged_wood_90|none": 4,
+          "grasp:stick|none": 4,
+          "release:wood_short|none": 3,
+          "grasp:wood_short|none": 2,
+          "strike:stone_small|wood_short": 1,
+          "bind:stick+stick|strand": 1,
+          "interlace:surface+strands|held": 1,
+          "cut:fresh_tissue|none": 1,
+          "bind:stick+stone_heavy|strand": 2
+        },
+        "progress": {
+          "grasp:stone_small|none": 9,
+          "grasp:stone_heavy|none": 9,
+          "separate:plant_tissue|none": 17,
+          "separate:strand_plant|held": 12,
+          "interlace:strands|held": 8,
+          "twist:strands|held": 11,
+          "wear:surface|held": 8,
+          "release:surface|worn": 7,
+          "strike:stone_small|stone_heavy": 2,
+          "apply_force:woody|none": 15,
+          "arrange:loose_wood|none": 10,
+          "separate:bark|none": 11,
+          "break:woody|none": 9,
+          "separate:bark|stone_small": 2,
+          "separate:arranged_wood|none": 4,
+          "separate:strand_bark|held": 7,
+          "separate:bark|stone_heavy": 2,
+          "cut:woody|stone_heavy": 1,
+          "interlace:surface+strands|held": 1
+        },
+        "effort": {
+          "grasp:stone_small|none": 33.808772108,
+          "move:local_negative_x|none": 42.68511034138425,
+          "move:local_negative_y|none": 30.161988917790428,
+          "grasp:stone_heavy|none": 92.741907012,
+          "move:local_positive_x|none": 37.663054811089005,
+          "strike:animal_stalker|none": 5.425151528462898,
+          "separate:plant_tissue|none": 306.0,
+          "release:strand_plant|none": 34.0,
+          "separate:strand_plant|held": 36.0,
+          "move:local_positive_y|none": 40.25288566706906,
+          "strike:animal_browser|none": 5.832109865566935,
+          "grasp:strand_plant|none": 24.01463010602637,
+          "interlace:strands|held": 200.0,
+          "release:stone_heavy|none": 18.0,
+          "twist:strands|held": 88.0,
+          "release:stone_small|none": 18.0,
+          "release:surface|none": 14.0,
+          "strike:stone_small|stone_small": 16.3373132025173,
+          "strike:stone_heavy|stone_small": 24.667949979123076,
+          "wear:surface|held": 32.0,
+          "release:surface|worn": 28.0,
+          "strike:stone_small|stone_heavy": 24.86531559428203,
+          "apply_force:woody|none": 183.86857528200002,
+          "arrange:loose_wood|none": 87.28905130150001,
+          "separate:bark|none": 198.0,
+          "break:woody|none": 300.0,
+          "separate:bark|stone_small": 20.0,
+          "separate:arranged_wood|none": 22.8737245785,
+          "release:strand_bark|none": 20.0,
+          "grasp:strand_bark|none": 18.04635208248478,
+          "bind:stone_heavy+stick|strand": 15.0,
+          "separate:strand_bark|held": 21.0,
+          "release:stick|none": 14.0,
+          "strike:animal_grazer|none": 14.903970672909491,
+          "bind:stick+stone_small|strand": 15.0,
+          "separate:bark|stone_heavy": 20.0,
+          "strike:stone_heavy|stick": 25.968312964863976,
+          "strike:stone_small|stick": 34.37209009119542,
+          "grasp:surface|none": 24.099498757689044,
+          "rotate:arranged_wood_-90|none": 16.627405703199997,
+          "cut:woody|stone_heavy": 25.0,
+          "rotate:arranged_wood_90|none": 16.633739295799998,
+          "grasp:stick|none": 14.635133052274321,
+          "release:wood_short|none": 6.0,
+          "grasp:wood_short|none": 6.520145311470704,
+          "strike:stone_small|wood_short": 8.14251963181541,
+          "bind:stick+stick|strand": 15.0,
+          "interlace:surface+strands|held": 25.0,
+          "cut:fresh_tissue|none": 10.0,
+          "bind:stick+stone_heavy|strand": 30.0
+        },
+        "reward": {
+          "food:strike:animal_stalker|none": 0.025680000000000005,
+          "thermal:wear:surface|held": 5.119222678523352e-06,
+          "thermal:arrange:loose_wood|none": 3.314713339202e-11
+        },
+        "reward_events": {
+          "food:strike:animal_stalker|none": 1,
+          "thermal:wear:surface|held": 5,
+          "thermal:arrange:loose_wood|none": 1
+        },
+        "choice_reasons": {
+          "none": 2909,
+          "ordinary_explore_retry_or_imitation": 327
+        }
+      },
+      "quarters": {
+        "1": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "untried_options_present": 656,
+          "fiber_extraction_offered": 699,
+          "fiber_extraction_offered_reserve_ready": 699,
+          "no_choice_with_options": 728,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 0.0,
+          "stone_pickup_offered": 480,
+          "stone_pickup_offered_reserve_ready": 480,
+          "at_least_one_action_chosen": 116,
+          "stone_two_local_targets": 232,
+          "stone_targets_and_fresh_tissue": 1,
+          "stone_strike_offered": 124,
+          "stone_strike_offered_reserve_ready": 124,
+          "tool_tissue_cut_offered": 1,
+          "fiber_split_offered": 526,
+          "fiber_split_offered_reserve_ready": 526,
+          "fiber_twist_offered": 529,
+          "fiber_twist_offered_reserve_ready": 529,
+          "soft_hands_full": 29,
+          "surface_interlace_offered": 117,
+          "surface_interlace_offered_reserve_ready": 117,
+          "surface_wear_offered": 30,
+          "surface_wear_offered_reserve_ready": 30,
+          "rigid_hands_full": 4,
+          "all_options_previously_tried": 82,
+          "wood_force_offered": 272,
+          "wood_force_offered_reserve_ready": 272,
+          "wood_arrange_offered": 58,
+          "wood_arrange_offered_reserve_ready": 58
+        },
+        "2": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "all_options_previously_tried": 141,
+          "stone_pickup_offered": 407,
+          "stone_pickup_offered_reserve_ready": 407,
+          "fiber_extraction_offered": 666,
+          "fiber_extraction_offered_reserve_ready": 666,
+          "fiber_split_offered": 496,
+          "fiber_split_offered_reserve_ready": 496,
+          "fiber_twist_offered": 468,
+          "fiber_twist_offered_reserve_ready": 468,
+          "wood_force_offered": 682,
+          "wood_force_offered_reserve_ready": 682,
+          "no_choice_with_options": 735,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 0.0,
+          "untried_options_present": 600,
+          "stone_strike_offered": 221,
+          "stone_strike_offered_reserve_ready": 221,
+          "wood_arrange_offered": 162,
+          "wood_arrange_offered_reserve_ready": 162,
+          "soft_hands_full": 47,
+          "stone_two_local_targets": 256,
+          "surface_interlace_offered": 192,
+          "surface_interlace_offered_reserve_ready": 192,
+          "at_least_one_action_chosen": 69,
+          "rigid_hands_full": 84,
+          "surface_wear_offered": 32,
+          "surface_wear_offered_reserve_ready": 32
+        },
+        "3": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "soft_hands_full": 82,
+          "untried_options_present": 236,
+          "stone_two_local_targets": 199,
+          "stone_pickup_offered": 297,
+          "stone_pickup_offered_reserve_ready": 297,
+          "fiber_twist_offered": 366,
+          "fiber_twist_offered_reserve_ready": 366,
+          "surface_interlace_offered": 166,
+          "surface_interlace_offered_reserve_ready": 166,
+          "wood_force_offered": 653,
+          "wood_force_offered_reserve_ready": 653,
+          "no_choice_with_options": 734,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 0.0,
+          "all_options_previously_tried": 509,
+          "fiber_extraction_offered": 644,
+          "fiber_extraction_offered_reserve_ready": 644,
+          "fiber_split_offered": 387,
+          "fiber_split_offered_reserve_ready": 387,
+          "wood_arrange_offered": 166,
+          "wood_arrange_offered_reserve_ready": 166,
+          "stone_strike_offered": 300,
+          "stone_strike_offered_reserve_ready": 300,
+          "at_least_one_action_chosen": 56,
+          "rigid_hands_full": 192,
+          "surface_wear_offered": 66,
+          "surface_wear_offered_reserve_ready": 66
+        },
+        "4": {
+          "interaction_agent_days": 712,
+          "reserve_ready": 712,
+          "all_options_previously_tried": 627,
+          "fiber_extraction_offered": 704,
+          "fiber_extraction_offered_reserve_ready": 704,
+          "wood_arrange_offered": 203,
+          "wood_arrange_offered_reserve_ready": 203,
+          "no_choice_with_options": 712,
+          "all_worn_saving_kcal": 0.0193897323,
+          "all_arrangement_saving_kcal": 7.72e-08,
+          "soft_hands_full": 9,
+          "stone_pickup_offered": 334,
+          "stone_pickup_offered_reserve_ready": 334,
+          "fiber_twist_offered": 286,
+          "fiber_twist_offered_reserve_ready": 286,
+          "surface_interlace_offered": 209,
+          "surface_interlace_offered_reserve_ready": 209,
+          "wood_force_offered": 424,
+          "wood_force_offered_reserve_ready": 424,
+          "stone_two_local_targets": 245,
+          "stone_strike_offered": 332,
+          "stone_strike_offered_reserve_ready": 332,
+          "fiber_split_offered": 495,
+          "fiber_split_offered_reserve_ready": 495,
+          "untried_options_present": 88,
+          "rigid_hands_full": 178,
+          "surface_wear_offered": 61,
+          "surface_wear_offered_reserve_ready": 61,
+          "at_least_one_action_chosen": 25
+        }
+      },
+      "max_interactions_per_agent_tick": 3,
+      "final_memory": {
+        "edges": 29,
+        "links": 1,
+        "repeated_links": 0,
+        "credited_edges": 1
+      },
+      "final_surfaces": [
+        {
+          "area_m2": 0.0001661595,
+          "cohesion": 0.1531994804,
+          "worn": false
+        },
+        {
+          "area_m2": 8.28758e-05,
+          "cohesion": 0.1081365597,
+          "worn": false
+        },
+        {
+          "area_m2": 8.69305e-05,
+          "cohesion": 0.0820260354,
+          "worn": false
+        },
+        {
+          "area_m2": 0.000208476,
+          "cohesion": 0.4110563804,
+          "worn": true
+        },
+        {
+          "area_m2": 0.0001402612,
+          "cohesion": 0.1480788464,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0002711298,
+          "cohesion": 0.3480750501,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0002031385,
+          "cohesion": 0.3982325437,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0003196058,
+          "cohesion": 0.6313821927,
+          "worn": false
+        }
+      ],
+      "final_arranged_mass_kg": 0.0561251794
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "weather": true,
+      "days": 365,
+      "observed": true,
+      "fingerprint": "60dcfadcdd721abd2b9a713e2508ef027c8635745e87640e947558d0b639b74f",
+      "ledger_digest": "b32a8d468e0bb3725408cbcaf676e55f9afbe661d0ae35029861311c9be57fd6",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 1.8909824867730558e-15,
+        "water_rel_error": 2.2116836614359775e-15,
+        "lithic_abs_error_kg": 0.0
+      },
+      "initial_agents": 8,
+      "alive": 10,
+      "births": 2,
+      "capacity_stats": {
+        "intake_kg_by_kind": {
+          "plant_tissue": 2536.6140553285186,
+          "seed": 1058.2217199709464,
+          "woody_tissue": 0.432,
+          "fresh_tissue": 2.392e-07,
+          "decayed_tissue": 0.0055629518
+        },
+        "intake_kcal_by_kind": {
+          "plant_tissue": 4464440.737370996,
+          "seed": 3015931.901916001,
+          "woody_tissue": 0.0,
+          "fresh_tissue": 0.001033,
+          "decayed_tissue": 0.0
+        },
+        "ingestion_hazard": 0.00333777108,
+        "interaction_counts": {
+          "grasp": 47,
+          "move": 63,
+          "strike": 37,
+          "release": 68,
+          "separate": 57,
+          "interlace": 9,
+          "twist": 12,
+          "wear": 6,
+          "cut": 6,
+          "break": 13,
+          "apply_force": 13,
+          "arrange": 10,
+          "rotate": 10,
+          "bind": 9
+        },
+        "interaction_injury": 0.1153716399938575,
+        "interaction_effort_kcal": 2813.850844374489,
+        "capture_attempts": 6,
+        "captures": 0,
+        "capture_escapes": 6,
+        "fractures": 18,
+        "sharp_flakes": 1,
+        "bindings": 3,
+        "binding_failures": 6,
+        "binding_load_slips": 0,
+        "binding_load_breaks": 0,
+        "fibers_extracted": 59,
+        "wood_pieces": 17,
+        "surfaces": 9,
+        "worn_surfaces": 6,
+        "encounter_reached_cover": 2,
+        "interlace_affordance_offered": 232,
+        "wear_affordance_offered": 135,
+        "encounter_outrun": 4,
+        "witnessed_events": 1149,
+        "witnessed_by_act": {
+          "eat:plant_tissue": 548,
+          "move:local_positive_x|none": 4,
+          "eat:seed": 534,
+          "grasp:strand_plant|none": 2,
+          "break:woody|none": 8,
+          "release:wood_short|none": 2,
+          "eat:woody_tissue": 2,
+          "separate:bark|none": 3,
+          "release:strand_bark|none": 4,
+          "release:strand_plant|none": 1,
+          "release:stone_small|none": 1,
+          "arrange:loose_wood|none": 1,
+          "rotate:arranged_wood_-90|none": 2,
+          "strike:stone_heavy|stick": 1,
+          "move:local_positive_y|none": 1,
+          "release:stone_heavy|none": 1,
+          "bind:stick+stick|strand": 1,
+          "release:bound_bundle|none": 1,
+          "twist:strands|held": 1,
+          "grasp:bound_bundle|none": 1,
+          "strike:stone_heavy|bound_bundle": 1,
+          "grasp:stone_heavy|none": 1,
+          "separate:strand_bark|held": 3,
+          "grasp:surface|none": 1,
+          "move:local_negative_y|none": 1,
+          "release:surface|none": 1,
+          "strike:stone_small|stick": 2,
+          "separate:plant_tissue|none": 2,
+          "separate:bark|stone_heavy": 1,
+          "strike:stone_heavy|stone_heavy": 1,
+          "strike:stone_small|bound_bundle": 1,
+          "apply_force:woody|none": 1,
+          "separate:bark|bound_bundle": 1,
+          "grasp:bound_stone_small_on_stick|none": 1,
+          "cut:woody|bound_bundle": 1,
+          "grasp:stone_small|none": 1,
+          "strike:stone_small|stone_small": 1,
+          "separate:bark|stone_small": 1,
+          "bind:stick+stone_small|strand": 1,
+          "interlace:strands|held": 1,
+          "wear:surface|held": 1,
+          "release:surface|worn": 1,
+          "grasp:strand_bark|none": 1,
+          "grasp:wood_short|none": 1,
+          "move:local_negative_x|none": 2
+        },
+        "observed_ingestions": {
+          "plant_tissue": 548,
+          "seed": 534,
+          "woody_tissue": 2
+        },
+        "solid_food_outcomes": {
+          "too_young": 360,
+          "not_hungry": 279
+        },
+        "imitation_tries": {
+          "break:woody|none": 2,
+          "separate:strand_bark|held": 1
+        },
+        "imitation_unpaid": {
+          "break:woody|none": 2,
+          "separate:strand_bark|held": 1
+        },
+        "imitated_from": {
+          "break:woody|none": [
+            "human-g00000004"
+          ],
+          "separate:strand_bark|held": [
+            "human-g00000005"
+          ]
+        },
+        "observed_transmissions": {
+          "strike:stone_heavy|stick": 1
+        }
+      },
+      "seconds": 116.36,
+      "census": {
+        "counts": {
+          "interaction_agent_days": 2920,
+          "reserve_ready": 2920,
+          "untried_options_present": 1826,
+          "stone_two_local_targets": 960,
+          "stone_pickup_offered": 1093,
+          "stone_pickup_offered_reserve_ready": 1093,
+          "fiber_extraction_offered": 2826,
+          "fiber_extraction_offered_reserve_ready": 2826,
+          "no_choice_with_options": 2912,
+          "all_worn_saving_kcal": 0.2729985848,
+          "all_arrangement_saving_kcal": 0.00025026800000000005,
+          "ambient_below_16C_agent_days": 1358,
+          "worn_readout_kcal": 0.026450644499999995,
+          "arrangement_readout_kcal": 0.0001898307,
+          "at_least_one_action_chosen": 303,
+          "stone_strike_offered": 1108,
+          "stone_strike_offered_reserve_ready": 1108,
+          "experienced_cold_agent_days": 392,
+          "stone_fractures": 14,
+          "stone_edges_created": 3,
+          "stone_edge_pickup_offered": 15,
+          "strands_created": 92,
+          "fiber_split_offered": 1943,
+          "fiber_split_offered_reserve_ready": 1943,
+          "fiber_twist_offered": 1457,
+          "fiber_twist_offered_reserve_ready": 1457,
+          "surface_interlace_offered": 214,
+          "surface_interlace_offered_reserve_ready": 214,
+          "rigid_hands_full": 772,
+          "surfaces_created": 9,
+          "surface_wear_offered": 131,
+          "surface_wear_offered_reserve_ready": 131,
+          "all_options_previously_tried": 1122,
+          "actual_wear_changes": 11,
+          "all_worn_benefit_agent_days": 25,
+          "wood_force_offered": 2164,
+          "wood_force_offered_reserve_ready": 2164,
+          "wood_arrange_offered": 393,
+          "wood_arrange_offered_reserve_ready": 393,
+          "all_arrangement_benefit_agent_days": 16,
+          "stone_targets_and_fresh_tissue": 4,
+          "tool_tissue_cut_offered": 3,
+          "soft_hands_full": 31,
+          "all_arrangement_benefit_without_trial_days": 15,
+          "all_worn_benefit_without_trial_days": 16
+        },
+        "offered_keys": {
+          "grasp:stone_small|none": 738,
+          "strike:animal_grazer|none": 26,
+          "separate:plant_tissue|none": 2793,
+          "move:local_positive_x|none": 2230,
+          "move:local_negative_x|none": 2912,
+          "move:local_positive_y|none": 2920,
+          "move:local_negative_y|none": 2810,
+          "grasp:stone_heavy|none": 662,
+          "release:stone_heavy|none": 502,
+          "strike:stone_small|stone_heavy": 361,
+          "strike:animal_browser|none": 68,
+          "release:stone_small|none": 722,
+          "strike:stone_heavy|stone_small": 174,
+          "strike:animal_grazer|stone_small": 7,
+          "strike:stone_small|stone_small": 243,
+          "grasp:stone_edged|none": 15,
+          "release:strand_plant|none": 1427,
+          "separate:strand_plant|held": 1396,
+          "twist:strands|held": 1457,
+          "strike:animal_stalker|none": 24,
+          "strike:animal_stalker|stone_small": 7,
+          "grasp:strand_plant|none": 109,
+          "interlace:strands|held": 214,
+          "strike:stone_heavy|stone_heavy": 59,
+          "release:surface|none": 131,
+          "wear:surface|held": 131,
+          "grasp:surface|none": 684,
+          "release:surface|worn": 170,
+          "apply_force:woody|none": 2164,
+          "separate:bark|none": 1972,
+          "break:woody|none": 1422,
+          "separate:bark|stone_small": 480,
+          "cut:woody|stone_small": 312,
+          "release:stick|none": 606,
+          "bind:stone_small+stick|strand": 11,
+          "grasp:stick|none": 80,
+          "arrange:loose_wood|none": 393,
+          "release:wood_short|none": 586,
+          "grasp:wood_short|none": 101,
+          "release:strand_bark|none": 886,
+          "grasp:strand_bark|none": 287,
+          "strike:stone_heavy|stick": 178,
+          "separate:bark|stone_heavy": 386,
+          "cut:woody|stone_heavy": 119,
+          "rotate:arranged_wood_-90|none": 412,
+          "rotate:arranged_wood_90|none": 412,
+          "separate:arranged_wood|none": 412,
+          "strike:stone_small|stick": 454,
+          "bind:stick+stick|strand": 38,
+          "strike:stone_small|wood_short": 148,
+          "bind:stone_small+wood_short|strand": 110,
+          "separate:strand_bark|held": 787,
+          "strike:stone_heavy|wood_short": 91,
+          "strike:animal_grazer|wood_short": 1,
+          "strike:animal_browser|stone_heavy": 11,
+          "bind:stick+stone_heavy|strand": 6,
+          "bind:stone_heavy+stick|strand": 123,
+          "strike:animal_browser|stick": 22,
+          "strike:animal_browser|wood_short": 22,
+          "release:bound_stone_small_on_stick|none": 43,
+          "strike:stone_heavy|bound_stone_small_on_stick": 30,
+          "separate:bark|bound_stone_small_on_stick": 35,
+          "cut:woody|bound_stone_small_on_stick": 29,
+          "strike:stone_small|bound_stone_small_on_stick": 6,
+          "strike:animal_grazer|bound_stone_small_on_stick": 2,
+          "release:bound_bundle|none": 259,
+          "strike:stone_heavy|bound_bundle": 45,
+          "grasp:bound_bundle|none": 3,
+          "strike:stone_small|bound_bundle": 12,
+          "bind:bound_bundle+stone_heavy|strand": 45,
+          "bind:stone_heavy+wood_short|strand": 32,
+          "grasp:bound_stone_small_on_stick|none": 30,
+          "cut:fresh_tissue|none": 4,
+          "separate:tendon|none": 4,
+          "separate:bark|bound_bundle": 171,
+          "cut:woody|bound_bundle": 91,
+          "bind:bound_stone_small_on_stick+stone_small|strand": 9,
+          "strike:animal_stalker|bound_stone_small_on_stick": 3,
+          "cut:fresh_tissue|bound_stone_small_on_stick": 3,
+          "separate:tendon|bound_stone_small_on_stick": 3,
+          "cut:fresh_tissue|stone_small": 3,
+          "separate:tendon|stone_small": 3,
+          "bind:bound_bundle+wood_short|strand": 30,
+          "bind:stick+stone_small|strand": 113
+        },
+        "attempts": {
+          "grasp:stone_heavy|none": 10,
+          "move:local_negative_x|none": 19,
+          "move:local_negative_y|none": 10,
+          "grasp:stone_small|none": 11,
+          "strike:stone_heavy|stone_small": 5,
+          "strike:animal_grazer|stone_small": 1,
+          "release:stone_heavy|none": 6,
+          "strike:stone_small|stone_heavy": 6,
+          "separate:plant_tissue|none": 13,
+          "move:local_positive_y|none": 17,
+          "strike:animal_stalker|none": 1,
+          "release:stone_small|none": 8,
+          "release:strand_plant|none": 15,
+          "separate:strand_plant|held": 11,
+          "move:local_positive_x|none": 17,
+          "grasp:strand_plant|none": 6,
+          "strike:stone_small|stone_small": 4,
+          "interlace:strands|held": 9,
+          "twist:strands|held": 12,
+          "strike:animal_browser|none": 3,
+          "release:surface|none": 9,
+          "grasp:surface|none": 7,
+          "wear:surface|held": 6,
+          "release:surface|worn": 5,
+          "cut:woody|stone_small": 3,
+          "release:stick|none": 6,
+          "break:woody|none": 13,
+          "apply_force:woody|none": 13,
+          "release:wood_short|none": 6,
+          "separate:bark|none": 12,
+          "release:strand_bark|none": 10,
+          "arrange:loose_wood|none": 10,
+          "separate:bark|stone_small": 4,
+          "rotate:arranged_wood_-90|none": 6,
+          "strike:stone_heavy|stick": 2,
+          "bind:stone_small+wood_short|strand": 2,
+          "separate:bark|stone_heavy": 3,
+          "cut:woody|stone_heavy": 2,
+          "strike:stone_small|stick": 6,
+          "bind:stick+stick|strand": 1,
+          "release:bound_bundle|none": 1,
+          "grasp:bound_bundle|none": 1,
+          "grasp:stick|none": 1,
+          "strike:stone_heavy|bound_bundle": 1,
+          "bind:stone_heavy+stick|strand": 1,
+          "separate:strand_bark|held": 8,
+          "grasp:strand_bark|none": 7,
+          "release:bound_stone_small_on_stick|none": 2,
+          "grasp:wood_short|none": 3,
+          "bind:stone_heavy+wood_short|strand": 1,
+          "strike:stone_heavy|stone_heavy": 2,
+          "strike:stone_small|bound_bundle": 1,
+          "bind:bound_bundle+stone_heavy|strand": 1,
+          "separate:bark|bound_bundle": 1,
+          "grasp:bound_stone_small_on_stick|none": 1,
+          "bind:bound_stone_small_on_stick+stone_small|strand": 1,
+          "strike:stone_small|wood_short": 2,
+          "strike:stone_heavy|bound_stone_small_on_stick": 1,
+          "separate:arranged_wood|none": 5,
+          "strike:animal_browser|stick": 1,
+          "cut:woody|bound_bundle": 1,
+          "rotate:arranged_wood_90|none": 4,
+          "strike:stone_heavy|wood_short": 1,
+          "bind:bound_bundle+wood_short|strand": 1,
+          "bind:stick+stone_small|strand": 1
+        },
+        "progress": {
+          "grasp:stone_heavy|none": 9,
+          "grasp:stone_small|none": 9,
+          "strike:stone_small|stone_heavy": 6,
+          "separate:plant_tissue|none": 13,
+          "separate:strand_plant|held": 11,
+          "strike:stone_small|stone_small": 3,
+          "interlace:strands|held": 9,
+          "twist:strands|held": 12,
+          "wear:surface|held": 6,
+          "release:surface|worn": 5,
+          "cut:woody|stone_small": 3,
+          "apply_force:woody|none": 13,
+          "break:woody|none": 12,
+          "separate:bark|none": 12,
+          "arrange:loose_wood|none": 10,
+          "separate:bark|stone_small": 4,
+          "strike:stone_heavy|stone_small": 1,
+          "separate:bark|stone_heavy": 3,
+          "cut:woody|stone_heavy": 2,
+          "strike:stone_small|stick": 2,
+          "bind:stone_small+wood_short|strand": 1,
+          "bind:stick+stick|strand": 1,
+          "separate:strand_bark|held": 8,
+          "strike:stone_heavy|stone_heavy": 2,
+          "bind:bound_bundle+stone_heavy|strand": 1,
+          "separate:bark|bound_bundle": 1,
+          "strike:stone_small|wood_short": 1,
+          "separate:arranged_wood|none": 5,
+          "cut:woody|bound_bundle": 1,
+          "bind:bound_bundle+wood_short|strand": 1,
+          "bind:stick+stone_small|strand": 1
+        },
+        "effort": {
+          "grasp:stone_heavy|none": 95.7523174036,
+          "move:local_negative_x|none": 48.19051344946501,
+          "move:local_negative_y|none": 25.108899999710946,
+          "grasp:stone_small|none": 44.404346793200006,
+          "strike:stone_heavy|stone_small": 41.93852884849846,
+          "strike:animal_grazer|stone_small": 9.080248934199764,
+          "release:stone_heavy|none": 12.0,
+          "strike:stone_small|stone_heavy": 69.1829587320012,
+          "separate:plant_tissue|none": 234.0,
+          "move:local_positive_y|none": 42.71126524841434,
+          "strike:animal_stalker|none": 9.662898629521788,
+          "release:stone_small|none": 16.0,
+          "release:strand_plant|none": 30.0,
+          "separate:strand_plant|held": 33.0,
+          "move:local_positive_x|none": 42.87296740597732,
+          "grasp:strand_plant|none": 18.008934459491293,
+          "strike:stone_small|stone_small": 34.324705321143526,
+          "interlace:strands|held": 225.0,
+          "twist:strands|held": 96.0,
+          "strike:animal_browser|none": 26.463545327640986,
+          "release:surface|none": 18.0,
+          "grasp:surface|none": 21.07225091820354,
+          "wear:surface|held": 24.0,
+          "release:surface|worn": 20.0,
+          "cut:woody|stone_small": 75.0,
+          "release:stick|none": 12.0,
+          "break:woody|none": 390.0,
+          "apply_force:woody|none": 161.931060671,
+          "release:wood_short|none": 12.0,
+          "separate:bark|none": 216.0,
+          "release:strand_bark|none": 20.0,
+          "arrange:loose_wood|none": 87.81263354750001,
+          "separate:bark|stone_small": 48.0,
+          "rotate:arranged_wood_-90|none": 25.6478784872,
+          "strike:stone_heavy|stick": 16.408886496743882,
+          "bind:stone_small+wood_short|strand": 30.0,
+          "separate:bark|stone_heavy": 38.0,
+          "cut:woody|stone_heavy": 50.0,
+          "strike:stone_small|stick": 52.553719965833054,
+          "bind:stick+stick|strand": 15.0,
+          "release:bound_bundle|none": 2.0,
+          "grasp:bound_bundle|none": 3.592288125133267,
+          "grasp:stick|none": 3.3519849534593,
+          "strike:stone_heavy|bound_bundle": 8.142259398198965,
+          "bind:stone_heavy+stick|strand": 15.0,
+          "separate:strand_bark|held": 24.0,
+          "grasp:strand_bark|none": 21.02226996116346,
+          "release:bound_stone_small_on_stick|none": 4.0,
+          "grasp:wood_short|none": 13.318354282097367,
+          "bind:stone_heavy+wood_short|strand": 15.0,
+          "strike:stone_heavy|stone_heavy": 20.90384887861353,
+          "strike:stone_small|bound_bundle": 8.135550836006647,
+          "bind:bound_bundle+stone_heavy|strand": 15.0,
+          "separate:bark|bound_bundle": 10.0,
+          "grasp:bound_stone_small_on_stick|none": 3.5811561416480617,
+          "bind:bound_stone_small_on_stick+stone_small|strand": 15.0,
+          "strike:stone_small|wood_short": 17.759745969586547,
+          "strike:stone_heavy|bound_stone_small_on_stick": 8.548553281609694,
+          "separate:arranged_wood|none": 28.4076318025,
+          "strike:animal_browser|stick": 9.431397219826046,
+          "cut:woody|bound_bundle": 25.0,
+          "rotate:arranged_wood_90|none": 16.5169312174,
+          "strike:stone_heavy|wood_short": 9.010311667901112,
+          "bind:bound_bundle+wood_short|strand": 15.0,
+          "bind:stick+stone_small|strand": 15.0
+        },
+        "reward": {
+          "thermal:wear:surface|held": 1.139681413612563e-05,
+          "thermal:arrange:loose_wood|none": 9.491535000000001e-08
+        },
+        "reward_events": {
+          "thermal:wear:surface|held": 9,
+          "thermal:arrange:loose_wood|none": 1
+        },
+        "choice_reasons": {
+          "none": 2912,
+          "ordinary_explore_retry_or_imitation": 360
+        }
+      },
+      "quarters": {
+        "1": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "untried_options_present": 640,
+          "stone_two_local_targets": 314,
+          "stone_pickup_offered": 420,
+          "stone_pickup_offered_reserve_ready": 420,
+          "fiber_extraction_offered": 723,
+          "fiber_extraction_offered_reserve_ready": 723,
+          "no_choice_with_options": 730,
+          "all_worn_saving_kcal": 0.026450644499999995,
+          "all_arrangement_saving_kcal": 0.0001898307,
+          "at_least_one_action_chosen": 115,
+          "stone_strike_offered": 183,
+          "stone_strike_offered_reserve_ready": 183,
+          "stone_edge_pickup_offered": 13,
+          "fiber_split_offered": 498,
+          "fiber_split_offered_reserve_ready": 498,
+          "fiber_twist_offered": 443,
+          "fiber_twist_offered_reserve_ready": 443,
+          "surface_interlace_offered": 40,
+          "surface_interlace_offered_reserve_ready": 40,
+          "rigid_hands_full": 89,
+          "surface_wear_offered": 24,
+          "surface_wear_offered_reserve_ready": 24,
+          "all_options_previously_tried": 102,
+          "wood_force_offered": 236,
+          "wood_force_offered_reserve_ready": 236,
+          "wood_arrange_offered": 37,
+          "wood_arrange_offered_reserve_ready": 37
+        },
+        "2": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "untried_options_present": 599,
+          "stone_two_local_targets": 286,
+          "stone_pickup_offered": 343,
+          "stone_pickup_offered_reserve_ready": 343,
+          "stone_strike_offered": 372,
+          "stone_strike_offered_reserve_ready": 372,
+          "fiber_extraction_offered": 700,
+          "fiber_extraction_offered_reserve_ready": 700,
+          "fiber_split_offered": 564,
+          "fiber_split_offered_reserve_ready": 564,
+          "wood_force_offered": 658,
+          "wood_force_offered_reserve_ready": 658,
+          "at_least_one_action_chosen": 88,
+          "rigid_hands_full": 179,
+          "no_choice_with_options": 734,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 0.0,
+          "surface_wear_offered": 51,
+          "surface_wear_offered_reserve_ready": 51,
+          "wood_arrange_offered": 96,
+          "wood_arrange_offered_reserve_ready": 96,
+          "all_options_previously_tried": 141,
+          "fiber_twist_offered": 398,
+          "fiber_twist_offered_reserve_ready": 398,
+          "stone_edge_pickup_offered": 2,
+          "surface_interlace_offered": 75,
+          "surface_interlace_offered_reserve_ready": 75,
+          "stone_targets_and_fresh_tissue": 4,
+          "tool_tissue_cut_offered": 3
+        },
+        "3": {
+          "interaction_agent_days": 736,
+          "reserve_ready": 736,
+          "all_options_previously_tried": 346,
+          "stone_two_local_targets": 201,
+          "stone_pickup_offered": 242,
+          "stone_pickup_offered_reserve_ready": 242,
+          "stone_strike_offered": 253,
+          "stone_strike_offered_reserve_ready": 253,
+          "fiber_extraction_offered": 691,
+          "fiber_extraction_offered_reserve_ready": 691,
+          "fiber_split_offered": 490,
+          "fiber_split_offered_reserve_ready": 490,
+          "wood_force_offered": 647,
+          "wood_force_offered_reserve_ready": 647,
+          "no_choice_with_options": 736,
+          "all_worn_saving_kcal": 0.0,
+          "all_arrangement_saving_kcal": 0.0,
+          "untried_options_present": 403,
+          "fiber_twist_offered": 352,
+          "fiber_twist_offered_reserve_ready": 352,
+          "wood_arrange_offered": 147,
+          "wood_arrange_offered_reserve_ready": 147,
+          "at_least_one_action_chosen": 68,
+          "surface_wear_offered": 43,
+          "surface_wear_offered_reserve_ready": 43,
+          "rigid_hands_full": 149,
+          "surface_interlace_offered": 83,
+          "surface_interlace_offered_reserve_ready": 83,
+          "soft_hands_full": 31
+        },
+        "4": {
+          "interaction_agent_days": 712,
+          "reserve_ready": 712,
+          "rigid_hands_full": 355,
+          "untried_options_present": 184,
+          "stone_strike_offered": 300,
+          "stone_strike_offered_reserve_ready": 300,
+          "fiber_extraction_offered": 712,
+          "fiber_extraction_offered_reserve_ready": 712,
+          "fiber_split_offered": 391,
+          "fiber_split_offered_reserve_ready": 391,
+          "fiber_twist_offered": 264,
+          "fiber_twist_offered_reserve_ready": 264,
+          "wood_force_offered": 623,
+          "wood_force_offered_reserve_ready": 623,
+          "at_least_one_action_chosen": 32,
+          "all_options_previously_tried": 533,
+          "no_choice_with_options": 712,
+          "all_worn_saving_kcal": 0.2465479403,
+          "all_arrangement_saving_kcal": 6.04373e-05,
+          "surface_wear_offered": 13,
+          "surface_wear_offered_reserve_ready": 13,
+          "wood_arrange_offered": 113,
+          "wood_arrange_offered_reserve_ready": 113,
+          "stone_pickup_offered": 88,
+          "stone_pickup_offered_reserve_ready": 88,
+          "stone_two_local_targets": 159,
+          "surface_interlace_offered": 16,
+          "surface_interlace_offered_reserve_ready": 16
+        }
+      },
+      "max_interactions_per_agent_tick": 3,
+      "final_memory": {
+        "edges": 40,
+        "links": 2,
+        "repeated_links": 0,
+        "credited_edges": 0
+      },
+      "final_surfaces": [
+        {
+          "area_m2": 7.6247e-05,
+          "cohesion": 0.1728320388,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0001798514,
+          "cohesion": 0.1194368808,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0002537625,
+          "cohesion": 0.366621067,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0003849528,
+          "cohesion": 0.3172467234,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0004604653,
+          "cohesion": 0.40525005,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0004257652,
+          "cohesion": 0.7919508747,
+          "worn": true
+        },
+        {
+          "area_m2": 0.0001632986,
+          "cohesion": 0.4471544603,
+          "worn": false
+        },
+        {
+          "area_m2": 0.000211962,
+          "cohesion": 0.4927205934,
+          "worn": false
+        },
+        {
+          "area_m2": 0.0001336724,
+          "cohesion": 0.6962868136,
+          "worn": false
+        }
+      ],
+      "final_arranged_mass_kg": 0.1569364368
+    }
+  ],
+  "opt_out": [
+    {
+      "seed": "agentus-demography-a",
+      "weather": true,
+      "days": 365,
+      "observed": false,
+      "fingerprint": "66790dada54746ef5108585a819c6aa7490134fdd6b43ea064b3d90e5e6f7b2f",
+      "ledger_digest": "8539919f84c1f570485db5d53e01c28016c79d65359d659f88487cfe80af95eb",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.840339023004071e-15,
+        "water_rel_error": 2.19993048439015e-15,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      },
+      "initial_agents": 8,
+      "alive": 11,
+      "births": 3,
+      "capacity_stats": {
+        "intake_kg_by_kind": {
+          "plant_tissue": 2544.106107727727,
+          "seed": 1084.9919390783493,
+          "decayed_tissue": 0.0090167417,
+          "woody_tissue": 0.4154916241
+        },
+        "intake_kcal_by_kind": {
+          "plant_tissue": 4477626.749585999,
+          "seed": 3092227.026382,
+          "decayed_tissue": 0.0,
+          "woody_tissue": 0.0
+        },
+        "ingestion_hazard": 0.00541004502,
+        "interaction_counts": {
+          "grasp": 42,
+          "move": 61,
+          "strike": 30,
+          "separate": 53,
+          "release": 62,
+          "twist": 11,
+          "interlace": 9,
+          "wear": 8,
+          "cut": 2,
+          "apply_force": 12,
+          "break": 11,
+          "bind": 7,
+          "arrange": 6,
+          "rotate": 5
+        },
+        "interaction_injury": 0.0,
+        "interaction_effort_kcal": 2373.232359111016,
+        "capture_attempts": 12,
+        "captures": 1,
+        "capture_escapes": 11,
+        "fractures": 4,
+        "sharp_flakes": 0,
+        "bindings": 0,
+        "binding_failures": 7,
+        "binding_load_slips": 0,
+        "binding_load_breaks": 0,
+        "fibers_extracted": 58,
+        "wood_pieces": 12,
+        "surfaces": 9,
+        "worn_surfaces": 8,
+        "interlace_affordance_offered": 398,
+        "encounter_contact_failed": 2,
+        "encounter_outrun": 8,
+        "wear_affordance_offered": 251,
+        "encounter_kill": 1,
+        "witnessed_events": 1541,
+        "witnessed_by_act": {
+          "eat:plant_tissue": 731,
+          "eat:seed": 741,
+          "strike:animal_stalker|stone_heavy": 1,
+          "release:stone_heavy|none": 2,
+          "grasp:stone_heavy|none": 3,
+          "release:stone_small|none": 2,
+          "separate:strand_bark|held": 7,
+          "move:local_positive_y|none": 5,
+          "twist:strands|held": 3,
+          "break:woody|none": 4,
+          "release:stick|none": 4,
+          "strike:stone_small|stick": 2,
+          "apply_force:woody|none": 2,
+          "release:strand_plant|none": 2,
+          "release:strand_bark|none": 2,
+          "grasp:strand_bark|none": 2,
+          "grasp:strand_plant|none": 1,
+          "interlace:strands|held": 4,
+          "wear:surface|held": 2,
+          "release:surface|none": 2,
+          "grasp:surface|none": 3,
+          "move:local_negative_x|none": 3,
+          "arrange:loose_wood|none": 2,
+          "grasp:stick|none": 2,
+          "move:local_positive_x|none": 3,
+          "strike:animal_grazer|none": 2,
+          "separate:plant_tissue|none": 1,
+          "strike:animal_grazer|stick": 1,
+          "strike:stone_small|stone_heavy": 1,
+          "separate:bark|stone_heavy": 1
+        },
+        "observed_ingestions": {
+          "plant_tissue": 731,
+          "seed": 741
+        },
+        "explore_days": 8,
+        "encounter_reached_cover": 1,
+        "solid_food_outcomes": {
+          "too_young": 517,
+          "not_hungry": 117
+        },
+        "observed_transmissions": {
+          "break:woody|none": 2
+        },
+        "imitation_tries": {
+          "separate:strand_bark|held": 2,
+          "interlace:strands|held": 1
+        },
+        "imitation_unpaid": {
+          "separate:strand_bark|held": 2,
+          "interlace:strands|held": 1
+        },
+        "imitated_from": {
+          "separate:strand_bark|held": [
+            "human-g00000002"
+          ],
+          "interlace:strands|held": [
+            "human-g00000000"
+          ]
+        }
+      },
+      "seconds": 108.73
+    },
+    {
+      "seed": "agentus-demography-b",
+      "weather": true,
+      "days": 365,
+      "observed": false,
+      "fingerprint": "d6ea22b1f1c872cd0876df973e374478b77e3e3b61b0fbbce3a5cadd064452a2",
+      "ledger_digest": "81511f7fe02ef7e319776b260054c1a1e72ed27ecb50602bd100ebc935c4b2a7",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.6176379446959435e-15,
+        "water_rel_error": 6.7786625582003885e-16,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      },
+      "initial_agents": 8,
+      "alive": 10,
+      "births": 2,
+      "capacity_stats": {
+        "intake_kg_by_kind": {
+          "plant_tissue": 2372.454568076002,
+          "seed": 1144.0619412666554,
+          "fresh_tissue": 0.0120000005,
+          "woody_tissue": 0.432,
+          "decayed_tissue": 0.026001086
+        },
+        "intake_kcal_by_kind": {
+          "plant_tissue": 4175520.0398150003,
+          "seed": 3260576.5326139997,
+          "fresh_tissue": 51.840002000000005,
+          "woody_tissue": 0.0,
+          "decayed_tissue": 0.0
+        },
+        "ingestion_hazard": 0.015600651600000001,
+        "interaction_counts": {
+          "grasp": 41,
+          "move": 58,
+          "strike": 20,
+          "separate": 56,
+          "release": 59,
+          "interlace": 9,
+          "twist": 12,
+          "wear": 7,
+          "apply_force": 15,
+          "arrange": 10,
+          "break": 10,
+          "bind": 3,
+          "rotate": 8,
+          "cut": 2
+        },
+        "interaction_injury": 0.0,
+        "interaction_effort_kcal": 2286.6348254416275,
+        "capture_attempts": 4,
+        "captures": 2,
+        "capture_escapes": 2,
+        "fractures": 2,
+        "sharp_flakes": 0,
+        "bindings": 0,
+        "binding_failures": 3,
+        "binding_load_slips": 0,
+        "binding_load_breaks": 0,
+        "fibers_extracted": 66,
+        "wood_pieces": 10,
+        "surfaces": 9,
+        "worn_surfaces": 7,
+        "encounter_kill": 2,
+        "interlace_affordance_offered": 646,
+        "encounter_contact_failed": 1,
+        "wear_affordance_offered": 63,
+        "explore_days": 4,
+        "witnessed_events": 2255,
+        "witnessed_by_act": {
+          "eat:seed": 1108,
+          "eat:plant_tissue": 1059,
+          "separate:bark|stone_small": 2,
+          "release:strand_bark|none": 5,
+          "grasp:strand_bark|none": 7,
+          "arrange:loose_wood|none": 6,
+          "break:woody|none": 4,
+          "release:stone_small|none": 1,
+          "release:stick|none": 3,
+          "separate:plant_tissue|none": 10,
+          "apply_force:woody|none": 3,
+          "wear:surface|held": 2,
+          "separate:bark|none": 1,
+          "grasp:wood_short|none": 1,
+          "strike:stone_small|wood_short": 1,
+          "separate:strand_bark|held": 4,
+          "strike:animal_grazer|none": 2,
+          "twist:strands|held": 2,
+          "move:local_positive_y|none": 3,
+          "eat:decayed_tissue": 4,
+          "cut:fresh_tissue|none": 2,
+          "eat:fresh_tissue": 1,
+          "interlace:strands|held": 1,
+          "move:local_negative_x|none": 2,
+          "separate:strand_plant|held": 4,
+          "release:strand_plant|none": 3,
+          "move:local_positive_x|none": 2,
+          "separate:arranged_wood|none": 2,
+          "grasp:strand_plant|none": 3,
+          "release:wood_short|none": 1,
+          "rotate:arranged_wood_90|none": 3,
+          "rotate:arranged_wood_-90|none": 3
+        },
+        "observed_ingestions": {
+          "seed": 1108,
+          "plant_tissue": 1059,
+          "decayed_tissue": 4,
+          "fresh_tissue": 1
+        },
+        "solid_food_outcomes": {
+          "too_young": 360,
+          "not_hungry": 172
+        },
+        "encounter_outrun": 1,
+        "observed_transmissions": {
+          "break:woody|none": 1
+        }
+      },
+      "seconds": 104.04
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "weather": true,
+      "days": 365,
+      "observed": false,
+      "fingerprint": "d4e3522a0115d6c0f02f68a902e8b092cc28a55572a058b5fed68e218b66c010",
+      "ledger_digest": "9612ff92c4a9dde22cb6238dfafd204da96e9b65626d360756177b7d860c3f94",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.38479755121588e-15,
+        "water_rel_error": 2.488140529730399e-15,
+        "lithic_abs_error_kg": 0.0
+      },
+      "initial_agents": 8,
+      "alive": 10,
+      "births": 2,
+      "capacity_stats": {
+        "intake_kg_by_kind": {
+          "plant_tissue": 2537.506601791917,
+          "seed": 1058.2343201487463,
+          "woody_tissue": 0.432,
+          "fresh_tissue": 2.392e-07,
+          "decayed_tissue": 0.0055629518
+        },
+        "intake_kcal_by_kind": {
+          "plant_tissue": 4466011.619151996,
+          "seed": 3015967.8124230006,
+          "woody_tissue": 0.0,
+          "fresh_tissue": 0.001033,
+          "decayed_tissue": 0.0
+        },
+        "ingestion_hazard": 0.00333777108,
+        "interaction_counts": {
+          "grasp": 46,
+          "move": 64,
+          "strike": 39,
+          "release": 62,
+          "separate": 58,
+          "interlace": 9,
+          "twist": 12,
+          "wear": 5,
+          "cut": 5,
+          "break": 13,
+          "apply_force": 13,
+          "arrange": 10,
+          "rotate": 10,
+          "bind": 10
+        },
+        "interaction_injury": 0.18366261788547583,
+        "interaction_effort_kcal": 2780.0035621398724,
+        "capture_attempts": 6,
+        "captures": 0,
+        "capture_escapes": 6,
+        "fractures": 16,
+        "sharp_flakes": 2,
+        "bindings": 4,
+        "binding_failures": 6,
+        "binding_load_slips": 0,
+        "binding_load_breaks": 0,
+        "fibers_extracted": 60,
+        "wood_pieces": 16,
+        "surfaces": 9,
+        "worn_surfaces": 5,
+        "encounter_reached_cover": 2,
+        "interlace_affordance_offered": 232,
+        "wear_affordance_offered": 111,
+        "encounter_outrun": 4,
+        "witnessed_events": 1147,
+        "witnessed_by_act": {
+          "eat:plant_tissue": 548,
+          "move:local_positive_x|none": 4,
+          "eat:seed": 534,
+          "grasp:strand_plant|none": 2,
+          "break:woody|none": 8,
+          "release:wood_short|none": 2,
+          "eat:woody_tissue": 2,
+          "separate:bark|none": 2,
+          "release:strand_bark|none": 4,
+          "release:strand_plant|none": 1,
+          "release:stone_small|none": 1,
+          "arrange:loose_wood|none": 1,
+          "rotate:arranged_wood_-90|none": 2,
+          "strike:stone_heavy|stick": 1,
+          "move:local_positive_y|none": 1,
+          "release:stone_heavy|none": 1,
+          "bind:stick+stick|strand": 1,
+          "release:bound_bundle|none": 1,
+          "twist:strands|held": 1,
+          "grasp:bound_bundle|none": 1,
+          "strike:stone_heavy|bound_bundle": 1,
+          "grasp:stone_heavy|none": 1,
+          "separate:strand_bark|held": 3,
+          "move:local_negative_y|none": 1,
+          "strike:stone_small|stick": 2,
+          "separate:plant_tissue|none": 2,
+          "separate:bark|stone_heavy": 1,
+          "strike:stone_heavy|stone_heavy": 1,
+          "strike:stone_small|bound_bundle": 1,
+          "apply_force:woody|none": 1,
+          "separate:bark|bound_bundle": 1,
+          "grasp:bound_stone_small_on_stick|none": 1,
+          "cut:woody|bound_bundle": 1,
+          "grasp:stone_small|none": 1,
+          "strike:stone_small|stone_small": 2,
+          "separate:bark|stone_small": 2,
+          "bind:stick+stone_small|strand": 1,
+          "interlace:strands|held": 1,
+          "wear:surface|held": 1,
+          "grasp:strand_bark|none": 1,
+          "grasp:wood_short|none": 1,
+          "move:local_negative_x|none": 2
+        },
+        "observed_ingestions": {
+          "plant_tissue": 548,
+          "seed": 534,
+          "woody_tissue": 2
+        },
+        "solid_food_outcomes": {
+          "too_young": 360,
+          "not_hungry": 279
+        },
+        "imitation_tries": {
+          "break:woody|none": 2,
+          "separate:strand_bark|held": 1
+        },
+        "imitation_unpaid": {
+          "break:woody|none": 2,
+          "separate:strand_bark|held": 1
+        },
+        "imitated_from": {
+          "break:woody|none": [
+            "human-g00000004"
+          ],
+          "separate:strand_bark|held": [
+            "human-g00000005"
+          ]
+        },
+        "observed_transmissions": {
+          "strike:stone_heavy|stick": 1,
+          "strike:stone_small|stone_small": 1
+        }
+      },
+      "seconds": 112.41
+    }
+  ],
+  "legacy_compatibility": [
+    {
+      "seed": "agentus-demography-a",
+      "fingerprint_matches": true,
+      "ledger_matches": true
+    },
+    {
+      "seed": "agentus-demography-b",
+      "fingerprint_matches": true,
+      "ledger_matches": true
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "fingerprint_matches": true,
+      "ledger_matches": true
+    }
+  ],
+  "controlled_wood": [
+    {
+      "seed": "agentus-demography-a",
+      "days": 120,
+      "controlled_action_selection": true,
+      "autonomous_discovery_claim": false,
+      "actor": "human-g00000000",
+      "selected_actions": {
+        "apply_force:woody|none": 117
+      },
+      "trajectory": [
+        {
+          "day": 1,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 2,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 3,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 4,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 5,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 6,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 7,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 8,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 9,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 10,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 11,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 12,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 13,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 14,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 15,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 16,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 17,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 18,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 19,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 20,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 21,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 22,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 23,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 24,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 25,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 26,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 27,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 28,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 29,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 30,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 31,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 32,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 33,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 34,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 35,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 36,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 37,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 38,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 39,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 40,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 41,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 42,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 43,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 44,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 45,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 46,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 47,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 48,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 49,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 50,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.4357030646,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 51,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.4357030646,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 52,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.4357030646,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 53,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.4357030646,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 54,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.4357030646,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 55,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.4357030646,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 56,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.7121203477,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 57,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.7797699197000001,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 58,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.8421719236999999,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 59,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.8969757532999999,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 60,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.9435978558,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 61,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.9817095154,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 62,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 63,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 64,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 65,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 66,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 67,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 68,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 69,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 70,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 71,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 72,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 73,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 74,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.1857030646,
+          "actor_xy": [
+            0,
+            6
+          ]
+        },
+        {
+          "day": 75,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.9357030646,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 76,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 2.6857030644999997,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 77,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 3.4357030644999997,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 78,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.1142950648,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 79,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.2645379241,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 80,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.4080866753,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 81,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 82,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 83,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 84,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 85,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 86,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 87,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            2,
+            7
+          ]
+        },
+        {
+          "day": 88,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 89,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 90,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 91,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 4.5445650438,
+          "actor_xy": [
+            1,
+            7
+          ]
+        },
+        {
+          "day": 92,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 5.294565043799999,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 93,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 5.9296440519999996,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 94,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 6.2880312779,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 95,
+          "max_cell_arranged_kg": 0.2473974292,
+          "max_cell_loose_kg": 6.3268227777,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 96,
+          "max_cell_arranged_kg": 0.2448402224,
+          "max_cell_loose_kg": 6.361375786999999,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 97,
+          "max_cell_arranged_kg": 0.2423242749,
+          "max_cell_loose_kg": 6.3988063989,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 98,
+          "max_cell_arranged_kg": 0.2398559613,
+          "max_cell_loose_kg": 6.4271021904,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 99,
+          "max_cell_arranged_kg": 0.2374208201,
+          "max_cell_loose_kg": 6.4452126134,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 100,
+          "max_cell_arranged_kg": 0.235032221,
+          "max_cell_loose_kg": 6.4521609902,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 101,
+          "max_cell_arranged_kg": 0.23267021699999998,
+          "max_cell_loose_kg": 6.447705095200001,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 102,
+          "max_cell_arranged_kg": 0.2284778493,
+          "max_cell_loose_kg": 6.430163103,
+          "actor_xy": [
+            0,
+            7
+          ]
+        },
+        {
+          "day": 103,
+          "max_cell_arranged_kg": 0.22469079050000001,
+          "max_cell_loose_kg": 6.3611094389,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 104,
+          "max_cell_arranged_kg": 0.2212324313,
+          "max_cell_loose_kg": 6.2936435236,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 105,
+          "max_cell_arranged_kg": 0.21696827100000002,
+          "max_cell_loose_kg": 6.2286284193,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 106,
+          "max_cell_arranged_kg": 0.2131485122,
+          "max_cell_loose_kg": 6.164812071,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 107,
+          "max_cell_arranged_kg": 0.21000335550000002,
+          "max_cell_loose_kg": 6.1019221525,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 108,
+          "max_cell_arranged_kg": 0.2070843764,
+          "max_cell_loose_kg": 6.039895044700001,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 109,
+          "max_cell_arranged_kg": 0.20435133149999998,
+          "max_cell_loose_kg": 5.978835704800001,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 110,
+          "max_cell_arranged_kg": 0.2018676655,
+          "max_cell_loose_kg": 5.9185113029,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 111,
+          "max_cell_arranged_kg": 0.1994924503,
+          "max_cell_loose_kg": 5.858891068,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 112,
+          "max_cell_arranged_kg": 0.1972086041,
+          "max_cell_loose_kg": 6.4862063287,
+          "actor_xy": [
+            0,
+            9
+          ]
+        },
+        {
+          "day": 113,
+          "max_cell_arranged_kg": 0.1950200551,
+          "max_cell_loose_kg": 6.421344262000001,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 114,
+          "max_cell_arranged_kg": 0.19292593889999998,
+          "max_cell_loose_kg": 6.3571308172,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 115,
+          "max_cell_arranged_kg": 0.1909141892,
+          "max_cell_loose_kg": 6.2935595075999995,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 116,
+          "max_cell_arranged_kg": 0.18893811049999998,
+          "max_cell_loose_kg": 6.2306239112,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 117,
+          "max_cell_arranged_kg": 0.18701058320000002,
+          "max_cell_loose_kg": 6.1683176711000005,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 118,
+          "max_cell_arranged_kg": 0.18510951660000002,
+          "max_cell_loose_kg": 6.1066344936000005,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 119,
+          "max_cell_arranged_kg": 0.1832386983,
+          "max_cell_loose_kg": 6.0455681482,
+          "actor_xy": [
+            0,
+            8
+          ]
+        },
+        {
+          "day": 120,
+          "max_cell_arranged_kg": 0.1813932988,
+          "max_cell_loose_kg": 6.750000000000002,
+          "actor_xy": [
+            0,
+            8
+          ]
+        }
+      ],
+      "ledger_valid": true,
+      "ledger_digest": "a3e6501427133cd955b345667ce0f5aa00b503daeb1bb3df4f9b15d627677e73",
+      "conservation": {
+        "element_rel_error": 1.6759846324225508e-15,
+        "water_rel_error": 7.217307940085321e-16,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      }
+    },
+    {
+      "seed": "agentus-demography-b",
+      "days": 120,
+      "controlled_action_selection": true,
+      "autonomous_discovery_claim": false,
+      "actor": "human-g00000000",
+      "selected_actions": {
+        "apply_force:woody|none": 60
+      },
+      "trajectory": [
+        {
+          "day": 1,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            1
+          ]
+        },
+        {
+          "day": 2,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 3,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 4,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 5,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 6,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 7,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            1
+          ]
+        },
+        {
+          "day": 8,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 9,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 10,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 11,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 12,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            1
+          ]
+        },
+        {
+          "day": 13,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 14,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 15,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            1
+          ]
+        },
+        {
+          "day": 16,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 17,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            3
+          ]
+        },
+        {
+          "day": 18,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 19,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 20,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 21,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 22,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 23,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 24,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 25,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 26,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 27,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 28,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 29,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 30,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 31,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 32,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 33,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 34,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 35,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 36,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 37,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 38,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 39,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 40,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 41,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 42,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 43,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 44,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 45,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 46,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 47,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 48,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 49,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 50,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 51,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 52,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 53,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.24999999999999997,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 54,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2500000001,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 55,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2500000001,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 56,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2455101017,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 57,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2414086241,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 58,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2376521967,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 59,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2328110734,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 60,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2283964342,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 61,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2243314891,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 62,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2209992504,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 63,
+          "max_cell_arranged_kg": 0.1184451044,
+          "max_cell_loose_kg": 0.2180525914,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 64,
+          "max_cell_arranged_kg": 0.1184451044,
+          "max_cell_loose_kg": 0.21534187789999998,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 65,
+          "max_cell_arranged_kg": 0.1184451044,
+          "max_cell_loose_kg": 0.24999999999999994,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 66,
+          "max_cell_arranged_kg": 0.1184451044,
+          "max_cell_loose_kg": 0.25,
+          "actor_xy": [
+            4,
+            5
+          ]
+        },
+        {
+          "day": 67,
+          "max_cell_arranged_kg": 0.1184451044,
+          "max_cell_loose_kg": 0.25,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 68,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.25,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 69,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.25,
+          "actor_xy": [
+            3,
+            6
+          ]
+        },
+        {
+          "day": 70,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.25,
+          "actor_xy": [
+            3,
+            5
+          ]
+        },
+        {
+          "day": 71,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.25,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 72,
+          "max_cell_arranged_kg": 0.0955581969,
+          "max_cell_loose_kg": 0.2795647556,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 73,
+          "max_cell_arranged_kg": 0.0940257195,
+          "max_cell_loose_kg": 0.31410020790000004,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 74,
+          "max_cell_arranged_kg": 0.0926199945,
+          "max_cell_loose_kg": 0.3432807398,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 75,
+          "max_cell_arranged_kg": 0.0914473808,
+          "max_cell_loose_kg": 0.367185897,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 76,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3845409131,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 77,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.39323074620000004,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 78,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3931859478,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 79,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3887374481,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 80,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3844312218,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 81,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3802788108,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 82,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3762261106,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 83,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3722611054,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 84,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3683850491,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 85,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.36459993659999995,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 86,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.36088998780000003,
+          "actor_xy": [
+            4,
+            3
+          ]
+        },
+        {
+          "day": 87,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3572291829,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 88,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3536147606,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 89,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3500444156,
+          "actor_xy": [
+            4,
+            4
+          ]
+        },
+        {
+          "day": 90,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3465162128,
+          "actor_xy": [
+            3,
+            4
+          ]
+        },
+        {
+          "day": 91,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3430379119,
+          "actor_xy": [
+            3,
+            3
+          ]
+        },
+        {
+          "day": 92,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3395968672,
+          "actor_xy": [
+            3,
+            3
+          ]
+        },
+        {
+          "day": 93,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.3361922405,
+          "actor_xy": [
+            3,
+            3
+          ]
+        },
+        {
+          "day": 94,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.5,
+          "actor_xy": [
+            3,
+            3
+          ]
+        },
+        {
+          "day": 95,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.4949951608,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 96,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.4900412808,
+          "actor_xy": [
+            3,
+            2
+          ]
+        },
+        {
+          "day": 97,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.4851393551,
+          "actor_xy": [
+            3,
+            1
+          ]
+        },
+        {
+          "day": 98,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.4802867334,
+          "actor_xy": [
+            4,
+            1
+          ]
+        },
+        {
+          "day": 99,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.4754828692,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 100,
+          "max_cell_arranged_kg": 0.25,
+          "max_cell_loose_kg": 0.4707273789,
+          "actor_xy": [
+            5,
+            2
+          ]
+        },
+        {
+          "day": 101,
+          "max_cell_arranged_kg": 0.2360932628,
+          "max_cell_loose_kg": 0.46601982509999995,
+          "actor_xy": [
+            6,
+            2
+          ]
+        },
+        {
+          "day": 102,
+          "max_cell_arranged_kg": 0.2248991138,
+          "max_cell_loose_kg": 0.4613594636,
+          "actor_xy": [
+            6,
+            3
+          ]
+        },
+        {
+          "day": 103,
+          "max_cell_arranged_kg": 0.2157503166,
+          "max_cell_loose_kg": 0.45674580480000004,
+          "actor_xy": [
+            7,
+            3
+          ]
+        },
+        {
+          "day": 104,
+          "max_cell_arranged_kg": 0.2090440294,
+          "max_cell_loose_kg": 0.4637532614,
+          "actor_xy": [
+            8,
+            3
+          ]
+        },
+        {
+          "day": 105,
+          "max_cell_arranged_kg": 0.2049706419,
+          "max_cell_loose_kg": 0.75,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 106,
+          "max_cell_arranged_kg": 0.2014629759,
+          "max_cell_loose_kg": 1.5,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 107,
+          "max_cell_arranged_kg": 0.1982732784,
+          "max_cell_loose_kg": 2.2500000000000004,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 108,
+          "max_cell_arranged_kg": 0.1945884449,
+          "max_cell_loose_kg": 2.7910896136999996,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 109,
+          "max_cell_arranged_kg": 0.19127277680000002,
+          "max_cell_loose_kg": 2.8750046759999996,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 110,
+          "max_cell_arranged_kg": 0.18878930470000002,
+          "max_cell_loose_kg": 2.9410563735,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 111,
+          "max_cell_arranged_kg": 0.1866996832,
+          "max_cell_loose_kg": 2.9885763057000005,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 112,
+          "max_cell_arranged_kg": 0.1847128245,
+          "max_cell_loose_kg": 3.0168769476,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 113,
+          "max_cell_arranged_kg": 0.1827684556,
+          "max_cell_loose_kg": 3.0252520191000003,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 114,
+          "max_cell_arranged_kg": 0.1808845359,
+          "max_cell_loose_kg": 3.0252520191,
+          "actor_xy": [
+            7,
+            4
+          ]
+        },
+        {
+          "day": 115,
+          "max_cell_arranged_kg": 0.1790553045,
+          "max_cell_loose_kg": 3.0252520191,
+          "actor_xy": [
+            7,
+            3
+          ]
+        },
+        {
+          "day": 116,
+          "max_cell_arranged_kg": 0.1772482041,
+          "max_cell_loose_kg": 3.0252520191,
+          "actor_xy": [
+            7,
+            3
+          ]
+        },
+        {
+          "day": 117,
+          "max_cell_arranged_kg": 0.17546229,
+          "max_cell_loose_kg": 3.0252520191,
+          "actor_xy": [
+            7,
+            3
+          ]
+        },
+        {
+          "day": 118,
+          "max_cell_arranged_kg": 0.1736992973,
+          "max_cell_loose_kg": 3.0252520191,
+          "actor_xy": [
+            8,
+            3
+          ]
+        },
+        {
+          "day": 119,
+          "max_cell_arranged_kg": 0.17195550999999998,
+          "max_cell_loose_kg": 3.0252520191,
+          "actor_xy": [
+            9,
+            3
+          ]
+        },
+        {
+          "day": 120,
+          "max_cell_arranged_kg": 0.1702320427,
+          "max_cell_loose_kg": 3.0252520191,
+          "actor_xy": [
+            10,
+            3
+          ]
+        }
+      ],
+      "ledger_valid": true,
+      "ledger_digest": "16f80eb7067fd622ea590e2490b251855a4d1bdeb8ea8a3bc41c5520f2ad3584",
+      "conservation": {
+        "element_rel_error": 1.7885874576799575e-15,
+        "water_rel_error": 2.884095272229789e-16,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      }
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "days": 120,
+      "controlled_action_selection": true,
+      "autonomous_discovery_claim": false,
+      "actor": "human-g00000000",
+      "selected_actions": {
+        "apply_force:woody|none": 98
+      },
+      "trajectory": [
+        {
+          "day": 1,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 2,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 3,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 4,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 5,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 6,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 7,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 8,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 9,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 10,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            2
+          ]
+        },
+        {
+          "day": 11,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 12,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            2
+          ]
+        },
+        {
+          "day": 13,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            2
+          ]
+        },
+        {
+          "day": 14,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            1
+          ]
+        },
+        {
+          "day": 15,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            2
+          ]
+        },
+        {
+          "day": 16,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            2
+          ]
+        },
+        {
+          "day": 17,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            2
+          ]
+        },
+        {
+          "day": 18,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            1
+          ]
+        },
+        {
+          "day": 19,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            1
+          ]
+        },
+        {
+          "day": 20,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            1
+          ]
+        },
+        {
+          "day": 21,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            1
+          ]
+        },
+        {
+          "day": 22,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            1
+          ]
+        },
+        {
+          "day": 23,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            1
+          ]
+        },
+        {
+          "day": 24,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            1
+          ]
+        },
+        {
+          "day": 25,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            2
+          ]
+        },
+        {
+          "day": 26,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            3
+          ]
+        },
+        {
+          "day": 27,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            4
+          ]
+        },
+        {
+          "day": 28,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            4
+          ]
+        },
+        {
+          "day": 29,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            5
+          ]
+        },
+        {
+          "day": 30,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 31,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 32,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 33,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 34,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 35,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 36,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            5,
+            5
+          ]
+        },
+        {
+          "day": 37,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            5
+          ]
+        },
+        {
+          "day": 38,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            5
+          ]
+        },
+        {
+          "day": 39,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            5
+          ]
+        },
+        {
+          "day": 40,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            5
+          ]
+        },
+        {
+          "day": 41,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            5
+          ]
+        },
+        {
+          "day": 42,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            5
+          ]
+        },
+        {
+          "day": 43,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            4
+          ]
+        },
+        {
+          "day": 44,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            4
+          ]
+        },
+        {
+          "day": 45,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            6,
+            4
+          ]
+        },
+        {
+          "day": 46,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            7,
+            4
+          ]
+        },
+        {
+          "day": 47,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            8,
+            4
+          ]
+        },
+        {
+          "day": 48,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 49,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 50,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 51,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 52,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.0,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 53,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.07838169,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 54,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.07838169,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 55,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.22770644220000003,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 56,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.2277064422,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 57,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.3704173197,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 58,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.402681931,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 59,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 0.7500000000000001,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 60,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.4172441601,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 61,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.5226671742,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 62,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.6226241586999999,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 63,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.7169370361,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 64,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.8054526413,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 65,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.8879639181,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 66,
+          "max_cell_arranged_kg": 0.0,
+          "max_cell_loose_kg": 1.9642851649,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 67,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.0342045878999997,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 68,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.0975257559,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 69,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1540042643,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 70,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.2034051077,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 71,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.2454859337,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 72,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.2799854516,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 73,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.3066316622,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 74,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.325142108,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 75,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.3018885345,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 76,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.2788682781,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 77,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.2560784822,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 78,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.2335167938000002,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 79,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.2111809445999997,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 80,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.189068582,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 81,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1671775262999997,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 82,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1455055512,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 83,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1240503502,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 84,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 85,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 86,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 87,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 88,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 89,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 90,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 91,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 92,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            5
+          ]
+        },
+        {
+          "day": 93,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 94,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.1301981345,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 95,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 2.6526819309,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 96,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.4026819309000005,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 97,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.9776845804,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 98,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.778341795,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 99,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.626366165,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 100,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.5066036722,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 101,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.4081540969,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 102,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.2776966542,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 103,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.2595786398,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 104,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.195828224,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 105,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.1238981606999996,
+          "actor_xy": [
+            9,
+            6
+          ]
+        },
+        {
+          "day": 106,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.0527197817,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 107,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.0858320617,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 108,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.4360030257000003,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 109,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.4459409326,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 110,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.4406085632,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 111,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.4203748399999996,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 112,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.3858114009999998,
+          "actor_xy": [
+            9,
+            7
+          ]
+        },
+        {
+          "day": 113,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.3517225417999996,
+          "actor_xy": [
+            8,
+            7
+          ]
+        },
+        {
+          "day": 114,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.3180734952999997,
+          "actor_xy": [
+            8,
+            6
+          ]
+        },
+        {
+          "day": 115,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.284792989,
+          "actor_xy": [
+            8,
+            7
+          ]
+        },
+        {
+          "day": 116,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.2518640672999997,
+          "actor_xy": [
+            8,
+            7
+          ]
+        },
+        {
+          "day": 117,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.2193029071,
+          "actor_xy": [
+            8,
+            7
+          ]
+        },
+        {
+          "day": 118,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.6674142546000006,
+          "actor_xy": [
+            8,
+            7
+          ]
+        },
+        {
+          "day": 119,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.7662040473000005,
+          "actor_xy": [
+            8,
+            7
+          ]
+        },
+        {
+          "day": 120,
+          "max_cell_arranged_kg": 0.2500000001,
+          "max_cell_loose_kg": 3.7406990043,
+          "actor_xy": [
+            8,
+            7
+          ]
+        }
+      ],
+      "ledger_valid": true,
+      "ledger_digest": "3e528678ab26d13e259614356788fedff740c585747edbbce097b185b64a808f",
+      "conservation": {
+        "element_rel_error": 8.691145134193711e-16,
+        "water_rel_error": 5.78651817709949e-16,
+        "lithic_abs_error_kg": 5.684341886080802e-14
+      }
+    }
+  ]
+}

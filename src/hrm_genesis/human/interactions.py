@@ -454,6 +454,18 @@ def enumerate_affordances(ctx: Context) -> list[tuple[str, dict]]:
         options.append(("twist:strands|held", {"verb": "twist"}))
     if len(strands) >= 4:
         options.append(("interlace:strands|held", {"verb": "interlace"}))
+    if (ctx.humans.get("surface_work_model") == "incremental-interlace-v1" and len(strands) >= 2
+            and len(soft) <= MAX_SOFT_IN_HAND and carry_room >= 0.0):
+        surfaces = [o for o in soft if o["material"] == "surface"]
+        if surfaces:
+            additions = sorted(strands, key=lambda o: (-float(o["length_m"]), o["id"]))
+            count = 4 if len(additions) >= 4 else 2
+            options.append(("interlace:surface+strands|held", {"verb": "extend_surface",
+                            "id": surfaces[0]["id"], "strands": [o["id"] for o in additions[:count]]}))
+    if ctx.humans.get("surface_work_model") == "incremental-interlace-v1":
+        for surface in ctx.humans.get("objects", []):
+            if surface.get("holder") == ctx.agent_id and surface.get("worn") and surface["material"] == "surface":
+                options.append(("release:surface|worn", {"verb": "remove_surface", "id": surface["id"]}))
     if strands and len(rigid) >= 2:
         options.append((f"bind:{object_class(rigid[0])}+{object_class(rigid[1])}|strand", {"verb": "bind"}))
     for surface in [o for o in soft if o["material"] == "surface" and not o.get("worn", False)]:
@@ -1022,6 +1034,30 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
             _bump(ctx.stats, "surfaces")
         else:
             out["unravelled"] = True
+
+    elif verb == "remove_surface" and humans.get("surface_work_model") == "incremental-interlace-v1":
+        surface = _find(humans, spec.get("id"))
+        if surface is not None and surface.get("holder") == ctx.agent_id and surface.get("worn") and surface["material"] == "surface":
+            surface["worn"] = False
+            surface["holder"] = None
+            out["effort_kcal"] = 4.0 * scale
+
+    elif verb == "extend_surface" and humans.get("surface_work_model") == "incremental-interlace-v1":
+        surface = _held(ctx, spec.get("id"))
+        additions = [_held(ctx, oid) for oid in spec.get("strands", [])]
+        if (surface is not None and surface["material"] == "surface" and not surface.get("worn")
+                and len(additions) in (2, 4) and all(s is not None and s["material"] == "fiber" and not s.get("worn") for s in additions)
+                and len({s["id"] for s in additions}) == len(additions)
+                and len(ctx.soft_held()) <= MAX_SOFT_IN_HAND
+                and ctx.held_mass() <= CARRY_LIMIT_KG * max(0.1, float(ctx.profile.get("development_scale", 1.0)))):
+            out["effort_kcal"] = 25.0 * scale
+            extended = mo.extend_surface(surface, additions, _new_id(humans, "surface"))
+            if extended is not None:
+                removed = {surface["id"], *(s["id"] for s in additions)}
+                humans["objects"] = [o for o in humans["objects"] if o["id"] not in removed]
+                humans["objects"].append(_place(extended, ctx.xy[0], ctx.xy[1], ctx.agent_id))
+            else:
+                out["unravelled"] = True
 
     elif verb == "bind":
         rigid = ctx.rigid_held()[:2]

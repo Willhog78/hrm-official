@@ -353,6 +353,32 @@ def interlace(strands: list[dict], object_id: str) -> dict | None:
     }
 
 
+def extend_surface(surface: dict, additions: list[dict], object_id: str) -> dict | None:
+    """Interlace new paired strands into existing material without healing it.
+
+    Use the same strand geometry as initial interlacing. Retain the old
+    surface's fractional loss of area and its current cohesion, even when
+    the input strands' friction would otherwise create a fresh pristine mat.
+    Short new strands can reduce the resulting span. No strand is discarded.
+    """
+    if surface.get("material") != "surface" or len(additions) not in (2, 4):
+        return None
+    if any(s.get("material") != "fiber" for s in additions):
+        return None
+    old = interlace(surface["strands"], object_id)
+    extended = interlace(surface["strands"] + additions, object_id)
+    if old is None or extended is None or float(old["area_m2"]) <= 0.0:
+        return None
+    retained_area = min(1.0, max(0.0, float(surface["area_m2"])) / float(old["area_m2"]))
+    extended["area_m2"] = round(float(extended["area_m2"]) * retained_area, 10)
+    extended["cohesion"] = min(float(surface["cohesion"]), float(extended["cohesion"]))
+    extended["wetness"] = max(float(surface.get("wetness", 0.0)),
+                              *(float(s.get("wetness", 0.0)) for s in additions))
+    if extended["cohesion"] < 0.5 or extended["area_m2"] <= 0.0:
+        return None
+    return extended
+
+
 def join_surfaces(surfaces: list[dict], binder: dict, object_id: str, wetness: float) -> dict | None:
     """A coarse stitched seam: no area or material is created.
 
