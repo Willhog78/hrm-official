@@ -1,0 +1,78 @@
+{
+  "model": "experienced-transitions-v2",
+  "date": "2026-10-09",
+  "controlled_fixture": {
+    "opportunities": 300,
+    "first_completed_grasp_cut_trial": 246,
+    "completed_grasp_cut_chains": 55,
+    "valued_grasp_choices": 53,
+    "valued_cut_choices": 53,
+    "frontier_grasp_trials": 7,
+    "grasp_individual_value": -0.0017,
+    "preconditions": "Known fresh tissue and a supplied edged stone; independent trial resets retain individual memory. No action sequence is supplied."
+  },
+  "smoke": [
+    {
+      "seed": "agentus-demography-a",
+      "days": 75,
+      "alive": 8,
+      "births": 0,
+      "ledger_valid": true,
+      "ledger_digest": "e6fde0d3f113a0ab51735df27e1869ec45abc99214872357a3383e0443a2afab",
+      "conservation": {
+        "element_rel_error": 1.2052320645430459e-15,
+        "water_rel_error": 0.0,
+        "lithic_abs_error_kg": 5.684341886080802e-14
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {},
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    },
+    {
+      "seed": "agentus-demography-b",
+      "days": 75,
+      "alive": 9,
+      "births": 1,
+      "ledger_valid": true,
+      "ledger_digest": "7ba961c0be27b7695b692daaa86063510e6d30728fe47792224e140cc5f5c3ba",
+      "conservation": {
+        "element_rel_error": 5.614872932731481e-16,
+        "water_rel_error": 0.0,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {
+        "release:stone_heavy|none": 1
+      },
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "days": 75,
+      "alive": 10,
+      "births": 2,
+      "ledger_valid": true,
+      "ledger_digest": "2dbc95203aaaeff1da742390e1e2fddb07d1b69d8da674e5a3cb67a1f0a0f398",
+      "conservation": {
+        "element_rel_error": 6.426180038615956e-16,
+        "water_rel_error": 1.9769457440192208e-16,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {},
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    }
+  ]
+}

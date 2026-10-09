@@ -139,10 +139,12 @@ class GenesisConfig:
             raise ValueError("human_actions_enabled requires human_cognition_enabled")
         if self.agentus_capacities_enabled and not (self.human_actions_enabled and self.human_calibration_enabled):
             raise ValueError("agentus_capacities_enabled requires human_actions_enabled and human_calibration_enabled")
-        if self.agentus_transition_model not in {"none", "experienced-transitions-v1"}:
+        if self.agentus_transition_model not in {"none", "experienced-transitions-v1", "experienced-transitions-v2"}:
             raise ValueError("unknown agentus_transition_model")
         if self.agentus_transition_model != "none" and not self.agentus_capacities_enabled:
             raise ValueError("agentus_transition_model requires agentus_capacities_enabled")
+        if self.agentus_transition_model == "experienced-transitions-v2" and self.child_energy_store != "size-scaled-v1":
+            raise ValueError("valued transitions require size-scaled-v1 energy accounting")
         if self.agentus_physiology_version not in {"reference-v1", "reference-v2"}:
             raise ValueError("unknown agentus_physiology_version")
         if self.agentus_physiology_version != "reference-v1" and not self.human_calibration_enabled:

@@ -1,7 +1,7 @@
 """Bounded memory of an individual's experienced physical transitions.
 
-Stage 1 is write-only: frequencies and costs are learned, but no reward,
-sequence value or action preference is inferred. Inputs are local perceptual
+Version 1 is write-only. Version 2 values short experienced chains from actual
+physiological benefit, cost and uncertainty. Inputs are local perceptual
 projections supplied by interactions, never raw world or peer state.
 """
 
@@ -13,6 +13,13 @@ import json
 
 
 MODEL = "experienced-transitions-v1"
+VALUED_MODEL = "experienced-transitions-v2"
+MODELS = {MODEL, VALUED_MODEL}
+PLAN_DEPTH = 3
+MIN_PLAN_EXPERIENCE = 2
+UNKNOWN_OUTCOMES = 2
+CONTINUATION_DISCOUNT = 0.9
+MAX_PLAN_EXPANSIONS = 128
 MAX_TRANSITIONS = 64
 RECENT_LENGTH = 8
 FORGET_AFTER_TICKS = 96
@@ -50,11 +57,11 @@ def forget(cognition: dict, epoch: int) -> None:
     retained = {e["id"] for e in edges}
     recent = [r for r in memory["recent"]
               if r["edge"] in retained and int(epoch) - int(r["epoch"]) <= FORGET_AFTER_TICKS]
-    cognition["transition_memory"] = {"model": MODEL, "edges": edges, "recent": recent}
+    cognition["transition_memory"] = {"model": memory["model"], "edges": edges, "recent": recent}
 
 
 def record(cognition: dict, before: dict, act: str, after: dict,
-           effort_kcal: float, injury: float, epoch: int) -> None:
+           effort_kcal: float, injury: float, epoch: int, *, model: str = MODEL) -> str:
     """Remember one actual attempt, including attempts with no visible change.
 
     Separate outcomes for the same before-state/action retain their individual
@@ -88,5 +95,74 @@ def record(cognition: dict, before: dict, act: str, after: dict,
     retained = {e["id"] for e in edges}
     recent = [r for r in memory["recent"] if r["edge"] in retained]
     recent.append({"edge": edge_id, "epoch": int(epoch)})
-    cognition["transition_memory"] = {"model": MODEL, "edges": edges,
+    cognition["transition_memory"] = {"model": model, "edges": edges,
                                        "recent": recent[-RECENT_LENGTH:]}
+    return edge_id
+
+
+def credit(cognition: dict, edge_id: str, gain_basal: float) -> None:
+    """Credit a particular experienced transition, never a time-near action.
+
+    The physical caller owns attribution and the benefit budget. Direct and
+    thermal components may add to one trial; n still counts physical attempts.
+    """
+    memory = cognition.get("transition_memory", {})
+    if memory.get("model") != VALUED_MODEL:
+        return
+    edges = []
+    for original in memory["edges"]:
+        edge = dict(original)
+        if edge["id"] == edge_id:
+            edge["gain_sum_basal"] = round(float(edge.get("gain_sum_basal", 0.0))
+                                           + max(0.0, float(gain_basal)), 10)
+        edges.append(edge)
+    cognition["transition_memory"] = {**memory, "edges": edges}
+
+
+def action_values(cognition: dict, state: dict, basal_kcal: float,
+                  depth: int = PLAN_DEPTH) -> dict[str, float]:
+    """Bounded expected net value over experienced state transitions only.
+
+    Costs and failures count. Two unknown adverse outcomes shrink expected
+    benefit, without discounting costs. Continuation can use only an action
+    newly enabled by the preceding transition. No state is applied to reality,
+    and no search branch can revisit an action or exceed three actions.
+    """
+    memory = cognition.get("transition_memory", {})
+    if memory.get("model") != VALUED_MODEL:
+        return {}
+    basal = max(1e-9, float(basal_kcal))
+    indexed: dict[str, dict[str, list[dict]]] = {}
+    state_key = lambda s: json.dumps(s, sort_keys=True, separators=(",", ":"))
+    for edge in memory["edges"]:
+        indexed.setdefault(state_key(edge["before"]), {}).setdefault(edge["act"], []).append(edge)
+    budget = MAX_PLAN_EXPANSIONS
+
+    def evaluate(current: dict, remaining: int, used: frozenset[str], allowed=None) -> dict[str, float]:
+        nonlocal budget
+        if budget <= 0:
+            return {}
+        budget -= 1
+        results = {}
+        for act, outcomes in sorted(indexed.get(state_key(current), {}).items()):
+            if act in used or (allowed is not None and act not in allowed):
+                continue
+            n = sum(int(e["n"]) for e in outcomes)
+            if n < MIN_PLAN_EXPERIENCE:
+                continue
+            benefit = 0.0
+            cost = 0.0
+            for edge in outcomes:
+                trials = int(edge["n"])
+                continuation = 0.0
+                if remaining > 1 and edge["enabled"]:
+                    following = evaluate(edge["after"], remaining - 1,
+                                         used | {act}, set(edge["enabled"]))
+                    continuation = max(0.0, max(following.values(), default=0.0))
+                benefit += float(edge.get("gain_sum_basal", 0.0))
+                benefit += trials * CONTINUATION_DISCOUNT * continuation
+                cost += trials * (float(edge["effort_kcal"]) / basal + 2.0 * float(edge["injury"]))
+            results[act] = round(benefit / (n + UNKNOWN_OUTCOMES) - cost / n, 10)
+        return results
+
+    return evaluate(state, max(1, min(PLAN_DEPTH, int(depth))), frozenset())
