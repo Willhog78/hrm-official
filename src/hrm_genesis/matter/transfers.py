@@ -56,6 +56,11 @@ def apply_water_cycle(
             0.0,
             0.03 * float(climate["solar"]) + 0.004 * max(float(climate["temperature"]), 0.0),
         )
+        # Only opt-in windy worlds provide this field. Move extra actual
+        # evaporated water through the existing water_output_kg ledger.
+        # The cap avoids an unbounded artificial loss under extreme winds.
+        wind_speed = max(0.0, float(climate.get("wind_speed_m_s", 0.0)))
+        evaporation *= 1.0 + min(0.6, wind_speed * 0.04)
         from_surface = min(surface, evaporation)
         surface -= from_surface
         remaining = evaporation - from_surface
