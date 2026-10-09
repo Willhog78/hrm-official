@@ -47,3 +47,12 @@ Climate/world fields -> matter hydrology -> producer fire/detritus/material geom
 
 ## Gate status / limitations
 Gate 0 **not passed yet**: no verified baseline suite, exhaustive production settings, full save-state schema and action/cognition/fire ownership trace. Gates 1–5 must not be described as implemented, tested, observed or learned. No full Railway experiment, deploy or merge authorized.
+
+## Gate 0 continuation — primitive geometry and deployment inspection
+- `human/actions.py::execute_live_sequence` transfers woody elements among woody, held, loose and arranged pools. `arrange` increases span by a fixed +0.45 m, height by +0.20 m and surface area by +0.5 m² per action even for arbitrarily small positive transferred mass. `separate` removes arranged mass without reducing stored geometry. `combine` transfers loose to arranged without updating geometry. These are direct physical consistency defects, requiring coordinated fixes with `biology._structural_protection` rather than changing only an insulation coefficient.
+- The current `biology._apply_physiology` charges thermal energy once and draws water for heat, followed later by a separate basal water loss recorded to `matter.water_output_kg`. The thermal water loss is not visibly added to that output in the inspected method. A conservation-focused test must verify this before Gate 2.
+- The default `GenesisConfig` uses 120 ticks/year and disabled human/ecology; a calibrated long run explicitly enables 365 ticks/year, material scale 1000 and human actions/cognition. Any new duration/rate must scale with simulated elapsed time, not blindly with tick count.
+- Root `AGENTS.md` is absent; other repository rules still apply. The tree also lists multiple *planned* files; do not treat them as present or import them.
+- Baseline tests **not run**: the available shell environment could not resolve github.com and therefore could not clone this repository. GitHub connector reads and writes work; they do not execute the project tests. This is an unresolved Gate 0 verification requirement, not a passing result.
+
+**Additional risk:** changing arrangement geometry setters and ambient moderation at the same time could confound protection contrasts. The minimal Gate 1 should first make geometry mass-constrained and damage-aware with a legacy-controlled opt-in, then measure resulting cover independently of thermal physiology.
