@@ -3,6 +3,7 @@
 Version 1 is write-only. Version 2 values short experienced chains from actual
 physiological benefit, cost and uncertainty. Inputs are local perceptual
 projections supplied by interactions, never raw world or peer state.
+Version 3 additionally accumulates bounded delayed thermal returns.
 """
 
 from __future__ import annotations
@@ -14,7 +15,11 @@ import json
 
 MODEL = "experienced-transitions-v1"
 VALUED_MODEL = "experienced-transitions-v2"
-MODELS = {MODEL, VALUED_MODEL}
+DELAYED_MODEL = "experienced-transitions-v3"
+VALUED_MODELS = {VALUED_MODEL, DELAYED_MODEL}
+MODELS = {MODEL, *VALUED_MODELS}
+THERMAL_HORIZON = 32
+THERMAL_DISCOUNT = 0.97
 PLAN_DEPTH = 3
 MIN_PLAN_EXPERIENCE = 2
 UNKNOWN_OUTCOMES = 2
@@ -107,7 +112,7 @@ def credit(cognition: dict, edge_id: str, gain_basal: float) -> None:
     thermal components may add to one trial; n still counts physical attempts.
     """
     memory = cognition.get("transition_memory", {})
-    if memory.get("model") != VALUED_MODEL:
+    if memory.get("model") not in VALUED_MODELS:
         return
     edges = []
     for original in memory["edges"]:
@@ -129,7 +134,7 @@ def action_values(cognition: dict, state: dict, basal_kcal: float,
     and no search branch can revisit an action or exceed three actions.
     """
     memory = cognition.get("transition_memory", {})
-    if memory.get("model") != VALUED_MODEL:
+    if memory.get("model") not in VALUED_MODELS:
         return {}
     basal = max(1e-9, float(basal_kcal))
     indexed: dict[str, dict[str, list[dict]]] = {}

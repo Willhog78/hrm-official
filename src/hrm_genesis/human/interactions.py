@@ -320,8 +320,11 @@ class Context:
         self.arrangement_before = ({
             "arranged_material_elements_kg": dict(pcell.get("arranged_material_elements_kg", {})),
             "arrangement_geometry": dict(pcell.get("arrangement_geometry", {})),
-        } if humans.get("transition_model") == transitions.VALUED_MODEL else None)
+        } if humans.get("transition_model") in transitions.VALUED_MODELS else None)
         self.insulation_before = insulation_c(humans, str(human["id"])) if self.arrangement_before is not None else None
+        self.worn_before_ids = ({str(o["id"]) for o in humans.get("objects", [])
+                                 if o.get("holder") == self.agent_id and o.get("worn")}
+                                if humans.get("transition_model") == transitions.DELAYED_MODEL else set())
 
     @property
     def agent_id(self) -> str:
@@ -679,7 +682,7 @@ def _transition_perception(ctx: Context) -> dict:
                     band(float(ctx.human.get("skin_wetness", 0.0)), (0.25, 0.75))],
         "acts": sorted({key for key, _ in enumerate_affordances(ctx)})[:transitions.MAX_ACTS],
     }
-    if ctx.humans.get("transition_model") == transitions.VALUED_MODEL:
+    if ctx.humans.get("transition_model") in transitions.VALUED_MODELS:
         basal = max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"]))
         water_loss = max(1e-9, float(ctx.profile.get("water_loss_per_tick_kg", 1.0)))
         water_floor = float(ctx.profile.get("water_capacity_kg", 0.0)) * float(ctx.profile.get("min_water_fraction", 0.5))
@@ -698,15 +701,19 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
     made, shaped or picked up. Object history is how later benefit reaches the
     preparation that made it possible, however long ago that was."""
     transition_model = ctx.humans.get("transition_model")
+    arrangement_before = (_thermal_arrangement(ctx.pcell)
+                          if transition_model == transitions.DELAYED_MODEL else None)
     transition_before = (_transition_perception(ctx)
                          if transition_model in transitions.MODELS else None)
     fresh_before = (available_kg("fresh_tissue", ctx.pcell, ctx.ccell)
-                    if transition_model == transitions.VALUED_MODEL else 0.0)
+                    if transition_model in transitions.VALUED_MODELS else 0.0)
     before = {o["id"]: (_signature(o), o.get("history", []), o.get("holder")) for o in ctx.humans["objects"]}
     forms_before, pools_before = _material_forms(ctx)
     tool = _find(ctx.humans, spec.get("tool"))
     tool_history = list(tool.get("history", [])) if tool is not None else []
     out = _execute_physical(ctx, key, spec)
+    if arrangement_before is not None and arrangement_before != _thermal_arrangement(ctx.pcell):
+        ctx.pcell["thermal_revision"] = int(ctx.pcell.get("thermal_revision", 0)) + 1
     out["tool_history"] = tool_history
     if "wind_speed_m_s" in ctx.wcell:
         for obj in ctx.humans["objects"]:
@@ -735,7 +742,7 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
         edge_id = transitions.record(ctx.human["cognition"], transition_before, key,
                                      transition_after, out["effort_kcal"], out["injury"], ctx.epoch,
                                      model=transition_model)
-        if transition_model == transitions.VALUED_MODEL:
+        if transition_model in transitions.VALUED_MODELS:
             out["transition_edge"] = edge_id
             out["fresh_before_kg"] = fresh_before
             out["wear_changed"] = transition_before["worn"] != transition_after["worn"]
@@ -1045,7 +1052,7 @@ def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: boo
     if not options:
         return None
     sequence_state = None
-    if ctx.humans.get("transition_model") == transitions.VALUED_MODEL:
+    if ctx.humans.get("transition_model") in transitions.VALUED_MODELS:
         # Only discretionary reserves fund a speculative plan. Recompute at
         # every physical step; a remembered plan cannot reserve or create matter.
         basal = max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"]))
@@ -1180,7 +1187,7 @@ def run_interactions(
 
 def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
     """Update interaction and food expectations from what was experienced."""
-    if ctx.humans.get("transition_model") == transitions.VALUED_MODEL:
+    if ctx.humans.get("transition_model") in transitions.VALUED_MODELS:
         if ctx.sequence_food_settled:
             return
         ctx.sequence_food_settled = True
@@ -1208,7 +1215,7 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
     hand_access = float(FOOD_KINDS["fresh_tissue"]["hand_access_kg"]) * max(0.1, float(ctx.profile.get("development_scale", 1.0)))
     trace = list(cognition.get("trace", []))
     sequence_gains = (_sequence_food_gains(ctx, intake, hand_access)
-                      if ctx.humans.get("transition_model") == transitions.VALUED_MODEL else None)
+                      if ctx.humans.get("transition_model") in transitions.VALUED_MODELS else None)
     for index, (key, out) in enumerate(ctx.performed):
         gain = 0.0
         if out.get("capture") and kg_by_kind.get("fresh_tissue", 0.0) > 0.0:
@@ -1273,6 +1280,92 @@ def _sequence_food_gains(ctx: Context, intake: list[dict], hand_access: float) -
         weights.append(share)
     divisor = max(1.0, sum(weights))
     return [received * w / divisor for w in weights]
+
+
+def _thermal_arrangement(pcell: dict) -> dict:
+    """Physical attribution snapshot; never a planner's perceptual state."""
+    return {"arranged_material_elements_kg": dict(pcell.get("arranged_material_elements_kg", {})),
+            "arrangement_geometry": dict(pcell.get("arrangement_geometry", {}))}
+
+
+def prepare_thermal_trials(humans: dict, human: dict, pcell: dict, epoch: int,
+                           profile: dict, ctx: Context | None = None) -> tuple[dict, float]:
+    """Follow only own actual contributions, with at most two bounded trials.
+
+    Physical provenance is stored outside cognition. Exact arrangement matching
+    deliberately abandons credit after any intervention, even a helpful one.
+    Worn objects may decay; their current contribution is measured by excluding
+    those exact IDs from the current worn inventory, not freezing old warmth.
+    """
+    current_arrangement = _thermal_arrangement(pcell)
+    current_insulation = insulation_c(humans, str(human["id"]))
+    if humans.get("transition_model") != transitions.DELAYED_MODEL:
+        return current_arrangement, current_insulation
+    retained = {e["id"] for e in human.get("cognition", {}).get("transition_memory", {}).get("edges", [])}
+    worn = {str(o["id"]): o for o in humans.get("objects", [])
+            if o.get("holder") == str(human["id"]) and o.get("worn")}
+    xy = [int(human["x"]), int(human["y"])]
+    trials = {}
+    for kind, trial in human.get("thermal_trials", {}).items():
+        if not 0 <= int(epoch) - int(trial["started"]) < transitions.THERMAL_HORIZON:
+            continue
+        if not all(edge_id in retained for edge_id in trial["edges"]):
+            continue
+        if kind == "arrangement":
+            if (trial["xy"] != xy or trial["after"] != current_arrangement
+                    or trial["revision"] != int(pcell.get("thermal_revision", 0))):
+                continue
+        elif kind == "worn":
+            if set(trial["worn_ids"]) != set(worn) or not set(trial["added_ids"]) <= set(worn):
+                continue
+        else:
+            continue
+        trials[kind] = trial
+    if ctx is not None and int(human.get("thermal_settled_epoch", -1)) != int(epoch):
+        basal = max(1e-9, float(profile["basal_energy_kcal_per_tick"]))
+        for kind, prefix in (("worn", "wear:"), ("arrangement", "arrange:")):
+            candidates = [out["transition_edge"] for key, out in ctx.performed
+                          if key.startswith(prefix) and out.get("transition_edge")
+                          and (out.get("wear_changed") if kind == "worn" else out.get("transformed"))]
+            if not candidates:
+                continue
+            # A new overlapping trial gets only its own marginal contribution.
+            trials.pop(kind, None)
+            common = {"edges": candidates, "started": int(epoch), "basal": basal}
+            if kind == "arrangement" and ctx.arrangement_before != current_arrangement:
+                trials[kind] = {**common, "xy": xy, "before": ctx.arrangement_before,
+                                "after": current_arrangement,
+                                "revision": int(pcell.get("thermal_revision", 0))}
+            elif kind == "worn":
+                added = sorted(set(worn) - ctx.worn_before_ids)
+                if added:
+                    trials[kind] = {**common, "worn_ids": sorted(worn), "added_ids": added}
+    human["thermal_trials"] = trials
+    arrangement_reference = trials.get("arrangement", {}).get("before", current_arrangement)
+    added_ids = set(trials.get("worn", {}).get("added_ids", []))
+    reference_objects = [o for o in humans.get("objects", []) if str(o["id"]) not in added_ids]
+    insulation_reference = insulation_c({"objects": reference_objects}, str(human["id"]))
+    return arrangement_reference, insulation_reference
+
+
+def settle_thermal_trials(humans: dict, human: dict, epoch: int,
+                          worn_kcal: float, arrangement_kcal: float) -> None:
+    """Add only today's discounted realized benefit to originating attempts."""
+    if (humans.get("transition_model") != transitions.DELAYED_MODEL
+            or int(human.get("thermal_settled_epoch", -1)) >= int(epoch)):
+        return
+    human["thermal_settled_epoch"] = int(epoch)
+    trials = human.get("thermal_trials", {})
+    for kind, gain in (("worn", worn_kcal), ("arrangement", arrangement_kcal)):
+        trial = trials.get(kind)
+        if trial is None:
+            continue
+        age = int(epoch) - int(trial["started"])
+        if not 0 <= age < transitions.THERMAL_HORIZON:
+            continue
+        received = max(0.0, float(gain)) * transitions.THERMAL_DISCOUNT ** age / float(trial["basal"])
+        for edge_id in trial["edges"]:
+            transitions.credit(human["cognition"], edge_id, received / len(trial["edges"]))
 
 
 def credit_transition_heat(ctx: Context | None, worn_kcal: float, arrangement_kcal: float) -> None:

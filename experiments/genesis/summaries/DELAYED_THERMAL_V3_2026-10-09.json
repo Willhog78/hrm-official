@@ -1,0 +1,91 @@
+{
+  "model": "experienced-transitions-v3",
+  "date": "2026-10-09",
+  "thermal_horizon_ticks": 32,
+  "thermal_discount": 0.97,
+  "controlled_fixture": {
+    "trials": 8,
+    "surface_area_m2": 0.015,
+    "temperature_c": 0,
+    "first_tick_saving_kcal": 0.6,
+    "wear_cost_kcal": 4,
+    "discounted_return_per_wear_trial_kcal": 12.453849,
+    "direct_grasp_value": -0.00156,
+    "conditional_grasp_value": 0.0005867085,
+    "preconditions": "Supplied surface; grasp/wear attempts are controlled. Actual thermal physiology runs for 32 ticks per trial; ordinary basal feeding/movement is outside this controlled fixture. Live-biology settlement and serialization are tested separately."
+  },
+  "smoke": [
+    {
+      "seed": "agentus-demography-a",
+      "days": 75,
+      "alive": 8,
+      "births": 0,
+      "ledger_valid": true,
+      "ledger_digest": "c33251969172c36151cd005dae881ec77cae699fcb77b7dd098b14665dc63564",
+      "conservation": {
+        "element_rel_error": 1.2052320645430459e-15,
+        "water_rel_error": 0.0,
+        "lithic_abs_error_kg": 5.684341886080802e-14
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {},
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    },
+    {
+      "seed": "agentus-demography-b",
+      "days": 75,
+      "alive": 9,
+      "births": 1,
+      "ledger_valid": true,
+      "ledger_digest": "016ec44c7453bca8a6ec9a87222a5c2dc53ac36bf96bf1be38558486507e0273",
+      "conservation": {
+        "element_rel_error": 5.614872932731481e-16,
+        "water_rel_error": 0.0,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {
+        "release:stone_heavy|none": 1
+      },
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "days": 75,
+      "alive": 10,
+      "births": 2,
+      "ledger_valid": true,
+      "ledger_digest": "c6a7c359bc90f4e7cfe855bbdf6b0c5b630f209a3f8cb30fc81ff7ddb26de8f6",
+      "conservation": {
+        "element_rel_error": 6.426180038615956e-16,
+        "water_rel_error": 1.9769457440192208e-16,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      },
+      "sequence_choices": {},
+      "sequence_exploration": {},
+      "max_interactions_per_agent_day": 3,
+      "checks": {
+        "fail": [],
+        "warn": []
+      }
+    }
+  ],
+  "verification": {
+    "distinct_tests_passed": 223,
+    "micro_tests": 164,
+    "selected_integration_and_regression_tests": 59,
+    "default_fast": "PASS",
+    "v3_smoke": "PASS",
+    "observer_ledger_parity": true,
+    "full_repository_suite_run": false,
+    "long_run_survival_run": false
+  }
+}
