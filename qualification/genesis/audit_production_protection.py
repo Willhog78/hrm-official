@@ -21,17 +21,18 @@ def main():
         previous_wear=0
         for day in range(1,DAYS+1):
             sim.run(1)
-            if day in (30,90,180,270,365):
-                h=sim.human_state()
-                st=h.get("capacity_stats",{})
-                objs=h.get("objects",[])
+            h=sim.human_state()
+            st=h.get("capacity_stats",{})
+            objs=h.get("objects",[])
             wear_count=int(st.get("worn_surfaces",0))
             if wear_count>previous_wear:
-                for o in objs:
-                    if o.get("material")=="surface":
-                        owner=next((p for p in h["humans"] if p["id"]==o.get("holder")),None)
-                        print(f"WEAR_TRACE seed={seed} day={day} object={o.get('id')} worn={o.get('worn')} holder={o.get('holder')} cohesion={o.get('cohesion')} area={o.get('area_m2')} owner_cold={None if owner is None else owner.get('cold_exposure')} owner_energy={None if owner is None else owner.get('energy')} history={o.get('history',[])[-5:]}",flush=True)
+                worn_now=[o for o in objs if o.get("material")=="surface" and o.get("worn")]
+                for o in worn_now:
+                    owner=next((p for p in h["humans"] if p["id"]==o.get("holder")),None)
+                    print(f"WEAR_TRACE seed={seed} day={day} object={o.get('id')} worn={o.get('worn')} holder={o.get('holder')} cohesion={o.get('cohesion')} area={o.get('area_m2')} owner_cold={None if owner is None else owner.get('cold_exposure')} history={o.get('history',[])[-5:]}",flush=True)
+                print(f"WEAR_EVENT seed={seed} day={day} attempts_delta={wear_count-previous_wear} worn_now={len(worn_now)}",flush=True)
                 previous_wear=wear_count
+            if day in (30,90,180,270,365):
                 worn=sum(o.get("worn",False) and o.get("material")=="surface" for o in objs)
                 held=sum(o.get("holder") is not None and o.get("material")=="surface" for o in objs)
                 alive=len(h["humans"])
