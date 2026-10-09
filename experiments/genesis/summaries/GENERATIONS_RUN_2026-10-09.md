@@ -57,7 +57,7 @@
   - d had none from year 6 to year 18.
 - **Seeds a and b slowed to 0–1 births a year**, and had none at all from year 15 (a) and year 12 (b) until year 19.
 - **Measured cause in seed d** (`scratchpad repro_check`, year 7): every one of the 1,460 adult-female days failed on a single condition, `no_adult_male_in_cell`. Energy, body mass (about 28 kg against a 25.2 kg threshold) and cooldown were all satisfied. The founders' sexes did not share cells. Reproduction rules were not changed.
-- **Year 19 onward.** In all four seeds, founder mothers (gen-1 births) and the new generation-1 mothers (gen-2 births) began giving birth in the same year, year 19. That is the year the first world-born individuals became adults.
+- **Birth restart.** Founder mothers (gen-1 births) and world-born mothers (gen-2 births) resumed or began births in year 19 in a, b and d, and year 20 in c. The subsequent diagnosis traces qualifying males and daily eligibility; see `GENERATIONS_DIAGNOSIS_2026-10-09.md`.
   - Inference, not measured: new adult males now share cells with founder and generation-1 females, which removes the `no_adult_male_in_cell` block. A per-day diagnostic at year 19 would confirm or refute this.
 - **Seed d's 4-a-year pattern.** d had exactly 4 gen-1 births in years 1–4, 19–22 and 24–27, which is consistent with all 4 founder females giving birth in those years.
 - **Founder births ending.** In seed a, founders had no births after year 27; generation-1 mothers continued (2–3 births a year in years 28–30). In b and d, both founders and generation-1 mothers were still giving birth in year 30.
@@ -92,8 +92,8 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 
 | Seed | Grazer | Stalker | Browser (start → year 30) |
 |---|---|---|---|
-| a | extinct by year 2: 3 captured by Agentus (years 1–2) | starved, year 3 | 1 → 631 |
-| b | 1 survived year 1 (2 captured); then grew to 4,090 at year 30 | none alive at the end of year 1 | 2 → 819 |
+| a | extinct by year 2: both initial grazers captured; the third capture was a browser | starved, year 3 | 1 → 631 |
+| b | 1 survived year 1 (1 grazer captured); then grew to 4,090 at year 30 | captured by Agentus on day 17 | 2 → 819 |
 | c | persisted; 2,044 at year 30 | 1 alive until year 23; starved | 2 → 712 |
 | d | extinct in year 1: 2 captured by Agentus | starved, year 2 | 2 → 864 |
 
@@ -123,9 +123,9 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
   - working bark and strands with a stone (year 29).
 
   Its captures rose to 9 in year 27 and 7 in year 30. Its positive learned values include `strike:stone_edged|bound_stone_small_on_stick` and `bind:stone_small+stick|strand`.
-- **Imitation never paid.** Attempts rose with population, peaking at 128 in one year in d, and none paid off.
+- **The immediate imitation payoff counter stayed zero.** Attempts rose with population, peaking at 128 in one year in d. This counter does not cover observation-based value updates or later benefits from preparation; zero is not evidence that all social learning failed.
 - **Following and clothing never appeared.** Following was 0 throughout, and no object was ever worn, so insulation saving was 0.
-- **Did learned behaviour carry forward?** Whether it is held by world-born adults or only by founders is not measured: `positive_acts_living` counts keys across all living individuals without attributing them to a generation.
+- **World-born tool use is present in c.** The subsequent diagnosis attributes repeated acts and positive values to generation-1 individuals `human-b00000008` and `human-b00000009`. The original `positive_acts_living` summary alone could not establish this.
 
 ## 5. Run mechanics
 
@@ -147,7 +147,7 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 ## 6. What this does and does not establish
 
 **Established, observed:**
-- In all four seeds, world-born children survived to adulthood, and they began having children in the year they matured.
+- In all four seeds, world-born children survived to adulthood. Generation-2 births began in year 19 in a, b and d, and year 20 in c.
 - Through year 30, gen-2 births continued in a, b and d, but stopped in c after year 25.
 
 **Not established:**
@@ -157,6 +157,6 @@ Generation-1 children born after year 12 are not yet 18, so the adult counts are
 - why the dependents died;
 - the cause of the year-19 restart of founder births, which is inferred, not measured.
 
-**Behaviour.** Behaviour did not improve with population, except in seed c, where browsers stayed reachable and a repeated stick-and-stone repertoire grew. Imitation, following and clothing never produced value.
+**Behaviour.** Seed c developed a repeated stick-and-stone repertoire, including world-born users. The immediate imitation payoff counter remained zero; the subsequent diagnosis identifies measurement and eligibility limitations. Following and clothing stayed absent.
 
 No world or behaviour change is proposed here.
