@@ -1012,7 +1012,16 @@ def run_interactions(
     for step in range(MAX_INTERACTIONS_PER_TICK):
         if float(human.get("fatigue", 0.0)) > 0.8:
             break
-        picked = choose(ctx, enumerate_affordances(ctx), step, hungry)
+        options = enumerate_affordances(ctx)
+        # Record opportunities, not intentions or prescribed behavior. An
+        # interlaced surface can be made without the agent ever seeing an
+        # opportunity to place it against the body.
+        if "wind_speed_m_s" in wcell:
+            if any(spec.get("verb") == "wear" for _, spec in options):
+                _bump(ctx.stats, "wear_affordance_offered")
+            if any(spec.get("verb") == "interlace" for _, spec in options):
+                _bump(ctx.stats, "interlace_affordance_offered")
+        picked = choose(ctx, options, step, hungry)
         if picked is None:
             break
         key, spec = picked
