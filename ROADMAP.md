@@ -494,3 +494,9 @@ Physical/replay qualification passes: 208 distinct selected tests, three-seed 30
 ### Material work scale — controlled read-only diagnosis (2026-10-09)
 
 Reference material-response probes identify the missing incremental interlacing affordance: live weaving consumes at most six held raw strands, while existing material physics supports larger strand sets. Twisting and surface joining offer expensive alternative accumulation routes, so this is not an absolute area ceiling. A controlled 30 kg arrangement costs 121 actions and 1,658 kcal but saves 49.5 kcal per favourable -5 °C day; ecology and weathering were not applied. Next: versioned incremental surface work plus controlled normal-tick arrangement accumulation. Three diagnostic tests pass; runtime code is unchanged. See `experiments/genesis/summaries/MATERIAL_SCALE_2026-10-09.md`.
+
+### Incremental interlacing — implemented, opt-in (2026-10-09)
+
+Surface work v1 adds currently held strands to an existing held unworn surface through costed interlacing, preserving material and existing damage. Own worn surfaces can be removed to the ground and reacquired under normal hand/carry limits. The version defaults off; priorities, physiology and production settings are unchanged.
+
+All 224 selected tests, smoke, opt-in checkpoint/observer equivalence, and three opt-out year-long ledger comparisons pass. Three untrained year-long worlds made one extension attempt with no learned sequence choices; protective savings remained negligible and all-worn energy saving fell to 0.3013 kcal. Separately controlled 120-day wood work in three normal worlds never accumulated a 30 kg arrangement. Continuity of accessible material and repeated investment across ticks is the next boundary. Contract: `docs/architecture/INCREMENTAL_INTERLACING.md`; report: `experiments/genesis/summaries/INCREMENTAL_INTERLACE_2026-10-09.md`.

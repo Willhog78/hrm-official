@@ -224,6 +224,8 @@ class GenesisSimulation:
                     human_state = enable_subcell_positions(human_state, config.master_seed)
                 if config.agentus_local_work_enabled:
                     human_state["local_work_model"] = "local-material-v1"
+                if config.agentus_surface_work_enabled:
+                    human_state["surface_work_model"] = "incremental-interlace-v1"
                 if config.agentus_capacity_ablation:
                     human_state["capacity_ablation"] = config.agentus_capacity_ablation
 
