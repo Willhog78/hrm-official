@@ -735,6 +735,19 @@ def _one_step_toward(origin: tuple[int, int], target: tuple[int, int]) -> tuple[
     return origin
 
 
+def _account_heat_water_loss(matter: dict, world_cell: dict, before_kg: float, after_kg: float) -> float:
+    """Move evaporated body water to the atmospheric-output ledger once.
+
+    Only newly opted-in weather worlds change behavior. No value is added
+    for hydration or water retained in the body.
+    """
+    if "wind_speed_m_s" not in world_cell:
+        return 0.0
+    amount = max(0.0, before_kg - after_kg)
+    matter["water_output_kg"] = float(matter["water_output_kg"]) + amount
+    return amount
+
+
 def _apply_physiology(
     human: dict,
     world_cell: dict,
@@ -1146,9 +1159,7 @@ def evolve_agentus_step(
         # In wind-enabled worlds every such kilogram must leave the human
         # inventory and enter Matter's existing water-output account exactly once.
         # Preserve historical accounting in old windless simulations.
-        if "wind_speed_m_s" in wcells[xy]:
-            heat_water_loss = max(0.0, water_before_physiology - float(human["body_water_kg"]))
-            matter["water_output_kg"] = float(matter["water_output_kg"]) + heat_water_loss
+        _account_heat_water_loss(matter, wcells[xy], water_before_physiology, float(human["body_water_kg"]))
         attacks = _apply_predator_threat(human, consumer_state, epoch)
         if attacks:
             humans["predator_attack_events"] = int(humans.get("predator_attack_events", 0)) + attacks
