@@ -27,7 +27,7 @@ def main():
         occupied_cover_days = 0
         worn_days = 0
         exposed_days = 0
-        initial_arrangement = None
+        initial_arrangement = sum(\n            _mass(cell.get("arranged_material_elements_kg", {}))\n            for cell in sim.ecology_state().get("cells", [])\n        )
         for day in range(1, DAYS + 1):
             sim.run(1)
             humans = sim.human_state()
@@ -45,8 +45,6 @@ def main():
                 if _mass(c.get("arranged_material_elements_kg", {})) > 0
             }
             amount = sum(_mass(c["arranged_material_elements_kg"]) for c in arranged.values())
-            if initial_arrangement is None:
-                initial_arrangement = amount
             max_arrangement_mass = max(max_arrangement_mass, amount)
             worn_owners = {
                 obj.get("holder") for obj in humans.get("objects", [])
@@ -64,14 +62,14 @@ def main():
                 print(f"JOINT_PROTECTION seed={seed} day={day} "
                       f"arrangement_mass_kg={amount:.8f} "
                       f"arrangement_cells={len(arranged)} "
-                      f"covered_occupant_days={occupied_cover_days} "
+                      f"same_cell_arrangement_occupant_days={occupied_cover_days} "
                       f"worn_occupant_days={worn_days} "
-                      f"outside_arrangement_days={exposed_days}", flush=True)
+                      f"other_cell_occupant_days={exposed_days}", flush=True)
         assert sim.ledger.verify_chain()
         print(f"JOINT_PROTECTION_FINAL seed={seed} "
               f"first_observed_arrangement_mass_kg={initial_arrangement:.8f} "
               f"peak_arrangement_mass_kg={max_arrangement_mass:.8f} "
-              f"covered_occupant_days={occupied_cover_days} "
+              f"same_cell_arrangement_occupant_days={occupied_cover_days} "
               f"worn_occupant_days={worn_days}", flush=True)
     print("JOINT_PROTECTION_AUDIT_COMPLETE", flush=True)
 
