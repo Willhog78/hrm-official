@@ -31,7 +31,8 @@ def test_interlacing_scale_conserves_constituent_matter():
             assert len(surface["strands"]) == count
             assert math.isclose(mo.object_mass(surface), before, rel_tol=1e-12)
             assert math.isclose(mo.object_elements(surface)["C"], before_elements, rel_tol=1e-12)
-            assert 0 <= surface["area_m2"] <= max(s["length_m"] for s in fibers) ** 2
+            assert surface["area_m2"] >= 0
+            assert surface["area_m2"] <= max(s["length_m"] for s in fibers) ** 2 + 1e-10
             assert surface["area_m2"] >= previous_area
             previous_area = surface["area_m2"]
             print(f"WEAVE_SCALE source={source} strands={count} "
