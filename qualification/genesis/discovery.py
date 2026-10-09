@@ -237,9 +237,12 @@ class Census:
             'counts', 'offered_keys', 'attempts', 'progress', 'effort', 'reward', 'reward_events', 'choice_reasons')}
 
 
-def run_one(seed, weather, days, observed=True, thermal_exposure=False):
+def run_one(seed, weather, days, observed=True, thermal_exposure=False, local_work=False):
     started = time.perf_counter()
-    sim = GenesisSimulation(config_for(seed, weather))
+    config = config_for(seed, weather)
+    if local_work:
+        config = replace(config, agentus_local_work_enabled=True)
+    sim = GenesisSimulation(config)
     census = Census(thermal_exposure)
     initial = sim.human_state()
     if observed:

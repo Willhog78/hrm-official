@@ -64,6 +64,8 @@ def execute_live_sequence(
     sequence: list[str] | tuple[str, ...],
     human: dict,
     producer_cell: dict,
+    *,
+    placement_offset_m: tuple[float, float] | None = None,
 ) -> tuple[dict, dict, dict]:
     """Apply general primitives to real local material state.
 
@@ -119,6 +121,9 @@ def execute_live_sequence(
             trace["effort_energy_kcal"] += 2.0
 
         elif action == "arrange" and _mass(loose) > 0.0:
+            # One arrangement per cell: additions cannot teleport existing wood.
+            if placement_offset_m is not None and _mass(arranged) <= 0.0:
+                geometry["center_offset_m"] = [float(v) for v in placement_offset_m]
             moved = dict(loose)
             for symbol in loose:
                 loose[symbol] = 0.0

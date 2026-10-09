@@ -485,3 +485,8 @@ Agents spontaneously interlace/wear and arrange material, but measured protectio
 is negligible and useful stone/food overlap is rare. Physical placement/work scale
 is the next boundary; no cognition, physics or production behavior was changed.
 Report: `experiments/genesis/summaries/DISCOVERY_DIAGNOSIS_V4_2026-10-09.md`.
+# Local material work v1 — implemented, opt-in (2026-10-09)
+
+The diagnosis's placement gap is addressed through costed local steps, first arrangement placement at the maker, fixed-centre reachable additions and quarter-turn rotation. Two held unworn surfaces can be joined with a held strand under physical seam constraints, preserving their elements and losing area to overlap. Delayed thermal attribution includes the previous occupant position. This does not change planning priorities or production defaults.
+
+Physical/replay qualification passes: 208 distinct selected tests, three-seed 30-day smoke, full 35-day opt-in observed/checkpoint equivalence, and three opt-out year-long ledger matches against the prior census. Three untrained active year-long worlds made 183 local moves and 23 rotations. Arrangement thermal savings were only 0.0002503452 kcal total; no joining opportunity or sequence-value choice occurred. Consequential work scale and ecological acquisition remain open. See `docs/architecture/LOCAL_MATERIAL_WORK.md` and `experiments/genesis/summaries/LOCAL_WORK_2026-10-09.md`.
