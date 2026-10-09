@@ -236,6 +236,8 @@ def object_mass(obj: dict) -> float:
         return float(obj["fragment"]["m"])
     if obj["material"] == "assembly":
         return sum(object_mass(c) for c in obj["components"]) + object_mass(obj["binder"])
+    if obj["material"] == "surface":
+        return sum(object_mass(strand) for strand in obj["strands"])
     return sum(float(v) for v in obj.get("elements_kg", {}).values())
 
 
