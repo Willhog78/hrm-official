@@ -633,6 +633,10 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
     tool_history = list(tool.get("history", [])) if tool is not None else []
     out = _execute_physical(ctx, key, spec)
     out["tool_history"] = tool_history
+    if "wind_speed_m_s" in ctx.wcell:
+        for obj in ctx.humans["objects"]:
+            if obj["id"] not in before:
+                obj["first_handled_epoch"] = int(ctx.epoch)
     after_ids = {o["id"] for o in ctx.humans["objects"]}
     # What anyone present can see appear: the classes of objects this act made.
     out["created_classes"] = sorted(object_class(o) for o in ctx.humans["objects"] if o["id"] not in before)
@@ -967,8 +971,24 @@ def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: boo
                 _bump_map(ctx.stats, "imitation_tries", option[0], 1)
                 return option
     explore_p = EXPLORE_HUNGRY if hungry else EXPLORE_SATED
+    candidates = untried
+    if "wind_speed_m_s" in ctx.wcell and untried:
+        # General physical novelty, not garment knowledge: any newly handled
+        # object briefly draws attention to interactions involving that object.
+        # Existing reward learning still decides whether the act is repeated.
+        fresh = []
+        for option in untried:
+            obj_id = option[1].get("id")
+            obj = _find(ctx.humans, obj_id) if obj_id is not None else None
+            if (obj is not None and obj.get("holder") == ctx.agent_id
+                    and 0 <= ctx.epoch - int(obj.get("first_handled_epoch", -999999)) <= 2):
+                fresh.append(option)
+        if fresh:
+            explore_p = max(explore_p, 0.30)
+            # Fresh objects receive more chances but never mandate an act.
+            candidates = untried + fresh * 3
     if untried and ctx.draw("explore", step) < explore_p:
-        return untried[int(ctx.draw("explore-pick", step) * len(untried)) % len(untried)]
+        return candidates[int(ctx.draw("explore-pick", step) * len(candidates)) % len(candidates)]
     known = [o for o in options if o[0] in values]
     positive = [o for o in known if float(values[o[0]]["v"]) > 0.0]
     if positive:
