@@ -307,3 +307,25 @@ These track the corrected plant-only control (771 t at year 5 for seed a).
 - **Grazer extinctions in a and d are caused by Agentus hunting in years 1–2.** The stalker deaths in those two seeds follow them, recorded as starvation.
 
 **Reproducibility check.** A redeploy of build 83ba80b (`8ed5e891`) reused its stored start command by mistake and re-ran the seed a world report. The result was identical: 16 alive, 8 births, 0 deaths, the same animals by year (grazers killed by Agentus in years 1–2, the stalker starved in year 3), and 771.3 t of edible plants at year 5. The caregiver audit runs from a fresh deployment of the same code. The commits since 83ba80b change documentation only.
+
+## Caregiver audit, third run
+
+Deployment `eafa5026`; code identical to 83ba80b. Second-run values in brackets.
+
+| Seed | Caregiver days with reserve < 0.75 | With reserve < 0.25 | Mean caregiver reserve | Milk per nursing day (kcal) | Child store clamp per nursing day (kcal) | Deaths |
+|---|---|---|---|---|---|---|
+| a | 10 (426) | 0 (11) | 0.926 (0.90) | 123.6 (141.3) | 36.3 (28.5) | 0 |
+| b | 71 (143) | 0 (0) | 0.915 (0.91) | 136.0 (149.1) | 31.6 (24.4) | 0 |
+| c | 6 (85) | 0 (0) | 0.915 (0.91) | 140.6 (135.6) | 29.9 (29.3) | 0 |
+| d | 122 (153) | 28 (28) | 0.910 (0.91) | 142.6 (143.5) | 28.9 (26.1) | 0 |
+
+- **Low-reserve days fell sharply in every seed.** In seed d, 8 adults care for up to 20 dependents and still hold a mean caregiver reserve of 0.91. Its 28 days below 0.25 match the second run exactly. That run had them on single-infant days (one dependent, 290 kcal of milk a day, full stomach every day).
+- **Hand-feeding checks:**
+  - Every child past 180 days was at or above the 0.75 trigger. Its reserve was 1.0 or higher in all four seeds, at whatever reserve its caregiver had.
+  - The only checks of children past 180 days whose caregiver was below 0.75 are 5 in seed b, and all 5 children were full.
+  - No child past 180 days was checked while its caregiver was below 0.25.
+- **Eating beyond need:**
+  - Non-caregivers: 0.34–0.36 kg/day of 1.31–1.33 kg eaten.
+  - Caregivers: 0.23–0.31 kg/day. On low-reserve days, 0.
+- **Milk:** produced, charged and absorbed are equal; nothing is unabsorbed; 98–99% of nursing days are limited by what the child can take.
+- **Child store clamp:** 29–36 kcal per nursing day. This is the open accounting defect, corrected next as an isolated change.
