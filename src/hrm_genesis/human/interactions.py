@@ -72,6 +72,9 @@ FOOD_SAMPLE_HUNGRY = 0.5
 FOOD_SAMPLE_SATED = 0.1
 # G10.7a: readiness to taste a kind seen eaten by others without distress.
 FOOD_SAMPLE_OBSERVED = 0.5
+# V2 discretionary exploration of experienced changes that open new actions.
+SEQUENCE_FRONTIER_TRIAL = 0.12
+SEQUENCE_FRONTIER_LIMIT = 8
 FATIGUE_PER_INTERACTION = 0.02
 MIN_INTERACTION_KCAL = 2.0
 INSULATION_MAX_C = 8.0
@@ -312,6 +315,13 @@ class Context:
         self.produced: dict[str, float] = {}
         self.stats = humans.setdefault("capacity_stats", empty_stats())
         self.performed: list[tuple[str, dict]] = []
+        self.sequence_food_settled = False
+        self.sequence_heat_settled = False
+        self.arrangement_before = ({
+            "arranged_material_elements_kg": dict(pcell.get("arranged_material_elements_kg", {})),
+            "arrangement_geometry": dict(pcell.get("arrangement_geometry", {})),
+        } if humans.get("transition_model") == transitions.VALUED_MODEL else None)
+        self.insulation_before = insulation_c(humans, str(human["id"])) if self.arrangement_before is not None else None
 
     @property
     def agent_id(self) -> str:
@@ -652,7 +662,7 @@ def _transition_perception(ctx: Context) -> dict:
               "arranged_material_elements_kg")]
     pools.extend(band(available_kg(kind, ctx.pcell, ctx.ccell), mass_thresholds)
                  for kind in ("fresh_tissue", "decayed_tissue", "seed"))
-    return {
+    state = {
         "held": transitions.bounded_forms([form(o) for o in ctx.held()]),
         "ground": transitions.bounded_forms(ground),
         "worn": transitions.bounded_forms(worn),
@@ -669,14 +679,29 @@ def _transition_perception(ctx: Context) -> dict:
                     band(float(ctx.human.get("skin_wetness", 0.0)), (0.25, 0.75))],
         "acts": sorted({key for key, _ in enumerate_affordances(ctx)})[:transitions.MAX_ACTS],
     }
+    if ctx.humans.get("transition_model") == transitions.VALUED_MODEL:
+        basal = max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"]))
+        water_loss = max(1e-9, float(ctx.profile.get("water_loss_per_tick_kg", 1.0)))
+        water_floor = float(ctx.profile.get("water_capacity_kg", 0.0)) * float(ctx.profile.get("min_water_fraction", 0.5))
+        state["body"] = [band(float(ctx.human["energy"]) / basal, (1.0, 2.0, 4.0, 8.0, 16.0)),
+                         band((float(ctx.human.get("body_water_kg", 0.0)) - water_floor) / water_loss, (1.0, 2.0, 4.0)),
+                         band(float(ctx.human.get("fatigue", 0.0)), (0.25, 0.75)),
+                         band(float(ctx.human.get("injury", 0.0)), (0.1, 0.5))]
+        # Exposed/gatherable material changes within a tick; omitting this
+        # would make a second or third redundant cut look like the first one.
+        state["access"] = band(float(ctx.access_bonus.get("fresh_tissue", 0.0)), (0.05, 0.25, 0.75, 1.0, 1.5))
+    return state
 
 
 def execute(ctx: Context, key: str, spec: dict) -> dict:
     """Run one interaction and record it in the history of every object it
     made, shaped or picked up. Object history is how later benefit reaches the
     preparation that made it possible, however long ago that was."""
+    transition_model = ctx.humans.get("transition_model")
     transition_before = (_transition_perception(ctx)
-                         if ctx.humans.get("transition_model") == transitions.MODEL else None)
+                         if transition_model in transitions.MODELS else None)
+    fresh_before = (available_kg("fresh_tissue", ctx.pcell, ctx.ccell)
+                    if transition_model == transitions.VALUED_MODEL else 0.0)
     before = {o["id"]: (_signature(o), o.get("history", []), o.get("holder")) for o in ctx.humans["objects"]}
     forms_before, pools_before = _material_forms(ctx)
     tool = _find(ctx.humans, spec.get("tool"))
@@ -706,8 +731,14 @@ def execute(ctx: Context, key: str, spec: dict) -> dict:
         elif prior[0] != _signature(obj) or (obj.get("holder") == ctx.agent_id and prior[2] != ctx.agent_id):
             obj["history"] = _merge_history(prior[1], [key])
     if transition_before is not None:
-        transitions.record(ctx.human["cognition"], transition_before, key,
-                           _transition_perception(ctx), out["effort_kcal"], out["injury"], ctx.epoch)
+        transition_after = _transition_perception(ctx)
+        edge_id = transitions.record(ctx.human["cognition"], transition_before, key,
+                                     transition_after, out["effort_kcal"], out["injury"], ctx.epoch,
+                                     model=transition_model)
+        if transition_model == transitions.VALUED_MODEL:
+            out["transition_edge"] = edge_id
+            out["fresh_before_kg"] = fresh_before
+            out["wear_changed"] = transition_before["worn"] != transition_after["worn"]
     return out
 
 
@@ -1013,6 +1044,22 @@ def _execute_physical(ctx: Context, key: str, spec: dict) -> dict:
 def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: bool) -> tuple[str, dict] | None:
     if not options:
         return None
+    sequence_state = None
+    if ctx.humans.get("transition_model") == transitions.VALUED_MODEL:
+        # Only discretionary reserves fund a speculative plan. Recompute at
+        # every physical step; a remembered plan cannot reserve or create matter.
+        basal = max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"]))
+        water_loss = max(1e-9, float(ctx.profile.get("water_loss_per_tick_kg", 1.0)))
+        water_floor = float(ctx.profile.get("water_capacity_kg", 0.0)) * float(ctx.profile.get("min_water_fraction", 0.5))
+        if (float(ctx.human["energy"]) >= 2.0 * basal
+                and float(ctx.human.get("body_water_kg", 0.0)) - water_floor >= 2.0 * water_loss):
+            sequence_state = _transition_perception(ctx)
+            plans = transitions.action_values(ctx.human["cognition"], sequence_state, basal)
+            positive_plans = [o for o in options if plans.get(o[0], 0.0) > 0.0]
+            if positive_plans:
+                picked = max(positive_plans, key=lambda o: (plans[o[0]], o[0]))
+                _bump_map(ctx.stats, "sequence_choices", picked[0], 1)
+                return picked
     values = ctx.human["cognition"].get("affordance_values", {})
     untried = [o for o in options if o[0] not in values]
     if untried and ctx.humans.get("imitation"):
@@ -1043,6 +1090,30 @@ def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: boo
     if untried and ctx.draw("explore", step) < explore_p:
         return candidates[int(ctx.draw("explore-pick", step) * len(candidates)) % len(candidates)]
     known = [o for o in options if o[0] in values]
+    if sequence_state is not None:
+        all_experienced = ctx.human["cognition"].get("transition_memory", {}).get("edges", [])
+        experienced = [e for e in all_experienced
+                       if e["before"] == sequence_state]
+        frontier = []
+        for option in known:
+            outcomes = [e for e in experienced if e["act"] == option[0]]
+            # A single useful downstream experience is grounds for another
+            # costed test, not enough evidence for a valued plan. This second
+            # exploration budget also has a finite attempt bound.
+            promising = any(future["before"] == prior["after"]
+                            and future["act"] in prior["enabled"]
+                            and float(future.get("gain_sum_basal", 0.0)) > 0.0
+                            and int(future["n"]) < transitions.MIN_PLAN_EXPERIENCE
+                            for prior in outcomes for future in all_experienced)
+            attempts = sum(int(e["n"]) for e in outcomes)
+            if (any(e["enabled"] for e in outcomes)
+                    and (attempts < SEQUENCE_FRONTIER_LIMIT
+                         or promising and attempts < SEQUENCE_FRONTIER_LIMIT * 2)):
+                frontier.append(option)
+        if frontier and ctx.draw("sequence-frontier", step) < SEQUENCE_FRONTIER_TRIAL:
+            picked = frontier[int(ctx.draw("sequence-frontier-pick", step) * len(frontier)) % len(frontier)]
+            _bump_map(ctx.stats, "sequence_exploration", picked[0], 1)
+            return picked
     positive = [o for o in known if float(values[o[0]]["v"]) > 0.0]
     if positive:
         picked = max(positive, key=lambda o: (float(values[o[0]]["v"]), o[0]))
@@ -1082,7 +1153,7 @@ def run_interactions(
 ) -> Context:
     """Perform up to MAX_INTERACTIONS_PER_TICK chosen interactions."""
     ctx = Context(humans, human, profile, pcell, ccell, lithic_cells, wcell, consumers, epoch)
-    if humans.get("transition_model") == transitions.MODEL:
+    if humans.get("transition_model") in transitions.MODELS:
         transitions.forget(human["cognition"], epoch)
     for step in range(MAX_INTERACTIONS_PER_TICK):
         if float(human.get("fatigue", 0.0)) > 0.8:
@@ -1109,6 +1180,10 @@ def run_interactions(
 
 def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
     """Update interaction and food expectations from what was experienced."""
+    if ctx.humans.get("transition_model") == transitions.VALUED_MODEL:
+        if ctx.sequence_food_settled:
+            return
+        ctx.sequence_food_settled = True
     cognition = dict(ctx.human["cognition"])
     basal = max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"]))
     values = dict(cognition.get("affordance_values", {}))
@@ -1132,13 +1207,19 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
         kg_by_kind[rec["kind"]] = kg_by_kind.get(rec["kind"], 0.0) + rec["kg"]
     hand_access = float(FOOD_KINDS["fresh_tissue"]["hand_access_kg"]) * max(0.1, float(ctx.profile.get("development_scale", 1.0)))
     trace = list(cognition.get("trace", []))
-    for key, out in ctx.performed:
+    sequence_gains = (_sequence_food_gains(ctx, intake, hand_access)
+                      if ctx.humans.get("transition_model") == transitions.VALUED_MODEL else None)
+    for index, (key, out) in enumerate(ctx.performed):
         gain = 0.0
         if out.get("capture") and kg_by_kind.get("fresh_tissue", 0.0) > 0.0:
             gain += max(0.0, kcal_by_kind["fresh_tissue"]) * min(1.0, ctx.produced.get("fresh_tissue", 0.0) / max(1e-9, kg_by_kind["fresh_tissue"]))
         if out.get("access_bonus_kg", 0.0) > 0.0 and kg_by_kind.get("fresh_tissue", 0.0) > 0.0:
             share = out["access_bonus_kg"] / (hand_access + ctx.access_bonus.get("fresh_tissue", 0.0))
             gain += max(0.0, kcal_by_kind["fresh_tissue"]) * share
+        if sequence_gains is not None:
+            gain = sequence_gains[index]
+            if out.get("transition_edge"):
+                transitions.credit(cognition, out["transition_edge"], gain / basal)
         reward = (gain - out["effort_kcal"]) / basal - out["injury"] * 2.0
         _update_value(values, key, reward, VALUE_LEARNING_RATE)
         if key in ctx.imitated:
@@ -1147,7 +1228,7 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
             sources = dict(ctx.stats.get("imitated_from", {}))
             sources[key] = sorted(set(sources.get(key, [])) | set(ctx.imitated[key]))
             ctx.stats["imitated_from"] = sources
-        if gain > 0.0:
+        if gain > 0.0 and sequence_gains is None:
             _credit_preparation(values, trace, out.get("tool_history", []), gain / basal)
         if _legacy_observation(ctx):
             if gain > 0.0:
@@ -1166,6 +1247,54 @@ def learn_from_tick(ctx: Context, intake: list[dict]) -> None:
     cognition["trace"] = trace
     ctx.human["cognition"] = cognition
     observe_food(ctx, intake)
+
+
+def _sequence_food_gains(ctx: Context, intake: list[dict], hand_access: float) -> list[float]:
+    """Conservative, single-budget credit from food actually received.
+
+    A cut earns only intake beyond hand access; a capture earns only intake
+    beyond the fresh material present before that capture. Overlapping routes
+    share one net credited-food budget. Mere manipulation never earns food.
+    """
+    records = [r for r in intake if r["kind"] == "fresh_tissue"]
+    kg = sum(float(r["kg"]) for r in records)
+    received = max(0.0, sum(float(r["kcal"]) - float(r.get("refused_kcal", 0.0))
+                            - float(r["handling_kcal"]) for r in records))
+    remaining_extra_kg = max(0.0, kg - hand_access)
+    weights = []
+    for _, out in ctx.performed:
+        share = 0.0
+        if out.get("capture") and kg > 0.0:
+            share += max(0.0, kg - float(out.get("fresh_before_kg", kg))) / kg
+        if kg > 0.0:
+            used_extra = min(remaining_extra_kg, max(0.0, float(out.get("access_bonus_kg", 0.0))))
+            share += used_extra / kg
+            remaining_extra_kg -= used_extra
+        weights.append(share)
+    divisor = max(1.0, sum(weights))
+    return [received * w / divisor for w in weights]
+
+
+def credit_transition_heat(ctx: Context | None, worn_kcal: float, arrangement_kcal: float) -> None:
+    """First-tick experienced benefit, only for an actual wear/arrange event.
+
+    No credit to a nearby temporal trace, earlier resident or another person's
+    construction. Later passive occupancy does not invent an action trial.
+    """
+    if ctx is None or ctx.humans.get("transition_model") != transitions.VALUED_MODEL:
+        return
+    if ctx.sequence_heat_settled:
+        return
+    ctx.sequence_heat_settled = True
+    basal = max(1e-9, float(ctx.profile["basal_energy_kcal_per_tick"]))
+    for prefix, saving in (("wear:", worn_kcal), ("arrange:", arrangement_kcal)):
+        candidates = [out for key, out in ctx.performed
+                      if key.startswith(prefix) and out.get("transition_edge")
+                      and (out.get("wear_changed") if prefix == "wear:" else out.get("transformed"))]
+        if candidates and saving > 0.0:
+            # One physical thermal benefit, shared rather than duplicated.
+            for out in candidates:
+                transitions.credit(ctx.human["cognition"], out["transition_edge"], saving / basal / len(candidates))
 
 
 def _credit_preparation(values: dict, trace: list[str], tool_history: list[str], gain_basal: float) -> None:

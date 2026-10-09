@@ -756,6 +756,9 @@ def _apply_physiology(
     producer_cell: dict | None = None,
     insulation_c: float = 0.0,
     sleep_recovery: bool = False,
+    record_arrangement_benefit: bool = False,
+    arrangement_reference: dict | None = None,
+    insulation_reference_c: float | None = None,
 ) -> None:
     """Apply bounded fatigue, thermoregulation cost, injury, and healing."""
     profile = profile or physiology_profile(calibrated=False, ticks_per_year=120)
@@ -777,6 +780,22 @@ def _apply_physiology(
     # both hot and cold extremes toward a stable subsurface-like temperature.
     if ambient > HUMAN_COMFORT_TEMPERATURE_C:
         ambient -= min(9.0, canopy * 9.0)
+    if record_arrangement_benefit:
+        # Isolate arranged material's contribution to this thermal debit,
+        # holding terrain, fire, canopy and actual skin wetness fixed. This
+        # readout changes no physical state and grants no predicted benefit.
+        natural_cover = min(0.90, max(0.0, float(world_cell.get("terrain_cover", 0.0))))
+        if arrangement_reference is not None:
+            _, natural_cover = _structural_protection(
+                world_cell, {**producer_cell, **arrangement_reference},
+                occupant_offset_m=(float(offset[0]), float(offset[1])),
+                wind_from_deg=None if wind is None else float(wind),
+            )
+        natural_moderation = min(0.55, natural_cover * 0.55)
+        unarranged_ambient = ambient * (1.0 - natural_moderation) + 15.0 * natural_moderation
+        reference_total_ambient = unarranged_ambient
+        if insulation_reference_c is not None and reference_total_ambient < HUMAN_COMFORT_TEMPERATURE_C:
+            reference_total_ambient = min(HUMAN_COMFORT_TEMPERATURE_C, reference_total_ambient + insulation_reference_c)
     if terrain_cover > 0.0:
         moderation = min(0.55, terrain_cover * 0.55)
         ambient = ambient * (1.0 - moderation) + 15.0 * moderation
@@ -784,6 +803,8 @@ def _apply_physiology(
     if insulation_c > 0.0 and ambient < HUMAN_COMFORT_TEMPERATURE_C:
         # Worn interlaced material slows heat loss in the cold (capacity v1).
         ambient = min(HUMAN_COMFORT_TEMPERATURE_C, ambient + insulation_c)
+    if record_arrangement_benefit and insulation_c > 0.0 and unarranged_ambient < HUMAN_COMFORT_TEMPERATURE_C:
+        unarranged_ambient = min(HUMAN_COMFORT_TEMPERATURE_C, unarranged_ambient + insulation_c)
 
     # New weather-enabled worlds accumulate real physiological consequences.
     # Existing worlds have no wind field and retain the original calculation.
@@ -802,6 +823,10 @@ def _apply_physiology(
         convective_c = min(12.0, wind_speed * (0.30 + 0.75 * skin_wetness))
         if ambient < HUMAN_COMFORT_TEMPERATURE_C:
             ambient -= convective_c
+        if record_arrangement_benefit and unarranged_ambient < HUMAN_COMFORT_TEMPERATURE_C:
+            unarranged_ambient -= convective_c
+        if record_arrangement_benefit and reference_total_ambient < HUMAN_COMFORT_TEMPERATURE_C:
+            reference_total_ambient -= convective_c
         cold_load = max(0.0, HUMAN_COMFORT_TEMPERATURE_C - ambient - HUMAN_THERMAL_TOLERANCE_C)
         heat_load = max(0.0, ambient - HUMAN_COMFORT_TEMPERATURE_C - HUMAN_THERMAL_TOLERANCE_C)
         previous_cold = max(0.0, float(human.get("cold_exposure", 0.0)))
@@ -833,12 +858,36 @@ def _apply_physiology(
     thermal_scale = max(0.08, float(profile.get("thermal_scale", 1.0)))
     thermal_cost_cap = (300.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.30
     thermal_cost_rate = (10.0 * thermal_scale) if bool(profile.get("calibrated")) else 0.01
+    if record_arrangement_benefit:
+        alternative_excess = max(0.0, abs(unarranged_ambient - HUMAN_COMFORT_TEMPERATURE_C) - HUMAN_THERMAL_TOLERANCE_C)
+        human["arrangement_saving_kcal"] = round(max(0.0,
+            min(thermal_cost_cap, alternative_excess * thermal_cost_rate)
+            - min(thermal_cost_cap, excess * thermal_cost_rate)), 10)
     if insulation_c > 0.0:
         # Experienced benefit of worn material: cold-stress energy not spent.
         bare_excess = max(0.0, abs(uninsulated_ambient - HUMAN_COMFORT_TEMPERATURE_C) - HUMAN_THERMAL_TOLERANCE_C)
         bare_cost = min(thermal_cost_cap, bare_excess * thermal_cost_rate)
         worn_cost = min(thermal_cost_cap, excess * thermal_cost_rate)
         human["insulation_saving_kcal"] = round(max(0.0, bare_cost - worn_cost), 10)
+    if record_arrangement_benefit and insulation_reference_c is not None:
+        # Credit the new material's marginal contribution, not the protection
+        # already provided by a surface worn before this tick. Share one joint
+        # thermal budget when wear and arrangement change together near a cap.
+        prior_worn_ambient = uninsulated_ambient
+        if prior_worn_ambient < HUMAN_COMFORT_TEMPERATURE_C:
+            prior_worn_ambient = min(HUMAN_COMFORT_TEMPERATURE_C, prior_worn_ambient + insulation_reference_c)
+        if "wind_speed_m_s" in world_cell and prior_worn_ambient < HUMAN_COMFORT_TEMPERATURE_C:
+            prior_worn_ambient -= convective_c
+        current_cost = min(thermal_cost_cap, excess * thermal_cost_rate)
+        prior_worn_excess = max(0.0, abs(prior_worn_ambient - HUMAN_COMFORT_TEMPERATURE_C) - HUMAN_THERMAL_TOLERANCE_C)
+        worn_gain = max(0.0, min(thermal_cost_cap, prior_worn_excess * thermal_cost_rate) - current_cost)
+        reference_excess = max(0.0, abs(reference_total_ambient - HUMAN_COMFORT_TEMPERATURE_C) - HUMAN_THERMAL_TOLERANCE_C)
+        budget = max(0.0, min(thermal_cost_cap, reference_excess * thermal_cost_rate) - current_cost)
+        arranged_gain = float(human["arrangement_saving_kcal"])
+        total = worn_gain + arranged_gain
+        scale = min(1.0, budget / total) if total > 0.0 else 0.0
+        human["insulation_saving_kcal"] = round(worn_gain * scale, 10)
+        human["arrangement_saving_kcal"] = round(arranged_gain * scale, 10)
     if excess > 0.0:
         human["energy"] = float(human["energy"]) - min(thermal_cost_cap, excess * thermal_cost_rate)
         if ambient > HUMAN_COMFORT_TEMPERATURE_C:
@@ -1091,6 +1140,7 @@ def evolve_agentus_step(
                 humans.setdefault("nursing_stats", {}) if nursing_model else None,
             )
         ate_kg_today = 0.0
+        ctx = None
         if self_feeding > 0.0 and capacities and "cognition" in human:
             _drink(human, mcells[xy], effective_profile)
             hungry = (
@@ -1151,8 +1201,15 @@ def evolve_agentus_step(
                 human, wcells[xy], moved, effective_profile, pcells[xy],
                 insulation_c=cap.insulation_c(humans, str(human["id"])),
                 sleep_recovery=integrity,
+                record_arrangement_benefit=humans.get("transition_model") == cap.transitions.VALUED_MODEL,
+                arrangement_reference=None if ctx is None else ctx.arrangement_before,
+                insulation_reference_c=None if ctx is None else ctx.insulation_before,
             )
-            cap.credit_worn_benefit(humans, human, float(human.pop("insulation_saving_kcal", 0.0)), effective_profile)
+            worn_saving = float(human.pop("insulation_saving_kcal", 0.0))
+            if humans.get("transition_model") == cap.transitions.VALUED_MODEL:
+                cap.credit_transition_heat(ctx, worn_saving, float(human.pop("arrangement_saving_kcal", 0.0)))
+            else:
+                cap.credit_worn_benefit(humans, human, worn_saving, effective_profile)
         else:
             _apply_physiology(human, wcells[xy], moved, effective_profile, pcells[xy], sleep_recovery=integrity)
         # Thermoregulation can evaporate body water before routine basal loss.

@@ -449,3 +449,12 @@ write-only recording of own local before/action/after experience and real costs;
 physical action choice and production defaults remain unchanged. Sequence
 valuation and sequential imitation require separate evidence before activation.
 Contract and verification: `docs/architecture/EXPERIENCED_TRANSITIONS_V1.md`.
+
+### Conditional sequence valuation — opt-in v2 (2026-10-09)
+
+Owner-authorized continuation adds bounded conditional expected value and
+reserve-funded live choice over experienced short chains. Food credit is bounded
+by actual received energy; newly changed cover/worn material receives only its
+marginal first-tick thermal benefit. Default and v1 recording remain available.
+Evidence and limits: `docs/architecture/SEQUENCE_VALUATION_V2.md`. Longer delayed
+thermal returns and sequential imitation remain separate validation steps.

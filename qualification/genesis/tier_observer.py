@@ -71,6 +71,13 @@ LEGACY_STORE = "-legacystore"  # arm suffix: unscaled eating store (pre one ener
 
 def build_config(seed: str, arm: str) -> GenesisConfig:
     base, _, physiology = arm.partition("@")
+    transition_model = "none"
+    for suffix, model in (("-transitionsv1", cap.transitions.MODEL),
+                          ("-transitionsv2", cap.transitions.VALUED_MODEL)):
+        if base.endswith(suffix):
+            transition_model = model
+            base = base.removesuffix(suffix)
+            break
     legacy_store = base.endswith(LEGACY_STORE)
     base = base.removesuffix(LEGACY_STORE)
     legacy_water = base.endswith(LEGACY_WATER)
@@ -96,6 +103,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
     integrity = not base.endswith(PRE_G10_6)
     config = config_for(seed, base.removesuffix(PRE_G10_6))
     overrides = {}
+    if transition_model != "none":
+        overrides["agentus_transition_model"] = transition_model
     if legacy_observation:
         overrides["agentus_observation_model"] = "g10.4-legacy"
     if no_memory:
@@ -282,8 +291,10 @@ class Observer:
 
         def choose(ctx, options, step, hungry):
             before = sum(ctx.stats.get("exploit_by_key", {}).values())
+            sequence_before = sum(ctx.stats.get("sequence_choices", {}).values())
             picked = original_choose(ctx, options, step, hungry)
-            if picked is not None and sum(ctx.stats.get("exploit_by_key", {}).values()) > before:
+            if picked is not None and (sum(ctx.stats.get("exploit_by_key", {}).values()) > before
+                                       or sum(ctx.stats.get("sequence_choices", {}).values()) > sequence_before):
                 obs._exploit_pick[ctx.agent_id] = picked[0]
                 obs.c["exploit_choices"] += 1
             return picked
@@ -440,6 +451,8 @@ def run_observed(seed: str, arm: str, days: int, scan_every: int = 1) -> dict:
             "intake_kg_by_kind": {k: round(v, 2) for k, v in stats.get("intake_kg_by_kind", {}).items()},
             "food_kinds_valued": dict(food_known),
             "interaction_counts": dict(stats.get("interaction_counts", {})),
+            "sequence_choices": dict(stats.get("sequence_choices", {})),
+            "sequence_exploration": dict(stats.get("sequence_exploration", {})),
             "repeated_use": dict(stats.get("exploit_by_key", {})),
             "repeated_use_agents": {k: len(v) for k, v in stats.get("exploit_agents", {}).items()},
             "observed_transmissions": dict(stats.get("observed_transmissions", {})),
