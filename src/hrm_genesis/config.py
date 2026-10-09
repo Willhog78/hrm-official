@@ -78,6 +78,8 @@ class GenesisConfig:
     # Nursing (docs/architecture/DEMAND_LIMITED_MILK.md). "demand-limited-v1"
     # (default) makes only the milk the child can receive and charges the
     # mother for what is made; "supply-capped-legacy" reproduces earlier runs.
+    # "remaining-demand-v2" is an opt-in: youngest dependents first, solids
+    # before milk, with milk limited by the remaining store room.
     # Active for calibrated humans.
     nursing_model: str = "demand-limited-v1"
     # Water cycle at material scale (docs/architecture/WATER_CYCLE_SCALE.md).
@@ -140,7 +142,7 @@ class GenesisConfig:
             raise ValueError("unknown agentus_capacity_ablation")
         if self.caregiving_model not in {"solid-food-v1", "none"}:
             raise ValueError("unknown caregiving_model")
-        if self.nursing_model not in {"demand-limited-v1", "supply-capped-legacy"}:
+        if self.nursing_model not in {"demand-limited-v1", "remaining-demand-v2", "supply-capped-legacy"}:
             raise ValueError("unknown nursing_model")
         if self.water_cycle_scale not in {"material-v1", "unscaled-legacy"}:
             raise ValueError("unknown water_cycle_scale")
@@ -194,7 +196,7 @@ class GenesisConfig:
 
     @property
     def demand_milk_active(self) -> bool:
-        return (self.nursing_model == "demand-limited-v1" and self.human_biology_enabled
+        return (self.nursing_model in {"demand-limited-v1", "remaining-demand-v2"} and self.human_biology_enabled
                 and self.human_calibration_enabled)
 
     @property
