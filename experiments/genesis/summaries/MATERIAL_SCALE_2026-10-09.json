@@ -1,0 +1,1842 @@
+{
+  "controlled_fixtures": true,
+  "ecological_or_discovery_claim": false,
+  "source_config_fingerprint": "576bafaaa9091407217b927de547f4b3322088f0cfd0406e6ab39bd6a2e541ca",
+  "physiology_profile": {
+    "calibrated": true,
+    "reference_total_mass_kg": 70.0,
+    "seed_dry_mass_kg": 28.0,
+    "water_capacity_kg": 42.0,
+    "water_loss_per_tick_kg": 2.5,
+    "bite_cap_kg": 1.35,
+    "assimilation": 0.8,
+    "food_energy_kcal_per_kg": 2200.0,
+    "basal_energy_kcal_per_tick": 2000.0,
+    "move_energy_kcal_per_tick": 55.0,
+    "maturity_ticks": 6570,
+    "max_age_ticks": 32850,
+    "reproduction_energy_kcal": 4000.0,
+    "reproduction_cooldown_ticks": 365,
+    "offspring_mass_fraction": 0.05,
+    "initial_energy_kcal": 6000.0,
+    "energy_capacity_kcal": 30000.0,
+    "min_dry_mass_kg": 14.0,
+    "min_water_fraction": 0.5,
+    "dependent_age_ticks": 730,
+    "independent_feeding_age_ticks": 1825,
+    "nursing_energy_kcal_per_tick": 350.0,
+    "nursing_water_kg_per_tick": 0.65,
+    "nursing_dry_mass_kg_per_tick": 0.035,
+    "development_scale": 1.0
+  },
+  "weave": [
+    {
+      "source": "plant",
+      "strand_count": 4,
+      "fits_live_hand_limit": true,
+      "area_m2": 7.056e-05,
+      "cohesion": 0.9,
+      "mass_kg": 0.001913642260071968,
+      "insulation_c": 0.00028224,
+      "source_length_m": 0.425,
+      "source_thickness_mm": 1.05,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.0028223999997862848,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.9971776000002,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8519830656
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.0028223999997862848,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.9971776000002,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7519830656
+        }
+      ]
+    },
+    {
+      "source": "plant",
+      "strand_count": 6,
+      "fits_live_hand_limit": true,
+      "area_m2": 0.00015876,
+      "cohesion": 0.9,
+      "mass_kg": 0.002870463390107952,
+      "insulation_c": 0.00063504,
+      "source_length_m": 0.425,
+      "source_thickness_mm": 1.05,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.006350399999973888,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.99364960000003,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8519618976
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.006350399999973888,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.9936496,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7519618976
+        }
+      ]
+    },
+    {
+      "source": "plant",
+      "strand_count": 24,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.00254016,
+      "cohesion": 0.9,
+      "mass_kg": 0.011481853560431809,
+      "insulation_c": 0.01016064,
+      "source_length_m": 0.425,
+      "source_thickness_mm": 1.05,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.10160639999958221,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.89839360000042,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8513903616
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.10160639999958221,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.8983936000004,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7513903616
+        }
+      ]
+    },
+    {
+      "source": "plant",
+      "strand_count": 100,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.0441,
+      "cohesion": 0.9,
+      "mass_kg": 0.0478410565017992,
+      "insulation_c": 0.1764,
+      "source_length_m": 0.425,
+      "source_thickness_mm": 1.05,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 1.7640000000001237,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 140.23599999999988,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.841416
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 1.7640000000001237,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 290.2359999999999,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.741416
+        }
+      ]
+    },
+    {
+      "source": "plant",
+      "strand_count": 300,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.180625,
+      "cohesion": 0.9,
+      "mass_kg": 0.1435231695053976,
+      "insulation_c": 0.7225,
+      "source_length_m": 0.425,
+      "source_thickness_mm": 1.05,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 7.225000000000364,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 134.77499999999964,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.80865
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 7.225000000000364,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 284.77499999999964,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.70865
+        }
+      ]
+    },
+    {
+      "source": "bark",
+      "strand_count": 4,
+      "fits_live_hand_limit": true,
+      "area_m2": 0.000256,
+      "cohesion": 1.0,
+      "mass_kg": 0.013885839528866885,
+      "insulation_c": 0.0011377777777777777,
+      "source_length_m": 0.85,
+      "source_thickness_mm": 2.0,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.011377777777852316,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.98862222222215,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8519317333
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.011377777777852316,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.98862222222215,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7519317333
+        }
+      ]
+    },
+    {
+      "source": "bark",
+      "strand_count": 6,
+      "fits_live_hand_limit": true,
+      "area_m2": 0.000576,
+      "cohesion": 1.0,
+      "mass_kg": 0.020828759293300327,
+      "insulation_c": 0.00256,
+      "source_length_m": 0.85,
+      "source_thickness_mm": 2.0,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.025599999999940337,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.97440000000006,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8518464
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.025599999999940337,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.97440000000006,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7518464
+        }
+      ]
+    },
+    {
+      "source": "bark",
+      "strand_count": 24,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.009216,
+      "cohesion": 1.0,
+      "mass_kg": 0.08331503717320131,
+      "insulation_c": 0.04096,
+      "source_length_m": 0.85,
+      "source_thickness_mm": 2.0,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.4095999999999549,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.59040000000005,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8495424
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.4095999999999549,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.59040000000005,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7495424
+        }
+      ]
+    },
+    {
+      "source": "bark",
+      "strand_count": 100,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.16,
+      "cohesion": 1.0,
+      "mass_kg": 0.34714598822167214,
+      "insulation_c": 0.7111111111111111,
+      "source_length_m": 0.85,
+      "source_thickness_mm": 2.0,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 7.111111111111313,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 134.8888888888887,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8093333333
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 7.111111111111313,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 284.8888888888887,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7093333333
+        }
+      ]
+    },
+    {
+      "source": "bark",
+      "strand_count": 300,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.7225,
+      "cohesion": 1.0,
+      "mass_kg": 1.0414379646650163,
+      "insulation_c": 3.2111111111111112,
+      "source_length_m": 0.85,
+      "source_thickness_mm": 2.0,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 32.11111111111131,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 109.88888888888869,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.6593333333
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 32.11111111111131,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 259.8888888888887,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.5593333333
+        }
+      ]
+    },
+    {
+      "source": "tendon",
+      "strand_count": 4,
+      "fits_live_hand_limit": true,
+      "area_m2": 0.00012544,
+      "cohesion": 0.7,
+      "mass_kg": 0.001200716712202019,
+      "insulation_c": 0.0003902577777777777,
+      "source_length_m": 0.15,
+      "source_thickness_mm": 1.4,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.003902577777807892,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.9960974222222,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8519765845
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.003902577777807892,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.9960974222222,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7519765845
+        }
+      ]
+    },
+    {
+      "source": "tendon",
+      "strand_count": 6,
+      "fits_live_hand_limit": true,
+      "area_m2": 0.00028224,
+      "cohesion": 0.7,
+      "mass_kg": 0.0018010750683030287,
+      "insulation_c": 0.0008780799999999999,
+      "source_length_m": 0.15,
+      "source_thickness_mm": 1.4,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.008780799999840383,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.99121920000016,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8519473152
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.008780799999840383,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.99121920000016,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7519473152
+        }
+      ]
+    },
+    {
+      "source": "tendon",
+      "strand_count": 24,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.00451584,
+      "cohesion": 0.7,
+      "mass_kg": 0.007204300273212115,
+      "insulation_c": 0.014049279999999999,
+      "source_length_m": 0.15,
+      "source_thickness_mm": 1.4,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.1404928000001746,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.85950719999983,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8511570432
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.1404928000001746,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.8595071999998,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7511570432
+        }
+      ]
+    },
+    {
+      "source": "tendon",
+      "strand_count": 100,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.0225,
+      "cohesion": 0.7,
+      "mass_kg": 0.030017917805050476,
+      "insulation_c": 0.06999999999999999,
+      "source_length_m": 0.15,
+      "source_thickness_mm": 1.4,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.6999999999998181,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.30000000000018,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8478
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.6999999999998181,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.3000000000002,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7478
+        }
+      ]
+    },
+    {
+      "source": "tendon",
+      "strand_count": 300,
+      "fits_live_hand_limit": false,
+      "area_m2": 0.0225,
+      "cohesion": 0.7,
+      "mass_kg": 0.09005375341515143,
+      "insulation_c": 0.06999999999999999,
+      "source_length_m": 0.15,
+      "source_thickness_mm": 1.4,
+      "thermal": [
+        {
+          "temperature_c": 12.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0
+        },
+        {
+          "temperature_c": -5.0,
+          "saving_kcal": 0.6999999999998181,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.30000000000018,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8478
+        },
+        {
+          "temperature_c": -20.0,
+          "saving_kcal": 0.6999999999998181,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.3000000000002,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7478
+        }
+      ]
+    }
+  ],
+  "joins": [
+    {
+      "patch_source": "plant",
+      "binder_source": "plant",
+      "completed_joins": 2,
+      "first_failed_attempt": 3,
+      "search_limit": 64,
+      "initial_mass_kg": 0.002870463390107952,
+      "final_area_m2": 0.000444528,
+      "final_cohesion": 0.50625,
+      "join_effort_kcal_including_failure": 24.756,
+      "element_abs_error_kg": 1.734723475976807e-18
+    },
+    {
+      "patch_source": "plant",
+      "binder_source": "bark",
+      "completed_joins": 64,
+      "first_failed_attempt": null,
+      "search_limit": 64,
+      "initial_mass_kg": 0.002870463390107952,
+      "final_area_m2": 0.009303336,
+      "final_cohesion": 0.9,
+      "join_effort_kcal_including_failure": 528.1280000000004,
+      "element_abs_error_kg": 3.3861802251067274e-15
+    },
+    {
+      "patch_source": "plant",
+      "binder_source": "tendon",
+      "completed_joins": 1,
+      "first_failed_attempt": 2,
+      "search_limit": 64,
+      "initial_mass_kg": 0.002870463390107952,
+      "final_area_m2": 0.000301644,
+      "final_cohesion": 0.525,
+      "join_effort_kcal_including_failure": 16.504,
+      "element_abs_error_kg": 0.0
+    },
+    {
+      "patch_source": "bark",
+      "binder_source": "plant",
+      "completed_joins": 2,
+      "first_failed_attempt": 3,
+      "search_limit": 64,
+      "initial_mass_kg": 0.020828759293300327,
+      "final_area_m2": 0.0016128,
+      "final_cohesion": 0.5625,
+      "join_effort_kcal_including_failure": 25.44,
+      "element_abs_error_kg": 0.0
+    },
+    {
+      "patch_source": "bark",
+      "binder_source": "bark",
+      "completed_joins": 64,
+      "first_failed_attempt": null,
+      "search_limit": 64,
+      "initial_mass_kg": 0.020828759293300327,
+      "final_area_m2": 0.0337536,
+      "final_cohesion": 1.0,
+      "join_effort_kcal_including_failure": 542.7200000000005,
+      "element_abs_error_kg": 8.659739592076221e-15
+    },
+    {
+      "patch_source": "bark",
+      "binder_source": "tendon",
+      "completed_joins": 1,
+      "first_failed_attempt": 2,
+      "search_limit": 64,
+      "initial_mass_kg": 0.020828759293300327,
+      "final_area_m2": 0.0010944,
+      "final_cohesion": 0.5833333333,
+      "join_effort_kcal_including_failure": 16.96,
+      "element_abs_error_kg": 6.938893903907228e-18
+    },
+    {
+      "patch_source": "tendon",
+      "binder_source": "plant",
+      "completed_joins": 1,
+      "first_failed_attempt": 2,
+      "search_limit": 64,
+      "initial_mass_kg": 0.0018010750683030287,
+      "final_area_m2": 0.000536256,
+      "final_cohesion": 0.525,
+      "join_effort_kcal_including_failure": 16.672,
+      "element_abs_error_kg": 0.0
+    },
+    {
+      "patch_source": "tendon",
+      "binder_source": "bark",
+      "completed_joins": 64,
+      "first_failed_attempt": null,
+      "search_limit": 64,
+      "initial_mass_kg": 0.0018010750683030287,
+      "final_area_m2": 0.016539264,
+      "final_cohesion": 0.7,
+      "join_effort_kcal_including_failure": 533.5040000000006,
+      "element_abs_error_kg": 2.4980018054066022e-15
+    },
+    {
+      "patch_source": "tendon",
+      "binder_source": "tendon",
+      "completed_joins": 0,
+      "first_failed_attempt": 1,
+      "search_limit": 64,
+      "initial_mass_kg": 0.0018010750683030287,
+      "final_area_m2": 0.00028224,
+      "final_cohesion": 0.7,
+      "join_effort_kcal_including_failure": 8.336,
+      "element_abs_error_kg": 0.0
+    }
+  ],
+  "twisted_bundles": [
+    {
+      "source": "plant",
+      "binary_twist_depth": 0,
+      "raw_strands": 6,
+      "final_held_strands": 6,
+      "area_m2": 0.00015876,
+      "mass_kg": 0.002870463390107952,
+      "bundle_length_m": 0.425,
+      "bundle_thickness_mm": 1.05,
+      "bundle_integrity": 1.0,
+      "optimistic_bare_hand_effort_kcal": 61,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 1,
+      "raw_strands": 12,
+      "final_held_strands": 6,
+      "area_m2": 0.00031752,
+      "mass_kg": 0.005740926780215904,
+      "bundle_length_m": 0.3825,
+      "bundle_thickness_mm": 1.4849242405,
+      "bundle_integrity": 0.8125,
+      "optimistic_bare_hand_effort_kcal": 145,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 2,
+      "raw_strands": 24,
+      "final_held_strands": 6,
+      "area_m2": 0.00063504,
+      "mass_kg": 0.011481853560431809,
+      "bundle_length_m": 0.34425,
+      "bundle_thickness_mm": 2.1,
+      "bundle_integrity": 0.66015625,
+      "optimistic_bare_hand_effort_kcal": 313,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 3,
+      "raw_strands": 48,
+      "final_held_strands": 6,
+      "area_m2": 0.00127008,
+      "mass_kg": 0.022963707120863618,
+      "bundle_length_m": 0.309825,
+      "bundle_thickness_mm": 2.969848481,
+      "bundle_integrity": 0.5363769531,
+      "optimistic_bare_hand_effort_kcal": 649,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 4,
+      "raw_strands": 96,
+      "final_held_strands": 6,
+      "area_m2": 0.00254016,
+      "mass_kg": 0.045927414241727235,
+      "bundle_length_m": 0.2788425,
+      "bundle_thickness_mm": 4.2,
+      "bundle_integrity": 0.4358062744,
+      "optimistic_bare_hand_effort_kcal": 1321,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 5,
+      "raw_strands": 192,
+      "final_held_strands": 6,
+      "area_m2": 0.00508032,
+      "mass_kg": 0.09185482848345447,
+      "bundle_length_m": 0.25095825,
+      "bundle_thickness_mm": 5.939696962,
+      "bundle_integrity": 0.354092598,
+      "optimistic_bare_hand_effort_kcal": 2665,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 6,
+      "raw_strands": 384,
+      "final_held_strands": 6,
+      "area_m2": 0.01016064,
+      "mass_kg": 0.18370965696690894,
+      "bundle_length_m": 0.225862425,
+      "bundle_thickness_mm": 8.4,
+      "bundle_integrity": 0.2877002359,
+      "optimistic_bare_hand_effort_kcal": 5353,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 7,
+      "raw_strands": 768,
+      "final_held_strands": 6,
+      "area_m2": 0.02032128,
+      "mass_kg": 0.3674193139338179,
+      "bundle_length_m": 0.2032761825,
+      "bundle_thickness_mm": 11.8793939239,
+      "bundle_integrity": 0.2337564417,
+      "optimistic_bare_hand_effort_kcal": 10729,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 8,
+      "raw_strands": 1536,
+      "final_held_strands": 6,
+      "area_m2": 0.0334701772,
+      "mass_kg": 0.7348386278676358,
+      "bundle_length_m": 0.1829485643,
+      "bundle_thickness_mm": 16.8,
+      "bundle_integrity": 0.1899271089,
+      "optimistic_bare_hand_effort_kcal": 21481,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 9,
+      "raw_strands": 3072,
+      "final_held_strands": 6,
+      "area_m2": 0.0271108435,
+      "mass_kg": 1.4696772557352715,
+      "bundle_length_m": 0.1646537079,
+      "bundle_thickness_mm": 23.7587878479,
+      "bundle_integrity": 0.154315776,
+      "optimistic_bare_hand_effort_kcal": 42985,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "plant",
+      "binary_twist_depth": 10,
+      "raw_strands": 6144,
+      "final_held_strands": 6,
+      "area_m2": 0.0219597833,
+      "mass_kg": 2.939354511470543,
+      "bundle_length_m": 0.1481883371,
+      "bundle_thickness_mm": 33.6,
+      "bundle_integrity": 0.125381568,
+      "optimistic_bare_hand_effort_kcal": 85993,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 0,
+      "raw_strands": 6,
+      "final_held_strands": 6,
+      "area_m2": 0.000576,
+      "mass_kg": 0.008331503717320131,
+      "bundle_length_m": 0.34,
+      "bundle_thickness_mm": 2.0,
+      "bundle_integrity": 1.0,
+      "optimistic_bare_hand_effort_kcal": 133,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 1,
+      "raw_strands": 12,
+      "final_held_strands": 6,
+      "area_m2": 0.001152,
+      "mass_kg": 0.016663007434640262,
+      "bundle_length_m": 0.306,
+      "bundle_thickness_mm": 2.8284271247,
+      "bundle_integrity": 0.9,
+      "optimistic_bare_hand_effort_kcal": 289,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 2,
+      "raw_strands": 24,
+      "final_held_strands": 6,
+      "area_m2": 0.002304,
+      "mass_kg": 0.033326014869280524,
+      "bundle_length_m": 0.2754,
+      "bundle_thickness_mm": 3.9999999999,
+      "bundle_integrity": 0.81,
+      "optimistic_bare_hand_effort_kcal": 601,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 3,
+      "raw_strands": 48,
+      "final_held_strands": 6,
+      "area_m2": 0.004608,
+      "mass_kg": 0.06665202973856105,
+      "bundle_length_m": 0.24786,
+      "bundle_thickness_mm": 5.6568542494,
+      "bundle_integrity": 0.729,
+      "optimistic_bare_hand_effort_kcal": 1225,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 4,
+      "raw_strands": 96,
+      "final_held_strands": 6,
+      "area_m2": 0.009216,
+      "mass_kg": 0.1333040594771221,
+      "bundle_length_m": 0.223074,
+      "bundle_thickness_mm": 7.9999999999,
+      "bundle_integrity": 0.6561,
+      "optimistic_bare_hand_effort_kcal": 2473,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 5,
+      "raw_strands": 192,
+      "final_held_strands": 6,
+      "area_m2": 0.018432,
+      "mass_kg": 0.2666081189542442,
+      "bundle_length_m": 0.2007666,
+      "bundle_thickness_mm": 11.3137084988,
+      "bundle_integrity": 0.59049,
+      "optimistic_bare_hand_effort_kcal": 4969,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 6,
+      "raw_strands": 384,
+      "final_held_strands": 6,
+      "area_m2": 0.0326488544,
+      "mass_kg": 0.5332162379084884,
+      "bundle_length_m": 0.18068994,
+      "bundle_thickness_mm": 15.9999999997,
+      "bundle_integrity": 0.531441,
+      "optimistic_bare_hand_effort_kcal": 9961,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 7,
+      "raw_strands": 768,
+      "final_held_strands": 6,
+      "area_m2": 0.0264455721,
+      "mass_kg": 1.0664324758169768,
+      "bundle_length_m": 0.162620946,
+      "bundle_thickness_mm": 22.6274169975,
+      "bundle_integrity": 0.4782969,
+      "optimistic_bare_hand_effort_kcal": 19945,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 8,
+      "raw_strands": 1536,
+      "final_held_strands": 6,
+      "area_m2": 0.0214209134,
+      "mass_kg": 2.1328649516339535,
+      "bundle_length_m": 0.1463588514,
+      "bundle_thickness_mm": 31.9999999993,
+      "bundle_integrity": 0.43046721,
+      "optimistic_bare_hand_effort_kcal": 39913,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 9,
+      "raw_strands": 3072,
+      "final_held_strands": 6,
+      "area_m2": 0.0173509399,
+      "mass_kg": 4.265729903267907,
+      "bundle_length_m": 0.1317229663,
+      "bundle_thickness_mm": 45.2548339949,
+      "bundle_integrity": 0.387420489,
+      "optimistic_bare_hand_effort_kcal": 79849,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "bark",
+      "binary_twist_depth": 10,
+      "raw_strands": 6144,
+      "final_held_strands": 6,
+      "area_m2": 0.0140542613,
+      "mass_kg": 8.531459806535814,
+      "bundle_length_m": 0.1185506697,
+      "bundle_thickness_mm": 63.9999999985,
+      "bundle_integrity": 0.3486784401,
+      "optimistic_bare_hand_effort_kcal": 159721,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 0,
+      "raw_strands": 6,
+      "final_held_strands": 6,
+      "area_m2": 0.00028224,
+      "mass_kg": 0.0005403225204909085,
+      "bundle_length_m": 0.045,
+      "bundle_thickness_mm": 1.4,
+      "bundle_integrity": 1.0,
+      "optimistic_bare_hand_effort_kcal": 133,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 1,
+      "raw_strands": 12,
+      "final_held_strands": 6,
+      "area_m2": 0.00056448,
+      "mass_kg": 0.001080645040981817,
+      "bundle_length_m": 0.0405,
+      "bundle_thickness_mm": 1.9798989873,
+      "bundle_integrity": 0.7541666667,
+      "optimistic_bare_hand_effort_kcal": 289,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 2,
+      "raw_strands": 24,
+      "final_held_strands": 6,
+      "area_m2": 0.00112896,
+      "mass_kg": 0.002161290081963634,
+      "bundle_length_m": 0.03645,
+      "bundle_thickness_mm": 2.8,
+      "bundle_integrity": 0.5687673611,
+      "optimistic_bare_hand_effort_kcal": 601,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 3,
+      "raw_strands": 48,
+      "final_held_strands": 6,
+      "area_m2": 0.001076168,
+      "mass_kg": 0.004322580163927268,
+      "bundle_length_m": 0.032805,
+      "bundle_thickness_mm": 3.9597979746,
+      "bundle_integrity": 0.4289453848,
+      "optimistic_bare_hand_effort_kcal": 1225,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 4,
+      "raw_strands": 96,
+      "final_held_strands": 6,
+      "area_m2": 0.0008716961,
+      "mass_kg": 0.008645160327854536,
+      "bundle_length_m": 0.0295245,
+      "bundle_thickness_mm": 5.5999999999,
+      "bundle_integrity": 0.323496311,
+      "optimistic_bare_hand_effort_kcal": 2473,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 5,
+      "raw_strands": 192,
+      "final_held_strands": 6,
+      "area_m2": 0.0007060738,
+      "mass_kg": 0.017290320655709072,
+      "bundle_length_m": 0.02657205,
+      "bundle_thickness_mm": 7.9195959491,
+      "bundle_integrity": 0.2439701345,
+      "optimistic_bare_hand_effort_kcal": 4969,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 6,
+      "raw_strands": 384,
+      "final_held_strands": 6,
+      "area_m2": 0.0005719198,
+      "mass_kg": 0.034580641311418144,
+      "bundle_length_m": 0.023914845,
+      "bundle_thickness_mm": 11.1999999997,
+      "bundle_integrity": 0.1839941431,
+      "optimistic_bare_hand_effort_kcal": 9961,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 7,
+      "raw_strands": 768,
+      "final_held_strands": 6,
+      "area_m2": 0.000463255,
+      "mass_kg": 0.06916128262283629,
+      "bundle_length_m": 0.0215233605,
+      "bundle_thickness_mm": 15.8391918982,
+      "bundle_integrity": 0.1387622496,
+      "optimistic_bare_hand_effort_kcal": 19945,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 8,
+      "raw_strands": 1536,
+      "final_held_strands": 6,
+      "area_m2": 0.0003752366,
+      "mass_kg": 0.13832256524567257,
+      "bundle_length_m": 0.0193710245,
+      "bundle_thickness_mm": 22.3999999995,
+      "bundle_integrity": 0.1046498632,
+      "optimistic_bare_hand_effort_kcal": 39913,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 9,
+      "raw_strands": 3072,
+      "final_held_strands": 6,
+      "area_m2": 0.0003039416,
+      "mass_kg": 0.27664513049134515,
+      "bundle_length_m": 0.0174339221,
+      "bundle_thickness_mm": 31.6783837965,
+      "bundle_integrity": 0.0789234385,
+      "optimistic_bare_hand_effort_kcal": 79849,
+      "fits_carry_mass_limit": true
+    },
+    {
+      "source": "tendon",
+      "binary_twist_depth": 10,
+      "raw_strands": 6144,
+      "final_held_strands": 6,
+      "area_m2": 0.0002461927,
+      "mass_kg": 0.5532902609826903,
+      "bundle_length_m": 0.0156905299,
+      "bundle_thickness_mm": 44.7999999991,
+      "bundle_integrity": 0.0595214265,
+      "optimistic_bare_hand_effort_kcal": 159721,
+      "fits_carry_mass_limit": true
+    }
+  ],
+  "wood": [
+    {
+      "arranged_mass_kg": 0.25,
+      "geometry": {
+        "span_m": 0.0875,
+        "height_m": 0.075,
+        "density": 1.0,
+        "surface_area_m2": 0.0166666667,
+        "center_offset_m": [
+          0.5,
+          0.5
+        ]
+      },
+      "effort_kcal": 21.75,
+      "physical_actions": 2,
+      "minimum_ticks_at_three_actions": 1,
+      "element_abs_error_kg": 0.0,
+      "measurements": [
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 0.0,
+          "cover": 1.3671874999999999e-05,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 90.0,
+          "cover": 8.371608978546359e-22,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 0.0,
+          "cover": 1.3671874999999999e-05,
+          "saving_kcal": 0.0015039062500363798,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.99849609374996,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8519909766,
+          "optimistic_payback_days": 14462.337661987816
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 90.0,
+          "cover": 8.371608978546359e-22,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 0.0,
+          "cover": 1.3671874999999999e-05,
+          "saving_kcal": 0.0026318359377910383,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.9973681640622,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.751984209,
+          "optimistic_payback_days": 8264.19294899335
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 90.0,
+          "cover": 8.371608978546359e-22,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        }
+      ]
+    },
+    {
+      "arranged_mass_kg": 1.0,
+      "geometry": {
+        "span_m": 0.2581988897,
+        "height_m": 0.2581988897,
+        "density": 1.0,
+        "surface_area_m2": 0.0666666667,
+        "center_offset_m": [
+          0.5,
+          0.5
+        ]
+      },
+      "effort_kcal": 63.0,
+      "physical_actions": 5,
+      "minimum_ticks_at_three_actions": 2,
+      "element_abs_error_kg": 0.0,
+      "measurements": [
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.0005555555553526062,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 90.0,
+          "cover": 3.4017966630554974e-20,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.0005555555553526062,
+          "saving_kcal": 0.061111111088393955,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 141.9388888889116,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8516333333,
+          "optimistic_payback_days": 1030.9090912923161
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 90.0,
+          "cover": 3.4017966630554974e-20,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.0005555555553526062,
+          "saving_kcal": 0.10694444440559892,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 291.8930555555944,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7513583333,
+          "optimistic_payback_days": 589.0909093048851
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 90.0,
+          "cover": 3.4017966630554974e-20,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        }
+      ]
+    },
+    {
+      "arranged_mass_kg": 5.0,
+      "geometry": {
+        "span_m": 0.5773502692,
+        "height_m": 0.5773502692,
+        "density": 1.0,
+        "surface_area_m2": 0.3333333333,
+        "center_offset_m": [
+          0.5,
+          0.5
+        ]
+      },
+      "effort_kcal": 283.0,
+      "physical_actions": 21,
+      "minimum_ticks_at_three_actions": 7,
+      "element_abs_error_kg": 0.0,
+      "measurements": [
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.013888888887999128,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 90.0,
+          "cover": 8.504491660200686e-19,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.013888888887999128,
+          "saving_kcal": 1.5277777776800576,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 140.47222222231994,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.8428333333,
+          "optimistic_payback_days": 185.23636364821178
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 90.0,
+          "cover": 8.504491660200686e-19,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.013888888887999128,
+          "saving_kcal": 2.673611110940328,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 289.3263888890597,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.7359583333,
+          "optimistic_payback_days": 105.84935065611201
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 90.0,
+          "cover": 8.504491660200686e-19,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        }
+      ]
+    },
+    {
+      "arranged_mass_kg": 15.0,
+      "geometry": {
+        "span_m": 1.0,
+        "height_m": 1.0,
+        "density": 1.0,
+        "surface_area_m2": 1.0,
+        "center_offset_m": [
+          0.5,
+          0.5
+        ]
+      },
+      "effort_kcal": 833.0,
+      "physical_actions": 61,
+      "minimum_ticks_at_three_actions": 21,
+      "element_abs_error_kg": 0.0,
+      "measurements": [
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.125,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 90.0,
+          "cover": 7.654042494670958e-18,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.125,
+          "saving_kcal": 13.75,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 128.25,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.7695,
+          "optimistic_payback_days": 60.58181818181818
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 90.0,
+          "cover": 7.654042494670958e-18,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.125,
+          "saving_kcal": 24.0625,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 267.9375,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.607625,
+          "optimistic_payback_days": 34.61818181818182
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 90.0,
+          "cover": 7.654042494670958e-18,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        }
+      ]
+    },
+    {
+      "arranged_mass_kg": 30.0,
+      "geometry": {
+        "span_m": 1.4142135624,
+        "height_m": 1.4142135624,
+        "density": 1.0,
+        "surface_area_m2": 2.0,
+        "center_offset_m": [
+          0.5,
+          0.5
+        ]
+      },
+      "effort_kcal": 1658.0,
+      "physical_actions": 121,
+      "minimum_ticks_at_three_actions": 41,
+      "element_abs_error_kg": 0.0,
+      "measurements": [
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.45,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 90.0,
+          "cover": 2.7554552980815448e-17,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.45,
+          "saving_kcal": 49.5,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 92.5,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.555,
+          "optimistic_payback_days": 33.494949494949495
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 90.0,
+          "cover": 2.7554552980815448e-17,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.45,
+          "saving_kcal": 86.625,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 205.375,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.23225,
+          "optimistic_payback_days": 19.13997113997114
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 90.0,
+          "cover": 2.7554552980815448e-17,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        }
+      ]
+    },
+    {
+      "arranged_mass_kg": 60.0,
+      "geometry": {
+        "span_m": 2.0,
+        "height_m": 2.0,
+        "density": 1.0,
+        "surface_area_m2": 4.0,
+        "center_offset_m": [
+          0.5,
+          0.5
+        ]
+      },
+      "effort_kcal": 3308.0,
+      "physical_actions": 241,
+      "minimum_ticks_at_three_actions": 81,
+      "element_abs_error_kg": 0.0,
+      "measurements": [
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.45,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 90.0,
+          "cover": 2.7554552980815448e-17,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": 12.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 0.0,
+          "covered_thermal_debit_kcal": 0.0,
+          "bare_cold_exposure": 0.0,
+          "covered_cold_exposure": 0.0,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.45,
+          "saving_kcal": 49.5,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 92.5,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.555,
+          "optimistic_payback_days": 66.82828282828282
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 90.0,
+          "cover": 2.7554552980815448e-17,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -5.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 142.0,
+          "covered_thermal_debit_kcal": 142.0,
+          "bare_cold_exposure": 0.852,
+          "covered_cold_exposure": 0.852,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 0.0,
+          "cover": 0.45,
+          "saving_kcal": 86.625,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 205.375,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.23225,
+          "optimistic_payback_days": 38.18759018759019
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 90.0,
+          "cover": 2.7554552980815448e-17,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        },
+        {
+          "temperature_c": -20.0,
+          "wind_from_deg": 180.0,
+          "cover": 0.0,
+          "saving_kcal": 0.0,
+          "bare_thermal_debit_kcal": 292.0,
+          "covered_thermal_debit_kcal": 292.0,
+          "bare_cold_exposure": 1.752,
+          "covered_cold_exposure": 1.752,
+          "optimistic_payback_days": null
+        }
+      ]
+    }
+  ],
+  "source_simulation_unchanged": true,
+  "passed": true
+}
