@@ -32,6 +32,7 @@ So the simulation's outcomes cannot depend on whether history is held in memory.
 
   An edited checkpoint state is rejected, as before.
 - **Full verification.** `verify_chain()` streams the whole file with bounded memory and applies the same checks as `ReplayLedger.verify_chain`. `replay_state()` also streams, keeping one value per resource. A tampered stream fails verification (test).
+- **Grouping.** `group_epochs` epochs share one compressed member (`codec` "gzip" or "xz"), so day-to-day similarity compresses. A checkpoint flushes the open block first, and locations are recorded as (member offset, epoch).
 - **Opt-in.** `GenesisSimulation(config, ledger_path=...)`. Without a path the in-memory ledger is used, exactly as before. The world configuration and fingerprint are unaffected.
 - **Note for long runs.** `GenesisSimulation.run(n)` returns all *n* step results; this is the orchestrator's existing interface. Long runners should call `run(1)` per day, as `experiments/genesis/run_generations.py` does, or those results accumulate in memory for the duration of the call.
 
@@ -43,5 +44,6 @@ So the simulation's outcomes cannot depend on whether history is held in memory.
 | 5 years, seed a, current default | In-memory, streaming, and checkpoint at 2.5 years + resume give the same ledger digest (`4a55cddd…`), the same world-state digest (`aadb64c3…`) and the same outcomes (15 alive, 7 born, 0 deaths, 3 browsers). |
 | 5 years, seed a, `v1-legacystore` (the third run's configuration), streaming runner | Reproduces the third run year by year: alive 12/13/14/15/16; births 4, 1, 1, 1, 1; the same animal deaths and causes; edible plants 47.8, 566.5, 698.6, 768.5 and 771.3 t. |
 | Memory | Peak 0.06 GB with the streaming runner, against 4.35 GB with the in-memory ledger. |
-| Disk | About 43 MB of ledger per simulated year per seed (gzip). Checkpoints are about 1 MB. |
+| Disk | About 43 MB of ledger per simulated year per seed with per-epoch gzip, or about 21–27 MB with xz in 30-epoch blocks (`group_epochs=30, codec="xz"`, the long-run default). Checkpoints are 1–3 MB. |
+| Grouped xz | Same digest as gzip (year 1, seed a: `42ab93ea…`). A checkpoint taken mid-block resumes exactly (test). |
 | Tests | `tests/genesis/test_streaming_ledger.py`: identical digest and buffer bound; tamper detection; resume equals uninterrupted, including Agentus state; an edited checkpoint is rejected. |

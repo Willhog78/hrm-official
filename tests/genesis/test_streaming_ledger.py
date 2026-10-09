@@ -79,3 +79,22 @@ def test_checkpoint_with_edited_state_is_rejected(tmp_path, config):
     ck.write_text(json.dumps(payload))
     with pytest.raises(ProvenanceError):
         load_genesis_checkpoint(ck, config)
+
+
+def test_grouped_xz_stream_matches_and_resumes_mid_group(tmp_path, config, reference):
+    kw = {"ledger_group_epochs": 5, "ledger_codec": "xz"}
+    whole = GenesisSimulation(config, ledger_path=str(tmp_path / "w.xz"), **kw)
+    whole.run(DAYS)
+    assert whole.ledger.digest() == reference.ledger.digest()
+    assert whole.ledger.verify_chain()
+    assert whole.ledger.replay_state() == reference.ledger.replay_state()
+    sim = GenesisSimulation(config, ledger_path=str(tmp_path / "l.xz"), **kw)
+    sim.run(7)  # 7 epochs: one full group of 5 and 2 pending
+    ck = tmp_path / "ck.json"
+    write_genesis_checkpoint(ck, sim)
+    sim.run(4)
+    resumed = load_genesis_checkpoint(ck, config)
+    resumed.run(DAYS - 7)
+    assert resumed.ledger.digest() == reference.ledger.digest()
+    assert resumed.human_state() == reference.human_state()
+    assert resumed.ledger.verify_chain()

@@ -397,36 +397,49 @@ class StreamingReplayLedger(ReplayLedger):
     """The same replay evidence, streamed to disk instead of held in RAM.
 
     Records and blocks are built and digested exactly as by ReplayLedger, so the
-    digest chain is identical. Each committed epoch is appended to `path` as one
-    gzip member holding one JSON line (`{"epoch", "block", "records"}`); the
-    genesis is the first member. Only the last `buffer_epochs` epochs stay in
-    memory, plus the identifier sets that admission needs (record, transaction
-    and committed ids; small strings). Nothing in a simulation step reads ledger
-    history, so the step is unchanged.
+    digest chain is identical. Committed epochs are appended to `path` as
+    compressed members (`codec` "gzip" or "xz"), each holding `group_epochs`
+    JSON lines `{"epoch", "block", "records"}`; the genesis is the first
+    member. Grouping lets the compressor exploit day-to-day similarity. Only
+    the last `buffer_epochs` epochs stay in memory (plus an unflushed group of
+    at most `group_epochs`), with the identifier sets admission needs. Nothing
+    in a simulation step reads ledger history, so the step is unchanged.
 
-    `tip()` describes the ledger at a completed epoch boundary for a checkpoint;
-    `resume(tip)` truncates the stream to that boundary and continues it.
-    `verify_chain()` and `replay_state()` stream the whole file with bounded
-    memory (one value per resource).
+    `tip()` flushes and describes the ledger at an epoch boundary for a
+    checkpoint; `resume(tip)` truncates the stream to that boundary and
+    continues it. `verify_chain()` and `replay_state()` stream the whole file
+    with bounded memory (one value per resource).
     """
 
-    def __init__(self, config_fingerprint: str, path: str, *, buffer_epochs: int = 8):
+    def __init__(self, config_fingerprint: str, path: str, *, buffer_epochs: int = 8,
+                 group_epochs: int = 1, codec: str = "gzip"):
         super().__init__(config_fingerprint)
         from collections import deque
+        if codec not in ("gzip", "xz"):
+            raise ValueError("codec must be 'gzip' or 'xz'")
         self.path = str(path)
         self.buffer_epochs = max(1, int(buffer_epochs))
+        self.group_epochs = max(1, int(group_epochs))
+        self.codec = codec
         self._buffer: "deque[tuple[EpochEvidenceBlock, tuple[LedgerRecord, ...]]]" = deque(maxlen=self.buffer_epochs)
+        self._pending: list[tuple[int, bytes, tuple[str, ...]]] = []  # (epoch, line, written resource keys)
         self._epoch_count = 0
         self._offset = 0
-        self._writer_offsets: dict[str, int] = {}
-        self._last_member_offset: int | None = None
+        self._writer_locations: dict[str, tuple[int, int]] = {}  # resource -> (member offset, epoch)
+        self._last_location: tuple[int, int] | None = None
         self._handle = None
+        self._started = False
 
     # -- storage ---------------------------------------------------------------
-    def _append_member(self, obj: Any) -> int:
+    def _compress(self, data: bytes) -> bytes:
+        if self.codec == "xz":
+            import lzma
+            return lzma.compress(data, preset=6)
         import gzip
+        return gzip.compress(data, compresslevel=6, mtime=0)
+
+    def _write(self, data: bytes) -> int:
         start = self._offset
-        data = gzip.compress((canonical_json(obj) + "\n").encode("utf-8"), compresslevel=6, mtime=0)
         if self._handle is None:
             self._handle = open(self.path, "ab")
         self._handle.write(data)
@@ -434,12 +447,27 @@ class StreamingReplayLedger(ReplayLedger):
         self._offset += len(data)
         return start
 
+    def _flush_group(self) -> None:
+        if not self._pending:
+            return
+        start = self._write(self._compress(b"".join(line for _, line, _ in self._pending)))
+        for epoch, _, keys in self._pending:
+            for key in keys:
+                self._writer_locations[key] = (start, epoch)
+            self._last_location = (start, epoch)
+        self._pending = []
+
     def _start_stream(self) -> None:
-        if self._handle is None and self._offset == 0:
-            open(self.path, "wb").close()
-            self._append_member({"genesis": self._genesis, "config_fingerprint": self.config_fingerprint})
+        if not self._started:
+            self._started = True
+            if self._offset == 0:
+                open(self.path, "wb").close()
+                header = {"genesis": self._genesis, "config_fingerprint": self.config_fingerprint,
+                          "codec": self.codec, "group_epochs": self.group_epochs}
+                self._write(self._compress((canonical_json(header) + "\n").encode("utf-8")))
 
     def close(self) -> None:
+        self._flush_group()
         if self._handle is not None:
             import os
             self._handle.flush()
@@ -478,46 +506,73 @@ class StreamingReplayLedger(ReplayLedger):
 
     def commit_prepared_batch(self, prepared: PreparedLedgerBatch) -> tuple[LedgerRecord, ...]:
         self._start_stream()
-        start = self._append_member({
+        line = (canonical_json({
             "epoch": prepared.epoch,
             "block": prepared.block.canonical(),
             "records": [r.canonical() for r in prepared.records],
-        })
+        }) + "\n").encode("utf-8")
+        keys = tuple(change.ref.as_key() for rec in prepared.records if rec.status == "COMMITTED"
+                     for change in rec.committed)
+        self._pending.append((prepared.epoch, line, keys))
+        if len(self._pending) >= self.group_epochs:
+            self._flush_group()
         self._buffer.append((prepared.block, prepared.records))
-        self._last_member_offset = start
         self._epoch_count += 1
         for rec in prepared.records:
             self._record_ids.add(rec.record_id)
             self._transaction_ids.add(rec.transaction_id)
             if rec.status == "COMMITTED":
                 self._committed_ids.update((rec.record_id, rec.transaction_id))
-                for change in rec.committed:
-                    self._writer_offsets[change.ref.as_key()] = start
         return prepared.records
 
     # -- reading the stream ---------------------------------------------------------
+    def _open_stream(self):
+        import gzip, lzma
+        with open(self.path, "rb") as raw:
+            magic = raw.read(6)
+        return lzma.open(self.path, "rb") if magic.startswith(b"\xfd7zXZ") else gzip.open(self.path, "rb")
+
     def _members(self):
-        """Stream every member from disk (the file always ends at the last
-        committed epoch: writes are flushed per epoch and resume truncates)."""
-        import gzip, json
+        """Every epoch line from disk, genesis first (flushes the open group)."""
+        import json
+        self._flush_group()
         if self._handle is not None:
             self._handle.flush()
-        with gzip.open(self.path, "rb") as stream:
+        with self._open_stream() as stream:
             for line in stream:
                 yield json.loads(line)
 
-    def _member_at(self, offset: int) -> dict[str, Any]:
-        import gzip, json, zlib
+    def _member_at(self, offset: int, epoch: int) -> dict[str, Any]:
+        """The epoch line `epoch` from the compressed member starting at `offset`."""
+        import json, lzma, zlib
         with open(self.path, "rb") as raw:
             raw.seek(offset)
-            d = zlib.decompressobj(16 + zlib.MAX_WBITS)
-            out = b""
+            head = raw.read(6)
+            raw.seek(offset)
+            d = lzma.LZMADecompressor() if head.startswith(b"\xfd7zXZ") else zlib.decompressobj(16 + zlib.MAX_WBITS)
+            out = bytearray()
             while not d.eof:
                 chunk = raw.read(1 << 20)
                 if not chunk:
                     break
                 out += d.decompress(chunk)
-        return json.loads(out)
+        for line in bytes(out).splitlines():
+            obj = json.loads(line)
+            if obj.get("epoch") == epoch:
+                return obj
+        raise ProvenanceError(f"epoch {epoch} not found at stream offset {offset}")
+
+    @staticmethod
+    def _check_member(member: dict[str, Any]) -> tuple[EpochEvidenceBlock, list[LedgerRecord]]:
+        block = _block_from_canonical(member["block"])
+        recs = [_record_from_canonical(r) for r in member["records"]]
+        if any(digest_obj(r.canonical_without_digest()) != r.record_digest for r in recs):
+            raise ProvenanceError(f"record digest mismatch in epoch {block.epoch}")
+        if tuple(sorted(r.record_digest for r in recs)) != block.record_digests:
+            raise ProvenanceError(f"block record digests mismatch in epoch {block.epoch}")
+        if digest_obj(block.canonical_without_digest()) != block.epoch_digest:
+            raise ProvenanceError(f"epoch digest mismatch in epoch {block.epoch}")
+        return block, recs
 
     def verify_chain(self) -> bool:
         """Stream the whole file and check it exactly as ReplayLedger does."""
@@ -561,7 +616,7 @@ class StreamingReplayLedger(ReplayLedger):
                 previous = block.epoch_digest
                 count += 1
             return count == self._epoch_count and previous == self.digest()
-        except (OSError, ValueError, KeyError, StopIteration):
+        except (OSError, ValueError, KeyError, StopIteration, EOFError):
             return False
 
     def replay_state(self) -> dict[str, dict[str, dict[str, Any]]]:
@@ -588,24 +643,18 @@ class StreamingReplayLedger(ReplayLedger):
     def latest_state(self) -> dict[str, dict[str, dict[str, Any]]]:
         """The current value of every resource, read from the epoch that last
         wrote it (a handful of members), checked against that epoch's digests."""
+        self._flush_group()
         state: dict[str, dict[str, dict[str, Any]]] = {
             aid: {rid: {"value": copy.deepcopy(v), "version": 0} for rid, v in values.items()}
             for aid, values in self._genesis.items()
         }
-        members: dict[int, dict[str, Any]] = {}
-        for offset in sorted(set(self._writer_offsets.values())):
-            member = self._member_at(offset)
-            block = _block_from_canonical(member["block"])
-            recs = [_record_from_canonical(r) for r in member["records"]]
-            if any(digest_obj(r.canonical_without_digest()) != r.record_digest for r in recs):
-                raise ProvenanceError(f"record digest mismatch in epoch {block.epoch}")
-            if tuple(sorted(r.record_digest for r in recs)) != block.record_digests:
-                raise ProvenanceError(f"block digest mismatch in epoch {block.epoch}")
-            if digest_obj(block.canonical_without_digest()) != block.epoch_digest:
-                raise ProvenanceError(f"epoch digest mismatch in epoch {block.epoch}")
-            members[offset] = member
-        for key, offset in self._writer_offsets.items():
-            for raw in sorted(members[offset]["records"], key=lambda r: (r["proposal_id"], r["transaction_id"])):
+        members: dict[tuple[int, int], dict[str, Any]] = {}
+        for location in sorted(set(self._writer_locations.values())):
+            member = self._member_at(*location)
+            self._check_member(member)
+            members[location] = member
+        for key, location in self._writer_locations.items():
+            for raw in sorted(members[location]["records"], key=lambda r: (r["proposal_id"], r["transaction_id"])):
                 if raw["status"] != "COMMITTED":
                     continue
                 for change in raw["committed"]:
@@ -629,19 +678,22 @@ class StreamingReplayLedger(ReplayLedger):
 
     # -- checkpoint and resume ------------------------------------------------------
     def tip(self) -> dict[str, Any]:
-        """The ledger at a completed epoch boundary (for a checkpoint)."""
+        """The ledger at a completed epoch boundary (for a checkpoint). Flushes
+        the open group, so the stream ends exactly at this epoch."""
         self.close()
         return {
-            "kind": "streaming-v1",
+            "kind": "streaming-v2",
             "path": self.path,
             "offset": self._offset,
+            "codec": self.codec,
+            "group_epochs": self.group_epochs,
             "config_fingerprint": self.config_fingerprint,
             "epoch_count": self._epoch_count,
             "digest": self.digest(),
             "last_block": self._buffer[-1][0].canonical() if self._buffer else None,
-            "last_member_offset": self._last_member_offset,
+            "last_location": list(self._last_location) if self._last_location else None,
             "buffer_epochs": self.buffer_epochs,
-            "writer_offsets": dict(sorted(self._writer_offsets.items())),
+            "writer_locations": {k: list(v) for k, v in sorted(self._writer_locations.items())},
             "record_ids": sorted(self._record_ids),
             "transaction_ids": sorted(self._transaction_ids),
             "committed_ids": sorted(self._committed_ids),
@@ -652,32 +704,32 @@ class StreamingReplayLedger(ReplayLedger):
         """Continue the stream from a checkpoint's tip. Epochs written after
         the checkpoint are discarded (the file is truncated to the tip)."""
         import os
-        if tip.get("kind") != "streaming-v1":
+        if tip.get("kind") != "streaming-v2":
             raise ProvenanceError("not a streaming ledger tip")
-        ledger = cls(str(tip["config_fingerprint"]), path or str(tip["path"]), buffer_epochs=int(tip["buffer_epochs"]))
+        ledger = cls(str(tip["config_fingerprint"]), path or str(tip["path"]), buffer_epochs=int(tip["buffer_epochs"]),
+                     group_epochs=int(tip["group_epochs"]), codec=str(tip["codec"]))
         if os.path.getsize(ledger.path) < int(tip["offset"]):
             raise ProvenanceError("ledger stream is shorter than the checkpoint tip")
         with open(ledger.path, "r+b") as raw:
             raw.truncate(int(tip["offset"]))
         ledger._offset = int(tip["offset"])
+        ledger._started = True
         head = next(ledger._members())
         if head.get("config_fingerprint") != ledger.config_fingerprint:
             raise ProvenanceError("ledger stream config fingerprint mismatch")
         ledger._genesis = dict(head["genesis"])
         ledger._epoch_count = int(tip["epoch_count"])
-        ledger._writer_offsets = {str(k): int(v) for k, v in tip["writer_offsets"].items()}
+        ledger._writer_locations = {str(k): (int(v[0]), int(v[1])) for k, v in tip["writer_locations"].items()}
         ledger._record_ids = set(tip["record_ids"])
         ledger._transaction_ids = set(tip["transaction_ids"])
         ledger._committed_ids = set(tip["committed_ids"])
         if tip["last_block"] is not None:
-            block = _block_from_canonical(tip["last_block"])
-            ledger._last_member_offset = int(tip["last_member_offset"])
-            last = ledger._member_at(ledger._last_member_offset)
-            if last is None or last["block"] != tip["last_block"] or block.epoch_digest != tip["digest"]:
+            ledger._last_location = (int(tip["last_location"][0]), int(tip["last_location"][1]))
+            last = ledger._member_at(*ledger._last_location)
+            block, recs = cls._check_member(last)
+            if last["block"] != tip["last_block"] or block.epoch_digest != tip["digest"]:
                 raise ProvenanceError("ledger stream tail does not match the checkpoint tip")
-            if digest_obj(block.canonical_without_digest()) != block.epoch_digest:
-                raise ProvenanceError("checkpoint tip block digest mismatch")
-            ledger._buffer.append((block, tuple(_record_from_canonical(r) for r in last["records"])))
+            ledger._buffer.append((block, tuple(recs)))
         if ledger.digest() != tip["digest"]:
             raise ProvenanceError("ledger digest does not match the checkpoint tip")
         return ledger

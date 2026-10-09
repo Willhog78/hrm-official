@@ -79,7 +79,8 @@ class GenesisSimulation:
     atomically so feeding/drinking cannot race lower-level material updates.
     """
 
-    def __init__(self, config: GenesisConfig, *, ledger_path: str | None = None, ledger_buffer_epochs: int = 8):
+    def __init__(self, config: GenesisConfig, *, ledger_path: str | None = None, ledger_buffer_epochs: int = 8,
+                 ledger_group_epochs: int = 1, ledger_codec: str = "gzip"):
         """`ledger_path`: stream replay evidence to this file and keep only the
         last `ledger_buffer_epochs` epochs in memory (StreamingReplayLedger).
         The simulation never reads ledger history, so outcomes and the ledger
@@ -244,7 +245,8 @@ class GenesisSimulation:
 
         self.ledger = (
             ReplayLedger(config.fingerprint()) if ledger_path is None
-            else StreamingReplayLedger(config.fingerprint(), ledger_path, buffer_epochs=ledger_buffer_epochs)
+            else StreamingReplayLedger(config.fingerprint(), ledger_path, buffer_epochs=ledger_buffer_epochs,
+                                       group_epochs=ledger_group_epochs, codec=ledger_codec)
         )
         for authority in self.authorities:
             state = {
