@@ -447,7 +447,7 @@ def _provision_dependent(
         caregiver_energy_floor = max(0.0, float(profile.get("basal_energy_kcal_per_tick", 0.0)))
         energy_available = max(0.0, float(caregiver["energy"]) - caregiver_energy_floor)
         supply = min(energy_cap, energy_available)
-    if nursing_model == NURSING_DEMAND_LIMITED:
+    if nursing_model in {NURSING_DEMAND_LIMITED, NURSING_REMAINING_DEMAND}:
         # docs/architecture/DEMAND_LIMITED_MILK.md: what the child can receive
         # (room in its store) is fixed before any milk is made; the mother
         # makes only that and pays for it, conversion loss included.
@@ -503,6 +503,7 @@ def _record_refused(stats: dict, profile: dict, kcal: float) -> None:
 
 
 NURSING_DEMAND_LIMITED = "demand-limited-v1"
+NURSING_REMAINING_DEMAND = "remaining-demand-v2"
 NURSING_SUPPLY_CAPPED_LEGACY = "supply-capped-legacy"
 
 
@@ -872,7 +873,15 @@ def evolve_agentus_step(
     # Where everyone stood at the start of the tick: a dependent is carried only
     # if it was with its caregiver before the caregiver moved.
     start_xy = {str(p["id"]): (int(p["x"]), int(p["y"])) for p in humans["humans"]}
-    if integrity:
+    remaining_demand = humans.get("nursing_model") == NURSING_REMAINING_DEMAND
+    if remaining_demand:
+        # Caregivers eat first; milk-only infants precede solid-capable siblings.
+        # Age, rather than ID, determines priority within dependent groups.
+        order = sorted(humans["humans"], key=lambda h: (
+            float(_age_profile(h, profile).get("caregiver_dependence", 0.0)) > 0.0,
+            int(h.get("age_ticks", 0)) if float(_age_profile(h, profile).get("caregiver_dependence", 0.0)) > 0.0 else 0,
+            h["id"]))
+    elif integrity:
         # Caregivers act before their dependents, so a carried child ends the
         # day wherever its caregiver walked, and is nursed after she has eaten.
         order = sorted(humans["humans"], key=lambda h: (
@@ -978,10 +987,12 @@ def evolve_agentus_step(
             human["energy"] = float(human["energy"]) - float(trace.get("effort_energy_kcal", 0.0))
             human["last_action_trace"] = trace
         nursing_model = humans.get("nursing_model")
-        provisioned = _provision_dependent(
-            human, caregiver, effective_profile, nursing_model,
-            humans.setdefault("nursing_stats", {}) if nursing_model else None,
-        )
+        provisioned = 0.0
+        if not remaining_demand:
+            provisioned = _provision_dependent(
+                human, caregiver, effective_profile, nursing_model,
+                humans.setdefault("nursing_stats", {}) if nursing_model else None,
+            )
         ate_kg_today = 0.0
         if self_feeding > 0.0 and capacities and "cognition" in human:
             _drink(human, mcells[xy], effective_profile)
@@ -1029,6 +1040,13 @@ def evolve_agentus_step(
                 **({"store_stats": store_stats} if store_stats is not None else {}),
             )
             ate = float(ate) + given
+        if remaining_demand:
+            # Solid intake has already credited the same bounded store. Only
+            # its remaining room requests milk; mass/water transfer stays physical.
+            provisioned = _provision_dependent(
+                human, caregiver, effective_profile, nursing_model,
+                humans.setdefault("nursing_stats", {}),
+            )
         human["energy"] = float(human["energy"]) - float(effective_profile["basal_energy_kcal_per_tick"])
         if capacities:
             _apply_physiology(

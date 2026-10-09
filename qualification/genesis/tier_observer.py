@@ -12,7 +12,8 @@ Arms are the multiseed arms (`v0`, `v1`, `plant_diet`, `no_interactions`,
 `no_recall`, `null`, each optionally `-nothirst`), then optionally
 `-preg106` (G10.6 integrity off), `-g104obs` (G10.4 observation), `-legacytb`
 or `-d2tb` (pre-D2 or D2 consumer timebase; the default is elapsed-time-v2),
-`-legacymilk` (supply-capped nursing), `-legacywater` (unscaled water cycle),
+`-legacymilk` (supply-capped nursing) or `-remainingmilk` (solids-first,
+youngest-first allocation), `-legacywater` (unscaled water cycle),
 `-legacystore` (unscaled eating store; outermost) and `@<physiology>`, e.g.
 `v1-preg106@reference-v2` or `v1-legacytb@reference-v2`.
 
@@ -74,6 +75,8 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
     base = base.removesuffix(LEGACY_STORE)
     legacy_water = base.endswith(LEGACY_WATER)
     base = base.removesuffix(LEGACY_WATER)
+    remaining_milk = base.endswith("-remainingmilk")
+    base = base.removesuffix("-remainingmilk")
     legacy_milk = base.endswith(LEGACY_MILK)
     base = base.removesuffix(LEGACY_MILK)
     legacy_timebase = base.endswith(LEGACY_TIMEBASE)
@@ -111,6 +114,10 @@ def build_config(seed: str, arm: str) -> GenesisConfig:
         overrides["consumer_timebase"] = "elapsed-time-v1"
     if not integrity:
         overrides["agentus_behavior_integrity_enabled"] = False
+    if legacy_milk and remaining_milk:
+        raise ValueError("conflicting nursing arms")
+    if remaining_milk:
+        overrides["nursing_model"] = "remaining-demand-v2"
     if legacy_milk:
         overrides["nursing_model"] = "supply-capped-legacy"
     if legacy_water:
