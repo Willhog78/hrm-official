@@ -104,7 +104,7 @@ class GenesisSimulation:
                 seed_bank=self.seed_bank,
                 wind_enabled=config.genesis_wind_enabled,
             )
-            authorities.append
+            authorities.append(
                 StateAuthority(WORLD_AUTHORITY, {WORLD_STATE_RESOURCE: world_state})
             )
 
