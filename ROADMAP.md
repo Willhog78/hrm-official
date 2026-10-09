@@ -476,3 +476,12 @@ bodily drift. Every step still uses current physical options and reserve guards;
 the three-interaction tick limit remains. Controlled four-action stone preparation
 replays across ticks; independent ecological discovery and sequential imitation
 remain unproven. Contract: `docs/architecture/PROCEDURAL_CONTINUITY_V4.md`.
+
+### Untrained discovery census — read-only (2026-10-09)
+
+Three seeds × 365 days, baseline and wind/subcell V4, with six unobserved twins
+and three additional thermal-exposure probes, all preserve ledger parity.
+Agents spontaneously interlace/wear and arrange material, but measured protection
+is negligible and useful stone/food overlap is rare. Physical placement/work scale
+is the next boundary; no cognition, physics or production behavior was changed.
+Report: `experiments/genesis/summaries/DISCOVERY_DIAGNOSIS_V4_2026-10-09.md`.
