@@ -1,0 +1,913 @@
+{
+  "passed": true,
+  "read_only": true,
+  "active": [
+    {
+      "seed": "agentus-demography-a",
+      "days": 365,
+      "fingerprint": "c51adee8bc75a9b5de11fc56a57aaca5257c2cf7756a050962bcdd6527d3c05a",
+      "ledger_digest": "05a5f967fdc2855286abffb0dc4ae31737bfcf2920f6d56ebe8cdc09a6c679d6",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.6095779603180396e-15,
+        "water_rel_error": 1.3749490051630674e-15,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      },
+      "continuity": {
+        "counts": {
+          "own_surface_removals": 8,
+          "own_removed_surface_reacquisitions": 3,
+          "own_removed_surface_reacquisitions_on_later_day": 2,
+          "offered:apply_force:woody|none": 2396,
+          "reserve_ready_offered:apply_force:woody|none": 2391,
+          "untried_offered:apply_force:woody|none": 363,
+          "no_action_with_option:apply_force:woody|none": 2386,
+          "other_action_with_option:apply_force:woody|none": 173,
+          "selected:apply_force:woody|none": 11,
+          "untried_selected:apply_force:woody|none": 8,
+          "wood_progress_actions": 19,
+          "interaction_days_at_own_wood_worksite": 681,
+          "offered:arrange:loose_wood|none": 332,
+          "reserve_ready_offered:arrange:loose_wood|none": 331,
+          "untried_offered:arrange:loose_wood|none": 118,
+          "other_action_with_option:arrange:loose_wood|none": 14,
+          "movement_decisions_at_own_wood_worksite": 677,
+          "nonpositive_offered:apply_force:woody|none": 2033,
+          "no_action_with_option:arrange:loose_wood|none": 323,
+          "departures_from_own_wood_worksite": 53,
+          "departures_after_last_observed_loose_wood": 24,
+          "departures_with_locally_adequate_food": 5,
+          "departures_with_locally_adequate_water": 53,
+          "departures_with_location_memory": 53,
+          "offered:interlace:surface+strands|held": 35,
+          "reserve_ready_offered:interlace:surface+strands|held": 35,
+          "untried_offered:interlace:surface+strands|held": 35,
+          "no_action_with_option:interlace:surface+strands|held": 34,
+          "selected:arrange:loose_wood|none": 8,
+          "untried_selected:arrange:loose_wood|none": 5,
+          "returns_to_own_wood_worksite": 44,
+          "other_action_with_option:interlace:surface+strands|held": 1,
+          "nonpositive_selected:apply_force:woody|none": 3,
+          "nonpositive_offered:arrange:loose_wood|none": 214,
+          "nonpositive_selected:arrange:loose_wood|none": 3
+        },
+        "option_decisions": {
+          "apply_force:woody|none": 2603,
+          "arrange:loose_wood|none": 345,
+          "interlace:surface+strands|held": 35
+        },
+        "selected_decisions": {
+          "apply_force:woody|none": 11,
+          "arrange:loose_wood|none": 8
+        },
+        "sites": [
+          {
+            "actor": "human-g00000000",
+            "xy": [
+              0,
+              6
+            ],
+            "first_day": 63,
+            "last_day": 63,
+            "work_days": [
+              63
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.25,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000000",
+            "xy": [
+              3,
+              9
+            ],
+            "first_day": 203,
+            "last_day": 203,
+            "work_days": [
+              203
+            ],
+            "actions": 1,
+            "departures": 8,
+            "returns": 7,
+            "away": true,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0845445897
+          },
+          {
+            "actor": "human-g00000001",
+            "xy": [
+              0,
+              6
+            ],
+            "first_day": 164,
+            "last_day": 301,
+            "work_days": [
+              164,
+              301
+            ],
+            "actions": 2,
+            "departures": 2,
+            "returns": 2,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0170540052
+          },
+          {
+            "actor": "human-g00000001",
+            "xy": [
+              2,
+              5
+            ],
+            "first_day": 80,
+            "last_day": 80,
+            "work_days": [
+              80
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.1349649351,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000002",
+            "xy": [
+              5,
+              5
+            ],
+            "first_day": 64,
+            "last_day": 64,
+            "work_days": [
+              64
+            ],
+            "actions": 1,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.2263353179,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000003",
+            "xy": [
+              9,
+              6
+            ],
+            "first_day": 273,
+            "last_day": 357,
+            "work_days": [
+              273,
+              357
+            ],
+            "actions": 2,
+            "departures": 0,
+            "returns": 0,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.09522841089999999
+          },
+          {
+            "actor": "human-g00000003",
+            "xy": [
+              13,
+              5
+            ],
+            "first_day": 94,
+            "last_day": 94,
+            "work_days": [
+              94
+            ],
+            "actions": 2,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.235032221
+          },
+          {
+            "actor": "human-g00000004",
+            "xy": [
+              0,
+              7
+            ],
+            "first_day": 281,
+            "last_day": 293,
+            "work_days": [
+              281,
+              293
+            ],
+            "actions": 2,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.1046995351,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000005",
+            "xy": [
+              7,
+              11
+            ],
+            "first_day": 76,
+            "last_day": 76,
+            "work_days": [
+              76
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.0557508322,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000005",
+            "xy": [
+              9,
+              8
+            ],
+            "first_day": 240,
+            "last_day": 287,
+            "work_days": [
+              240,
+              253,
+              287
+            ],
+            "actions": 3,
+            "departures": 0,
+            "returns": 0,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.043136336399999996
+          },
+          {
+            "actor": "human-g00000006",
+            "xy": [
+              11,
+              9
+            ],
+            "first_day": 118,
+            "last_day": 118,
+            "work_days": [
+              118
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.24502500000000002,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000007",
+            "xy": [
+              3,
+              9
+            ],
+            "first_day": 153,
+            "last_day": 153,
+            "work_days": [
+              153
+            ],
+            "actions": 1,
+            "departures": 33,
+            "returns": 33,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0231279996
+          },
+          {
+            "actor": "human-g00000007",
+            "xy": [
+              5,
+              11
+            ],
+            "first_day": 75,
+            "last_day": 75,
+            "work_days": [
+              75
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.013242482699999999,
+            "arranged_kg": 0.0
+          }
+        ],
+        "distinct_actor_sites": 13,
+        "sites_worked_on_multiple_days": 4,
+        "sites_returned_to": 5
+      },
+      "prior_ledger_matches": true,
+      "prior_fingerprint_matches": true
+    },
+    {
+      "seed": "agentus-demography-b",
+      "days": 365,
+      "fingerprint": "f56832f66a03aed51ac1cc6c1ce22021c961520e334657056176ee49616b3ad4",
+      "ledger_digest": "a873d6a2d4717accce9747c09d8af50af24e455d15ff637dd663552648f4d924",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.3948882907918074e-15,
+        "water_rel_error": 2.7114627616214127e-16,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      },
+      "continuity": {
+        "counts": {
+          "own_surface_removals": 7,
+          "offered:apply_force:woody|none": 2031,
+          "reserve_ready_offered:apply_force:woody|none": 2031,
+          "untried_offered:apply_force:woody|none": 189,
+          "other_action_with_option:apply_force:woody|none": 157,
+          "no_action_with_option:apply_force:woody|none": 2022,
+          "selected:apply_force:woody|none": 14,
+          "untried_selected:apply_force:woody|none": 8,
+          "wood_progress_actions": 25,
+          "interaction_days_at_own_wood_worksite": 897,
+          "offered:arrange:loose_wood|none": 589,
+          "reserve_ready_offered:arrange:loose_wood|none": 589,
+          "untried_offered:arrange:loose_wood|none": 99,
+          "other_action_with_option:arrange:loose_wood|none": 31,
+          "movement_decisions_at_own_wood_worksite": 894,
+          "nonpositive_offered:apply_force:woody|none": 1842,
+          "no_action_with_option:arrange:loose_wood|none": 577,
+          "departures_from_own_wood_worksite": 40,
+          "departures_after_last_observed_loose_wood": 20,
+          "departures_with_locally_adequate_water": 40,
+          "departures_with_location_memory": 40,
+          "departures_with_locally_adequate_food": 19,
+          "returns_to_own_wood_worksite": 32,
+          "selected:arrange:loose_wood|none": 10,
+          "untried_selected:arrange:loose_wood|none": 7,
+          "nonpositive_offered:arrange:loose_wood|none": 490,
+          "nonpositive_selected:apply_force:woody|none": 6,
+          "own_removed_surface_reacquisitions": 5,
+          "own_removed_surface_reacquisitions_on_later_day": 5,
+          "nonpositive_selected:arrange:loose_wood|none": 3,
+          "offered:interlace:surface+strands|held": 10,
+          "reserve_ready_offered:interlace:surface+strands|held": 10,
+          "untried_offered:interlace:surface+strands|held": 10,
+          "no_action_with_option:interlace:surface+strands|held": 8,
+          "other_action_with_option:interlace:surface+strands|held": 2,
+          "selected:interlace:surface+strands|held": 1,
+          "untried_selected:interlace:surface+strands|held": 1
+        },
+        "option_decisions": {
+          "apply_force:woody|none": 2225,
+          "arrange:loose_wood|none": 623,
+          "interlace:surface+strands|held": 11
+        },
+        "selected_decisions": {
+          "apply_force:woody|none": 15,
+          "arrange:loose_wood|none": 10,
+          "interlace:surface+strands|held": 1
+        },
+        "sites": [
+          {
+            "actor": "human-g00000000",
+            "xy": [
+              3,
+              4
+            ],
+            "first_day": 78,
+            "last_day": 78,
+            "work_days": [
+              78
+            ],
+            "actions": 2,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.22032591389999998
+          },
+          {
+            "actor": "human-g00000001",
+            "xy": [
+              1,
+              8
+            ],
+            "first_day": 80,
+            "last_day": 301,
+            "work_days": [
+              80,
+              111,
+              301
+            ],
+            "actions": 3,
+            "departures": 8,
+            "returns": 8,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.004943521
+          },
+          {
+            "actor": "human-g00000002",
+            "xy": [
+              7,
+              5
+            ],
+            "first_day": 109,
+            "last_day": 152,
+            "work_days": [
+              109,
+              152
+            ],
+            "actions": 2,
+            "departures": 3,
+            "returns": 2,
+            "away": true,
+            "loose_kg": 0.3803405895,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000002",
+            "xy": [
+              9,
+              6
+            ],
+            "first_day": 65,
+            "last_day": 76,
+            "work_days": [
+              65,
+              76
+            ],
+            "actions": 2,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.25
+          },
+          {
+            "actor": "human-g00000003",
+            "xy": [
+              5,
+              8
+            ],
+            "first_day": 273,
+            "last_day": 357,
+            "work_days": [
+              273,
+              296,
+              357
+            ],
+            "actions": 3,
+            "departures": 0,
+            "returns": 0,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0184124238
+          },
+          {
+            "actor": "human-g00000003",
+            "xy": [
+              7,
+              7
+            ],
+            "first_day": 94,
+            "last_day": 94,
+            "work_days": [
+              94
+            ],
+            "actions": 2,
+            "departures": 3,
+            "returns": 2,
+            "away": true,
+            "loose_kg": 0.4008040024,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000004",
+            "xy": [
+              7,
+              10
+            ],
+            "first_day": 60,
+            "last_day": 63,
+            "work_days": [
+              60,
+              63
+            ],
+            "actions": 2,
+            "departures": 10,
+            "returns": 9,
+            "away": true,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0782007344
+          },
+          {
+            "actor": "human-g00000005",
+            "xy": [
+              3,
+              9
+            ],
+            "first_day": 287,
+            "last_day": 287,
+            "work_days": [
+              287
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.1380977121,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000005",
+            "xy": [
+              4,
+              9
+            ],
+            "first_day": 139,
+            "last_day": 240,
+            "work_days": [
+              139,
+              240
+            ],
+            "actions": 3,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.0877882423,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000006",
+            "xy": [
+              14,
+              7
+            ],
+            "first_day": 53,
+            "last_day": 53,
+            "work_days": [
+              53
+            ],
+            "actions": 1,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.1614389043,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000007",
+            "xy": [
+              12,
+              8
+            ],
+            "first_day": 67,
+            "last_day": 153,
+            "work_days": [
+              67,
+              68,
+              98,
+              153
+            ],
+            "actions": 4,
+            "departures": 7,
+            "returns": 7,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0102036995
+          }
+        ],
+        "distinct_actor_sites": 11,
+        "sites_worked_on_multiple_days": 7,
+        "sites_returned_to": 9
+      },
+      "prior_ledger_matches": true,
+      "prior_fingerprint_matches": true
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "days": 365,
+      "fingerprint": "60dcfadcdd721abd2b9a713e2508ef027c8635745e87640e947558d0b639b74f",
+      "ledger_digest": "b32a8d468e0bb3725408cbcaf676e55f9afbe661d0ae35029861311c9be57fd6",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 1.8909824867730558e-15,
+        "water_rel_error": 2.2116836614359775e-15,
+        "lithic_abs_error_kg": 0.0
+      },
+      "continuity": {
+        "counts": {
+          "own_surface_removals": 5,
+          "offered:apply_force:woody|none": 2164,
+          "reserve_ready_offered:apply_force:woody|none": 2164,
+          "untried_offered:apply_force:woody|none": 269,
+          "no_action_with_option:apply_force:woody|none": 2159,
+          "other_action_with_option:apply_force:woody|none": 197,
+          "selected:apply_force:woody|none": 13,
+          "untried_selected:apply_force:woody|none": 8,
+          "wood_progress_actions": 23,
+          "interaction_days_at_own_wood_worksite": 742,
+          "offered:arrange:loose_wood|none": 393,
+          "reserve_ready_offered:arrange:loose_wood|none": 393,
+          "untried_offered:arrange:loose_wood|none": 194,
+          "no_action_with_option:arrange:loose_wood|none": 383,
+          "movement_decisions_at_own_wood_worksite": 738,
+          "departures_from_own_wood_worksite": 41,
+          "departures_after_last_observed_loose_wood": 24,
+          "departures_with_locally_adequate_food": 16,
+          "departures_with_locally_adequate_water": 41,
+          "departures_with_location_memory": 41,
+          "nonpositive_offered:apply_force:woody|none": 1895,
+          "other_action_with_option:arrange:loose_wood|none": 28,
+          "returns_to_own_wood_worksite": 31,
+          "selected:arrange:loose_wood|none": 10,
+          "untried_selected:arrange:loose_wood|none": 7,
+          "nonpositive_selected:apply_force:woody|none": 5,
+          "nonpositive_offered:arrange:loose_wood|none": 199,
+          "own_removed_surface_reacquisitions": 2,
+          "own_removed_surface_reacquisitions_on_later_day": 2,
+          "nonpositive_selected:arrange:loose_wood|none": 3
+        },
+        "option_decisions": {
+          "apply_force:woody|none": 2403,
+          "arrange:loose_wood|none": 421
+        },
+        "selected_decisions": {
+          "apply_force:woody|none": 13,
+          "arrange:loose_wood|none": 10
+        },
+        "sites": [
+          {
+            "actor": "human-g00000000",
+            "xy": [
+              8,
+              6
+            ],
+            "first_day": 76,
+            "last_day": 82,
+            "work_days": [
+              76,
+              82
+            ],
+            "actions": 2,
+            "departures": 3,
+            "returns": 2,
+            "away": true,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.25
+          },
+          {
+            "actor": "human-g00000000",
+            "xy": [
+              10,
+              4
+            ],
+            "first_day": 105,
+            "last_day": 105,
+            "work_days": [
+              105
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.25,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000001",
+            "xy": [
+              2,
+              6
+            ],
+            "first_day": 80,
+            "last_day": 301,
+            "work_days": [
+              80,
+              201,
+              301
+            ],
+            "actions": 3,
+            "departures": 2,
+            "returns": 2,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.023337189799999998
+          },
+          {
+            "actor": "human-g00000002",
+            "xy": [
+              11,
+              5
+            ],
+            "first_day": 76,
+            "last_day": 76,
+            "work_days": [
+              76
+            ],
+            "actions": 1,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.20229372839999998,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000002",
+            "xy": [
+              14,
+              5
+            ],
+            "first_day": 109,
+            "last_day": 109,
+            "work_days": [
+              109
+            ],
+            "actions": 1,
+            "departures": 2,
+            "returns": 1,
+            "away": true,
+            "loose_kg": 0.0972209235,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000003",
+            "xy": [
+              3,
+              6
+            ],
+            "first_day": 157,
+            "last_day": 157,
+            "work_days": [
+              157
+            ],
+            "actions": 1,
+            "departures": 4,
+            "returns": 3,
+            "away": true,
+            "loose_kg": 0.1066087518,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000003",
+            "xy": [
+              3,
+              8
+            ],
+            "first_day": 273,
+            "last_day": 357,
+            "work_days": [
+              273,
+              323,
+              357
+            ],
+            "actions": 3,
+            "departures": 0,
+            "returns": 0,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0625675861
+          },
+          {
+            "actor": "human-g00000004",
+            "xy": [
+              6,
+              6
+            ],
+            "first_day": 165,
+            "last_day": 190,
+            "work_days": [
+              165,
+              190
+            ],
+            "actions": 2,
+            "departures": 4,
+            "returns": 3,
+            "away": true,
+            "loose_kg": 0.11111249309999999,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000005",
+            "xy": [
+              0,
+              8
+            ],
+            "first_day": 240,
+            "last_day": 287,
+            "work_days": [
+              240,
+              253,
+              287
+            ],
+            "actions": 3,
+            "departures": 0,
+            "returns": 0,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0468423058
+          },
+          {
+            "actor": "human-g00000005",
+            "xy": [
+              6,
+              7
+            ],
+            "first_day": 77,
+            "last_day": 77,
+            "work_days": [
+              77
+            ],
+            "actions": 1,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.2466272247,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000006",
+            "xy": [
+              10,
+              9
+            ],
+            "first_day": 57,
+            "last_day": 57,
+            "work_days": [
+              57
+            ],
+            "actions": 1,
+            "departures": 3,
+            "returns": 2,
+            "away": true,
+            "loose_kg": 0.1931060671,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000006",
+            "xy": [
+              13,
+              10
+            ],
+            "first_day": 194,
+            "last_day": 194,
+            "work_days": [
+              194
+            ],
+            "actions": 1,
+            "departures": 12,
+            "returns": 12,
+            "away": false,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.0176453228
+          },
+          {
+            "actor": "human-g00000007",
+            "xy": [
+              9,
+              8
+            ],
+            "first_day": 153,
+            "last_day": 153,
+            "work_days": [
+              153
+            ],
+            "actions": 1,
+            "departures": 6,
+            "returns": 5,
+            "away": true,
+            "loose_kg": 0.0951883986,
+            "arranged_kg": 0.0
+          },
+          {
+            "actor": "human-g00000007",
+            "xy": [
+              13,
+              10
+            ],
+            "first_day": 62,
+            "last_day": 67,
+            "work_days": [
+              62,
+              67
+            ],
+            "actions": 2,
+            "departures": 1,
+            "returns": 0,
+            "away": true,
+            "loose_kg": 0.0,
+            "arranged_kg": 0.2500000001
+          }
+        ],
+        "distinct_actor_sites": 14,
+        "sites_worked_on_multiple_days": 6,
+        "sites_returned_to": 9
+      },
+      "prior_ledger_matches": true,
+      "prior_fingerprint_matches": true
+    }
+  ]
+}
