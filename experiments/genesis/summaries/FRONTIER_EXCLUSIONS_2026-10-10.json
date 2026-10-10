@@ -1,0 +1,2483 @@
+{
+  "passed": true,
+  "read_only": true,
+  "active": [
+    {
+      "seed": "agentus-demography-a",
+      "days": 365,
+      "fingerprint": "e707297d323548119d854eae1d4d0bc47160ffb60934b56bdc98dc4b8da2b59e",
+      "ledger_digest": "b2c46c7d72a5e49a2dd5ffcc3242bb38f04311ba2704e13a937dbd0e5b110478",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.6095779603180396e-15,
+        "water_rel_error": 1.3749490051630674e-15,
+        "lithic_abs_error_kg": 1.1368683772161603e-13
+      },
+      "audit": {
+        "calls": {
+          "choose_calls": 3243,
+          "frontier_stage_reached": 2969,
+          "early:ordinary_novelty": 254,
+          "early:imitation_tries": 3,
+          "frontier_candidate_calls": 7,
+          "frontier_trial_declined": 6,
+          "frontier_trial_accepted": 1,
+          "actual_frontier_selections": 1
+        },
+        "option_decisions": {
+          "apply_force:woody|none": {
+            "untried_single_action": 401,
+            "physical_state_mismatch": 1014,
+            "preempted:ordinary_novelty": 107,
+            "no_retained_attempt": 1078,
+            "preempted:imitation_tries": 3
+          },
+          "arrange:loose_wood|none": {
+            "untried_single_action": 122,
+            "physical_state_mismatch": 92,
+            "preempted:ordinary_novelty": 1,
+            "no_retained_attempt": 130
+          },
+          "bind:stick+stick|strand": {
+            "untried_single_action": 92,
+            "physical_state_mismatch": 167,
+            "preempted:ordinary_novelty": 7,
+            "no_enabled_successor": 1,
+            "no_retained_attempt": 87
+          },
+          "bind:stick+stone_small|strand": {
+            "untried_single_action": 24,
+            "physical_state_mismatch": 2,
+            "preempted:ordinary_novelty": 1
+          },
+          "bind:stone_heavy+stick|strand": {
+            "untried_single_action": 14,
+            "physical_state_mismatch": 2
+          },
+          "bind:stone_heavy+stone_small|strand": {
+            "untried_single_action": 30
+          },
+          "bind:stone_small+stick|strand": {
+            "untried_single_action": 161,
+            "physical_state_mismatch": 52,
+            "preempted:ordinary_novelty": 3
+          },
+          "break:woody|none": {
+            "untried_single_action": 419,
+            "physical_state_mismatch": 464,
+            "preempted:ordinary_novelty": 44,
+            "no_retained_attempt": 645,
+            "preempted:imitation_tries": 3,
+            "no_enabled_successor": 1
+          },
+          "cut:fresh_tissue|none": {
+            "untried_single_action": 5
+          },
+          "cut:woody|stone_heavy": {
+            "untried_single_action": 4,
+            "physical_state_mismatch": 3,
+            "preempted:ordinary_novelty": 1
+          },
+          "cut:woody|stone_small": {
+            "untried_single_action": 53,
+            "physical_state_mismatch": 5,
+            "preempted:ordinary_novelty": 1
+          },
+          "grasp:stick|none": {
+            "untried_single_action": 87,
+            "no_retained_attempt": 106,
+            "preempted:ordinary_novelty": 1
+          },
+          "grasp:stone_heavy|none": {
+            "untried_single_action": 148,
+            "physical_state_mismatch": 267,
+            "preempted:ordinary_novelty": 50,
+            "reserve_blocked": 11,
+            "no_retained_attempt": 574
+          },
+          "grasp:stone_small|none": {
+            "untried_single_action": 150,
+            "physical_state_mismatch": 405,
+            "preempted:ordinary_novelty": 64,
+            "reserve_blocked": 1,
+            "no_retained_attempt": 360
+          },
+          "grasp:strand_bark|none": {
+            "untried_single_action": 64,
+            "physical_state_mismatch": 124,
+            "preempted:ordinary_novelty": 25,
+            "no_retained_attempt": 466
+          },
+          "grasp:strand_plant|none": {
+            "untried_single_action": 131,
+            "physical_state_mismatch": 195,
+            "preempted:ordinary_novelty": 12,
+            "no_retained_attempt": 178
+          },
+          "grasp:surface|none": {
+            "untried_single_action": 69,
+            "physical_state_mismatch": 364,
+            "preempted:ordinary_novelty": 16,
+            "no_retained_attempt": 190
+          },
+          "grasp:wood_short|none": {
+            "untried_single_action": 5
+          },
+          "interlace:strands|held": {
+            "untried_single_action": 195,
+            "no_retained_attempt": 180,
+            "physical_state_mismatch": 14,
+            "preempted:ordinary_novelty": 2
+          },
+          "interlace:surface+strands|held": {
+            "untried_single_action": 35
+          },
+          "move:local_negative_x|none": {
+            "untried_single_action": 307,
+            "physical_state_mismatch": 1016,
+            "preempted:ordinary_novelty": 174,
+            "reserve_blocked": 18,
+            "no_retained_attempt": 1273,
+            "preempted:imitation_tries": 3
+          },
+          "move:local_negative_y|none": {
+            "untried_single_action": 277,
+            "physical_state_mismatch": 846,
+            "preempted:ordinary_novelty": 188,
+            "reserve_blocked": 18,
+            "no_retained_attempt": 1616,
+            "preempted:imitation_tries": 3
+          },
+          "move:local_positive_x|none": {
+            "untried_single_action": 305,
+            "physical_state_mismatch": 1017,
+            "preempted:ordinary_novelty": 180,
+            "reserve_blocked": 18,
+            "no_retained_attempt": 1466,
+            "preempted:imitation_tries": 3
+          },
+          "move:local_positive_y|none": {
+            "untried_single_action": 224,
+            "physical_state_mismatch": 1021,
+            "preempted:ordinary_novelty": 191,
+            "reserve_blocked": 18,
+            "no_retained_attempt": 1388,
+            "preempted:imitation_tries": 3
+          },
+          "release:stick|none": {
+            "untried_single_action": 39,
+            "physical_state_mismatch": 772,
+            "preempted:ordinary_novelty": 83,
+            "no_retained_attempt": 752,
+            "preempted:imitation_tries": 3,
+            "candidate_trial_declined": 6
+          },
+          "release:stone_heavy|none": {
+            "untried_single_action": 77,
+            "physical_state_mismatch": 29,
+            "preempted:ordinary_novelty": 5
+          },
+          "release:stone_small|none": {
+            "untried_single_action": 236,
+            "physical_state_mismatch": 7,
+            "no_retained_attempt": 214,
+            "preempted:ordinary_novelty": 11
+          },
+          "release:strand_bark|none": {
+            "untried_single_action": 148,
+            "physical_state_mismatch": 1625,
+            "preempted:ordinary_novelty": 122,
+            "preempted:imitation_tries": 6,
+            "no_retained_attempt": 1237,
+            "candidate_trial_declined": 6,
+            "candidate_selected": 2
+          },
+          "release:strand_plant|none": {
+            "untried_single_action": 383,
+            "physical_state_mismatch": 1530,
+            "preempted:ordinary_novelty": 205,
+            "reserve_blocked": 36,
+            "no_retained_attempt": 748,
+            "preempted:imitation_tries": 3
+          },
+          "release:surface|none": {
+            "untried_single_action": 107,
+            "physical_state_mismatch": 35,
+            "preempted:ordinary_novelty": 5,
+            "no_retained_attempt": 58
+          },
+          "release:surface|worn": {
+            "untried_single_action": 95
+          },
+          "release:wood_short|none": {
+            "untried_single_action": 1
+          },
+          "rotate:arranged_wood_-90|none": {
+            "untried_single_action": 110,
+            "physical_state_mismatch": 142,
+            "preempted:ordinary_novelty": 2,
+            "no_retained_attempt": 12
+          },
+          "rotate:arranged_wood_90|none": {
+            "untried_single_action": 109,
+            "physical_state_mismatch": 153,
+            "preempted:ordinary_novelty": 4
+          },
+          "separate:arranged_wood|none": {
+            "untried_single_action": 118,
+            "physical_state_mismatch": 87,
+            "preempted:ordinary_novelty": 3,
+            "no_retained_attempt": 58
+          },
+          "separate:bark|none": {
+            "untried_single_action": 261,
+            "physical_state_mismatch": 915,
+            "preempted:ordinary_novelty": 107,
+            "no_retained_attempt": 1115,
+            "preempted:imitation_tries": 3
+          },
+          "separate:bark|stone_heavy": {
+            "untried_single_action": 23
+          },
+          "separate:bark|stone_small": {
+            "untried_single_action": 90,
+            "physical_state_mismatch": 129,
+            "preempted:ordinary_novelty": 14,
+            "no_retained_attempt": 70
+          },
+          "separate:plant_tissue|none": {
+            "untried_single_action": 155,
+            "physical_state_mismatch": 961,
+            "preempted:ordinary_novelty": 200,
+            "reserve_blocked": 16,
+            "no_retained_attempt": 1814,
+            "preempted:imitation_tries": 3
+          },
+          "separate:strand_bark|held": {
+            "untried_single_action": 140,
+            "preempted:ordinary_novelty": 94,
+            "physical_state_mismatch": 1425,
+            "preempted:imitation_tries": 1,
+            "no_retained_attempt": 770
+          },
+          "separate:strand_plant|held": {
+            "untried_single_action": 287,
+            "physical_state_mismatch": 891,
+            "preempted:ordinary_novelty": 151,
+            "reserve_blocked": 36,
+            "no_retained_attempt": 654,
+            "preempted:imitation_tries": 3
+          },
+          "separate:tendon|none": {
+            "untried_single_action": 2,
+            "physical_state_mismatch": 3
+          },
+          "strike:animal_browser|none": {
+            "untried_single_action": 73,
+            "physical_state_mismatch": 31,
+            "preempted:ordinary_novelty": 5,
+            "no_retained_attempt": 67
+          },
+          "strike:animal_browser|stick": {
+            "untried_single_action": 63,
+            "physical_state_mismatch": 53,
+            "preempted:ordinary_novelty": 5,
+            "no_retained_attempt": 84
+          },
+          "strike:animal_browser|stone_small": {
+            "untried_single_action": 33
+          },
+          "strike:animal_grazer|none": {
+            "untried_single_action": 60,
+            "no_retained_attempt": 1,
+            "physical_state_mismatch": 4
+          },
+          "strike:animal_grazer|stick": {
+            "untried_single_action": 35,
+            "physical_state_mismatch": 26,
+            "preempted:ordinary_novelty": 2
+          },
+          "strike:animal_grazer|stone_small": {
+            "untried_single_action": 1
+          },
+          "strike:animal_stalker|none": {
+            "untried_single_action": 7
+          },
+          "strike:animal_stalker|stone_heavy": {
+            "untried_single_action": 3
+          },
+          "strike:animal_stalker|stone_small": {
+            "untried_single_action": 3
+          },
+          "strike:stone_heavy|stick": {
+            "untried_single_action": 206,
+            "physical_state_mismatch": 296,
+            "preempted:ordinary_novelty": 32,
+            "no_enabled_successor": 2,
+            "no_retained_attempt": 157
+          },
+          "strike:stone_heavy|stone_heavy": {
+            "untried_single_action": 35,
+            "physical_state_mismatch": 23,
+            "preempted:ordinary_novelty": 4
+          },
+          "strike:stone_heavy|stone_small": {
+            "untried_single_action": 119,
+            "physical_state_mismatch": 74,
+            "preempted:ordinary_novelty": 8,
+            "no_retained_attempt": 95
+          },
+          "strike:stone_heavy|wood_short": {
+            "untried_single_action": 1
+          },
+          "strike:stone_small|stick": {
+            "untried_single_action": 104,
+            "physical_state_mismatch": 780,
+            "preempted:ordinary_novelty": 48,
+            "no_retained_attempt": 447,
+            "no_enabled_successor": 5
+          },
+          "strike:stone_small|stone_heavy": {
+            "untried_single_action": 42,
+            "physical_state_mismatch": 19,
+            "preempted:ordinary_novelty": 3
+          },
+          "strike:stone_small|stone_small": {
+            "untried_single_action": 93,
+            "physical_state_mismatch": 25,
+            "preempted:ordinary_novelty": 7,
+            "no_retained_attempt": 9
+          },
+          "twist:strands|held": {
+            "untried_single_action": 427,
+            "physical_state_mismatch": 622,
+            "preempted:ordinary_novelty": 81,
+            "reserve_blocked": 18,
+            "no_retained_attempt": 886,
+            "preempted:imitation_tries": 3
+          },
+          "wear:surface|held": {
+            "untried_single_action": 126,
+            "physical_state_mismatch": 14,
+            "preempted:ordinary_novelty": 4,
+            "no_retained_attempt": 58
+          }
+        },
+        "closest_same_action_mismatch_fields": {
+          "apply_force:woody|none": {
+            "acts": 1003,
+            "ground": 860,
+            "held": 836,
+            "pools": 1010,
+            "weather": 1004,
+            "worn": 85,
+            "injury": 10,
+            "position": 455,
+            "geometry": 208
+          },
+          "arrange:loose_wood|none": {
+            "geometry": 92,
+            "ground": 86,
+            "held": 76,
+            "pools": 92,
+            "weather": 92,
+            "acts": 50,
+            "position": 18
+          },
+          "bind:stick+stick|strand": {
+            "acts": 142,
+            "ground": 66,
+            "held": 154,
+            "weather": 166,
+            "position": 19,
+            "pools": 100,
+            "geometry": 10,
+            "injury": 1
+          },
+          "bind:stick+stone_small|strand": {
+            "weather": 2
+          },
+          "bind:stone_heavy+stick|strand": {
+            "acts": 2,
+            "ground": 2,
+            "held": 2,
+            "pools": 2,
+            "weather": 2
+          },
+          "bind:stone_small+stick|strand": {
+            "ground": 52,
+            "held": 52,
+            "weather": 51,
+            "geometry": 49,
+            "acts": 30,
+            "pools": 30
+          },
+          "break:woody|none": {
+            "acts": 451,
+            "ground": 444,
+            "pools": 444,
+            "weather": 458,
+            "held": 416,
+            "worn": 90,
+            "injury": 3,
+            "position": 155,
+            "geometry": 14
+          },
+          "cut:woody|stone_heavy": {
+            "acts": 3,
+            "ground": 3,
+            "weather": 3
+          },
+          "cut:woody|stone_small": {
+            "acts": 5,
+            "ground": 5,
+            "held": 5,
+            "pools": 5,
+            "weather": 5
+          },
+          "grasp:stone_heavy|none": {
+            "acts": 264,
+            "ground": 241,
+            "held": 240,
+            "weather": 267,
+            "injury": 36,
+            "position": 169,
+            "pools": 247,
+            "worn": 16
+          },
+          "grasp:stone_small|none": {
+            "weather": 405,
+            "position": 223,
+            "acts": 388,
+            "ground": 330,
+            "held": 359,
+            "pools": 363,
+            "injury": 62,
+            "worn": 9
+          },
+          "grasp:strand_bark|none": {
+            "acts": 121,
+            "ground": 119,
+            "held": 122,
+            "pools": 119,
+            "weather": 122,
+            "position": 48,
+            "worn": 4
+          },
+          "grasp:strand_plant|none": {
+            "acts": 195,
+            "ground": 195,
+            "held": 195,
+            "pools": 105,
+            "position": 102,
+            "weather": 195,
+            "worn": 2,
+            "geometry": 10
+          },
+          "grasp:surface|none": {
+            "acts": 322,
+            "ground": 346,
+            "held": 207,
+            "pools": 243,
+            "weather": 361,
+            "position": 109,
+            "geometry": 114,
+            "worn": 2,
+            "injury": 10
+          },
+          "interlace:strands|held": {
+            "acts": 14,
+            "ground": 14,
+            "held": 14,
+            "pools": 14,
+            "weather": 14
+          },
+          "move:local_negative_x|none": {
+            "acts": 949,
+            "position": 817,
+            "weather": 1009,
+            "ground": 784,
+            "injury": 67,
+            "held": 899,
+            "pools": 829,
+            "worn": 117,
+            "geometry": 49
+          },
+          "move:local_negative_y|none": {
+            "acts": 815,
+            "ground": 707,
+            "held": 777,
+            "pools": 748,
+            "weather": 841,
+            "position": 641,
+            "injury": 119,
+            "worn": 29,
+            "geometry": 4
+          },
+          "move:local_positive_x|none": {
+            "position": 816,
+            "weather": 1005,
+            "acts": 905,
+            "ground": 800,
+            "injury": 132,
+            "held": 896,
+            "pools": 922,
+            "worn": 50,
+            "geometry": 75
+          },
+          "move:local_positive_y|none": {
+            "position": 950,
+            "weather": 1010,
+            "injury": 48,
+            "acts": 866,
+            "held": 833,
+            "ground": 725,
+            "pools": 896,
+            "worn": 21,
+            "geometry": 93
+          },
+          "release:stick|none": {
+            "held": 770,
+            "weather": 767,
+            "pools": 695,
+            "acts": 755,
+            "ground": 532,
+            "position": 233,
+            "worn": 27,
+            "geometry": 57,
+            "injury": 4
+          },
+          "release:stone_heavy|none": {
+            "acts": 29,
+            "ground": 29,
+            "held": 29,
+            "pools": 29,
+            "weather": 28
+          },
+          "release:stone_small|none": {
+            "acts": 7,
+            "ground": 7,
+            "held": 7,
+            "pools": 7,
+            "position": 7,
+            "weather": 7
+          },
+          "release:strand_bark|none": {
+            "held": 1545,
+            "weather": 1580,
+            "acts": 1520,
+            "ground": 1369,
+            "pools": 1400,
+            "injury": 62,
+            "geometry": 328,
+            "position": 557,
+            "worn": 171
+          },
+          "release:strand_plant|none": {
+            "acts": 1500,
+            "ground": 1401,
+            "held": 1530,
+            "weather": 1518,
+            "position": 866,
+            "pools": 1173,
+            "injury": 90,
+            "worn": 19
+          },
+          "release:surface|none": {
+            "acts": 29,
+            "held": 35,
+            "pools": 25,
+            "position": 10,
+            "weather": 35,
+            "ground": 31
+          },
+          "rotate:arranged_wood_-90|none": {
+            "geometry": 142,
+            "ground": 86,
+            "held": 90,
+            "pools": 92,
+            "weather": 140,
+            "position": 68,
+            "acts": 56,
+            "injury": 4
+          },
+          "rotate:arranged_wood_90|none": {
+            "geometry": 96,
+            "acts": 68,
+            "held": 115,
+            "ground": 102,
+            "weather": 147,
+            "pools": 112,
+            "injury": 4
+          },
+          "separate:arranged_wood|none": {
+            "geometry": 87,
+            "pools": 87,
+            "position": 80,
+            "weather": 87,
+            "ground": 64,
+            "acts": 75,
+            "held": 75,
+            "injury": 4
+          },
+          "separate:bark|none": {
+            "acts": 892,
+            "ground": 685,
+            "held": 894,
+            "weather": 907,
+            "pools": 838,
+            "injury": 6,
+            "geometry": 147,
+            "worn": 40,
+            "position": 278
+          },
+          "separate:bark|stone_small": {
+            "acts": 124,
+            "held": 129,
+            "pools": 101,
+            "weather": 127,
+            "ground": 116,
+            "position": 64,
+            "geometry": 3
+          },
+          "separate:plant_tissue|none": {
+            "acts": 960,
+            "held": 924,
+            "weather": 952,
+            "ground": 755,
+            "injury": 77,
+            "pools": 800,
+            "position": 379,
+            "worn": 35,
+            "geometry": 3
+          },
+          "separate:strand_bark|held": {
+            "acts": 1304,
+            "held": 1395,
+            "pools": 1281,
+            "weather": 1379,
+            "ground": 742,
+            "geometry": 218,
+            "injury": 7,
+            "position": 411,
+            "worn": 137
+          },
+          "separate:strand_plant|held": {
+            "acts": 863,
+            "ground": 704,
+            "held": 891,
+            "weather": 880,
+            "position": 497,
+            "pools": 741,
+            "injury": 118,
+            "worn": 9
+          },
+          "separate:tendon|none": {
+            "held": 3,
+            "pools": 3,
+            "weather": 3,
+            "position": 2,
+            "injury": 1
+          },
+          "strike:animal_browser|none": {
+            "acts": 26,
+            "ground": 31,
+            "held": 27,
+            "pools": 31,
+            "weather": 31,
+            "geometry": 5,
+            "position": 9
+          },
+          "strike:animal_browser|stick": {
+            "pools": 53,
+            "weather": 53,
+            "acts": 51,
+            "held": 50,
+            "worn": 12,
+            "ground": 45,
+            "geometry": 6,
+            "position": 6
+          },
+          "strike:animal_grazer|none": {
+            "held": 4,
+            "weather": 4,
+            "position": 3
+          },
+          "strike:animal_grazer|stick": {
+            "held": 14,
+            "weather": 26,
+            "pools": 12
+          },
+          "strike:stone_heavy|stick": {
+            "pools": 162,
+            "weather": 296,
+            "held": 249,
+            "acts": 254,
+            "ground": 220,
+            "position": 97,
+            "worn": 4,
+            "geometry": 23
+          },
+          "strike:stone_heavy|stone_heavy": {
+            "acts": 23,
+            "held": 23,
+            "weather": 23,
+            "injury": 6,
+            "ground": 14,
+            "position": 5,
+            "pools": 11
+          },
+          "strike:stone_heavy|stone_small": {
+            "ground": 73,
+            "held": 66,
+            "pools": 60,
+            "weather": 72,
+            "acts": 31,
+            "position": 31
+          },
+          "strike:stone_small|stick": {
+            "ground": 693,
+            "held": 666,
+            "acts": 439,
+            "position": 424,
+            "weather": 779,
+            "pools": 728,
+            "worn": 28,
+            "geometry": 344,
+            "injury": 6
+          },
+          "strike:stone_small|stone_heavy": {
+            "ground": 19,
+            "pools": 6,
+            "weather": 19,
+            "acts": 14,
+            "held": 14
+          },
+          "strike:stone_small|stone_small": {
+            "acts": 17,
+            "ground": 19,
+            "weather": 24,
+            "pools": 17,
+            "held": 17
+          },
+          "twist:strands|held": {
+            "acts": 614,
+            "held": 622,
+            "weather": 612,
+            "ground": 483,
+            "position": 452,
+            "pools": 543,
+            "injury": 70,
+            "geometry": 50
+          },
+          "wear:surface|held": {
+            "weather": 14,
+            "held": 13,
+            "acts": 11,
+            "ground": 10,
+            "pools": 11
+          }
+        },
+        "consistency_errors": 0
+      },
+      "prior_ledger_matches": true,
+      "prior_fingerprint_matches": true
+    },
+    {
+      "seed": "agentus-demography-b",
+      "days": 365,
+      "fingerprint": "75160fb89adab42e0d52c723144ad718d20a83690dbc847e4f224279543186bb",
+      "ledger_digest": "1961af8108b6ce69202efcdb598b3551bb8016f18d16eaa30a918c1505fb4b78",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 2.3948882907918074e-15,
+        "water_rel_error": 2.7114627616214127e-16,
+        "lithic_abs_error_kg": 2.2737367544323206e-13
+      },
+      "audit": {
+        "calls": {
+          "choose_calls": 3236,
+          "frontier_stage_reached": 2990,
+          "early:ordinary_novelty": 246,
+          "frontier_candidate_calls": 4,
+          "frontier_trial_declined": 4
+        },
+        "option_decisions": {
+          "apply_force:woody|none": {
+            "untried_single_action": 223,
+            "physical_state_mismatch": 893,
+            "preempted:ordinary_novelty": 106,
+            "no_retained_attempt": 1003
+          },
+          "arrange:loose_wood|none": {
+            "untried_single_action": 110,
+            "physical_state_mismatch": 258,
+            "preempted:ordinary_novelty": 10,
+            "no_retained_attempt": 245
+          },
+          "bind:stick+stick|strand": {
+            "untried_single_action": 22,
+            "physical_state_mismatch": 14,
+            "preempted:ordinary_novelty": 4,
+            "no_retained_attempt": 58
+          },
+          "bind:stick+stone_heavy|strand": {
+            "untried_single_action": 20,
+            "physical_state_mismatch": 7,
+            "no_enabled_successor": 1,
+            "preempted:ordinary_novelty": 1
+          },
+          "bind:stick+stone_small|strand": {
+            "untried_single_action": 9,
+            "preempted:ordinary_novelty": 5,
+            "physical_state_mismatch": 29
+          },
+          "bind:stone_heavy+stick|strand": {
+            "untried_single_action": 2,
+            "preempted:ordinary_novelty": 3,
+            "physical_state_mismatch": 9
+          },
+          "break:woody|none": {
+            "untried_single_action": 304,
+            "physical_state_mismatch": 599,
+            "preempted:ordinary_novelty": 49,
+            "no_retained_attempt": 505
+          },
+          "cut:fresh_tissue|none": {
+            "untried_single_action": 30,
+            "physical_state_mismatch": 9
+          },
+          "cut:fresh_tissue|stone_small": {
+            "untried_single_action": 1
+          },
+          "cut:woody|stone_heavy": {
+            "untried_single_action": 81
+          },
+          "cut:woody|stone_small": {
+            "untried_single_action": 39
+          },
+          "grasp:stick|none": {
+            "untried_single_action": 205
+          },
+          "grasp:stone_heavy|none": {
+            "untried_single_action": 222,
+            "physical_state_mismatch": 459,
+            "preempted:ordinary_novelty": 53,
+            "no_retained_attempt": 341
+          },
+          "grasp:stone_small|none": {
+            "untried_single_action": 180,
+            "physical_state_mismatch": 409,
+            "preempted:ordinary_novelty": 56,
+            "no_retained_attempt": 396
+          },
+          "grasp:strand_bark|none": {
+            "untried_single_action": 229,
+            "physical_state_mismatch": 3,
+            "no_retained_attempt": 308,
+            "preempted:ordinary_novelty": 4
+          },
+          "grasp:strand_plant|none": {
+            "untried_single_action": 125,
+            "physical_state_mismatch": 69,
+            "no_retained_attempt": 531,
+            "preempted:ordinary_novelty": 25
+          },
+          "grasp:surface|none": {
+            "untried_single_action": 81,
+            "physical_state_mismatch": 300,
+            "preempted:ordinary_novelty": 9,
+            "no_retained_attempt": 210,
+            "candidate_trial_declined": 3
+          },
+          "grasp:wood_short|none": {
+            "untried_single_action": 26,
+            "no_retained_attempt": 3
+          },
+          "interlace:strands|held": {
+            "untried_single_action": 262,
+            "physical_state_mismatch": 28,
+            "preempted:ordinary_novelty": 17,
+            "no_retained_attempt": 420
+          },
+          "interlace:surface+strands|held": {
+            "untried_single_action": 11
+          },
+          "move:local_negative_x|none": {
+            "untried_single_action": 161,
+            "physical_state_mismatch": 1467,
+            "preempted:ordinary_novelty": 212,
+            "no_retained_attempt": 1396
+          },
+          "move:local_negative_y|none": {
+            "untried_single_action": 230,
+            "physical_state_mismatch": 715,
+            "preempted:ordinary_novelty": 171,
+            "no_retained_attempt": 1684
+          },
+          "move:local_positive_x|none": {
+            "untried_single_action": 285,
+            "no_enabled_successor": 1,
+            "physical_state_mismatch": 835,
+            "preempted:ordinary_novelty": 155,
+            "no_retained_attempt": 1553
+          },
+          "move:local_positive_y|none": {
+            "untried_single_action": 359,
+            "physical_state_mismatch": 1214,
+            "preempted:ordinary_novelty": 172,
+            "no_retained_attempt": 1301
+          },
+          "release:stick|none": {
+            "untried_single_action": 203,
+            "physical_state_mismatch": 215,
+            "preempted:ordinary_novelty": 40,
+            "no_retained_attempt": 802
+          },
+          "release:stone_heavy|none": {
+            "untried_single_action": 117,
+            "physical_state_mismatch": 86,
+            "preempted:ordinary_novelty": 7,
+            "no_retained_attempt": 4
+          },
+          "release:stone_small|none": {
+            "untried_single_action": 191,
+            "physical_state_mismatch": 8,
+            "preempted:ordinary_novelty": 4
+          },
+          "release:strand_bark|none": {
+            "untried_single_action": 116,
+            "physical_state_mismatch": 665,
+            "preempted:ordinary_novelty": 63,
+            "no_retained_attempt": 1191
+          },
+          "release:strand_plant|none": {
+            "untried_single_action": 164,
+            "physical_state_mismatch": 2946,
+            "preempted:ordinary_novelty": 397,
+            "no_retained_attempt": 1247,
+            "candidate_trial_declined": 2
+          },
+          "release:surface|none": {
+            "untried_single_action": 89,
+            "physical_state_mismatch": 26,
+            "no_retained_attempt": 80
+          },
+          "release:surface|worn": {
+            "untried_single_action": 89,
+            "physical_state_mismatch": 40,
+            "no_retained_attempt": 65
+          },
+          "release:wood_short|none": {
+            "untried_single_action": 81,
+            "physical_state_mismatch": 172,
+            "preempted:ordinary_novelty": 4,
+            "no_retained_attempt": 172
+          },
+          "rotate:arranged_wood_-90|none": {
+            "untried_single_action": 221,
+            "physical_state_mismatch": 159,
+            "preempted:ordinary_novelty": 3,
+            "no_retained_attempt": 45
+          },
+          "rotate:arranged_wood_90|none": {
+            "untried_single_action": 188,
+            "preempted:ordinary_novelty": 8,
+            "physical_state_mismatch": 157,
+            "no_retained_attempt": 70,
+            "no_enabled_successor": 5
+          },
+          "separate:arranged_wood|none": {
+            "untried_single_action": 114,
+            "physical_state_mismatch": 25,
+            "no_retained_attempt": 272,
+            "preempted:ordinary_novelty": 17
+          },
+          "separate:bark|none": {
+            "untried_single_action": 339,
+            "physical_state_mismatch": 744,
+            "preempted:ordinary_novelty": 83,
+            "no_retained_attempt": 575
+          },
+          "separate:bark|stone_heavy": {
+            "untried_single_action": 133,
+            "physical_state_mismatch": 6
+          },
+          "separate:bark|stone_small": {
+            "untried_single_action": 16,
+            "preempted:ordinary_novelty": 8,
+            "physical_state_mismatch": 36
+          },
+          "separate:plant_tissue|none": {
+            "untried_single_action": 120,
+            "physical_state_mismatch": 1264,
+            "preempted:ordinary_novelty": 203,
+            "no_retained_attempt": 1394
+          },
+          "separate:strand_bark|held": {
+            "untried_single_action": 111,
+            "physical_state_mismatch": 540,
+            "preempted:ordinary_novelty": 23,
+            "no_retained_attempt": 208
+          },
+          "separate:strand_plant|held": {
+            "untried_single_action": 336,
+            "physical_state_mismatch": 1186,
+            "preempted:ordinary_novelty": 210,
+            "no_retained_attempt": 1136
+          },
+          "separate:tendon|none": {
+            "untried_single_action": 18
+          },
+          "separate:tendon|stone_small": {
+            "untried_single_action": 1
+          },
+          "strike:animal_browser|none": {
+            "untried_single_action": 6,
+            "physical_state_mismatch": 6,
+            "preempted:ordinary_novelty": 2
+          },
+          "strike:animal_browser|stone_heavy": {
+            "untried_single_action": 6
+          },
+          "strike:animal_browser|stone_small": {
+            "untried_single_action": 3
+          },
+          "strike:animal_grazer|none": {
+            "untried_single_action": 54,
+            "physical_state_mismatch": 6,
+            "preempted:ordinary_novelty": 2
+          },
+          "strike:animal_grazer|stick": {
+            "untried_single_action": 2
+          },
+          "strike:animal_stalker|none": {
+            "untried_single_action": 4
+          },
+          "strike:stone_heavy|stick": {
+            "untried_single_action": 117,
+            "preempted:ordinary_novelty": 34,
+            "physical_state_mismatch": 265,
+            "no_retained_attempt": 326
+          },
+          "strike:stone_heavy|stone_heavy": {
+            "untried_single_action": 49
+          },
+          "strike:stone_heavy|stone_small": {
+            "untried_single_action": 80,
+            "physical_state_mismatch": 23,
+            "preempted:ordinary_novelty": 7
+          },
+          "strike:stone_heavy|wood_short": {
+            "untried_single_action": 7
+          },
+          "strike:stone_small|stick": {
+            "untried_single_action": 78,
+            "physical_state_mismatch": 330,
+            "preempted:ordinary_novelty": 15,
+            "no_enabled_successor": 3
+          },
+          "strike:stone_small|stone_heavy": {
+            "untried_single_action": 63,
+            "physical_state_mismatch": 14,
+            "preempted:ordinary_novelty": 3
+          },
+          "strike:stone_small|stone_small": {
+            "untried_single_action": 123,
+            "preempted:ordinary_novelty": 6,
+            "physical_state_mismatch": 9
+          },
+          "strike:stone_small|wood_short": {
+            "untried_single_action": 106,
+            "physical_state_mismatch": 184,
+            "preempted:ordinary_novelty": 5,
+            "no_retained_attempt": 168
+          },
+          "twist:strands|held": {
+            "untried_single_action": 430,
+            "physical_state_mismatch": 764,
+            "preempted:ordinary_novelty": 94,
+            "no_retained_attempt": 541
+          },
+          "wear:surface|held": {
+            "untried_single_action": 42,
+            "physical_state_mismatch": 66,
+            "preempted:ordinary_novelty": 8,
+            "no_retained_attempt": 79
+          }
+        },
+        "closest_same_action_mismatch_fields": {
+          "apply_force:woody|none": {
+            "acts": 849,
+            "pools": 882,
+            "position": 294,
+            "weather": 886,
+            "held": 810,
+            "ground": 690,
+            "geometry": 322,
+            "injury": 53,
+            "worn": 44
+          },
+          "arrange:loose_wood|none": {
+            "acts": 237,
+            "geometry": 243,
+            "ground": 255,
+            "held": 252,
+            "pools": 258,
+            "weather": 258,
+            "injury": 15,
+            "position": 117
+          },
+          "bind:stick+stick|strand": {
+            "weather": 14,
+            "ground": 7,
+            "held": 9,
+            "acts": 4
+          },
+          "bind:stick+stone_heavy|strand": {
+            "ground": 7,
+            "weather": 7,
+            "held": 4
+          },
+          "bind:stick+stone_small|strand": {
+            "acts": 29,
+            "ground": 29,
+            "weather": 29,
+            "held": 13,
+            "pools": 24
+          },
+          "bind:stone_heavy+stick|strand": {
+            "acts": 9,
+            "ground": 9,
+            "held": 9,
+            "pools": 9,
+            "weather": 9,
+            "geometry": 3
+          },
+          "break:woody|none": {
+            "acts": 595,
+            "held": 535,
+            "pools": 556,
+            "weather": 596,
+            "ground": 534,
+            "injury": 17,
+            "position": 192,
+            "geometry": 188,
+            "worn": 103
+          },
+          "cut:fresh_tissue|none": {
+            "held": 3,
+            "pools": 9,
+            "weather": 9
+          },
+          "grasp:stone_heavy|none": {
+            "acts": 440,
+            "ground": 347,
+            "held": 439,
+            "position": 245,
+            "weather": 455,
+            "pools": 441,
+            "geometry": 111,
+            "injury": 2,
+            "worn": 10
+          },
+          "grasp:stone_small|none": {
+            "acts": 380,
+            "ground": 293,
+            "held": 355,
+            "pools": 376,
+            "weather": 405,
+            "position": 170,
+            "worn": 37,
+            "injury": 20,
+            "geometry": 5
+          },
+          "grasp:strand_bark|none": {
+            "acts": 3,
+            "ground": 3,
+            "held": 3,
+            "pools": 3,
+            "weather": 3
+          },
+          "grasp:strand_plant|none": {
+            "acts": 49,
+            "ground": 69,
+            "held": 69,
+            "pools": 30,
+            "position": 24,
+            "weather": 67,
+            "geometry": 6
+          },
+          "grasp:surface|none": {
+            "ground": 277,
+            "weather": 298,
+            "acts": 202,
+            "held": 246,
+            "pools": 223,
+            "position": 123,
+            "geometry": 85
+          },
+          "interlace:strands|held": {
+            "acts": 28,
+            "ground": 28,
+            "held": 28,
+            "pools": 28,
+            "position": 26,
+            "weather": 28,
+            "geometry": 9
+          },
+          "move:local_negative_x|none": {
+            "acts": 1376,
+            "position": 1259,
+            "weather": 1448,
+            "pools": 1291,
+            "ground": 1263,
+            "held": 1263,
+            "injury": 30,
+            "worn": 171,
+            "geometry": 189
+          },
+          "move:local_negative_y|none": {
+            "acts": 685,
+            "ground": 602,
+            "held": 676,
+            "weather": 710,
+            "position": 674,
+            "pools": 626,
+            "worn": 17,
+            "injury": 19,
+            "geometry": 94
+          },
+          "move:local_positive_x|none": {
+            "pools": 802,
+            "weather": 823,
+            "acts": 758,
+            "held": 778,
+            "ground": 717,
+            "position": 760,
+            "injury": 35,
+            "worn": 92,
+            "geometry": 190
+          },
+          "move:local_positive_y|none": {
+            "acts": 1067,
+            "position": 1136,
+            "weather": 1190,
+            "held": 1075,
+            "ground": 977,
+            "pools": 1096,
+            "injury": 27,
+            "geometry": 152,
+            "worn": 99
+          },
+          "release:stick|none": {
+            "acts": 215,
+            "ground": 190,
+            "held": 180,
+            "pools": 215,
+            "weather": 215,
+            "geometry": 79,
+            "worn": 70,
+            "position": 184,
+            "injury": 1
+          },
+          "release:stone_heavy|none": {
+            "acts": 84,
+            "geometry": 72,
+            "ground": 84,
+            "pools": 86,
+            "position": 86,
+            "weather": 86,
+            "held": 70,
+            "injury": 10
+          },
+          "release:stone_small|none": {
+            "acts": 8,
+            "ground": 8,
+            "held": 8,
+            "pools": 8,
+            "weather": 8
+          },
+          "release:strand_bark|none": {
+            "acts": 665,
+            "ground": 517,
+            "held": 665,
+            "pools": 651,
+            "weather": 660,
+            "geometry": 290,
+            "position": 222,
+            "worn": 7,
+            "injury": 2
+          },
+          "release:strand_plant|none": {
+            "acts": 2708,
+            "ground": 2331,
+            "held": 2886,
+            "weather": 2904,
+            "position": 1953,
+            "pools": 2372,
+            "injury": 118,
+            "geometry": 436,
+            "worn": 84
+          },
+          "release:surface|none": {
+            "held": 18,
+            "weather": 26,
+            "position": 20,
+            "pools": 12,
+            "acts": 4,
+            "ground": 4
+          },
+          "release:surface|worn": {
+            "acts": 40,
+            "ground": 40,
+            "pools": 40,
+            "weather": 40,
+            "worn": 40,
+            "geometry": 14,
+            "position": 3
+          },
+          "release:wood_short|none": {
+            "held": 155,
+            "weather": 172,
+            "pools": 156,
+            "acts": 140,
+            "ground": 135,
+            "position": 138
+          },
+          "rotate:arranged_wood_-90|none": {
+            "geometry": 158,
+            "weather": 159,
+            "ground": 88,
+            "held": 94,
+            "pools": 120,
+            "position": 92,
+            "acts": 22
+          },
+          "rotate:arranged_wood_90|none": {
+            "acts": 97,
+            "geometry": 31,
+            "held": 122,
+            "worn": 1,
+            "ground": 95,
+            "weather": 155,
+            "pools": 104,
+            "position": 67
+          },
+          "separate:arranged_wood|none": {
+            "acts": 25,
+            "geometry": 25,
+            "ground": 25,
+            "held": 25,
+            "pools": 25,
+            "weather": 25,
+            "position": 7
+          },
+          "separate:bark|none": {
+            "acts": 743,
+            "held": 728,
+            "weather": 738,
+            "pools": 674,
+            "ground": 662,
+            "injury": 100,
+            "geometry": 208,
+            "position": 205,
+            "worn": 81
+          },
+          "separate:bark|stone_heavy": {
+            "acts": 6,
+            "geometry": 3,
+            "ground": 6,
+            "held": 6,
+            "pools": 4,
+            "weather": 6
+          },
+          "separate:bark|stone_small": {
+            "acts": 36,
+            "held": 20,
+            "pools": 31,
+            "weather": 36,
+            "ground": 35
+          },
+          "separate:plant_tissue|none": {
+            "acts": 1263,
+            "held": 1252,
+            "weather": 1253,
+            "ground": 1005,
+            "position": 742,
+            "pools": 1139,
+            "injury": 31,
+            "worn": 132,
+            "geometry": 158
+          },
+          "separate:strand_bark|held": {
+            "acts": 475,
+            "ground": 437,
+            "held": 540,
+            "pools": 452,
+            "weather": 533,
+            "geometry": 85,
+            "position": 138,
+            "injury": 2
+          },
+          "separate:strand_plant|held": {
+            "acts": 1110,
+            "held": 1186,
+            "weather": 1176,
+            "ground": 899,
+            "pools": 1020,
+            "position": 755,
+            "injury": 132,
+            "geometry": 277
+          },
+          "strike:animal_browser|none": {
+            "acts": 6,
+            "held": 6,
+            "weather": 6,
+            "ground": 5,
+            "pools": 3,
+            "position": 3
+          },
+          "strike:animal_grazer|none": {
+            "acts": 6,
+            "ground": 6,
+            "held": 6,
+            "pools": 6,
+            "weather": 6
+          },
+          "strike:stone_heavy|stick": {
+            "acts": 207,
+            "ground": 223,
+            "held": 237,
+            "weather": 265,
+            "geometry": 58,
+            "pools": 209,
+            "position": 85,
+            "worn": 7
+          },
+          "strike:stone_heavy|stone_small": {
+            "weather": 23,
+            "pools": 20,
+            "held": 12,
+            "acts": 16,
+            "ground": 16
+          },
+          "strike:stone_small|stick": {
+            "acts": 109,
+            "ground": 64,
+            "pools": 291,
+            "weather": 330,
+            "held": 232,
+            "position": 49,
+            "worn": 5,
+            "injury": 15
+          },
+          "strike:stone_small|stone_heavy": {
+            "pools": 6,
+            "weather": 14,
+            "held": 9,
+            "ground": 10
+          },
+          "strike:stone_small|stone_small": {
+            "acts": 7,
+            "ground": 7,
+            "held": 1,
+            "pools": 7,
+            "weather": 9
+          },
+          "strike:stone_small|wood_short": {
+            "ground": 166,
+            "held": 159,
+            "weather": 184,
+            "acts": 144,
+            "pools": 174,
+            "position": 169
+          },
+          "twist:strands|held": {
+            "held": 755,
+            "weather": 759,
+            "acts": 744,
+            "ground": 617,
+            "pools": 731,
+            "position": 436,
+            "injury": 24,
+            "geometry": 247
+          },
+          "wear:surface|held": {
+            "acts": 36,
+            "ground": 37,
+            "pools": 44,
+            "weather": 66,
+            "held": 59,
+            "position": 18
+          }
+        },
+        "consistency_errors": 0
+      },
+      "prior_ledger_matches": true,
+      "prior_fingerprint_matches": true
+    },
+    {
+      "seed": "agentus-g10-4-01",
+      "days": 365,
+      "fingerprint": "0280883ba8add526e82df4fc45fc321f0ee2fb417550a2775a512ed3bca8c9fb",
+      "ledger_digest": "8377b57a2b34cec30c8acf5cca30199e5afdc542baad9ba34298a0a7b5f7bf24",
+      "ledger_valid": true,
+      "conservation": {
+        "element_rel_error": 1.8909824867730558e-15,
+        "water_rel_error": 2.2116836614359775e-15,
+        "lithic_abs_error_kg": 0.0
+      },
+      "audit": {
+        "calls": {
+          "choose_calls": 3272,
+          "frontier_stage_reached": 2993,
+          "early:ordinary_novelty": 276,
+          "early:imitation_tries": 3
+        },
+        "option_decisions": {
+          "apply_force:woody|none": {
+            "untried_single_action": 312,
+            "physical_state_mismatch": 982,
+            "preempted:ordinary_novelty": 131,
+            "preempted:imitation_tries": 1,
+            "no_retained_attempt": 977
+          },
+          "arrange:loose_wood|none": {
+            "untried_single_action": 205,
+            "physical_state_mismatch": 166,
+            "no_retained_attempt": 41,
+            "preempted:ordinary_novelty": 9
+          },
+          "bind:bound_bundle+stone_heavy|strand": {
+            "untried_single_action": 51
+          },
+          "bind:bound_bundle+wood_short|strand": {
+            "untried_single_action": 18,
+            "physical_state_mismatch": 13,
+            "preempted:ordinary_novelty": 1
+          },
+          "bind:bound_stone_small_on_stick+stone_small|strand": {
+            "untried_single_action": 7,
+            "physical_state_mismatch": 2,
+            "preempted:ordinary_novelty": 2
+          },
+          "bind:stick+stick|strand": {
+            "untried_single_action": 39
+          },
+          "bind:stick+stone_heavy|strand": {
+            "untried_single_action": 6
+          },
+          "bind:stick+stone_small|strand": {
+            "untried_single_action": 19,
+            "physical_state_mismatch": 91,
+            "preempted:ordinary_novelty": 3,
+            "no_retained_attempt": 8
+          },
+          "bind:stone_heavy+stick|strand": {
+            "untried_single_action": 25,
+            "physical_state_mismatch": 1,
+            "preempted:ordinary_novelty": 1,
+            "no_retained_attempt": 104
+          },
+          "bind:stone_heavy+wood_short|strand": {
+            "untried_single_action": 5,
+            "physical_state_mismatch": 30,
+            "preempted:ordinary_novelty": 2
+          },
+          "bind:stone_small+stick|strand": {
+            "untried_single_action": 11
+          },
+          "bind:stone_small+wood_short|strand": {
+            "untried_single_action": 48,
+            "physical_state_mismatch": 10,
+            "preempted:ordinary_novelty": 3,
+            "no_retained_attempt": 58
+          },
+          "break:woody|none": {
+            "untried_single_action": 275,
+            "physical_state_mismatch": 448,
+            "preempted:ordinary_novelty": 79,
+            "preempted:imitation_tries": 1,
+            "no_retained_attempt": 757
+          },
+          "cut:fresh_tissue|bound_stone_small_on_stick": {
+            "untried_single_action": 3
+          },
+          "cut:fresh_tissue|none": {
+            "untried_single_action": 4
+          },
+          "cut:fresh_tissue|stone_small": {
+            "untried_single_action": 3
+          },
+          "cut:woody|bound_bundle": {
+            "untried_single_action": 59,
+            "physical_state_mismatch": 38,
+            "preempted:ordinary_novelty": 4
+          },
+          "cut:woody|bound_stone_small_on_stick": {
+            "untried_single_action": 29
+          },
+          "cut:woody|stone_heavy": {
+            "untried_single_action": 86,
+            "preempted:ordinary_novelty": 8,
+            "physical_state_mismatch": 37,
+            "no_retained_attempt": 2
+          },
+          "cut:woody|stone_small": {
+            "untried_single_action": 46,
+            "preempted:ordinary_novelty": 15,
+            "physical_state_mismatch": 135,
+            "preempted:imitation_tries": 1,
+            "no_retained_attempt": 144
+          },
+          "grasp:bound_bundle|none": {
+            "untried_single_action": 3
+          },
+          "grasp:bound_stone_small_on_stick|none": {
+            "untried_single_action": 31,
+            "physical_state_mismatch": 2
+          },
+          "grasp:stick|none": {
+            "untried_single_action": 65,
+            "no_retained_attempt": 18
+          },
+          "grasp:stone_edged|none": {
+            "untried_single_action": 18
+          },
+          "grasp:stone_heavy|none": {
+            "untried_single_action": 172,
+            "physical_state_mismatch": 241,
+            "preempted:ordinary_novelty": 51,
+            "no_retained_attempt": 285,
+            "preempted:imitation_tries": 1
+          },
+          "grasp:stone_small|none": {
+            "untried_single_action": 214,
+            "physical_state_mismatch": 244,
+            "preempted:ordinary_novelty": 40,
+            "no_retained_attempt": 331
+          },
+          "grasp:strand_bark|none": {
+            "untried_single_action": 149,
+            "physical_state_mismatch": 58,
+            "preempted:ordinary_novelty": 7,
+            "no_retained_attempt": 99
+          },
+          "grasp:strand_plant|none": {
+            "untried_single_action": 94,
+            "physical_state_mismatch": 7,
+            "preempted:ordinary_novelty": 5,
+            "no_retained_attempt": 16
+          },
+          "grasp:surface|none": {
+            "untried_single_action": 103,
+            "physical_state_mismatch": 298,
+            "preempted:ordinary_novelty": 13,
+            "no_retained_attempt": 305
+          },
+          "grasp:wood_short|none": {
+            "untried_single_action": 103,
+            "physical_state_mismatch": 5,
+            "preempted:ordinary_novelty": 2
+          },
+          "interlace:strands|held": {
+            "untried_single_action": 164,
+            "physical_state_mismatch": 33,
+            "preempted:ordinary_novelty": 3,
+            "no_retained_attempt": 32
+          },
+          "move:local_negative_x|none": {
+            "untried_single_action": 265,
+            "physical_state_mismatch": 1417,
+            "preempted:ordinary_novelty": 227,
+            "no_retained_attempt": 1349,
+            "preempted:imitation_tries": 1
+          },
+          "move:local_negative_y|none": {
+            "untried_single_action": 264,
+            "physical_state_mismatch": 871,
+            "preempted:ordinary_novelty": 220,
+            "preempted:imitation_tries": 3,
+            "no_retained_attempt": 1793
+          },
+          "move:local_positive_x|none": {
+            "untried_single_action": 382,
+            "physical_state_mismatch": 864,
+            "preempted:ordinary_novelty": 136,
+            "no_retained_attempt": 1101,
+            "preempted:imitation_tries": 1
+          },
+          "move:local_positive_y|none": {
+            "untried_single_action": 184,
+            "physical_state_mismatch": 1314,
+            "preempted:ordinary_novelty": 233,
+            "preempted:imitation_tries": 3,
+            "no_retained_attempt": 1538
+          },
+          "release:bound_bundle|none": {
+            "untried_single_action": 1,
+            "physical_state_mismatch": 95,
+            "preempted:ordinary_novelty": 22,
+            "no_retained_attempt": 167
+          },
+          "release:bound_stone_small_on_stick|none": {
+            "untried_single_action": 47
+          },
+          "release:stick|none": {
+            "untried_single_action": 137,
+            "physical_state_mismatch": 186,
+            "preempted:ordinary_novelty": 22,
+            "no_retained_attempt": 350
+          },
+          "release:stone_heavy|none": {
+            "untried_single_action": 87,
+            "physical_state_mismatch": 97,
+            "preempted:ordinary_novelty": 34,
+            "no_retained_attempt": 346
+          },
+          "release:stone_small|none": {
+            "untried_single_action": 235,
+            "physical_state_mismatch": 97,
+            "preempted:ordinary_novelty": 33,
+            "no_retained_attempt": 436,
+            "preempted:imitation_tries": 1
+          },
+          "release:strand_bark|none": {
+            "untried_single_action": 165,
+            "physical_state_mismatch": 698,
+            "preempted:ordinary_novelty": 75,
+            "preempted:imitation_tries": 1,
+            "no_retained_attempt": 790
+          },
+          "release:strand_plant|none": {
+            "untried_single_action": 296,
+            "physical_state_mismatch": 1671,
+            "preempted:ordinary_novelty": 277,
+            "no_retained_attempt": 1188
+          },
+          "release:surface|none": {
+            "untried_single_action": 87,
+            "physical_state_mismatch": 23,
+            "preempted:ordinary_novelty": 5,
+            "no_retained_attempt": 20
+          },
+          "release:surface|worn": {
+            "untried_single_action": 93,
+            "physical_state_mismatch": 81,
+            "preempted:ordinary_novelty": 2,
+            "no_retained_attempt": 1
+          },
+          "release:wood_short|none": {
+            "untried_single_action": 166,
+            "physical_state_mismatch": 185,
+            "preempted:ordinary_novelty": 9,
+            "no_retained_attempt": 260
+          },
+          "rotate:arranged_wood_-90|none": {
+            "untried_single_action": 135,
+            "physical_state_mismatch": 241,
+            "preempted:ordinary_novelty": 7,
+            "no_retained_attempt": 63
+          },
+          "rotate:arranged_wood_90|none": {
+            "untried_single_action": 162,
+            "physical_state_mismatch": 235,
+            "preempted:ordinary_novelty": 4,
+            "no_retained_attempt": 45
+          },
+          "separate:arranged_wood|none": {
+            "untried_single_action": 113,
+            "physical_state_mismatch": 180,
+            "preempted:ordinary_novelty": 11,
+            "no_retained_attempt": 142
+          },
+          "separate:bark|bound_bundle": {
+            "untried_single_action": 6,
+            "physical_state_mismatch": 99,
+            "preempted:ordinary_novelty": 10,
+            "no_retained_attempt": 71
+          },
+          "separate:bark|bound_stone_small_on_stick": {
+            "untried_single_action": 37
+          },
+          "separate:bark|none": {
+            "untried_single_action": 355,
+            "physical_state_mismatch": 1008,
+            "preempted:ordinary_novelty": 121,
+            "preempted:imitation_tries": 1,
+            "no_retained_attempt": 708
+          },
+          "separate:bark|stone_heavy": {
+            "untried_single_action": 166,
+            "preempted:ordinary_novelty": 26,
+            "physical_state_mismatch": 171,
+            "no_retained_attempt": 77
+          },
+          "separate:bark|stone_small": {
+            "untried_single_action": 132,
+            "preempted:ordinary_novelty": 27,
+            "physical_state_mismatch": 244,
+            "preempted:imitation_tries": 1,
+            "no_retained_attempt": 135
+          },
+          "separate:plant_tissue|none": {
+            "untried_single_action": 257,
+            "physical_state_mismatch": 1133,
+            "preempted:ordinary_novelty": 228,
+            "no_retained_attempt": 1516,
+            "preempted:imitation_tries": 1
+          },
+          "separate:strand_bark|held": {
+            "untried_single_action": 169,
+            "physical_state_mismatch": 631,
+            "preempted:ordinary_novelty": 42,
+            "no_retained_attempt": 303
+          },
+          "separate:strand_plant|held": {
+            "untried_single_action": 281,
+            "physical_state_mismatch": 1279,
+            "preempted:ordinary_novelty": 205,
+            "no_retained_attempt": 848
+          },
+          "separate:tendon|bound_stone_small_on_stick": {
+            "untried_single_action": 3
+          },
+          "separate:tendon|none": {
+            "untried_single_action": 4
+          },
+          "separate:tendon|stone_small": {
+            "untried_single_action": 3
+          },
+          "strike:animal_browser|none": {
+            "untried_single_action": 21,
+            "physical_state_mismatch": 43,
+            "no_retained_attempt": 6,
+            "preempted:ordinary_novelty": 1
+          },
+          "strike:animal_browser|stick": {
+            "untried_single_action": 13,
+            "physical_state_mismatch": 10
+          },
+          "strike:animal_browser|stone_heavy": {
+            "untried_single_action": 11
+          },
+          "strike:animal_browser|wood_short": {
+            "untried_single_action": 22
+          },
+          "strike:animal_grazer|bound_stone_small_on_stick": {
+            "untried_single_action": 2
+          },
+          "strike:animal_grazer|none": {
+            "untried_single_action": 32
+          },
+          "strike:animal_grazer|stone_small": {
+            "untried_single_action": 7,
+            "physical_state_mismatch": 1
+          },
+          "strike:animal_grazer|wood_short": {
+            "untried_single_action": 1
+          },
+          "strike:animal_stalker|bound_stone_small_on_stick": {
+            "untried_single_action": 3
+          },
+          "strike:animal_stalker|none": {
+            "untried_single_action": 20,
+            "physical_state_mismatch": 2,
+            "no_retained_attempt": 3
+          },
+          "strike:animal_stalker|stone_small": {
+            "untried_single_action": 7
+          },
+          "strike:stone_heavy|bound_bundle": {
+            "untried_single_action": 12,
+            "preempted:ordinary_novelty": 9,
+            "physical_state_mismatch": 16,
+            "no_retained_attempt": 21
+          },
+          "strike:stone_heavy|bound_stone_small_on_stick": {
+            "untried_single_action": 53,
+            "preempted:ordinary_novelty": 2
+          },
+          "strike:stone_heavy|stick": {
+            "untried_single_action": 181,
+            "physical_state_mismatch": 74,
+            "preempted:ordinary_novelty": 5,
+            "no_retained_attempt": 27
+          },
+          "strike:stone_heavy|stone_heavy": {
+            "untried_single_action": 67,
+            "physical_state_mismatch": 3,
+            "preempted:ordinary_novelty": 2
+          },
+          "strike:stone_heavy|stone_small": {
+            "untried_single_action": 49,
+            "physical_state_mismatch": 171,
+            "preempted:ordinary_novelty": 28,
+            "no_retained_attempt": 8
+          },
+          "strike:stone_heavy|wood_short": {
+            "untried_single_action": 146,
+            "physical_state_mismatch": 2
+          },
+          "strike:stone_small|bound_bundle": {
+            "untried_single_action": 20
+          },
+          "strike:stone_small|bound_stone_small_on_stick": {
+            "untried_single_action": 13
+          },
+          "strike:stone_small|stick": {
+            "untried_single_action": 144,
+            "physical_state_mismatch": 200,
+            "preempted:ordinary_novelty": 11,
+            "no_enabled_successor": 3,
+            "no_retained_attempt": 181
+          },
+          "strike:stone_small|stone_heavy": {
+            "untried_single_action": 87,
+            "physical_state_mismatch": 128,
+            "preempted:ordinary_novelty": 21,
+            "no_retained_attempt": 182
+          },
+          "strike:stone_small|stone_small": {
+            "untried_single_action": 122,
+            "preempted:ordinary_novelty": 8,
+            "physical_state_mismatch": 115,
+            "no_retained_attempt": 48,
+            "no_enabled_successor": 1
+          },
+          "strike:stone_small|wood_short": {
+            "untried_single_action": 135,
+            "physical_state_mismatch": 69
+          },
+          "twist:strands|held": {
+            "untried_single_action": 205,
+            "preempted:ordinary_novelty": 105,
+            "physical_state_mismatch": 756,
+            "no_retained_attempt": 558
+          },
+          "wear:surface|held": {
+            "untried_single_action": 114,
+            "physical_state_mismatch": 20,
+            "preempted:ordinary_novelty": 1
+          }
+        },
+        "closest_same_action_mismatch_fields": {
+          "apply_force:woody|none": {
+            "pools": 969,
+            "weather": 973,
+            "held": 810,
+            "acts": 965,
+            "position": 418,
+            "geometry": 225,
+            "ground": 686,
+            "injury": 14,
+            "worn": 55
+          },
+          "arrange:loose_wood|none": {
+            "acts": 128,
+            "ground": 35,
+            "held": 155,
+            "pools": 146,
+            "position": 72,
+            "weather": 163,
+            "geometry": 151,
+            "worn": 25
+          },
+          "bind:bound_bundle+wood_short|strand": {
+            "acts": 13,
+            "geometry": 8,
+            "ground": 13,
+            "held": 13,
+            "pools": 9,
+            "weather": 13,
+            "position": 12
+          },
+          "bind:bound_stone_small_on_stick+stone_small|strand": {
+            "acts": 2,
+            "ground": 2,
+            "pools": 2,
+            "weather": 1
+          },
+          "bind:stick+stone_small|strand": {
+            "acts": 91,
+            "ground": 91,
+            "weather": 91,
+            "held": 89,
+            "pools": 81,
+            "position": 52
+          },
+          "bind:stone_heavy+stick|strand": {
+            "held": 1,
+            "weather": 1
+          },
+          "bind:stone_heavy+wood_short|strand": {
+            "acts": 24,
+            "ground": 28,
+            "held": 28,
+            "pools": 23,
+            "weather": 30,
+            "geometry": 17,
+            "position": 3
+          },
+          "bind:stone_small+wood_short|strand": {
+            "acts": 10,
+            "ground": 10,
+            "pools": 10,
+            "weather": 10,
+            "held": 2,
+            "position": 2
+          },
+          "break:woody|none": {
+            "acts": 442,
+            "ground": 397,
+            "pools": 417,
+            "weather": 443,
+            "held": 367,
+            "geometry": 35,
+            "injury": 17,
+            "position": 266,
+            "worn": 70
+          },
+          "cut:woody|bound_bundle": {
+            "acts": 38,
+            "geometry": 38,
+            "ground": 38,
+            "held": 38,
+            "pools": 38,
+            "position": 38,
+            "weather": 38
+          },
+          "cut:woody|stone_heavy": {
+            "acts": 37,
+            "ground": 37,
+            "held": 37,
+            "weather": 37,
+            "pools": 18,
+            "position": 12,
+            "geometry": 8
+          },
+          "cut:woody|stone_small": {
+            "acts": 135,
+            "ground": 129,
+            "held": 134,
+            "weather": 134,
+            "pools": 133,
+            "geometry": 70,
+            "position": 43
+          },
+          "grasp:bound_stone_small_on_stick|none": {
+            "ground": 2,
+            "held": 2,
+            "weather": 2
+          },
+          "grasp:stone_heavy|none": {
+            "weather": 240,
+            "acts": 193,
+            "held": 178,
+            "ground": 211,
+            "position": 76,
+            "injury": 4,
+            "pools": 215
+          },
+          "grasp:stone_small|none": {
+            "acts": 214,
+            "ground": 215,
+            "held": 217,
+            "pools": 210,
+            "weather": 240,
+            "injury": 40,
+            "position": 93,
+            "geometry": 9
+          },
+          "grasp:strand_bark|none": {
+            "acts": 58,
+            "geometry": 58,
+            "ground": 58,
+            "held": 58,
+            "pools": 58,
+            "weather": 58,
+            "position": 40
+          },
+          "grasp:strand_plant|none": {
+            "ground": 7,
+            "held": 7,
+            "pools": 7,
+            "weather": 7,
+            "acts": 6,
+            "position": 1
+          },
+          "grasp:surface|none": {
+            "weather": 298,
+            "ground": 278,
+            "pools": 280,
+            "acts": 256,
+            "held": 232,
+            "injury": 3,
+            "position": 56,
+            "geometry": 12
+          },
+          "grasp:wood_short|none": {
+            "acts": 5,
+            "ground": 5,
+            "held": 5,
+            "pools": 5,
+            "position": 5,
+            "weather": 4
+          },
+          "interlace:strands|held": {
+            "acts": 33,
+            "ground": 23,
+            "held": 33,
+            "pools": 33,
+            "position": 33,
+            "weather": 32,
+            "injury": 5
+          },
+          "move:local_negative_x|none": {
+            "position": 1144,
+            "weather": 1401,
+            "acts": 1338,
+            "ground": 1206,
+            "held": 1311,
+            "pools": 1141,
+            "injury": 92,
+            "worn": 10,
+            "geometry": 273
+          },
+          "move:local_negative_y|none": {
+            "position": 771,
+            "weather": 868,
+            "acts": 829,
+            "ground": 745,
+            "held": 822,
+            "injury": 92,
+            "pools": 734,
+            "worn": 10,
+            "geometry": 74
+          },
+          "move:local_positive_x|none": {
+            "position": 764,
+            "weather": 857,
+            "held": 832,
+            "acts": 776,
+            "ground": 720,
+            "pools": 736,
+            "worn": 84,
+            "geometry": 89,
+            "injury": 20
+          },
+          "move:local_positive_y|none": {
+            "position": 1078,
+            "weather": 1297,
+            "acts": 1258,
+            "ground": 904,
+            "injury": 131,
+            "pools": 1154,
+            "held": 1083,
+            "worn": 84,
+            "geometry": 182
+          },
+          "release:bound_bundle|none": {
+            "acts": 95,
+            "held": 95,
+            "pools": 95,
+            "weather": 93,
+            "ground": 94,
+            "injury": 3,
+            "geometry": 38,
+            "position": 81
+          },
+          "release:stick|none": {
+            "acts": 185,
+            "ground": 186,
+            "held": 153,
+            "pools": 142,
+            "weather": 186,
+            "position": 11,
+            "geometry": 4
+          },
+          "release:stone_heavy|none": {
+            "held": 79,
+            "pools": 96,
+            "weather": 97,
+            "acts": 75,
+            "ground": 50,
+            "geometry": 8
+          },
+          "release:stone_small|none": {
+            "acts": 97,
+            "geometry": 9,
+            "ground": 93,
+            "held": 97,
+            "pools": 97,
+            "position": 41,
+            "weather": 96
+          },
+          "release:strand_bark|none": {
+            "acts": 672,
+            "geometry": 261,
+            "ground": 451,
+            "held": 682,
+            "pools": 601,
+            "position": 163,
+            "weather": 696
+          },
+          "release:strand_plant|none": {
+            "acts": 1450,
+            "ground": 1286,
+            "held": 1635,
+            "weather": 1643,
+            "pools": 1379,
+            "position": 809,
+            "injury": 33,
+            "geometry": 73,
+            "worn": 8
+          },
+          "release:surface|none": {
+            "held": 23,
+            "pools": 22,
+            "weather": 23,
+            "acts": 21,
+            "position": 17,
+            "ground": 12,
+            "geometry": 4
+          },
+          "release:surface|worn": {
+            "pools": 81,
+            "weather": 81,
+            "worn": 43,
+            "acts": 64,
+            "geometry": 64
+          },
+          "release:wood_short|none": {
+            "ground": 184,
+            "held": 164,
+            "pools": 177,
+            "weather": 185,
+            "acts": 171,
+            "position": 38,
+            "geometry": 18
+          },
+          "rotate:arranged_wood_-90|none": {
+            "geometry": 241,
+            "held": 155,
+            "pools": 210,
+            "weather": 240,
+            "acts": 149,
+            "injury": 1,
+            "position": 107,
+            "ground": 134,
+            "worn": 33
+          },
+          "rotate:arranged_wood_90|none": {
+            "ground": 146,
+            "held": 152,
+            "pools": 128,
+            "weather": 233,
+            "acts": 158,
+            "position": 38,
+            "geometry": 84,
+            "worn": 37
+          },
+          "separate:arranged_wood|none": {
+            "geometry": 173,
+            "ground": 128,
+            "pools": 97,
+            "weather": 180,
+            "acts": 158,
+            "held": 166,
+            "position": 125,
+            "worn": 7
+          },
+          "separate:bark|bound_bundle": {
+            "held": 99,
+            "weather": 99,
+            "acts": 82,
+            "ground": 62,
+            "pools": 86,
+            "geometry": 66,
+            "position": 32
+          },
+          "separate:bark|none": {
+            "acts": 889,
+            "ground": 620,
+            "held": 970,
+            "weather": 1000,
+            "pools": 850,
+            "geometry": 161,
+            "injury": 14,
+            "position": 566,
+            "worn": 41
+          },
+          "separate:bark|stone_heavy": {
+            "acts": 154,
+            "ground": 158,
+            "held": 171,
+            "weather": 170,
+            "pools": 127,
+            "geometry": 84,
+            "position": 90
+          },
+          "separate:bark|stone_small": {
+            "acts": 244,
+            "ground": 186,
+            "held": 244,
+            "weather": 244,
+            "pools": 217,
+            "geometry": 70,
+            "position": 90
+          },
+          "separate:plant_tissue|none": {
+            "acts": 1123,
+            "held": 1081,
+            "weather": 1125,
+            "ground": 941,
+            "position": 647,
+            "pools": 904,
+            "injury": 22,
+            "worn": 59,
+            "geometry": 41
+          },
+          "separate:strand_bark|held": {
+            "held": 631,
+            "weather": 627,
+            "position": 289,
+            "pools": 519,
+            "geometry": 117,
+            "acts": 576,
+            "ground": 485
+          },
+          "separate:strand_plant|held": {
+            "acts": 1193,
+            "held": 1279,
+            "weather": 1269,
+            "ground": 1145,
+            "pools": 1049,
+            "position": 826,
+            "injury": 169,
+            "geometry": 49,
+            "worn": 11
+          },
+          "strike:animal_browser|none": {
+            "acts": 43,
+            "held": 38,
+            "pools": 42,
+            "position": 23,
+            "weather": 43,
+            "ground": 35
+          },
+          "strike:animal_browser|stick": {
+            "held": 8,
+            "pools": 10,
+            "weather": 10,
+            "acts": 1,
+            "position": 1
+          },
+          "strike:animal_grazer|stone_small": {
+            "acts": 1,
+            "ground": 1,
+            "held": 1,
+            "pools": 1,
+            "position": 1,
+            "weather": 1
+          },
+          "strike:animal_stalker|none": {
+            "acts": 2,
+            "ground": 2,
+            "held": 2,
+            "position": 2,
+            "weather": 2
+          },
+          "strike:stone_heavy|bound_bundle": {
+            "acts": 16,
+            "ground": 11,
+            "held": 16,
+            "position": 16,
+            "weather": 16,
+            "pools": 4
+          },
+          "strike:stone_heavy|stick": {
+            "weather": 74,
+            "acts": 70,
+            "position": 58,
+            "ground": 62,
+            "held": 68,
+            "pools": 72
+          },
+          "strike:stone_heavy|stone_heavy": {
+            "ground": 3,
+            "held": 3,
+            "weather": 3
+          },
+          "strike:stone_heavy|stone_small": {
+            "acts": 149,
+            "ground": 138,
+            "pools": 148,
+            "weather": 166,
+            "position": 105,
+            "held": 98
+          },
+          "strike:stone_heavy|wood_short": {
+            "held": 2,
+            "weather": 2
+          },
+          "strike:stone_small|stick": {
+            "ground": 172,
+            "held": 152,
+            "weather": 199,
+            "pools": 91,
+            "acts": 117,
+            "geometry": 10,
+            "position": 93
+          },
+          "strike:stone_small|stone_heavy": {
+            "ground": 128,
+            "weather": 118,
+            "pools": 86,
+            "acts": 90,
+            "geometry": 65,
+            "held": 82,
+            "position": 58
+          },
+          "strike:stone_small|stone_small": {
+            "acts": 111,
+            "ground": 108,
+            "held": 113,
+            "position": 54,
+            "weather": 115,
+            "pools": 82
+          },
+          "strike:stone_small|wood_short": {
+            "weather": 69,
+            "acts": 64,
+            "ground": 38,
+            "held": 64,
+            "pools": 63
+          },
+          "twist:strands|held": {
+            "acts": 712,
+            "ground": 700,
+            "held": 756,
+            "position": 349,
+            "weather": 744,
+            "pools": 669,
+            "injury": 97,
+            "geometry": 54
+          },
+          "wear:surface|held": {
+            "acts": 5,
+            "ground": 5,
+            "held": 20,
+            "pools": 9,
+            "position": 20,
+            "weather": 20
+          }
+        },
+        "consistency_errors": 0
+      },
+      "prior_ledger_matches": true,
+      "prior_fingerprint_matches": true
+    }
+  ]
+}
