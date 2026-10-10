@@ -211,6 +211,8 @@ class GenesisSimulation:
                 if config.agentus_transition_model != "none":
                     human_state = dict(human_state)
                     human_state["transition_model"] = config.agentus_transition_model
+                if config.agentus_frontier_state_enabled:
+                    human_state["frontier_state_model"] = "procedural-frontier-v1"
                 if config.solid_food_active:
                     human_state = dict(human_state)
                     human_state["caregiving_model"] = config.caregiving_model

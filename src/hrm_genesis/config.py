@@ -27,6 +27,8 @@ class GenesisConfig:
     agentus_capacities_enabled: bool = False
     # Write-only, bounded own-experience model; legacy fingerprints omit "none".
     agentus_transition_model: str = "none"
+    # Opt-in V4 frontier recognition consistent with procedural planning.
+    agentus_frontier_state_enabled: bool = False
     # Opt-in physical placement; absent/False preserves historical fingerprints.
     agentus_subcell_position_enabled: bool = False
     # Opt-in costed local movement, material placement and surface joining.
@@ -147,6 +149,8 @@ class GenesisConfig:
             raise ValueError("unknown agentus_transition_model")
         if self.agentus_transition_model != "none" and not self.agentus_capacities_enabled:
             raise ValueError("agentus_transition_model requires agentus_capacities_enabled")
+        if self.agentus_frontier_state_enabled and self.agentus_transition_model != "experienced-transitions-v4":
+            raise ValueError("frontier state recognition requires experienced-transitions-v4")
         if self.agentus_transition_model in {"experienced-transitions-v2", "experienced-transitions-v3", "experienced-transitions-v4"} and self.child_energy_store != "size-scaled-v1":
             raise ValueError("valued transitions require size-scaled-v1 energy accounting")
         if self.agentus_physiology_version not in {"reference-v1", "reference-v2"}:
@@ -254,6 +258,8 @@ class GenesisConfig:
             canonical["agentus_capacity_ablation"] = self.agentus_capacity_ablation
         if self.agentus_transition_model != "none":
             canonical["agentus_transition_model"] = self.agentus_transition_model
+        if self.agentus_frontier_state_enabled:
+            canonical["agentus_frontier_state"] = "procedural-frontier-v1"
         if self.thirst_planning_active:
             canonical["agentus_thirst_enabled"] = True
         if self.agentus_capacities_enabled and self.agentus_observation_model != "g10.4-legacy":

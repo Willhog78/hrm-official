@@ -47,6 +47,15 @@ def _procedural_state(state: dict) -> str:
                       sort_keys=True, separators=(",", ":"))
 
 
+def same_procedural_state(remembered: dict, current: dict) -> bool:
+    """The V4 physical match; reserves/fatigue drift, injury stays relevant.
+
+    Uses the planning projection without changing either perceptual record.
+    Weather, access, position, material and available acts remain exact.
+    """
+    return _procedural_state(remembered) == _procedural_state(current)
+
+
 def _material_changes(edge: dict) -> set[str]:
     """Coarse perceptible aspects changed by an actual transition."""
     before, after = edge["before"], edge["after"]
