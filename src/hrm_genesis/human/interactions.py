@@ -1205,16 +1205,19 @@ def choose(ctx: Context, options: list[tuple[str, dict]], step: int, hungry: boo
         return candidates[int(ctx.draw("explore-pick", step) * len(candidates)) % len(candidates)]
     known = [o for o in options if o[0] in values]
     if sequence_state is not None:
+        matches = (transitions.same_procedural_state
+                   if ctx.humans.get("frontier_state_model") == "procedural-frontier-v1"
+                   else lambda remembered, current: remembered == current)
         all_experienced = ctx.human["cognition"].get("transition_memory", {}).get("edges", [])
         experienced = [e for e in all_experienced
-                       if e["before"] == sequence_state]
+                       if matches(e["before"], sequence_state)]
         frontier = []
         for option in known:
             outcomes = [e for e in experienced if e["act"] == option[0]]
             # A single useful downstream experience is grounds for another
             # costed test, not enough evidence for a valued plan. This second
             # exploration budget also has a finite attempt bound.
-            promising = any(future["before"] == prior["after"]
+            promising = any(matches(future["before"], prior["after"])
                             and future["act"] in prior["enabled"]
                             and float(future.get("gain_sum_basal", 0.0)) > 0.0
                             and int(future["n"]) < transitions.MIN_PLAN_EXPERIENCE
